@@ -7,6 +7,18 @@
     <groupId>org.example</groupId>
     <artifactId>generator</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <name>VISAP Generator</name>
     <url>https://github.com/softvis-research/VISAP</url>
 
@@ -15,5 +27,13 @@
         <maven.compiler.target>18</maven.compiler.target>
         <neo4j-driver.version>1.7.2</neo4j-driver.version>
     </properties>
+    <dependencies>
+        <!-- neo4j -->
+        <dependency>
+            <groupId>org.neo4j.driver</groupId>
+            <artifactId>neo4j-java-driver</artifactId>
+            <version>${neo4j-driver.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -14,7 +14,7 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class LoaderStep {
-    private static final DatabaseConnector connector = DatabaseConnector.getInstance("bolt://localhost:11020");
+    private static final DatabaseConnector connector = DatabaseConnector.getInstance("bolt://localhost:7687");
     public static void main(String[] args) {
         boolean isSilentMode = true;
         String pathToNodesCsv = "";
@@ -47,7 +47,7 @@ public class LoaderStep {
         }
 
         if (pathToNodesCsv.isEmpty() || pathToInheritanceCsv.isEmpty() || pathToReferenceCsv.isEmpty())
-                // should config stay the same?
+                // TODO: should config stay the same?
                // || (config.addMigrationFindings() && pathToMigrationFindingsNewCsv.isEmpty()))
         {
             System.out.println("Some input file wasn't found");
@@ -123,27 +123,27 @@ public class LoaderStep {
         );
 
         // 6. Upload Migration Findings NEW - for districts and buildings
-        if(config.addMigrationFindings()) {
-            System.out.println("Path to Migration Findings CSV : " + pathToMigrationFindingsNewCsv);
-            if (!isSilentMode) {
-                System.out.print("ADDING 'MIGRATION_FINDINGS' to Element-Nodes. Press any key to continue...");
-                userInput.nextLine();
-            }
-            pathToMigrationFindingsNewCsv = pathToMigrationFindingsNewCsv.replace("\\", "/");
-            connector.executeWrite(
-                    "LOAD CSV WITH HEADERS FROM \"file:///" + pathToMigrationFindingsNewCsv + "\"\n" +
-                            "AS row FIELDTERMINATOR ';'\n" +
-                            "MATCH (a:Elements {object_name: row.SUB_OBJ_NAME})\n" +
-                            "SET a.migration_findings = \"true\"\n"
-            );
-            connector.executeWrite(
-                    "LOAD CSV WITH HEADERS FROM \"file:///" + pathToMigrationFindingsNewCsv + "\"\n" +
-                            "AS row FIELDTERMINATOR ';'\n" +
-                            "MATCH (a:Elements {object_name: row.OBJ_NAME})\n" +
-                            "SET a.migration_findings = \"true\"\n"
-
-            );
-        }
+//        if(config.addMigrationFindings()) {
+//            System.out.println("Path to Migration Findings CSV : " + pathToMigrationFindingsNewCsv);
+//            if (!isSilentMode) {
+//                System.out.print("ADDING 'MIGRATION_FINDINGS' to Element-Nodes. Press any key to continue...");
+//                userInput.nextLine();
+//            }
+//            pathToMigrationFindingsNewCsv = pathToMigrationFindingsNewCsv.replace("\\", "/");
+//            connector.executeWrite(
+//                    "LOAD CSV WITH HEADERS FROM \"file:///" + pathToMigrationFindingsNewCsv + "\"\n" +
+//                            "AS row FIELDTERMINATOR ';'\n" +
+//                            "MATCH (a:Elements {object_name: row.SUB_OBJ_NAME})\n" +
+//                            "SET a.migration_findings = \"true\"\n"
+//            );
+//            connector.executeWrite(
+//                    "LOAD CSV WITH HEADERS FROM \"file:///" + pathToMigrationFindingsNewCsv + "\"\n" +
+//                            "AS row FIELDTERMINATOR ';'\n" +
+//                            "MATCH (a:Elements {object_name: row.OBJ_NAME})\n" +
+//                            "SET a.migration_findings = \"true\"\n"
+//
+//            );
+//        }
 
         /*// 6. Upload Migration Findings - only for districts
         if(config.addMigrationFindings()) {
@@ -167,7 +167,7 @@ public class LoaderStep {
 
     private static class CSVInput {
         private static List<Path> getInputCSVFiles() {
-            String path = config.getString("input.map", "src/test/neo4jexport/");
+            String path = "src/test/neo4jexport/";
             File currentDir = new File(path);
             String helper = currentDir.getAbsolutePath();
             List<Path> files = new ArrayList<>();
@@ -179,10 +179,6 @@ public class LoaderStep {
                 e.printStackTrace();
             }
             return files;
-        }
-
-        private static String getFilepath() {
-
         }
     }
 
