@@ -20,8 +20,6 @@ public class LoaderStep {
         String pathToNodesCsv = "";
         String pathToReferenceCsv = "";
         String pathToInheritanceCsv = "";
-        String pathToMigrationFindingsCsv = "";
-        String pathToMigrationFindingsNewCsv = "";
 
         Scanner userInput = new Scanner(System.in);
         System.out.print("Silent mode? (y/n): "); // Silent mode to run with default values
@@ -39,10 +37,6 @@ public class LoaderStep {
                 pathToReferenceCsv = p.toString();
             } else if (p.toString().endsWith("_Inheritance.csv")) {
                 pathToInheritanceCsv = p.toString();
-                //} else if (p.toString().endsWith("_export.csv")) {
-                //  pathToMigrationFindingsCsv = p.toString();
-            } else if (p.toString().endsWith("_rc3.0.csv")) {
-                pathToMigrationFindingsNewCsv = p.toString();
             }
         }
 
@@ -53,7 +47,6 @@ public class LoaderStep {
             System.out.println("Some input file wasn't found");
             System.exit(0);
         }
-
 
         // Make sure the graph is empty
         connector.executeWrite("MATCH (n) DETACH DELETE n;");
@@ -71,7 +64,6 @@ public class LoaderStep {
                         "CREATE (n:Elements)\n" +
                         "SET n = row"
         );
-
 
         // 2. Upload contains relations
         if (!isSilentMode) {
@@ -121,46 +113,7 @@ public class LoaderStep {
                         "MATCH (a:Elements {element_id: row.subclass_id}), (b:Elements {element_id: row.superclass_id})\n" +
                         "CREATE (a)-[r:"+ SAPRelationLabels.INHERIT +"]->(b)"
         );
-
-        // 6. Upload Migration Findings NEW - for districts and buildings
-//        if(config.addMigrationFindings()) {
-//            System.out.println("Path to Migration Findings CSV : " + pathToMigrationFindingsNewCsv);
-//            if (!isSilentMode) {
-//                System.out.print("ADDING 'MIGRATION_FINDINGS' to Element-Nodes. Press any key to continue...");
-//                userInput.nextLine();
-//            }
-//            pathToMigrationFindingsNewCsv = pathToMigrationFindingsNewCsv.replace("\\", "/");
-//            connector.executeWrite(
-//                    "LOAD CSV WITH HEADERS FROM \"file:///" + pathToMigrationFindingsNewCsv + "\"\n" +
-//                            "AS row FIELDTERMINATOR ';'\n" +
-//                            "MATCH (a:Elements {object_name: row.SUB_OBJ_NAME})\n" +
-//                            "SET a.migration_findings = \"true\"\n"
-//            );
-//            connector.executeWrite(
-//                    "LOAD CSV WITH HEADERS FROM \"file:///" + pathToMigrationFindingsNewCsv + "\"\n" +
-//                            "AS row FIELDTERMINATOR ';'\n" +
-//                            "MATCH (a:Elements {object_name: row.OBJ_NAME})\n" +
-//                            "SET a.migration_findings = \"true\"\n"
-//
-//            );
-//        }
-
-        /*// 6. Upload Migration Findings - only for districts
-        if(config.addMigrationFindings()) {
-            System.out.println("Path to Migration Findings UE CSV : " + pathToMigrationFindingsCsv);
-            if (!isSilentMode) {
-                System.out.print("ADDING 'MIGRATION_FINDINGS' to Element-Nodes. Press any key to continue...");
-                userInput.nextLine();
-            }
-            pathToMigrationFindingsCsv = pathToMigrationFindingsCsv.replace("\\", "/");
-            connector.executeWrite(
-                    "LOAD CSV WITH HEADERS FROM \"file:///" + pathToMigrationFindingsCsv + "\"\n" +
-                            "AS row FIELDTERMINATOR ';'\n" +
-                            "MATCH (a:Elements {object_name: row.Objektname})\n" +
-                            "SET a.migration_findings = \"true\""
-            );
-        }*/
-
+        
         connector.close();
         System.out.println("Loader step was completed");
     }
