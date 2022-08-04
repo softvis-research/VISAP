@@ -118,7 +118,7 @@ public class LoaderStep {
 
     private static class CSVInput {
         private static List<Path> getInputCSVFiles() {
-            String path = "src/neo4jexport/";
+            String path = config.inputCSVFilePath();
             File currentDir = new File(path);
             String helper = currentDir.getAbsolutePath();
             List<Path> files = new ArrayList<>();

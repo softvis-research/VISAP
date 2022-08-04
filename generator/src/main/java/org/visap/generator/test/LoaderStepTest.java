@@ -18,8 +18,4 @@ class LoaderStepTest {
     void boltAddressIsNotEmpty() {
         assertNotNull(config.boltAddress());
     }
-    @Test
-    void maxThreadsIs5() {
-        assertEquals(5, config.maxThreads());
-    }
 }
