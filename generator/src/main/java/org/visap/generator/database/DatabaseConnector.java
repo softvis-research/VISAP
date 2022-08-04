@@ -1,4 +1,4 @@
-package org.getaviz.generator.database;
+package org.visap.generator.database;
 
 import org.neo4j.driver.v1.AccessMode;
 import org.neo4j.driver.v1.Driver;

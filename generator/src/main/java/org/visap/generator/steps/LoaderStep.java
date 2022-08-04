@@ -1,7 +1,9 @@
-package org.getaviz.generator.steps;
+package org.visap.generator.steps;
 
-import org.getaviz.generator.abap.enums.SAPRelationLabels;
-import org.getaviz.generator.database.DatabaseConnector;
+import org.aeonbits.owner.ConfigFactory;
+import org.visap.generator.abap.enums.SAPRelationLabels;
+import org.visap.generator.database.DatabaseConnector;
+import org.visap.generator.configuration.SettingsConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +16,8 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class LoaderStep {
-    private static final DatabaseConnector connector = DatabaseConnector.getInstance("bolt://localhost:7687");
+    static SettingsConfig config = ConfigFactory.create(SettingsConfig.class);
+    private static final DatabaseConnector connector = DatabaseConnector.getInstance(config.boltAddress());
     public static void main(String[] args) {
         boolean isSilentMode = true;
         String pathToNodesCsv = "";
@@ -113,14 +116,14 @@ public class LoaderStep {
                         "MATCH (a:Elements {element_id: row.subclass_id}), (b:Elements {element_id: row.superclass_id})\n" +
                         "CREATE (a)-[r:"+ SAPRelationLabels.INHERIT +"]->(b)"
         );
-        
+
         connector.close();
         System.out.println("Loader step was completed");
     }
 
     private static class CSVInput {
         private static List<Path> getInputCSVFiles() {
-            String path = "src/test/neo4jexport/";
+            String path = "src/neo4jexport/";
             File currentDir = new File(path);
             String helper = currentDir.getAbsolutePath();
             List<Path> files = new ArrayList<>();
