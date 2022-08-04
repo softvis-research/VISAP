@@ -19,17 +19,12 @@ public class LoaderStep {
     static SettingsConfig config = ConfigFactory.create(SettingsConfig.class);
     private static final DatabaseConnector connector = DatabaseConnector.getInstance(config.boltAddress());
     public static void main(String[] args) {
-        boolean isSilentMode = true;
+        boolean isSilentMode = config.silentMode();
         String pathToNodesCsv = "";
         String pathToReferenceCsv = "";
         String pathToInheritanceCsv = "";
 
         Scanner userInput = new Scanner(System.in);
-        System.out.print("Silent mode? (y/n): "); // Silent mode to run with default values
-        String input = userInput.nextLine();
-        if (input.equals("n")) {
-            isSilentMode = false;
-        }
 
         // Get files for nodes and relations
         List<Path> files = CSVInput.getInputCSVFiles();

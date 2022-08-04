@@ -7,4 +7,5 @@ public interface SettingsConfig extends Config {
     String boltAddress();
     @DefaultValue("5")
     int maxThreads();
+    boolean silentMode();
 }
