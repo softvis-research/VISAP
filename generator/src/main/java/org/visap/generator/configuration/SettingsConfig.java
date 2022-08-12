@@ -8,4 +8,6 @@ public interface SettingsConfig extends Config {
     String inputCSVFilePath();
     @DefaultValue("true")
     boolean silentMode();
+    String neo4jUsername();
+    String neo4jPassword();
 }

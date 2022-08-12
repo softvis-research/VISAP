@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.visap.generator.configuration.SettingsConfig;
+import org.visap.generator.database.DatabaseConnector;
 
 class LoaderStepTest {
     SettingsConfig config = ConfigFactory.create(SettingsConfig.class);
@@ -17,5 +18,13 @@ class LoaderStepTest {
     @Test
     void boltAddressIsNotEmpty() {
         assertNotNull(config.boltAddress());
+    }
+
+    @Test
+    void connectionToDatabaseSucceeds() {
+        DatabaseConnector connector = DatabaseConnector.getInstance(config.boltAddress());
+        connector.executeWrite("CREATE (test)");
+        connector.executeWrite("MATCH (n) RETURN n");
+        connector.close();
     }
 }

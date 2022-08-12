@@ -39,8 +39,6 @@ public class LoaderStep {
         }
 
         if (pathToNodesCsv.isEmpty() || pathToInheritanceCsv.isEmpty() || pathToReferenceCsv.isEmpty())
-                // TODO: should config stay the same?
-               // || (config.addMigrationFindings() && pathToMigrationFindingsNewCsv.isEmpty()))
         {
             System.out.println("Some input file wasn't found");
             System.exit(0);

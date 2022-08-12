@@ -25,7 +25,7 @@
     <properties>
         <maven.compiler.source>18</maven.compiler.source>
         <maven.compiler.target>18</maven.compiler.target>
-        <neo4j-driver.version>1.7.2</neo4j-driver.version>
+        <neo4j-driver.version>4.4.9</neo4j-driver.version>
     </properties>
     <dependencies>
         <!-- neo4j -->
