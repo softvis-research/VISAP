@@ -20,7 +20,7 @@ public class SourceNodeRepository {
 
     private Log log = LogFactory.getLog(this.getClass());
     static SettingsConfig config = ConfigFactory.create(SettingsConfig.class);
-    private DatabaseConnector connector = DatabaseConnector.getInstance();
+    private DatabaseConnector connector = DatabaseConnector.getInstance(config.boltAddress());
 
     /* Node not implements comparable interface to use Sets
      *   -> use Maps with ID to Node */

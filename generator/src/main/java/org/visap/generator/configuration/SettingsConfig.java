@@ -8,4 +8,10 @@ public interface SettingsConfig extends Config {
     String inputCSVFilePath();
     @DefaultValue("true")
     boolean silentMode();
+    @DefaultValue("false")
+    boolean showMountainReferenceBuilding();
+    @DefaultValue("false")
+    boolean showSeaReferenceBuilding();
+    @DefaultValue("false")
+    boolean showCloudReferenceBuilding();
 }

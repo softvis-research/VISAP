@@ -7,17 +7,16 @@ import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.visap.generator.abap.enums.SAPRelationLabels;
 import org.visap.generator.database.DatabaseConnector;
 import org.visap.generator.configuration.SettingsConfig;
+import org.visap.generator.metropolis.steps.MetropolisCreator;
 import org.visap.generator.repository.ACityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
 
 public class CreatorStep {
     static SettingsConfig config = ConfigFactory.create(SettingsConfig.class);
-    private static DatabaseConnector connector = DatabaseConnector.getInstance(config.boltAddress());
-    private static SourceNodeRepository nodeRepository;
-    private static ACityRepository aCityRepository;
+    private static final DatabaseConnector connector = DatabaseConnector.getInstance(config.boltAddress());
 
     public static void main(String[] args) {
-        nodeRepository = new SourceNodeRepository();
+        SourceNodeRepository nodeRepository = new SourceNodeRepository();
         nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.TYPEOF, true);
@@ -25,7 +24,7 @@ public class CreatorStep {
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.REFERENCES, true);
 
-        aCityRepository = new ACityRepository();
+        ACityRepository aCityRepository = new ACityRepository();
 
         MetropolisCreator creator = new MetropolisCreator(aCityRepository, nodeRepository, config);
         creator.createRepositoryFromNodeRepository();
