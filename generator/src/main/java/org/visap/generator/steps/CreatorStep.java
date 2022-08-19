@@ -36,6 +36,6 @@ public class CreatorStep {
         aCityRepository.writeRepositoryToNeo4j();
 
         connector.close();
-        System.out.println("\nCreator step was completed\"");
+        System.out.println("\nCreator step was completed");
     }
 }
