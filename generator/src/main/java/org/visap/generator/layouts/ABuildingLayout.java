@@ -27,8 +27,6 @@ public class ABuildingLayout {
         this.chimneys = chimneys;
     }
 
-
-
     public void calculate(){
 
         ABuildingSegmentLayout buildingSegmentLayout = new ABuildingSegmentLayout(building, floors, chimneys, config);
@@ -36,7 +34,6 @@ public class ABuildingLayout {
 
         setSizeOfBuilding();
         setPositionOfBuilding();
-
     }
 
     private void setPositionOfBuilding() {
@@ -46,30 +43,27 @@ public class ABuildingLayout {
         building.setZPosition(0.0);
 
     }
-
-
     private void setSizeOfBuilding() {
-
         ACityElement.ACitySubType referenceBuildingType = building.getSubType();
 
         if(referenceBuildingType != null) {
             switch (referenceBuildingType) {
                 case Sea:
-                    building.setHeight(config.getMetropolisReferenceBuildingHeigth("seaReferenceBuilding"));
-                    building.setWidth(config.getMetropolisReferenceBuildingWidth("seaReferenceBuilding"));
-                    building.setLength(config.getMetropolisReferenceBuildingLength("seaReferenceBuilding"));
+                    building.setHeight(config.metropolisReferenceBuildingSeaHeight());
+                    building.setWidth(config.metropolisReferenceBuildingSeaWidth());
+                    building.setLength(config.metropolisReferenceBuildingSeaLength());
                     break;
 
                 case Mountain:
-                    building.setHeight(config.getMetropolisReferenceBuildingHeigth("mountainReferenceBuilding"));
-                    building.setWidth(config.getMetropolisReferenceBuildingWidth("mountainReferenceBuilding"));
-                    building.setLength(config.getMetropolisReferenceBuildingLength("mountainReferenceBuilding"));
+                    building.setHeight(config.metropolisReferenceBuildingMountainHeight());
+                    building.setWidth(config.metropolisReferenceBuildingMountainWidth());
+                    building.setLength(config.metropolisReferenceBuildingMountainLength());
                     break;
 
                 case Cloud:
-                    building.setHeight(config.getMetropolisReferenceBuildingHeigth("cloudReferenceBuilding"));
-                    building.setWidth(config.getMetropolisReferenceBuildingWidth("cloudReferenceBuilding"));
-                    building.setLength(config.getMetropolisReferenceBuildingLength("cloudReferenceBuilding"));
+                    building.setHeight(config.metropolisReferenceBuildingCloudHeight());
+                    building.setWidth(config.metropolisReferenceBuildingCloudWidth());
+                    building.setLength(config.metropolisReferenceBuildingCloudLength());
                     break;
             }
         } else {
@@ -96,7 +90,7 @@ public class ABuildingLayout {
 
     private Double calculateFloorHeightSum() {
         // no floors & no numberOfStatements => default
-        double floorHeightSum = config.getFloorHeightSum();
+        double floorHeightSum = config.abapFloorHeightSum();
 
         //no floors, but numberOfStatements
         if (floors.isEmpty()){
@@ -117,7 +111,7 @@ public class ABuildingLayout {
                     if(iteration >= 0) {
                         if (building.getSourceNodeProperty(SAPNodeProperties.creator).equals("SAP")) {
                             if (!type_name.equals(SAPNodeTypes.Attribute)) {
-                                floorHeightSum = config.getAbapStandardCodeHeight();
+                                floorHeightSum = config.abapStandardCodeHeight();
                             }
                         }
                     }
@@ -139,10 +133,10 @@ public class ABuildingLayout {
     }
 
     private double getScaledHeight(double unscaledHeight) {
-        if (unscaledHeight < config.getAbapScoMinHeight()) {
-            return config.getAbapScoMinHeight();
-        } else if (unscaledHeight > config.getAbapScoMaxHeight()) {
-            return config.getAbapScoMaxHeight();
+        if (unscaledHeight < config.abapScoMinHeight()) {
+            return config.abapScoMinHeight();
+        } else if (unscaledHeight > config.abapScoMaxHeight()) {
+            return config.abapScoMaxHeight();
         } else {
             return unscaledHeight;
         }
@@ -150,12 +144,12 @@ public class ABuildingLayout {
 
     private double getScaledHeightNew(double unscaledHeight) {
 
-        unscaledHeight = unscaledHeight / config.getACityFactorMaxHeight();
+        unscaledHeight = unscaledHeight / config.abapScoFactorMaxHeight();
 
-        if (unscaledHeight < config.getAbapScoMinHeight()) {
-            return config.getAbapScoMinHeight();
-        } else if (unscaledHeight > config.getAbapScoMaxHeight()) {
-            return config.getAbapScoMaxHeight();
+        if (unscaledHeight < config.abapScoMinHeight()) {
+            return config.abapScoMinHeight();
+        } else if (unscaledHeight > config.abapScoMaxHeight()) {
+            return config.abapScoMaxHeight();
         } else {
             return unscaledHeight;
         }
@@ -163,7 +157,7 @@ public class ABuildingLayout {
 
     private double calculateGroundAreaByChimneyAmount() {
         if (chimneys.size() < 2){
-            return config.getACityGroundAreaByChimneyAmount();
+            return config.abapGroundAreaByChimney();
         }
 
         int chimneyAmount = chimneys.size();
