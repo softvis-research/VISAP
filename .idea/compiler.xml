@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="generator" target="18" />
+      <module name="generator" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>
