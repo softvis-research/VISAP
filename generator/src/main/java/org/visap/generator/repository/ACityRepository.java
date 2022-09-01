@@ -1,10 +1,9 @@
 package org.visap.generator.repository;
 
-import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.visap.generator.abap.enums.SAPNodeProperties;
-import org.visap.generator.configuration.SettingsConfig;
+import org.visap.generator.configuration.Config;
 import org.visap.generator.database.DatabaseConnector;
 import org.neo4j.driver.Value;
 import org.neo4j.driver.types.Node;
@@ -16,8 +15,7 @@ public class ACityRepository {
 
     private Log log = LogFactory.getLog(this.getClass());
 
-    static SettingsConfig config = ConfigFactory.create(SettingsConfig.class);
-    private static final DatabaseConnector connector = DatabaseConnector.getInstance(config.boltAddress());
+    private static final DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
 
     private Map<Long, ACityElement> elementsBySourceID;
 

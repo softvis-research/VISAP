@@ -1,19 +1,16 @@
 package org.visap.generator.steps;
 
-import org.aeonbits.owner.ConfigFactory;
-
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.visap.generator.abap.enums.SAPRelationLabels;
+import org.visap.generator.configuration.Config;
 import org.visap.generator.database.DatabaseConnector;
-import org.visap.generator.configuration.SettingsConfig;
 import org.visap.generator.metropolis.steps.MetropolisCreator;
 import org.visap.generator.repository.ACityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
 
 public class CreatorStep {
-    static SettingsConfig config = ConfigFactory.create(SettingsConfig.class);
-    private static final DatabaseConnector connector = DatabaseConnector.getInstance(config.boltAddress());
+    private static final DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
 
     public static void main(String[] args) {
         SourceNodeRepository nodeRepository = new SourceNodeRepository();
@@ -26,7 +23,7 @@ public class CreatorStep {
 
         ACityRepository aCityRepository = new ACityRepository();
 
-        MetropolisCreator creator = new MetropolisCreator(aCityRepository, nodeRepository, config);
+        MetropolisCreator creator = new MetropolisCreator(aCityRepository, nodeRepository);
         creator.createRepositoryFromNodeRepository();
 
         // Delete old ACityRepository Nodes

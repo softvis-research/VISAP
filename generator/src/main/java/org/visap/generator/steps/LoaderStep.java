@@ -1,9 +1,8 @@
 package org.visap.generator.steps;
 
-import org.aeonbits.owner.ConfigFactory;
 import org.visap.generator.abap.enums.SAPRelationLabels;
+import org.visap.generator.configuration.Config;
 import org.visap.generator.database.DatabaseConnector;
-import org.visap.generator.configuration.SettingsConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,10 +15,9 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class LoaderStep {
-    static SettingsConfig config = ConfigFactory.create(SettingsConfig.class);
-    private static final DatabaseConnector connector = DatabaseConnector.getInstance(config.boltAddress());
+    private static final DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
     public static void main(String[] args) {
-        boolean isSilentMode = config.silentMode();
+        boolean isSilentMode = Config.setup.silentMode();
         String pathToNodesCsv = "";
         String pathToReferenceCsv = "";
         String pathToInheritanceCsv = "";
@@ -116,7 +114,7 @@ public class LoaderStep {
 
     private static class CSVInput {
         private static List<Path> getInputCSVFiles() {
-            String path = config.inputCSVFilePath();
+            String path = Config.setup.inputCSVFilePath();
             File currentDir = new File(path);
             String helper = currentDir.getAbsolutePath();
             List<Path> files = new ArrayList<>();

@@ -2,30 +2,25 @@ package org.visap.generator.metropolis.steps;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.visap.generator.configuration.SettingsConfig;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.visap.generator.abap.enums.SAPRelationLabels;
+import org.visap.generator.configuration.Config;
 import org.visap.generator.repository.ACityElement;
 import org.visap.generator.repository.ACityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
 import org.neo4j.driver.types.Node;
 
-import java.text.CollationElementIterator;
 import java.util.*;
 
 public class MetropolisCreator {
 
 
     private Log log = LogFactory.getLog(this.getClass());
-    private SettingsConfig config;
-
     private SourceNodeRepository nodeRepository;
     private ACityRepository repository;
 
-    public MetropolisCreator(ACityRepository aCityRepository, SourceNodeRepository sourceNodeRepository, SettingsConfig config) {
-        this.config = config;
-
+    public MetropolisCreator(ACityRepository aCityRepository, SourceNodeRepository sourceNodeRepository) {
         repository = aCityRepository;
         nodeRepository = sourceNodeRepository;
 
@@ -108,19 +103,19 @@ public class MetropolisCreator {
 
                 if (!subElements.isEmpty()) {
 
-                    if (config.showMountainReferenceBuilding()) {
+                    if (Config.visualization.showMountainReferenceBuilding()) {
                         createRefBuilding(packageDistrict, ACityElement.ACitySubType.Mountain);
                         mountainCounter++;
                     }
 
-                    if (config.showSeaReferenceBuilding()) {
+                    if (Config.visualization.showSeaReferenceBuilding()) {
                         createRefBuilding(packageDistrict, ACityElement.ACitySubType.Sea);
                         seaCounter++;
                     }
                 }
             }
 
-            if (config.showCloudReferenceBuilding()) {
+            if (Config.visualization.showCloudReferenceBuilding()) {
                 for (ACityElement subElement : subElements) { //SubElements = Class/Repo/FuGr-District
 
                     if (subElement.getType().equals(ACityElement.ACityType.District)) {

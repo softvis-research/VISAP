@@ -1,15 +1,13 @@
 package org.visap.generator.repository;
 
-import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.visap.generator.configuration.SettingsConfig;
 import org.visap.generator.abap.enums.SAPNodeLabels;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPRelationLabels;
+import org.visap.generator.configuration.Config;
 import org.visap.generator.database.DatabaseConnector;
 import org.neo4j.driver.Record;
-import org.neo4j.driver.Result;
 import org.neo4j.driver.Value;
 import org.neo4j.driver.types.Node;
 
@@ -19,8 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SourceNodeRepository {
 
     private Log log = LogFactory.getLog(this.getClass());
-    static SettingsConfig config = ConfigFactory.create(SettingsConfig.class);
-    private DatabaseConnector connector = DatabaseConnector.getInstance(config.boltAddress());
+    private DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
 
     /* Node not implements comparable interface to use Sets
      *   -> use Maps with ID to Node */

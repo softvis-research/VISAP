@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.visap.generator.configuration.Config;
-import org.visap.generator.configuration.SettingsConfig;
 import org.visap.generator.database.DatabaseConnector;
 
 class LoaderStepTest {
