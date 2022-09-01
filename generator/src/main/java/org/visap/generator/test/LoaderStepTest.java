@@ -16,7 +16,6 @@ class LoaderStepTest {
     void boltAddressIsNotEmpty() {
         assertNotNull(Config.setup.boltAddress());
     }
-
     @Test
     void connectionToDatabaseSucceeds() {
         DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
@@ -24,7 +23,6 @@ class LoaderStepTest {
         connector.executeWrite("MATCH (n) RETURN n");
         connector.close();
     }
-
     @Test
     void visualizationConfigIsLoadable() {
         assertNotNull(Config.visualization.abapFloorHeightSum());
