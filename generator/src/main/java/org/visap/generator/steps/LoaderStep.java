@@ -52,6 +52,7 @@ public class LoaderStep {
             userInput.nextLine();
         }
         pathToNodesCsv = pathToNodesCsv.replace("\\", "/");
+        pathToNodesCsv = pathToNodesCsv.replace(" ", "%20");
         connector.executeWrite(
                 "LOAD CSV WITH HEADERS FROM \"file:///" + pathToNodesCsv + "\"\n" +
                         "AS row FIELDTERMINATOR ';'\n" +
@@ -86,6 +87,7 @@ public class LoaderStep {
             userInput.nextLine();
         }
         pathToReferenceCsv = pathToReferenceCsv.replace("\\", "/");
+        pathToReferenceCsv = pathToReferenceCsv.replace(" ", "%20");
         connector.executeWrite(
                 "LOAD CSV WITH HEADERS FROM \"file:///" + pathToReferenceCsv + "\"\n" +
                         "AS row FIELDTERMINATOR ';'\n" +
@@ -101,6 +103,7 @@ public class LoaderStep {
             userInput.nextLine();
         }
         pathToInheritanceCsv = pathToInheritanceCsv.replace("\\", "/");
+        pathToInheritanceCsv = pathToInheritanceCsv.replace(" ", "%20");
         connector.executeWrite(
                 "LOAD CSV WITH HEADERS FROM \"file:///" + pathToInheritanceCsv + "\"\n" +
                         "AS row FIELDTERMINATOR ';'\n" +
