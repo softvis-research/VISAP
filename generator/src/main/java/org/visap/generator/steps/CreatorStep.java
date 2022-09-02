@@ -12,8 +12,11 @@ import org.visap.generator.repository.SourceNodeRepository;
 public class CreatorStep {
     private static final DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
 
+    private static SourceNodeRepository nodeRepository;
+    private static ACityRepository aCityRepository;
+
     public static void main(String[] args) {
-        SourceNodeRepository nodeRepository = new SourceNodeRepository();
+        nodeRepository = new SourceNodeRepository();
         nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.TYPEOF, true);
@@ -21,7 +24,7 @@ public class CreatorStep {
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.REFERENCES, true);
 
-        ACityRepository aCityRepository = new ACityRepository();
+        aCityRepository = new ACityRepository();
 
         MetropolisCreator creator = new MetropolisCreator(aCityRepository, nodeRepository);
         creator.createRepositoryFromNodeRepository();

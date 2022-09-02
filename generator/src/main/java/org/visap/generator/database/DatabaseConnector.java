@@ -44,10 +44,13 @@ public class DatabaseConnector implements AutoCloseable {
 
     public Node addNode(String statement, String parameterName) {
         Node result;
+
         try (Session session = driver.session()) {
-            try (Transaction tx = session.beginTransaction()) {
-                result = tx.run(statement + " RETURN " + parameterName).next().get(parameterName).asNode();
-            }
+            result = session.writeTransaction(tx -> {
+                Result stateResult = tx.run(statement + " RETURN " + parameterName);
+
+                return stateResult.single().get(0).asNode();
+            });
         }
         return result;
     }

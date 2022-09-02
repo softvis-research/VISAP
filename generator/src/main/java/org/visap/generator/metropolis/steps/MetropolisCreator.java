@@ -192,7 +192,6 @@ public class MetropolisCreator {
                 element.addSubElement(childElement);
                 childElement.setParentElement(element);
                 relationCounter++;
-
             }
 
             // for uses-relation
@@ -342,6 +341,4 @@ public class MetropolisCreator {
 
         return aCityElements;
     }
-
-
 }
