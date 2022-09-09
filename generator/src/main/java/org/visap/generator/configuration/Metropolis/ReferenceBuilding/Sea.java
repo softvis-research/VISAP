@@ -7,4 +7,5 @@ public interface Sea extends Config {
     double height();
     double width();
     double length();
+    boolean show();
 }

@@ -7,4 +7,5 @@ public interface Cloud extends Config {
     double width();
     double height();
     double length();
+    boolean show();
 }

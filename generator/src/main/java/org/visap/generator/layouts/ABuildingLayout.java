@@ -2,7 +2,7 @@ package org.visap.generator.layouts;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.visap.generator.configuration.SettingsConfig;
+import org.visap.generator.configuration.Config;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.visap.generator.layouts.ABuildingSegmentLayout;
@@ -13,14 +13,11 @@ import java.util.Collection;
 public class ABuildingLayout {
 
     private Log log = LogFactory.getLog(this.getClass());
-    private SettingsConfig config;
-
     private ACityElement building;
     private Collection<ACityElement> floors;
     private Collection<ACityElement> chimneys;
 
-    public ABuildingLayout(ACityElement building, Collection<ACityElement> floors, Collection<ACityElement> chimneys, SettingsConfig config) {
-        this.config = config;
+    public ABuildingLayout(ACityElement building, Collection<ACityElement> floors, Collection<ACityElement> chimneys) {
 
         this.building = building;
         this.floors = floors;
@@ -29,7 +26,7 @@ public class ABuildingLayout {
 
     public void calculate(){
 
-        ABuildingSegmentLayout buildingSegmentLayout = new ABuildingSegmentLayout(building, floors, chimneys, config);
+        ABuildingSegmentLayout buildingSegmentLayout = new ABuildingSegmentLayout(building, floors, chimneys);
         buildingSegmentLayout.calculate();
 
         setSizeOfBuilding();
@@ -49,21 +46,21 @@ public class ABuildingLayout {
         if(referenceBuildingType != null) {
             switch (referenceBuildingType) {
                 case Sea:
-                    building.setHeight(config.metropolisReferenceBuildingSeaHeight());
-                    building.setWidth(config.metropolisReferenceBuildingSeaWidth());
-                    building.setLength(config.metropolisReferenceBuildingSeaLength());
+                    building.setHeight(Config.Visualization.Metropolis.ReferenceBuilding.sea.height());
+                    building.setWidth(Config.Visualization.Metropolis.ReferenceBuilding.sea.width());
+                    building.setLength(Config.Visualization.Metropolis.ReferenceBuilding.sea.length());
                     break;
 
                 case Mountain:
-                    building.setHeight(config.metropolisReferenceBuildingMountainHeight());
-                    building.setWidth(config.metropolisReferenceBuildingMountainWidth());
-                    building.setLength(config.metropolisReferenceBuildingMountainLength());
+                    building.setHeight(Config.Visualization.Metropolis.ReferenceBuilding.mountain.height());
+                    building.setWidth(Config.Visualization.Metropolis.ReferenceBuilding.mountain.width());
+                    building.setLength(Config.Visualization.Metropolis.ReferenceBuilding.mountain.length());
                     break;
 
                 case Cloud:
-                    building.setHeight(config.metropolisReferenceBuildingCloudHeight());
-                    building.setWidth(config.metropolisReferenceBuildingCloudWidth());
-                    building.setLength(config.metropolisReferenceBuildingCloudLength());
+                    building.setHeight(Config.Visualization.Metropolis.ReferenceBuilding.cloud.height());
+                    building.setWidth(Config.Visualization.Metropolis.ReferenceBuilding.cloud.height());
+                    building.setLength(Config.Visualization.Metropolis.ReferenceBuilding.cloud.height());
                     break;
             }
         } else {

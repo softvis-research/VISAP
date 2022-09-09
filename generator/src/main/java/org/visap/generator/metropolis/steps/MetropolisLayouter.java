@@ -3,7 +3,6 @@ package org.visap.generator.metropolis.steps;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.visap.generator.configuration.Config;
-import org.visap.generator.configuration.SettingsConfig;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.layouts.ADistrictLightMapLayout;
 import org.visap.generator.layouts.ABuildingLayout;
@@ -90,12 +89,12 @@ public class MetropolisLayouter {
 
         if (config.getAbapNotInOrigin_layout() == SettingsConfiguration.NotInOriginLayout.DEFAULT) {
 
-            ADistrictLightMapLayout aDistrictLightMapLayout = new ADistrictLightMapLayout(virtualRootDistrict, districts, config);
+            ADistrictLightMapLayout aDistrictLightMapLayout = new ADistrictLightMapLayout(virtualRootDistrict, districts);
             aDistrictLightMapLayout.calculate();
 
         } else if (config.getAbapNotInOrigin_layout() == SettingsConfiguration.NotInOriginLayout.CIRCULAR) {
 
-            ADistrictCircluarLayout aDistrictLayout = new ADistrictCircluarLayout(virtualRootDistrict, districts, config);
+            ADistrictCircluarLayout aDistrictLayout = new ADistrictCircluarLayout(virtualRootDistrict, districts);
             aDistrictLayout.calculate();
         }
 
@@ -197,11 +196,11 @@ public class MetropolisLayouter {
             }
 
             //layout district
-            ADistrictLightMapLayout aBAPDistrictLightMapLayout = new ADistrictLightMapLayout(district, subElements, config);
+            ADistrictLightMapLayout aBAPDistrictLightMapLayout = new ADistrictLightMapLayout(district, subElements);
             aBAPDistrictLightMapLayout.calculate();
 
             //stack district sub elements
-            AStackLayout stackLayout = new AStackLayout(district, subElements, config);
+            AStackLayout stackLayout = new AStackLayout(district, subElements);
             stackLayout.calculate();
 
             log.info("\"" + district.getSourceNodeProperty(SAPNodeProperties.object_name) + "\"" + "-District with " + subElements.size() + " subElements layouted");
@@ -214,22 +213,22 @@ public class MetropolisLayouter {
 
         switch (referenceBuildingType) {
             case Sea:
-                referenceElement.setHeight(Config.Metropolis.ReferenceBuilding.sea.height());
-                referenceElement.setWidth(Config.Metropolis.ReferenceBuilding.sea.width());
-                referenceElement.setLength(Config.Metropolis.ReferenceBuilding.sea.length());
+                referenceElement.setHeight(Config.Visualization.Metropolis.ReferenceBuilding.sea.height());
+                referenceElement.setWidth(Config.Visualization.Metropolis.ReferenceBuilding.sea.width());
+                referenceElement.setLength(Config.Visualization.Metropolis.ReferenceBuilding.sea.length());
                 referenceElement.setYPosition(referenceElement.getHeight() / 2);
                 break;
 
             case Mountain:
-                referenceElement.setHeight(Config.Metropolis.ReferenceBuilding.mountain.height());
-                referenceElement.setWidth(Config.Metropolis.ReferenceBuilding.mountain.length());
-                referenceElement.setLength(Config.Metropolis.ReferenceBuilding.mountain.width());
+                referenceElement.setHeight(Config.Visualization.Metropolis.ReferenceBuilding.mountain.height());
+                referenceElement.setWidth(Config.Visualization.Metropolis.ReferenceBuilding.mountain.length());
+                referenceElement.setLength(Config.Visualization.Metropolis.ReferenceBuilding.mountain.width());
                 break;
 
             case Cloud:
-                referenceElement.setHeight(Config.Metropolis.ReferenceBuilding.cloud.height());
-                referenceElement.setWidth(Config.Metropolis.ReferenceBuilding.cloud.width());
-                referenceElement.setLength(Config.Metropolis.ReferenceBuilding.cloud.length());
+                referenceElement.setHeight(Config.Visualization.Metropolis.ReferenceBuilding.cloud.height());
+                referenceElement.setWidth(Config.Visualization.Metropolis.ReferenceBuilding.cloud.width());
+                referenceElement.setLength(Config.Visualization.Metropolis.ReferenceBuilding.cloud.length());
                 break;
         }
     }

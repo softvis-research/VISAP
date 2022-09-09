@@ -15,16 +15,13 @@ public class ADistrictLightMapLayout {
     //Old coding -> Refactor, generalize and maybe reimplement
 
     private Log log = LogFactory.getLog(this.getClass());
-    private SettingsConfig config;
 
     private ACityElement district;
     private Collection<ACityElement> subElements;
 
     private Map<ACityRectangle, ACityElement> rectangleElementsMap;
 
-    public ADistrictLightMapLayout(ACityElement district, Collection<ACityElement> subElements, SettingsConfig config) {
-        this.config = config;
-
+    public ADistrictLightMapLayout(ACityElement district, Collection<ACityElement> subElements) {
         this.district = district;
         this.subElements = subElements;
 
