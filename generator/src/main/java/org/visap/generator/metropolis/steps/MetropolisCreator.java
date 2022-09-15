@@ -103,19 +103,19 @@ public class MetropolisCreator {
 
                 if (!subElements.isEmpty()) {
 
-                    if (Config.visualization.showMountainReferenceBuilding()) {
+                    if (Config.Visualization.Metropolis.ReferenceBuilding.show.mountain()) {
                         createRefBuilding(packageDistrict, ACityElement.ACitySubType.Mountain);
                         mountainCounter++;
                     }
 
-                    if (Config.visualization.showSeaReferenceBuilding()) {
+                    if (Config.Visualization.Metropolis.ReferenceBuilding.show.sea()) {
                         createRefBuilding(packageDistrict, ACityElement.ACitySubType.Sea);
                         seaCounter++;
                     }
                 }
             }
 
-            if (Config.visualization.showCloudReferenceBuilding()) {
+            if (Config.Visualization.Metropolis.ReferenceBuilding.show.cloud()) {
                 for (ACityElement subElement : subElements) { //SubElements = Class/Repo/FuGr-District
 
                     if (subElement.getType().equals(ACityElement.ACityType.District)) {

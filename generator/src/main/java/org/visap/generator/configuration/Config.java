@@ -1,9 +1,10 @@
 package org.visap.generator.configuration;
 
 import org.aeonbits.owner.ConfigFactory;
-import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Cloud;
-import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Mountain;
-import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Sea;
+import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Show;
+import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Width;
+import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Height;
+import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Length;
 
 public class Config {
     public static Setup setup = ConfigFactory.create(Setup.class);
@@ -11,9 +12,11 @@ public class Config {
     public static class Visualization {
         public static class Metropolis {
             public static class ReferenceBuilding {
-                public static Sea sea = ConfigFactory.create(Sea.class);
-                public static Mountain mountain = ConfigFactory.create(Mountain.class);
-                public static Cloud cloud = ConfigFactory.create(Cloud.class);
+                public static Height height = ConfigFactory.create(Height.class);
+                public static Width width = ConfigFactory.create(Width.class);
+                public static Length length = ConfigFactory.create(Length.class);
+
+                public static Show show = ConfigFactory.create(Show.class);
             }
         }
     }

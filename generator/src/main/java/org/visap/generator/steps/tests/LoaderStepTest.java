@@ -1,4 +1,4 @@
-package org.visap.generator.test;
+package org.visap.generator.steps.tests;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,8 +22,8 @@ class LoaderStepTest {
         connector.executeWrite("MATCH (n) RETURN n");
         connector.close();
     }
-    @Test
-    void visualizationConfigIsLoadable() {
-        assertNotNull(Config.visualization.abapFloorHeightSum());
-    }
+//    @Test
+//    void visualizationConfigIsLoadable() {
+//        assertNotNull(Config.visualization.abapFloorHeightSum());
+//    }
 }
