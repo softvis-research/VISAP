@@ -5,6 +5,8 @@ import org.apache.commons.logging.LogFactory;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.layouts.ABuildingLayout;
+import org.visap.generator.layouts.DistrictLightMapLayout;
+import org.visap.generator.layouts.StackLayout;
 import org.visap.generator.repository.ACityElement;
 import org.visap.generator.repository.ACityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
@@ -37,6 +39,10 @@ public class MetropolisLayouter {
         log.info(referenceElements.size() + " reference elements loaded");
         layoutReferenceElements(referenceElements);
 
+        // layout districts
+        Collection<ACityElement> packageDistricts = repository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.District, SAPNodeProperties.type_name, "Namespace");
+        layoutDistricts(packageDistricts);
+
         // layout cloud elements
         layoutCloudModel();
     }
@@ -47,15 +53,20 @@ public class MetropolisLayouter {
         }
     }
 
-    private void layoutBuilding(ACityElement building) {
-        ABuildingLayout buildingLayout = new ABuildingLayout(building);
-        buildingLayout.calculate();
-    }
-
     private void layoutReferenceElements(Collection<ACityElement> referenceElements) {
         for (ACityElement referenceElement: referenceElements) {
             layoutReference(referenceElement);
         }
+    }
+
+    private void layoutDistricts(Collection<ACityElement> districtElements) {
+        log.info(districtElements.size() + " districts loaded");
+
+        for (ACityElement districtElement : districtElements) {
+            layoutDistrict(districtElement);
+        }
+
+        layoutVirtualRootDistrict(districtElements);
     }
 
     private void layoutCloudModel() {
@@ -90,6 +101,11 @@ public class MetropolisLayouter {
         }
     }
 
+    private void layoutBuilding(ACityElement building) {
+        ABuildingLayout buildingLayout = new ABuildingLayout(building);
+        buildingLayout.calculate();
+    }
+
     private void layoutReference(ACityElement referenceElement) {
         ACityElement.ACitySubType referenceBuildingType = referenceElement.getSubType();
 
@@ -113,5 +129,63 @@ public class MetropolisLayouter {
                 referenceElement.setLength(Config.Visualization.Metropolis.ReferenceBuilding.length.cloud());
                 break;
         }
+    }
+
+    private void layoutVirtualRootDistrict(Collection<ACityElement> districts){
+        log.info(districts.size() + " districts for virtual root district loaded");
+
+        ACityElement virtualRootDistrict = new ACityElement(ACityElement.ACityType.District);
+
+        DistrictLightMapLayout aDistrictLightMapLayout = new DistrictLightMapLayout(virtualRootDistrict, districts);
+        aDistrictLightMapLayout.calculate();
+    }
+
+    private void layoutDistrict(ACityElement district) {
+        if(isDistrictEmpty(district)){
+            layoutEmptyDistrict(district);
+
+            log.info("Empty district \"" + district.getSourceNodeProperty(SAPNodeProperties.object_name) + "\" layouted");
+        } else {
+
+            Collection<ACityElement> subElements = district.getSubElements();
+
+            // layout sub districts
+            for(ACityElement subElement : subElements){
+                if (subElement.getType() == ACityElement.ACityType.District) {
+                    layoutDistrict(subElement);
+                }
+            }
+
+            // layout district
+            DistrictLightMapLayout districtLightMapLayout = new DistrictLightMapLayout(district, subElements);
+            districtLightMapLayout.calculate();
+
+            // stack district sub elements
+            StackLayout stackLayout = new StackLayout(district, subElements);
+            stackLayout.calculate();
+
+            log.info("\"" + district.getSourceNodeProperty(SAPNodeProperties.object_name) + "\"" + "-District with " + subElements.size() + " subElements layouted");
+        }
+    }
+
+    private boolean isDistrictEmpty(ACityElement district){
+        Collection<ACityElement> subElements = district.getSubElements();
+
+        boolean isEmpty = true;
+
+        for (ACityElement subElement: subElements) {
+            if(!subElement.getType().equals(ACityElement.ACityType.Reference)){
+                isEmpty = false;
+                break;
+            }
+        }
+
+        return isEmpty;
+    }
+
+    private void layoutEmptyDistrict( ACityElement district) {
+        district.setHeight(Config.Visualization.Metropolis.district.emptyDistrictHeight());
+        district.setLength(Config.Visualization.Metropolis.district.emptyDistrictLength());
+        district.setWidth(Config.Visualization.Metropolis.district.emptyDistrictWidth());
     }
 }

@@ -7,7 +7,7 @@ import org.visap.generator.repository.ACityElement;
 
 import java.util.Collection;
 
-public class AStackLayout {
+public class StackLayout {
 
     private Log log = LogFactory.getLog(this.getClass());
 
@@ -15,7 +15,7 @@ public class AStackLayout {
     private Collection<ACityElement> stackElements;
 
 
-    public AStackLayout(ACityElement rootElement, Collection<ACityElement> stackElements){
+    public StackLayout(ACityElement rootElement, Collection<ACityElement> stackElements){
         this.rootElement = rootElement;
         this.stackElements = stackElements;
     }
