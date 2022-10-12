@@ -1,6 +1,7 @@
 package org.visap.generator.configuration;
 
 import org.aeonbits.owner.ConfigFactory;
+import org.visap.generator.configuration.Metropolis.Building;
 import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Show;
 import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Width;
 import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Height;
@@ -11,6 +12,7 @@ public class Config {
 
     public static class Visualization {
         public static class Metropolis {
+            public static Building building = ConfigFactory.create(Building.class);
             public static class ReferenceBuilding {
                 public static Height height = ConfigFactory.create(Height.class);
                 public static Width width = ConfigFactory.create(Width.class);
