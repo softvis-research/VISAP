@@ -5,8 +5,10 @@ import org.apache.commons.logging.LogFactory;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.layouts.BuildingLayout;
+import org.visap.generator.layouts.DistrictCircularLayout;
 import org.visap.generator.layouts.DistrictLightMapLayout;
 import org.visap.generator.layouts.StackLayout;
+import org.visap.generator.layouts.enums.LayoutType;
 import org.visap.generator.repository.CityElement;
 import org.visap.generator.repository.CityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
@@ -14,7 +16,6 @@ import org.visap.generator.repository.SourceNodeRepository;
 import java.util.*;
 
 public class MetropolisLayouter {
-
     private Log log = LogFactory.getLog(this.getClass());
 
     private SourceNodeRepository nodeRepository;
@@ -70,7 +71,6 @@ public class MetropolisLayouter {
     }
 
     private void layoutCloudModel() {
-
         Collection<CityElement> districtsWithFindings = repository.getElementsByTypeAndSourceProperty(
                 CityElement.CityType.District, SAPNodeProperties.migration_findings, "true"
         );
@@ -136,8 +136,13 @@ public class MetropolisLayouter {
 
         CityElement virtualRootDistrict = new CityElement(CityElement.CityType.District);
 
-        DistrictLightMapLayout aDistrictLightMapLayout = new DistrictLightMapLayout(virtualRootDistrict, districts);
-        aDistrictLightMapLayout.calculate();
+        if (Config.Visualization.Metropolis.district.layoutType() == LayoutType.CIRCULAR) {
+            DistrictCircularLayout districtCircularLayout = new DistrictCircularLayout(virtualRootDistrict, districts);
+            districtCircularLayout.calculate();
+        } else {
+            DistrictLightMapLayout districtLightMapLayout = new DistrictLightMapLayout(virtualRootDistrict, districts);
+            districtLightMapLayout.calculate();
+        }
     }
 
     private void layoutDistrict(CityElement district) {

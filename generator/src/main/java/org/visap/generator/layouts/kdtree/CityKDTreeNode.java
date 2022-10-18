@@ -8,16 +8,16 @@ import java.util.List;
  * 
  * @see <a href="http://www.blackpawn.com/texts/lightmaps/"></a>
  */
-public class ACityKDTreeNode {
-	public ACityKDTreeNode() {
+public class CityKDTreeNode {
+	public CityKDTreeNode() {
 		super();
 		this.leftChild = null;
 		this.rightChild = null;
-		this.rectangle = new ACityRectangle();
+		this.rectangle = new CityRectangle();
 		this.occupied = false;
 	}
 
-	public ACityKDTreeNode(ACityRectangle rectangle) {
+	public CityKDTreeNode(CityRectangle rectangle) {
 		super();
 		this.leftChild = null;
 		this.rightChild = null;
@@ -25,7 +25,7 @@ public class ACityKDTreeNode {
 		this.occupied = false;
 	}
 
-	public ACityKDTreeNode(ACityKDTreeNode leftChild, ACityKDTreeNode rightChild, ACityRectangle rectangle) {
+	public CityKDTreeNode(CityKDTreeNode leftChild, CityKDTreeNode rightChild, CityRectangle rectangle) {
 		super();
 		this.leftChild = leftChild;
 		this.rightChild = rightChild;
@@ -33,12 +33,12 @@ public class ACityKDTreeNode {
 		this.occupied = false;
 	}
 	
-	private ACityKDTreeNode leftChild;
-	private ACityKDTreeNode rightChild;
-	private ACityRectangle rectangle;
+	private CityKDTreeNode leftChild;
+	private CityKDTreeNode rightChild;
+	private CityRectangle rectangle;
 	private boolean occupied;
 	
-	public void isEmptyLeaf(ACityRectangle r, List<ACityKDTreeNode> list){
+	public void isEmptyLeaf(CityRectangle r, List<CityKDTreeNode> list){
 		if(this.rectangle.getWidth() >= r.getWidth() && this.rectangle.getLength() >= r.getLength() && this.occupied == false){
 			list.add(this);
 		}
@@ -49,22 +49,22 @@ public class ACityKDTreeNode {
 			this.rightChild.isEmptyLeaf(r, list);
 		}
 	}
-	public ACityKDTreeNode getLeftChild() {
+	public CityKDTreeNode getLeftChild() {
 		return leftChild;
 	}
-	public void setLeftChild(ACityKDTreeNode leftChild) {
+	public void setLeftChild(CityKDTreeNode leftChild) {
 		this.leftChild = leftChild;
 	}
-	public ACityKDTreeNode getRightChild() {
+	public CityKDTreeNode getRightChild() {
 		return rightChild;
 	}
-	public void setRightChild(ACityKDTreeNode rightChild) {
+	public void setRightChild(CityKDTreeNode rightChild) {
 		this.rightChild = rightChild;
 	}
-	public ACityRectangle getACityRectangle() {
+	public CityRectangle getCityRectangle() {
 		return rectangle;
 	}
-	public void setACityRectangle(ACityRectangle rectangle) {
+	public void setCityRectangle(CityRectangle rectangle) {
 		this.rectangle = rectangle;
 	}
 	public boolean isOccupied() {

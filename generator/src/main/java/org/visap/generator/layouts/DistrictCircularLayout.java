@@ -1,28 +1,23 @@
 package org.visap.generator.layouts;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.visap.generator.abap.enums.SAPNodeProperties;
+import org.visap.generator.configuration.Config;
+import org.visap.generator.layouts.enums.LayoutVersion;
 import org.visap.generator.layouts.kdtree.CityKDTree;
 import org.visap.generator.layouts.kdtree.CityKDTreeNode;
 import org.visap.generator.layouts.kdtree.CityRectangle;
 import org.visap.generator.repository.CityElement;
 
-import org.visap.generator.configuration.Config;
-
-import java.math.BigDecimal;
 import java.util.*;
 
-public class DistrictLightMapLayout {
-    // Old coding -> Refactor, generalize and maybe reimplement
+public class DistrictCircularLayout {
+    //Old coding -> Refactor, generalize and maybe reimplement
+    private final CityElement district;
+    private final Collection<CityElement> subElements;
 
-    private Log log = LogFactory.getLog(this.getClass());
+    private final Map<CityRectangle, CityElement> rectangleElementsMap;
 
-    private CityElement district;
-    private Collection<CityElement> subElements;
-
-    private Map<CityRectangle, CityElement> rectangleElementsMap;
-
-    public DistrictLightMapLayout(CityElement district, Collection<CityElement> subElements) {
+    public DistrictCircularLayout(CityElement district, Collection<CityElement> subElements) {
         this.district = district;
         this.subElements = subElements;
 
@@ -30,15 +25,16 @@ public class DistrictLightMapLayout {
     }
 
     public void calculate(){
+
         CityRectangle coveringCityRectangle = arrangeSubElements(subElements);
-
         setSizeOfDistrict(coveringCityRectangle);
-
         setPositionOfDistrict(coveringCityRectangle);
+
     }
 
 
     private void setSizeOfDistrict(CityRectangle coveringCityRectangle) {
+
         district.setWidth(coveringCityRectangle.getWidth());
         district.setLength(coveringCityRectangle.getLength());
         district.setHeight(Config.Visualization.Metropolis.district.districtHeight());
@@ -53,11 +49,11 @@ public class DistrictLightMapLayout {
     private void setNewPositionFromNode(CityRectangle rectangle, CityKDTreeNode fitNode) {
         CityElement element = rectangleElementsMap.get(rectangle);
 
-        double xPosition = fitNode.getCityRectangle().getCenterX();
+        double xPosition = fitNode.getCityRectangle().getCenterX();// - config.getBuildingHorizontalGap() / 2;
         double xPositionDelta = xPosition - element.getXPosition();
         element.setXPosition(xPosition);
 
-        double zPosition = fitNode.getCityRectangle().getCenterY();
+        double zPosition = fitNode.getCityRectangle().getCenterY();//- config.getBuildingHorizontalGap() / 2;
         double zPositionDelta = zPosition - element.getZPosition();
         element.setZPosition(zPosition);
 
@@ -71,44 +67,79 @@ public class DistrictLightMapLayout {
         for (CityElement element : elements) {
 
             double centerX = element.getXPosition();
-            double newXPosition = centerX + parentX + Config.Visualization.Metropolis.district.horizontalMargin();
-            element.setXPosition(newXPosition);
-
+            double centerY = element.getYPosition();
             double centerZ = element.getZPosition();
+
+            double newXPosition = centerX + parentX + Config.Visualization.Metropolis.district.horizontalMargin();
             double newZPosition = centerZ + parentZ + Config.Visualization.Metropolis.district.verticalMargin();
+
+            element.setXPosition(newXPosition);
             element.setZPosition(newZPosition);
 
             Collection<CityElement> subElements = element.getSubElements();
             if(!subElements.isEmpty()){
-                adjustPositionsOfSubSubElements(subElements, parentX,  parentZ);
+                adjustPositionsOfSubSubElements(subElements, parentX, parentZ);
             }
         }
     }
-
-
-
-
-
 
 
     /*
         Copied from CityLayout
      */
 
-    private CityRectangle arrangeSubElements(Collection<CityElement> subElements){
-
+    private CityRectangle arrangeSubElements(Collection<CityElement> subElements) {
+        // get maxArea (worst case) for root of KDTree
         CityRectangle docCityRectangle = calculateMaxAreaRoot(subElements);
         CityKDTree ptree = new CityKDTree(docCityRectangle);
 
         CityRectangle covrec = new CityRectangle();
 
-        List<CityRectangle> elements = createACityRectanglesOfElements(subElements);
+        List<CityRectangle> elements = createCityRectanglesOfElements(subElements);
         Collections.sort(elements);
         Collections.reverse(elements);
 
-        // algorithm
-        for (CityRectangle el : elements) {
+        List<CityRectangle> originSet = new ArrayList<>();
+        List<CityRectangle> customCode = new ArrayList<>();
+        List<CityRectangle> standardCode = new ArrayList<>();
 
+        // order the rectangles to the fit sets
+        for (CityRectangle element : elements) {
+
+            CityElement recElement = rectangleElementsMap.get(element);
+            CityElement.CitySubType refBuilding = recElement.getSubType();
+
+            //no sourceNode, no refBuilding
+            if (recElement.getSourceNode() == null && refBuilding == null) {
+                continue;
+            }
+
+            // for RefBuildings
+            if (recElement.getSourceNode() == null && refBuilding != null){
+                if (refBuilding == CityElement.CitySubType.Sea || refBuilding == CityElement.CitySubType.Mountain ){
+                    originSet.add(element);
+                }
+            }
+
+            // for Elements with SourceNode
+            if ( recElement.getSourceNode() != null && refBuilding == null) {
+
+                String creator = recElement.getSourceNodeProperty(SAPNodeProperties.creator);
+                String iterationString = recElement.getSourceNodeProperty(SAPNodeProperties.iteration);
+                int iteration = Integer.parseInt(iterationString);
+
+                if (iteration == 0 && (!creator.equals("SAP"))) {
+                    originSet.add(element);
+                } else if (iteration >= 1 && (!creator.equals("SAP"))) {
+                    customCode.add(element);
+                } else {
+                    standardCode.add(element);
+                }
+            }
+        }
+
+        // Light Map algorithm for the origin set
+        for (CityRectangle el : originSet) {
             Map<CityKDTreeNode, Double> preservers = new LinkedHashMap<>();
             Map<CityKDTreeNode, Double> expanders = new LinkedHashMap<>();
             CityKDTreeNode targetNode = new CityKDTreeNode();
@@ -152,18 +183,140 @@ public class DistrictLightMapLayout {
             }
         }
 
-        return covrec;
+
+        arrangeDistrictsCircular(customCode, covrec);
+        arrangeDistrictsCircular(standardCode, covrec);
+
+        return covrec; // used to adjust viewpoint in x3d
     }
 
-    private List<CityRectangle> createACityRectanglesOfElements(Collection<CityElement> elements) {
+    private void arrangeDistrictsCircular(List<CityRectangle> elements, CityRectangle covrec) {
+        double covrecRadius = covrec.getPerimeterRadius() + Config.Visualization.Metropolis.district.horizontalGap();
+        LayoutVersion version = Config.Visualization.Metropolis.district.layoutVersion();
+
+        if (elements.size() == 0)
+            return;
+        else {
+
+            CityRectangle biggestRec = elements.get(0);
+            double maxOuterRadius = biggestRec.getPerimeterRadius();
+            double sumOfPerimeterRadius = 0;
+
+            for (CityRectangle element : elements) {
+                sumOfPerimeterRadius += element.getPerimeterRadius() + Config.Visualization.Metropolis.district.horizontalGap();
+
+                if(element.getPerimeterRadius() > maxOuterRadius) {
+                    maxOuterRadius = element.getPerimeterRadius();
+                    biggestRec = element;
+                    elements.remove(element);
+                    elements.add(0, biggestRec);
+                }
+
+            }
+
+            double minRadius = maxOuterRadius
+                    + covrecRadius
+                    + Config.Visualization.Metropolis.district.horizontalGap();
+
+            double maxRadius = 0;
+
+            // new estimation of the radius
+            if (elements.size() > 1)
+                maxRadius = (sumOfPerimeterRadius / elements.size()) / Math.sin(Math.PI / elements.size())
+                        + Config.Visualization.Metropolis.district.horizontalGap();
+
+            double radius = Math.max(minRadius, maxRadius);
+
+
+            CityElement biggestRectangle = rectangleElementsMap.get(biggestRec);
+
+            double xPosition = covrec.getCenterX() + radius;
+            double xPositionDelta = xPosition - biggestRectangle.getXPosition();
+            biggestRectangle.setXPosition(xPosition);
+
+            double zPosition = covrec.getCenterY();
+            double zPositionDelta = zPosition - biggestRectangle.getZPosition();
+            biggestRectangle.setZPosition(zPosition);
+
+            Collection<CityElement> subElements = biggestRectangle.getSubElements();
+            if(!subElements.isEmpty()){
+                adjustPositionsOfSubSubElements(subElements, xPositionDelta, zPositionDelta);
+            }
+
+            if (elements.size() > 1) {
+
+                double cacheRotationAngle = 0;
+
+                for (int i = 1; i < elements.size(); ++i) {
+
+                    CityRectangle previousRec = elements.get(i - 1);
+                    CityRectangle currentRec = elements.get(i);
+
+                    double previousRadius = previousRec.getPerimeterRadius();
+                    //+ config.getBuildingHorizontalGap();
+
+                    double currentRadius = currentRec.getPerimeterRadius();
+                    //+ config.getBuildingHorizontalGap();
+
+                    double rotationAngle = 0;
+
+                    switch (version) {
+                        case MINIMAL_DISTANCE ->
+//							rotationAngle = Math.acos(1 - (Math.pow(previousRadius + currentRadius, 2) / (2 * Math.pow(radius, 2))));
+                                rotationAngle = 2 * Math.asin((previousRadius + currentRadius) / (2 * radius));
+                        case FULL_CIRCLE -> {
+                            double idealRotationAngle = 2 * Math.PI / elements.size() - cacheRotationAngle;
+                            double leastRotationAngle = 2 * Math.asin((previousRadius + currentRadius) / (2 * radius));
+                            if (idealRotationAngle >= leastRotationAngle) {
+                                rotationAngle = idealRotationAngle;
+                                cacheRotationAngle = 0;
+                            } else {
+                                rotationAngle = leastRotationAngle;
+                                cacheRotationAngle = leastRotationAngle - idealRotationAngle;
+                            }
+                        }
+                        default ->
+//							rotationAngle = Math.acos(1 - (Math.pow(previousRadius + currentRadius, 2) / (2 * Math.pow(radius, 2))));
+                                rotationAngle = 2 * Math.asin((previousRadius + currentRadius) / (2 * radius));
+                    }
+
+                    CityElement previousRectangle = rectangleElementsMap.get(previousRec);
+                    CityElement currentRectangle = rectangleElementsMap.get(currentRec);
+
+                    double newX = (previousRectangle.getXPosition() - covrec.getCenterX()) * Math.cos(rotationAngle)
+                            - (previousRectangle.getZPosition() - covrec.getCenterY()) * Math.sin(rotationAngle)
+                            + covrec.getCenterX();
+
+                    double xPositionDeltaManyDistricts = newX - currentRectangle.getXPosition();
+                    currentRectangle.setXPosition(newX);
+
+
+
+                    double newZ = (previousRectangle.getXPosition() - covrec.getCenterX()) * Math.sin(rotationAngle)
+                            + (previousRectangle.getZPosition() - covrec.getCenterY()) * Math.cos(rotationAngle)
+                            + covrec.getCenterY();
+
+                    double zPositionDeltaManyDistricts = newZ - currentRectangle.getZPosition();
+                    currentRectangle.setZPosition(newZ);
+
+
+                    Collection<CityElement> subElementsManyDistricts = currentRectangle.getSubElements();
+                    if(!subElementsManyDistricts.isEmpty()){
+                        adjustPositionsOfSubSubElements(subElementsManyDistricts, xPositionDeltaManyDistricts, zPositionDeltaManyDistricts);
+                    }
+
+                }
+            }
+
+            double newCovrecWidth = 2 * radius + (Math.max(biggestRec.getWidth(), biggestRec.getLength()));
+            covrec.changeRectangle(covrec.getCenterX(), covrec.getCenterY(), newCovrecWidth, newCovrecWidth, 0);
+        }
+    }
+
+    private List<CityRectangle> createCityRectanglesOfElements(Collection<CityElement> elements) {
         List<CityRectangle> rectangles = new ArrayList<>();
 
         for (CityElement element : elements) {
-
-            if(element.getSubType() != null){
-                if(element.getSubType().equals(CityElement.CitySubType.Cloud)){
-                    continue;
-                }}
             double width = element.getWidth();
             double length = element.getLength();
 
@@ -277,8 +430,6 @@ public class DistrictLightMapLayout {
     private void updateCovrec(CityKDTreeNode fitNode, CityRectangle covrec) {
         double newX = (Math.max(fitNode.getCityRectangle().getBottomRightX(), covrec.getBottomRightX()));
         double newY = (Math.max(fitNode.getCityRectangle().getBottomRightY(), covrec.getBottomRightY()));
-        BigDecimal newY_big = BigDecimal.valueOf(newY);
-        covrec.changeRectangle(0, 0, newX, newY_big.doubleValue());
+        covrec.changeRectangle(0, 0, newX, newY);
     }
-
 }

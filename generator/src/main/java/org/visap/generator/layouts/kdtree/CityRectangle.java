@@ -11,7 +11,7 @@ import java.util.Arrays;
  * one single overloaded method: changeRectangle No setter for class-attributes
  * available to ensure data validity, for interaction use changeRectangle
  */
-public class ACityRectangle implements Comparable<ACityRectangle> {
+public class CityRectangle implements Comparable<CityRectangle> {
 //	@Accessors(PUBLIC_GETTER) var double width
 //	@Accessors(PUBLIC_GETTER) var double length
 	double width;
@@ -26,12 +26,12 @@ public class ACityRectangle implements Comparable<ACityRectangle> {
 	double centerX;
 	double centerY;
 
-	public ACityRectangle() {
+	public CityRectangle() {
 		super();
 		changeRectangle(0, 0, 0, 0);
 	}
 
-	public ACityRectangle(double x1, double y1, double x2, double y2) {
+	public CityRectangle(double x1, double y1, double x2, double y2) {
 		super();
 		changeRectangle(x1, y1, x2, y2);
 	}
@@ -48,7 +48,7 @@ public class ACityRectangle implements Comparable<ACityRectangle> {
 	 *                      UpperRight 3: P(x|y) is BottomRight 4: P(x|y) is
 	 *                      BottomLeft
 	 */
-	public ACityRectangle(double pX, double pY, double width, double length, int pointPosition) {
+	public CityRectangle(double pX, double pY, double width, double length, int pointPosition) {
 		super();
 		changeRectangle(pX, pY, width, length, pointPosition);
 	}
@@ -135,7 +135,7 @@ public class ACityRectangle implements Comparable<ACityRectangle> {
 		centerY = upperLeftY + length / 2;
 	}
 
-	public int compareTo(ACityRectangle second) {
+	public int compareTo(CityRectangle second) {
 		int firstComparison = Double.compare(this.area, second.getArea());
 		if (firstComparison == 0) {
 			int secondComparison = Double.compare(this.width, second.getWidth());
