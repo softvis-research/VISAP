@@ -4,11 +4,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.abap.enums.SAPNodeProperties;
-import org.visap.generator.layouts.ABuildingLayout;
+import org.visap.generator.layouts.BuildingLayout;
 import org.visap.generator.layouts.DistrictLightMapLayout;
 import org.visap.generator.layouts.StackLayout;
-import org.visap.generator.repository.ACityElement;
-import org.visap.generator.repository.ACityRepository;
+import org.visap.generator.repository.CityElement;
+import org.visap.generator.repository.CityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
 
 import java.util.*;
@@ -18,10 +18,10 @@ public class MetropolisLayouter {
     private Log log = LogFactory.getLog(this.getClass());
 
     private SourceNodeRepository nodeRepository;
-    private ACityRepository repository;
+    private CityRepository repository;
 
-    public MetropolisLayouter(ACityRepository aCityRepository, SourceNodeRepository sourceNodeRepository) {
-        repository = aCityRepository;
+    public MetropolisLayouter(CityRepository cityRepository, SourceNodeRepository sourceNodeRepository) {
+        repository = cityRepository;
         nodeRepository = sourceNodeRepository;
 
         log.info("*****************************************************************************************************************************************");
@@ -30,39 +30,39 @@ public class MetropolisLayouter {
 
     public void layoutRepository(){
         // layout buildings
-        Collection<ACityElement> buildings = repository.getElementsByType(ACityElement.ACityType.Building);
+        Collection<CityElement> buildings = repository.getElementsByType(CityElement.CityType.Building);
         log.info(buildings.size() + " buildings loaded");
         layoutBuildings(buildings);
 
         // layout reference elements
-        Collection<ACityElement> referenceElements = repository.getElementsByType(ACityElement.ACityType.Reference);
+        Collection<CityElement> referenceElements = repository.getElementsByType(CityElement.CityType.Reference);
         log.info(referenceElements.size() + " reference elements loaded");
         layoutReferenceElements(referenceElements);
 
         // layout districts
-        Collection<ACityElement> packageDistricts = repository.getElementsByTypeAndSourceProperty(ACityElement.ACityType.District, SAPNodeProperties.type_name, "Namespace");
+        Collection<CityElement> packageDistricts = repository.getElementsByTypeAndSourceProperty(CityElement.CityType.District, SAPNodeProperties.type_name, "Namespace");
         layoutDistricts(packageDistricts);
 
         // layout cloud elements
         layoutCloudModel();
     }
 
-    private void layoutBuildings(Collection<ACityElement> buildings) {
-        for (ACityElement building: buildings) {
+    private void layoutBuildings(Collection<CityElement> buildings) {
+        for (CityElement building: buildings) {
             layoutBuilding(building);
         }
     }
 
-    private void layoutReferenceElements(Collection<ACityElement> referenceElements) {
-        for (ACityElement referenceElement: referenceElements) {
+    private void layoutReferenceElements(Collection<CityElement> referenceElements) {
+        for (CityElement referenceElement: referenceElements) {
             layoutReference(referenceElement);
         }
     }
 
-    private void layoutDistricts(Collection<ACityElement> districtElements) {
+    private void layoutDistricts(Collection<CityElement> districtElements) {
         log.info(districtElements.size() + " districts loaded");
 
-        for (ACityElement districtElement : districtElements) {
+        for (CityElement districtElement : districtElements) {
             layoutDistrict(districtElement);
         }
 
@@ -71,18 +71,18 @@ public class MetropolisLayouter {
 
     private void layoutCloudModel() {
 
-        Collection<ACityElement> districtsWithFindings = repository.getElementsByTypeAndSourceProperty(
-                ACityElement.ACityType.District, SAPNodeProperties.migration_findings, "true"
+        Collection<CityElement> districtsWithFindings = repository.getElementsByTypeAndSourceProperty(
+                CityElement.CityType.District, SAPNodeProperties.migration_findings, "true"
         );
 
-        for (ACityElement districtWithFinding: districtsWithFindings) {
+        for (CityElement districtWithFinding: districtsWithFindings) {
 
-            Collection<ACityElement> cloudSubElements = districtWithFinding.getSubElements();
+            Collection<CityElement> cloudSubElements = districtWithFinding.getSubElements();
 
-            for (ACityElement cloudSubElement : cloudSubElements) {
+            for (CityElement cloudSubElement : cloudSubElements) {
 
-                if (cloudSubElement.getType().equals(ACityElement.ACityType.Reference) &&
-                        cloudSubElement.getSubType().equals(ACityElement.ACitySubType.Cloud)) {
+                if (cloudSubElement.getType().equals(CityElement.CityType.Reference) &&
+                        cloudSubElement.getSubType().equals(CityElement.CitySubType.Cloud)) {
 
                     cloudSubElement.setWidth(0);
                     cloudSubElement.setLength(0);
@@ -101,13 +101,13 @@ public class MetropolisLayouter {
         }
     }
 
-    private void layoutBuilding(ACityElement building) {
-        ABuildingLayout buildingLayout = new ABuildingLayout(building);
+    private void layoutBuilding(CityElement building) {
+        BuildingLayout buildingLayout = new BuildingLayout(building);
         buildingLayout.calculate();
     }
 
-    private void layoutReference(ACityElement referenceElement) {
-        ACityElement.ACitySubType referenceBuildingType = referenceElement.getSubType();
+    private void layoutReference(CityElement referenceElement) {
+        CityElement.CitySubType referenceBuildingType = referenceElement.getSubType();
 
         switch (referenceBuildingType) {
             case Sea:
@@ -131,27 +131,27 @@ public class MetropolisLayouter {
         }
     }
 
-    private void layoutVirtualRootDistrict(Collection<ACityElement> districts){
+    private void layoutVirtualRootDistrict(Collection<CityElement> districts){
         log.info(districts.size() + " districts for virtual root district loaded");
 
-        ACityElement virtualRootDistrict = new ACityElement(ACityElement.ACityType.District);
+        CityElement virtualRootDistrict = new CityElement(CityElement.CityType.District);
 
         DistrictLightMapLayout aDistrictLightMapLayout = new DistrictLightMapLayout(virtualRootDistrict, districts);
         aDistrictLightMapLayout.calculate();
     }
 
-    private void layoutDistrict(ACityElement district) {
+    private void layoutDistrict(CityElement district) {
         if(isDistrictEmpty(district)){
             layoutEmptyDistrict(district);
 
             log.info("Empty district \"" + district.getSourceNodeProperty(SAPNodeProperties.object_name) + "\" layouted");
         } else {
 
-            Collection<ACityElement> subElements = district.getSubElements();
+            Collection<CityElement> subElements = district.getSubElements();
 
             // layout sub districts
-            for(ACityElement subElement : subElements){
-                if (subElement.getType() == ACityElement.ACityType.District) {
+            for(CityElement subElement : subElements){
+                if (subElement.getType() == CityElement.CityType.District) {
                     layoutDistrict(subElement);
                 }
             }
@@ -168,13 +168,13 @@ public class MetropolisLayouter {
         }
     }
 
-    private boolean isDistrictEmpty(ACityElement district){
-        Collection<ACityElement> subElements = district.getSubElements();
+    private boolean isDistrictEmpty(CityElement district){
+        Collection<CityElement> subElements = district.getSubElements();
 
         boolean isEmpty = true;
 
-        for (ACityElement subElement: subElements) {
-            if(!subElement.getType().equals(ACityElement.ACityType.Reference)){
+        for (CityElement subElement: subElements) {
+            if(!subElement.getType().equals(CityElement.CityType.Reference)){
                 isEmpty = false;
                 break;
             }
@@ -183,7 +183,7 @@ public class MetropolisLayouter {
         return isEmpty;
     }
 
-    private void layoutEmptyDistrict( ACityElement district) {
+    private void layoutEmptyDistrict( CityElement district) {
         district.setHeight(Config.Visualization.Metropolis.district.emptyDistrictHeight());
         district.setLength(Config.Visualization.Metropolis.district.emptyDistrictLength());
         district.setWidth(Config.Visualization.Metropolis.district.emptyDistrictWidth());

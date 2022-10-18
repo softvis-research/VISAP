@@ -8,39 +8,39 @@ import org.neo4j.driver.Value;
 import org.neo4j.driver.types.Node;
 import java.util.*;
 
-public class ACityElement {
+public class CityElement {
 
     private Log log = LogFactory.getLog(this.getClass());
 
-    public ACityShape getShape() {
+    public CityShape getShape() {
         return shape;
     }
 
-    public void setShape(ACityShape shape) {
+    public void setShape(CityShape shape) {
         this.shape = shape;
     }
 
-    public ACitySubType getSubType() {
+    public CitySubType getSubType() {
         return subType;
     }
 
-    public void setSubType(ACitySubType subType) {
+    public void setSubType(CitySubType subType) {
         this.subType = subType;
     }
 
-    public void setRCData(ACityElement refBuilding) {
+    public void setRCData(CityElement refBuilding) {
         this.refBuilding = refBuilding;
     }
 
 
-    public enum ACityType {
+    public enum CityType {
         District, Building, Floor, Chimney,
 
         //additional for Metropolis
         Reference
     }
 
-    public enum ACitySubType {
+    public enum CitySubType {
         Class, Report, FunctionGroup, Table, DDIC
 
         // additional subTypes for metropolis
@@ -50,7 +50,7 @@ public class ACityElement {
     }
 
 
-    public enum ACityShape {
+    public enum CityShape {
         Box, Cylinder, Cone
 
         // alternative shapes
@@ -66,15 +66,15 @@ public class ACityElement {
 
     private Node sourceNode;
 
-    private List<ACityElement> subElements;
-    private ACityElement parentElement;
-    private ACityElement refBuilding;
+    private List<CityElement> subElements;
+    private CityElement parentElement;
+    private CityElement refBuilding;
 
-    private ACityType type;
-    private ACitySubType subType;
+    private CityType type;
+    private CitySubType subType;
 
     private String color;
-    private ACityShape shape;
+    private CityShape shape;
     private String source;
     private String model;
     private String modelScale;
@@ -92,7 +92,7 @@ public class ACityElement {
     private String metaData;
     private String aframeProperty;
 
-    public ACityElement(ACityType type) {
+    public CityElement(CityType type) {
         this.type = type;
         subElements = new ArrayList<>();
 
@@ -211,28 +211,28 @@ public class ACityElement {
     }
 
 
-    public ACityElement getParentElement() {
+    public CityElement getParentElement() {
         return parentElement;
     }
 
-    public ACityElement getRefBuildingData() {
+    public CityElement getRefBuildingData() {
         return refBuilding;
     }
 
 
-    public void setParentElement(ACityElement parentElement) {
+    public void setParentElement(CityElement parentElement) {
         this.parentElement = parentElement;
     }
 
-    public Collection<ACityElement> getSubElements() {
+    public Collection<CityElement> getSubElements() {
         return new ArrayList(subElements);
     }
 
-    public Collection<ACityElement> getSubElementsOfType(ACityType elementType) {
-        List<ACityElement> subElementsOfType = new ArrayList<>();
+    public Collection<CityElement> getSubElementsOfType(CityType elementType) {
+        List<CityElement> subElementsOfType = new ArrayList<>();
 
-        Collection<ACityElement> subElements = getSubElements();
-        for(ACityElement element : subElements){
+        Collection<CityElement> subElements = getSubElements();
+        for(CityElement element : subElements){
 
             if( element.getType() == elementType){
                 subElementsOfType.add(element);
@@ -268,11 +268,11 @@ public class ACityElement {
         return sourceNodeProperty;
     }
 
-    public void addSubElement(ACityElement subElement) {
+    public void addSubElement(CityElement subElement) {
         this.subElements.add(subElement);
     }
 
-    public void removeSubElement(ACityElement subElement) {
+    public void removeSubElement(CityElement subElement) {
         this.subElements.remove(subElement);
     }
 
@@ -280,7 +280,7 @@ public class ACityElement {
         return hash;
     }
 
-    public ACityType getType() {
+    public CityType getType() {
         return type;
     }
 

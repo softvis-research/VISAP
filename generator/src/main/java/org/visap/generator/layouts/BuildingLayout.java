@@ -4,14 +4,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.configuration.Config;
-import org.visap.generator.repository.ACityElement;
+import org.visap.generator.repository.CityElement;
 
-public class ABuildingLayout {
+public class BuildingLayout {
     private Log log = LogFactory.getLog(this.getClass());
 
-    private ACityElement building;
+    private CityElement building;
 
-    public ABuildingLayout(ACityElement building) {
+    public BuildingLayout(CityElement building) {
         this.building = building;
     }
 
@@ -27,7 +27,7 @@ public class ABuildingLayout {
     }
 
     private void setSizeOfBuilding() {
-        ACityElement.ACitySubType referenceBuildingType = building.getSubType();
+        CityElement.CitySubType referenceBuildingType = building.getSubType();
 
         if(referenceBuildingType != null) {
             switch (referenceBuildingType) {

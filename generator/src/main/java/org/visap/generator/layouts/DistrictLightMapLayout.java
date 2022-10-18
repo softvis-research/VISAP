@@ -5,7 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.visap.generator.layouts.kdtree.ACityKDTree;
 import org.visap.generator.layouts.kdtree.ACityKDTreeNode;
 import org.visap.generator.layouts.kdtree.ACityRectangle;
-import org.visap.generator.repository.ACityElement;
+import org.visap.generator.repository.CityElement;
 
 import org.visap.generator.configuration.Config;
 
@@ -17,12 +17,12 @@ public class DistrictLightMapLayout {
 
     private Log log = LogFactory.getLog(this.getClass());
 
-    private ACityElement district;
-    private Collection<ACityElement> subElements;
+    private CityElement district;
+    private Collection<CityElement> subElements;
 
-    private Map<ACityRectangle, ACityElement> rectangleElementsMap;
+    private Map<ACityRectangle, CityElement> rectangleElementsMap;
 
-    public DistrictLightMapLayout(ACityElement district, Collection<ACityElement> subElements) {
+    public DistrictLightMapLayout(CityElement district, Collection<CityElement> subElements) {
         this.district = district;
         this.subElements = subElements;
 
@@ -51,7 +51,7 @@ public class DistrictLightMapLayout {
     }
 
     private void setNewPositionFromNode(ACityRectangle rectangle, ACityKDTreeNode fitNode) {
-        ACityElement element = rectangleElementsMap.get(rectangle);
+        CityElement element = rectangleElementsMap.get(rectangle);
 
         double xPosition = fitNode.getACityRectangle().getCenterX();
         double xPositionDelta = xPosition - element.getXPosition();
@@ -61,14 +61,14 @@ public class DistrictLightMapLayout {
         double zPositionDelta = zPosition - element.getZPosition();
         element.setZPosition(zPosition);
 
-        Collection<ACityElement> subElements = element.getSubElements();
+        Collection<CityElement> subElements = element.getSubElements();
         if(!subElements.isEmpty()){
             adjustPositionsOfSubSubElements(subElements, xPositionDelta, zPositionDelta);
         }
     }
 
-    private void adjustPositionsOfSubSubElements(Collection<ACityElement> elements, double parentX, double parentZ) {
-        for (ACityElement element : elements) {
+    private void adjustPositionsOfSubSubElements(Collection<CityElement> elements, double parentX, double parentZ) {
+        for (CityElement element : elements) {
 
             double centerX = element.getXPosition();
             double newXPosition = centerX + parentX + Config.Visualization.Metropolis.district.horizontalMargin();
@@ -78,7 +78,7 @@ public class DistrictLightMapLayout {
             double newZPosition = centerZ + parentZ + Config.Visualization.Metropolis.district.verticalMargin();
             element.setZPosition(newZPosition);
 
-            Collection<ACityElement> subElements = element.getSubElements();
+            Collection<CityElement> subElements = element.getSubElements();
             if(!subElements.isEmpty()){
                 adjustPositionsOfSubSubElements(subElements, parentX,  parentZ);
             }
@@ -95,7 +95,7 @@ public class DistrictLightMapLayout {
         Copied from CityLayout
      */
 
-    private ACityRectangle arrangeSubElements(Collection<ACityElement> subElements){
+    private ACityRectangle arrangeSubElements(Collection<CityElement> subElements){
 
         ACityRectangle docACityRectangle = calculateMaxAreaRoot(subElements);
         ACityKDTree ptree = new ACityKDTree(docACityRectangle);
@@ -155,13 +155,13 @@ public class DistrictLightMapLayout {
         return covrec;
     }
 
-    private List<ACityRectangle> createACityRectanglesOfElements(Collection<ACityElement> elements) {
+    private List<ACityRectangle> createACityRectanglesOfElements(Collection<CityElement> elements) {
         List<ACityRectangle> rectangles = new ArrayList<>();
 
-        for (ACityElement element : elements) {
+        for (CityElement element : elements) {
 
             if(element.getSubType() != null){
-                if(element.getSubType().equals(ACityElement.ACitySubType.Cloud)){
+                if(element.getSubType().equals(CityElement.CitySubType.Cloud)){
                     continue;
                 }}
             double width = element.getWidth();
@@ -176,10 +176,10 @@ public class DistrictLightMapLayout {
     }
 
 
-    private ACityRectangle calculateMaxAreaRoot(Collection<ACityElement> elements) {
+    private ACityRectangle calculateMaxAreaRoot(Collection<CityElement> elements) {
         double sum_width = 0;
         double sum_length = 0;
-        for (ACityElement element : elements) {
+        for (CityElement element : elements) {
             sum_width += element.getWidth() + Config.Visualization.Metropolis.district.horizontalGap();
             sum_length += element.getLength() + Config.Visualization.Metropolis.district.horizontalGap();
         }
