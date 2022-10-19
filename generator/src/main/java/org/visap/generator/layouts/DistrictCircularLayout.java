@@ -1,5 +1,6 @@
 package org.visap.generator.layouts;
 
+import org.visap.generator.abap.AElementArranger;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.layouts.enums.LayoutVersion;
@@ -25,11 +26,9 @@ public class DistrictCircularLayout {
     }
 
     public void calculate(){
-
         CityRectangle coveringCityRectangle = arrangeSubElements(subElements);
         setSizeOfDistrict(coveringCityRectangle);
         setPositionOfDistrict(coveringCityRectangle);
-
     }
 
 
@@ -99,44 +98,16 @@ public class DistrictCircularLayout {
         Collections.sort(elements);
         Collections.reverse(elements);
 
-        List<CityRectangle> originSet = new ArrayList<>();
-        List<CityRectangle> customCode = new ArrayList<>();
-        List<CityRectangle> standardCode = new ArrayList<>();
+        // TODO: Review
+        List<CityRectangle> originSet;
+        List<CityRectangle> customCode;
+        List<CityRectangle> standardCode;
 
-        // order the rectangles to the fit sets
-        for (CityRectangle element : elements) {
-
-            CityElement recElement = rectangleElementsMap.get(element);
-            CityElement.CitySubType refBuilding = recElement.getSubType();
-
-            //no sourceNode, no refBuilding
-            if (recElement.getSourceNode() == null && refBuilding == null) {
-                continue;
-            }
-
-            // for RefBuildings
-            if (recElement.getSourceNode() == null && refBuilding != null){
-                if (refBuilding == CityElement.CitySubType.Sea || refBuilding == CityElement.CitySubType.Mountain ){
-                    originSet.add(element);
-                }
-            }
-
-            // for Elements with SourceNode
-            if ( recElement.getSourceNode() != null && refBuilding == null) {
-
-                String creator = recElement.getSourceNodeProperty(SAPNodeProperties.creator);
-                String iterationString = recElement.getSourceNodeProperty(SAPNodeProperties.iteration);
-                int iteration = Integer.parseInt(iterationString);
-
-                if (iteration == 0 && (!creator.equals("SAP"))) {
-                    originSet.add(element);
-                } else if (iteration >= 1 && (!creator.equals("SAP"))) {
-                    customCode.add(element);
-                } else {
-                    standardCode.add(element);
-                }
-            }
-        }
+        AElementArranger arranger = new AElementArranger();
+        List<List<CityRectangle>> listOfSets = arranger.constructElementSets(elements, rectangleElementsMap);
+        originSet = listOfSets.get(0);
+        customCode = listOfSets.get(1);
+        standardCode = listOfSets.get(2);
 
         // Light Map algorithm for the origin set
         for (CityRectangle el : originSet) {
