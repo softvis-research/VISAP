@@ -6,9 +6,9 @@ import org.visap.generator.layouts.enums.LayoutVersion;
 
 @Config.Sources("file:${user.dir}/src/main/java/properties/metropolis/layouter/District.properties")
 public interface District extends Config {
-    double horizontalMargin();
-    double verticalMargin();
-    double horizontalGap();
+    double horizontalBuildingMargin();
+    double horizontalBuildingGap();
+    double horizontalDistrictGap();
     double districtHeight();
 
     double emptyDistrictHeight();

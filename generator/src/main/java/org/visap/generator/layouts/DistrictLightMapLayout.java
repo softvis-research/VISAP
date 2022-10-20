@@ -71,11 +71,11 @@ public class DistrictLightMapLayout {
         for (CityElement element : elements) {
 
             double centerX = element.getXPosition();
-            double newXPosition = centerX + parentX + Config.Visualization.Metropolis.district.horizontalMargin();
+            double newXPosition = centerX + parentX + Config.Visualization.Metropolis.district.horizontalBuildingMargin();
             element.setXPosition(newXPosition);
 
             double centerZ = element.getZPosition();
-            double newZPosition = centerZ + parentZ + Config.Visualization.Metropolis.district.verticalMargin();
+            double newZPosition = centerZ + parentZ + Config.Visualization.Metropolis.district.horizontalBuildingGap();
             element.setZPosition(newZPosition);
 
             Collection<CityElement> subElements = element.getSubElements();
@@ -167,8 +167,8 @@ public class DistrictLightMapLayout {
             double width = element.getWidth();
             double length = element.getLength();
 
-            CityRectangle rectangle = new CityRectangle(0, 0, width + Config.Visualization.Metropolis.district.horizontalGap(),
-                    length + Config.Visualization.Metropolis.district.horizontalGap(), 1);
+            CityRectangle rectangle = new CityRectangle(0, 0, width + Config.Visualization.Metropolis.district.horizontalDistrictGap(),
+                    length + Config.Visualization.Metropolis.district.horizontalDistrictGap(), 1);
             rectangles.add(rectangle);
             rectangleElementsMap.put(rectangle, element);
         }
@@ -180,8 +180,8 @@ public class DistrictLightMapLayout {
         double sum_width = 0;
         double sum_length = 0;
         for (CityElement element : elements) {
-            sum_width += element.getWidth() + Config.Visualization.Metropolis.district.horizontalGap();
-            sum_length += element.getLength() + Config.Visualization.Metropolis.district.horizontalGap();
+            sum_width += element.getWidth() + Config.Visualization.Metropolis.district.horizontalDistrictGap();
+            sum_length += element.getLength() + Config.Visualization.Metropolis.district.horizontalDistrictGap();
         }
         return new CityRectangle(0, 0, sum_width, sum_length, 1);
     }
