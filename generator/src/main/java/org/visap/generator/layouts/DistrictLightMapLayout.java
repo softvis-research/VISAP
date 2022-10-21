@@ -167,8 +167,8 @@ public class DistrictLightMapLayout {
             double width = element.getWidth();
             double length = element.getLength();
 
-            CityRectangle rectangle = new CityRectangle(0, 0, width + Config.Visualization.Metropolis.district.horizontalDistrictGap(),
-                    length + Config.Visualization.Metropolis.district.horizontalDistrictGap(), 1);
+            CityRectangle rectangle = new CityRectangle(0, 0, width + Config.Visualization.Metropolis.district.horizontalBuildingGap(),
+                    length + Config.Visualization.Metropolis.district.horizontalBuildingGap(), 1);
             rectangles.add(rectangle);
             rectangleElementsMap.put(rectangle, element);
         }
@@ -180,8 +180,8 @@ public class DistrictLightMapLayout {
         double sum_width = 0;
         double sum_length = 0;
         for (CityElement element : elements) {
-            sum_width += element.getWidth() + Config.Visualization.Metropolis.district.horizontalDistrictGap();
-            sum_length += element.getLength() + Config.Visualization.Metropolis.district.horizontalDistrictGap();
+            sum_width += element.getWidth() + Config.Visualization.Metropolis.district.horizontalBuildingGap();
+            sum_length += element.getLength() + Config.Visualization.Metropolis.district.horizontalBuildingGap();
         }
         return new CityRectangle(0, 0, sum_width, sum_length, 1);
     }
