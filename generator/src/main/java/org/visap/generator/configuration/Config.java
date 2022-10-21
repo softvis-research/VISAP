@@ -1,9 +1,7 @@
 package org.visap.generator.configuration;
 
 import org.aeonbits.owner.ConfigFactory;
-import org.visap.generator.configuration.Metropolis.Building;
-import org.visap.generator.configuration.Metropolis.Color;
-import org.visap.generator.configuration.Metropolis.District;
+import org.visap.generator.configuration.Metropolis.*;
 import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Show;
 import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Width;
 import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Height;
@@ -24,6 +22,8 @@ public class Config {
                 public static Show show = ConfigFactory.create(Show.class);
             }
             public static Color color = ConfigFactory.create(Color.class);
+            public static Shape shape = ConfigFactory.create(Shape.class);
+            public static Model model = ConfigFactory.create(Model.class);
         }
     }
 }
