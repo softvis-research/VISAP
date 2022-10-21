@@ -2,6 +2,7 @@ package org.visap.generator.configuration;
 
 import org.aeonbits.owner.ConfigFactory;
 import org.visap.generator.configuration.Metropolis.Building;
+import org.visap.generator.configuration.Metropolis.Color;
 import org.visap.generator.configuration.Metropolis.District;
 import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Show;
 import org.visap.generator.configuration.Metropolis.ReferenceBuilding.Width;
@@ -22,6 +23,7 @@ public class Config {
 
                 public static Show show = ConfigFactory.create(Show.class);
             }
+            public static Color color = ConfigFactory.create(Color.class);
         }
     }
 }
