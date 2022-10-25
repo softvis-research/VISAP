@@ -26,4 +26,6 @@ public class Config {
             public static Model model = ConfigFactory.create(Model.class);
         }
     }
+
+    public static Output output = ConfigFactory.create(Output.class);
 }
