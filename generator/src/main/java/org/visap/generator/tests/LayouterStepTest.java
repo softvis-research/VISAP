@@ -1,4 +1,4 @@
-package org.visap.generator.steps.tests;
+package org.visap.generator.tests;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
