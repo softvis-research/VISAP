@@ -8,7 +8,6 @@ import org.visap.generator.abap.enums.SAPRelationLabels;
 import org.visap.generator.repository.CityElement;
 import org.visap.generator.repository.CityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
-import org.visap.generator.database.DatabaseConnector;
 import org.neo4j.driver.types.Node;
 
 import java.io.File;
@@ -20,14 +19,12 @@ import java.util.Collection;
 import java.util.*;
 
 public class MetaDataExporter {
-
-    private static DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
     private SourceNodeRepository nodeRepository;
-    private CityRepository aCityRepository;
+    private CityRepository cityRepository;
 
-    public MetaDataExporter(CityRepository aCityRepository, SourceNodeRepository sourceNodeRepository) {
+    public MetaDataExporter(CityRepository cityRepository, SourceNodeRepository sourceNodeRepository) {
         this.nodeRepository = sourceNodeRepository;
-        this.aCityRepository = aCityRepository;
+        this.cityRepository = cityRepository;
     }
 
     public void exportMetaDataFile() {
@@ -36,7 +33,7 @@ public class MetaDataExporter {
             File outputDir = new File(Config.output.mapPath());
             String path = outputDir.getAbsolutePath() + "/metaData.json";
             fw = new FileWriter(path);
-            fw.write(toJSON(aCityRepository.getAllElements()));
+            fw.write(toJSON(cityRepository.getAllElements()));
         } catch (IOException e) {
             System.out.println(e);
         } finally {
@@ -50,8 +47,8 @@ public class MetaDataExporter {
     }
 
     public void setMetaDataPropToCityElements() {
-        Collection<CityElement> aCityElements = aCityRepository.getAllElements();
-        for (final CityElement element : aCityElements) {
+        Collection<CityElement> cityElements = cityRepository.getAllElements();
+        for (final CityElement element : cityElements) {
 
             // skip reference buildings (only Metropolis)
             if (element.getSourceNode() == null) {
@@ -314,7 +311,7 @@ public class MetaDataExporter {
 
         Node parentNode = parentNodes.iterator().next();
 
-        CityElement parentElement = aCityRepository.getElementBySourceID(parentNode.id());
+        CityElement parentElement = cityRepository.getElementBySourceID(parentNode.id());
         if (parentElement == null) {  // Some SAP standard packages may not included
             return "";
         }
@@ -335,12 +332,12 @@ public class MetaDataExporter {
         List<String> nodesHashes = new ArrayList<>();
         for (Node node : nodes) {
             Long nodeId = node.id();
-            CityElement aCityElement = aCityRepository.getElementBySourceID(nodeId);
-            if (aCityElement == null) {
+            CityElement cityElement = cityRepository.getElementBySourceID(nodeId);
+            if (cityElement == null) {
                 continue;
             }
 
-            nodesHashes.add(aCityElement.getHash());
+            nodesHashes.add(cityElement.getHash());
         }
         return nodesHashes;
     }
