@@ -8,6 +8,9 @@
 # Target folder
 target/
 
+# iml files
+*.iml
+
 # Model output
 model.html
 metaData.json
