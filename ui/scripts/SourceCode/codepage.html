@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <script src="../../node_modules/prismjs/prism.js" ></script>
+        <script src="../../node_modules/prismjs/components/prism-java.min.js" ></script>
+        <script src="../../node_modules/prismjs/components/prism-c.min.js" ></script>
+        <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="CodeHelperFunctions.js"></script>   
+        <link href="../../node_modules/prismjs/themes/prism.css" rel="stylesheet" />
+        <link href="prismPluginCodeController.css" rel="stylesheet" />
+    </head>
+    <body>  
+            <!-- Display Code -->
+        <div style="width:100%; height:100%;">
+            <pre id="codepage"><code id="codeTag"></code></pre>
+        </div>
+        <script>
+
+            function displayCode(file, classEntity, entity, filetype){
+                let preElement = document.getElementById('codepage');
+                preElement.className = "language-" + filetype + " line-numbers";
+                codeHelperFunction.displayCode(file, classEntity, entity, publishOnEntitySelected, filetype);
+            }
+
+            
+            function publishOnEntitySelected(entityId){
+                var applicationEvent = {			
+                    sender: opener.codeController,
+                    entities: [opener.model.getEntityById(entityId)]
+                };
+                
+                opener.events.selected.on.publish(applicationEvent);	
+            }
+            
+			function reset(){
+				codeTag = $("#codeTag")[0].textContent = "";
+			}
+        </script>
+
+    </body>
+</html>
