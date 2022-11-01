@@ -6,6 +6,23 @@ The project is currently in a pre-development phase. Porting of functionality fr
 
 ## Installation
 
+### Compiling the Generator
+
+This project requires a JDK version of 12 or higher.
+
+The generator project is built using Maven. Open the project in your IDE of choice by importing the pom.xml file in the generator/ directory and then building the project.
+
+### Graph Database
+
+VISAP uses a local Neo4J graph database to generate its model. Download a current version of Neo4J, then set up a new local project there. Setting a password is required, but authorization will be disabled during development.
+
+Make the following changes to the configuration of that database (… > Settings):
+- comment out ```server.directories.import=import``` by prepending #
+- set ```dbms.security.auth_enable``` to ```false```
+- de-comment ```dbms.security.allow_csv_import_from_file_urls=true``` by removing the leading #
+
+Then, start the database. The authorization being disabled will throw warnings on start-up which can be dismissed.
+
 ### Displaying a Model in the Browser
 
 | :warning: WARNING                                                                                                                                                                                                      |
