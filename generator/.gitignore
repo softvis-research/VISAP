@@ -1,9 +1,17 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java
 # Edit at https://www.toptal.com/developers/gitignore?templates=java
 
-### Java ###
+### IDE ###
+.idea/
+
+### Generator ###
 # Target folder
 target/
+
+# Model output
+model.html
+metaData.json
+
 # Compiled class file
 *.class
 
@@ -30,3 +38,8 @@ hs_err_pid*
 replay_pid*
 
 # End of https://www.toptal.com/developers/gitignore/api/java
+
+### UI ###
+# Node
+node_modules/
+
