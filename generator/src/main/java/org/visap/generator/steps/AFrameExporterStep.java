@@ -25,7 +25,6 @@ public class AFrameExporterStep {
     public static void main(String[] args) {
         boolean isSilentMode = Config.setup.silentMode();
 
-
         nodeRepository = new SourceNodeRepository();
         nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
