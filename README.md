@@ -12,16 +12,25 @@ This project requires a JDK version of 12 or higher.
 
 The generator project is built using Maven. Open the project in your IDE of choice by importing the pom.xml file in the generator/ directory and then building the project.
 
-### Graph Database
+### Initializing the Graph Database
 
 VISAP uses a local Neo4J graph database to generate its model. Download a current version of Neo4J, then set up a new local project there. Setting a password is required, but authorization will be disabled during development.
 
 Make the following changes to the configuration of that database (… > Settings):
-- comment out ```server.directories.import=import``` by prepending #
-- set ```dbms.security.auth_enable``` to ```false```
-- de-comment ```dbms.security.allow_csv_import_from_file_urls=true``` by removing the leading #
+- Comment out ```server.directories.import=import``` by prepending #
+- Set ```dbms.security.auth_enable``` to ```false```
+- De-comment ```dbms.security.allow_csv_import_from_file_urls=true``` by removing the leading #
 
-Then, start the database. The authorization being disabled will throw warnings on start-up which can be dismissed.
+Then, start the database. The authorization being disabled may cause warnings on start-up, which can be dismissed.
+
+### Generating a Model
+
+- Ensure that the Neo4J database is running
+- Place input CSV files in the directory ```generator/src/neo4jexport```. This directory contains several sub-directories with example data.
+- Execute the file ```generator/src/main/java/org.visap.generator/steps/LoaderStep.java```. This will place the initial data in the local graph database. Any previously contained data is overwritten!
+- Execute the file ```generator/src/main/java/org.visap.generator/steps/AFrameExporterStep.java```. This will run all additional model-generating steps. Depending on the model size, this process can take a few minutes to finish.
+
+The resulting model files (model.html and metaData.json) are placed in the neo4jexport/ folder along with your input data.
 
 ### Displaying a Model in the Browser
 
@@ -31,13 +40,13 @@ Then, start the database. The authorization being disabled will throw warnings o
 
 After executing all the steps, two files will have been generated for you: model.html and metaData.json.
 
-To display the model in the browser, first, navigate to the folder ui/data. Create a folder with a fitting name, for example "Test". Create a subfolder named "model". Copy both the model.html file and the metaData.json file into the model folder.
+To display the model in the browser, first, navigate to the folder ui/data. Create a folder with a fitting name, for example "Test". Create a subfolder named "model". Copy both the model.html file and the metaData.json file into the this subfolder.
 
 Next, you will need a webserver. We recommend [XAMPP](https://www.apachefriends.org/download.html).
 
 ![xampp.png](xampp.png)
 
-Click on the config for Apache and select Apache (httpd.conf). Change the path behind DocumentRoot and <Directory to match the location of the ui folder.
+Click on the config for Apache and select Apache (httpd.conf). Change the path behind ```DocumentRoot``` and in ```<Directory "...">``` to match the location of the ui folder. Alternatively, create a symbolic link to the folder in the existing document root, in which case the symlink name should be inserted correspondingly after "localhost/" for all following localhost URLs.
 
 ![apache_config.png](apache_config.png)
 
@@ -46,7 +55,7 @@ Save the config, close it, and start the Apache Module.
 You should now be able to view the visualization in the browser.
 Enter the URL http://localhost/index.php?setup=ABAP/PackageExplorer&model={folderName}
 
-Instead of {folderName}, use the name of the folder where your model sits, for example http://localhost/index.php?setup=ABAP/PackageExplorer&model=Test
+Instead of {folderName}, use the name of your model folder in ui/data/, for example http://localhost/index.php?setup=ABAP/PackageExplorer&model=Test
 
 The visualization will look similar to this:
 
