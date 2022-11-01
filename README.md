@@ -7,9 +7,14 @@ The project is currently in a pre-development phase. Porting of functionality fr
 ## Installation
 
 ### Displaying a Model in the Browser
+
+| :warning: WARNING                                                                                                                                                                                                      |
+|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Before you get started with displaying the model in the browser, you will need a node_modules folder in the ui folder. Unfortunately, we are currently unable to upload this folder to the repository.                 |
+
 After executing all the steps, two files will have been generated for you: model.html and metaData.json.
 
-First, navigate to the folder ui/data. Create a folder with a fitting name, for example "Test". Create a subfolder named "model". Copy both the model.html file and the metaData.json file into the model folder.
+To display the model in the browser, first, navigate to the folder ui/data. Create a folder with a fitting name, for example "Test". Create a subfolder named "model". Copy both the model.html file and the metaData.json file into the model folder.
 
 Next, you will need a webserver. We recommend [XAMPP](https://www.apachefriends.org/download.html).
 
