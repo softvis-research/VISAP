@@ -44,11 +44,11 @@ To display the model in the browser, first navigate to the folder ```ui/data/```
 
 Next, you will need a webserver. We recommend [XAMPP](https://www.apachefriends.org/download.html).
 
-![xampp.png](xampp.png)
+![xampp.png](images/xampp.png)
 
 Click on the config for Apache and select Apache (httpd.conf). Change the path behind ```DocumentRoot``` and in ```<Directory "...">``` to match the location of the ui folder. Alternatively, create a symbolic link to the folder in the existing document root, in which case the symlink name should be inserted correspondingly after "localhost/" for all following localhost URLs.
 
-![apache_config.png](apache_config.png)
+![apache_config.png](images/apache_config.png)
 
 Save the config, close it, and start the Apache Module.
 
@@ -59,7 +59,7 @@ In our example, it is named ```Test```, so the complete URL will be http://local
 
 The visualization will look similar to this:
 
-![visualization.png](visualization.png)
+![visualization.png](images/visualization.png)
 
 ## Documentation
 The development team actively uses and maintains https://miro.com/app/board/uXjVOGFnA-M=/ for project coordination and documentation. The Miro board also includes instructions for installation and usage. Access requests will generally be accepted. Most documentation is currently available in German only.
