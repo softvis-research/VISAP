@@ -34,13 +34,13 @@ The resulting model files (model.html and metaData.json) are placed in the neo4j
 
 ### Displaying a Model in the Browser
 
-| :warning: WARNING                                                                                                                                                                                                      |
-|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Before you get started with displaying the model in the browser, you will need a node_modules folder in the ui folder. Unfortunately, we are currently unable to upload this folder to the repository.                 |
+| :warning: WARNING                                                                                                                                                                                                     |
+|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Before you get started with displaying your model in the browser, you will need a ```node_modules/``` folder in the ```ui/``` folder. Unfortunately, we are currently unable to upload this folder to the repository. |
 
-After executing all the steps, two files will have been generated for you: model.html and metaData.json.
+After following the instructions in section [Generating a Model](#generating-a-model), two files will have been generated for you: model.html and metaData.json.
 
-To display the model in the browser, first, navigate to the folder ui/data. Create a folder with a fitting name, for example "Test". Create a subfolder named "model". Copy both the model.html file and the metaData.json file into the this subfolder.
+To display the model in the browser, first navigate to the folder ```ui/data/```. Create a subfolder with a name of your liking, for example ```Test/```. Inside the newly created subfolder, create another subfolder named ```model/```. Copy both the model.html file and the metaData.json file into this subfolder.
 
 Next, you will need a webserver. We recommend [XAMPP](https://www.apachefriends.org/download.html).
 
@@ -53,9 +53,9 @@ Click on the config for Apache and select Apache (httpd.conf). Change the path b
 Save the config, close it, and start the Apache Module.
 
 You should now be able to view the visualization in the browser.
-Enter the URL http://localhost/index.php?setup=ABAP/PackageExplorer&model={folderName}
+Enter the URL http://localhost/index.php?setup=ABAP/PackageExplorer&model={folderName}, where ```{folderName}``` is the name of the folder inside which you created the ```model/``` subfolder.
 
-Instead of {folderName}, use the name of your model folder in ui/data/, for example http://localhost/index.php?setup=ABAP/PackageExplorer&model=Test
+In our example, it is named ```Test```, so the complete URL will be http://localhost/index.php?setup=ABAP/PackageExplorer&model=Test.
 
 The visualization will look similar to this:
 
