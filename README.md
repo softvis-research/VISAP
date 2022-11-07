@@ -53,9 +53,9 @@ Click on the config for Apache and select Apache (httpd.conf). Change the path b
 Save the config, close it, and start the Apache Module.
 
 You should now be able to view the visualization in the browser.
-Enter the URL http://localhost/index.php?setup=ABAP/PackageExplorer&model={folderName}, where ```{folderName}``` is the name of the folder inside which you created the ```model/``` subfolder.
+Enter the URL http://localhost/index.php?setup={setupPath}&model={folderName}, where ```{folderName}``` is the name of the folder inside which you created the ```model/``` subfolder. ```{setupPath}``` is where the setup lives inside the ```ui/setups/``` folder. For now, the only available setup is Initial/hover.
 
-In our example, it is named Test, so the complete URL will be http://localhost/index.php?setup=ABAP/PackageExplorer&model=Test.
+Hence, with our folderName being Test, the complete URL will be http://localhost/index.php?setup=Initial/hover&model=Test.
 
 The visualization will look similar to this:
 
