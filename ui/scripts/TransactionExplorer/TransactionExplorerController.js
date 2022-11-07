@@ -1,137 +1,72 @@
-var packageExplorerController = (function () {
+var transactionExplorerController = (function () {
 
-	let packageExplorerTreeID = "packageExplorerTree";
-	let jQPackageExplorerTree = "#packageExplorerTree";
+    let transactionExplorerTreeID = "transactionExplorerTree";
+	let jQTransactionExplorerTree = "#transactionExplorerTree";
 
 	let tree;
 
-	var entityTypesForSearch = ["Namespace", "Class", "Interface", "Report", "FunctionGroup"];
+	//var entityTypesForSearch = ["Namespace", "Class", "Interface", "Report", "FunctionGroup"];
 
     var elementsMap = new Map();
 
 	const domIDs = {
 		zTreeDiv: "zTreeDiv",
-		searchDiv: "searchDiv",
-		searchInput: "searchField"
+		//searchDiv: "searchDiv",
+		//searchInput: "searchField"
 	}
 
 	let controllerConfig = {
-		elements: [],
+
+        elements: [],
 		elementsSelectable: true,
 
-		showSearchField: true,
-		entityTypesForSearch: entityTypesForSearch,
+		//showSearchField: true,
+		//entityTypesForSearch: entityTypesForSearch,
 
 		useMultiselect: true,
+
 	};
 
-	var selectedEntities = [];
+    var selectedEntities = [];
 
 	function initialize(setupConfig) {
-		application.transferConfigParams(setupConfig, controllerConfig);
+
+        application.transferConfigParams(setupConfig, controllerConfig);
 
         controllerConfig.elements.forEach(function (element) {
 			elementsMap.set(element.type, element);
 		});
+
 	}
 
 	function activate(rootDiv) {
 
-		if (controllerConfig.showSearchField) {
-			//search field
-			let searchDiv = document.createElement("DIV");
-			searchDiv.id = domIDs.searchDiv;
-			searchDiv.setAttribute("ignoreTheme", "true");
-
-			const cssLink = document.createElement("link");
-			cssLink.type = "text/css";
-			cssLink.rel = "stylesheet";
-			cssLink.href = "scripts/PackageExplorer/tt.css";
-			document.getElementsByTagName("head")[0].appendChild(cssLink);
-
-			//create search input field
-			const searchInput = document.createElement("INPUT");
-			searchInput.id = domIDs.searchInput;
-			searchInput.type = "text";
-
-			searchDiv.appendChild(searchInput);
-			rootDiv.appendChild(searchDiv);
-
-			$("#" + domIDs.searchInput).jqxInput({ theme: "metro", width: "100%", height: "30px", placeHolder: "Search" });
-		}
-
-		//create zTree div-container
+        //create zTree div-container
 		let zTreeDiv = document.createElement("DIV");
 		zTreeDiv.id = domIDs.zTreeDiv;
 
-		let packageExplorerTreeUL = document.createElement("UL");
-		packageExplorerTreeUL.id = packageExplorerTreeID;
-		packageExplorerTreeUL.setAttribute("class", "ztree");
+		let transactionExplorerTreeUL = document.createElement("UL");
+		transactionExplorerTreeUL.id = transactionExplorerTreeID;
+		transactionExplorerTreeUL.setAttribute("class", "ztree");
 
-		zTreeDiv.appendChild(packageExplorerTreeUL);
+		zTreeDiv.appendChild(transactionExplorerTreeUL);
 		rootDiv.appendChild(zTreeDiv);
 
 		//create zTree
 		prepareTreeView();
 
-		if (controllerConfig.showSearchField) {
-			initializeSearch();
-		}
-
-		events.selected.on.subscribe(onEntitySelected);
+        events.selected.on.subscribe(onEntitySelected);
 		events.selected.off.subscribe(onEntityUnselected);
 		events.loaded.on.subscribe(onEntitiesLoaded);
 		events.filtered.off.subscribe(onEntitiesUnfiltered);
+        
 	}
 
-	function reset() {
+    function reset() {
 		prepareTreeView();
 	}
 
-	function initializeSearch() {
-		var relevantEntities = [];
-
-		model.getAllEntities().forEach(function(entity) {
-			if (entityTypesForSearch.includes(entity.type)) {
-				//ignore local classes and local interfaces
-				if ((entity.type === "Class" || entity.type === "Interface") && entity.belongsTo.type !== "Namespace") {
-					return;
-				}
-				relevantEntities.push(entity);
-			}
-		})
-
-		var suggestions = new Bloodhound({
-			local: relevantEntities,
-			datumTokenizer: function (entity) {
-				return Bloodhound.tokenizers.whitespace(entity.name);
-			},
-			queryTokenizer: Bloodhound.tokenizers.whitespace,
-			limit: 20
-		});
-		suggestions.initialize();
-
-		$("#" + domIDs.searchInput).typeahead(
-			{
-				hint: true,
-				highlight: true,
-				minLength: 3
-			}, {
-			name: "suggestions",
-			// displayKey: "qualifiedName",
-			source: suggestions.ttAdapter(),
-			templates: {
-				empty: Handlebars.compile('<div class="result"><p>no entities found</p></div>'),
-				suggestion: Handlebars.compile('<div class="result"><p class="name">{{name}}</p><p class="entityType">{{type}}</p></div>')
-			}
-		});
-
-        $("#" + domIDs.searchInput).on("typeahead:selected", function(event, suggestion) {
-			publishSelectEvent(undefined, undefined, { id: suggestion.id }, undefined);
-        });
-	}
-
-	function prepareTreeView() {
+    function prepareTreeView() {
 
 		const entities = model.getCodeEntities();
 		const items = createZTreeElements(entities);
@@ -164,42 +99,100 @@ var packageExplorerController = (function () {
 		};
 
 		//create zTree
-		tree = $.fn.zTree.init($(jQPackageExplorerTree), settings, items);
+		tree = $.fn.zTree.init($(jQTransactionExplorerTree), settings, items);
+	}
+
+	function searchTransactionsForZTree(entities) {
+		const transactionElements = [];
+     
+        entities.forEach(function (entity) {
+
+		  if( entity.type == 'Transaction'){
+
+				transactionElements.push(entity)
+			
+		  }
+	  });	
+	  
+	  return transactionElements;
+	}
+
+	function findCalledByElements(entity) {
+		const calledByElements = [];
+
+		var calledElements = entity.calls;
+
+		if (!calledElements || calledElements.length < 1){
+			return calledByElements;
+		}
+
+		calledElements.forEach(function (calledElement) {
+			
+			calledByElements.push(calledElement)
+		});
+
+		return calledByElements;
+
+	}
+
+	function createItemsForTransactions(entity, parentId){
+
+		var transactionItems = [];
+
+        var icon = elementsMap.get(entity.type).icon;
+
+		var item = createItem(entity, icon, parentId);
+		transactionItems.push(item);
+
+		var calledByEntities = findCalledByElements(entity);
+
+		if(calledByEntities.length < 1){
+			return transactionItems;
+		}
+
+		calledByEntities.forEach(function(calledElement){
+
+            var calledItems = createItemsForTransactions(calledElement, entity.id);
+            transactionItems.push(...calledItems);
+		});	
+
+		return transactionItems;
+	}
+
+
+	function createItem(entity, icon, parentId){
+
+		var item = {
+			id: entity.id,
+			open: false,
+			checked: !entity.filtered,
+			parentId: parentId,
+			name: entity.name,
+			type: entity.type,
+			icon: icon,
+			iconSkin: "zt"
+		};
+
+		return item;
+
 	}
 
 	function createZTreeElements(entities) {
-		const items = [];
-		entities.forEach(function (entity) {
-			if(elementsMap.has(entity.type)){
-				var icon = elementsMap.get(entity.type).icon;
 
-				var parentId = "";
-				if (entity.belongsTo !== undefined) {
-					parentId = entity.belongsTo.id;
-				}
-				const item = {
-					id: entity.id,
-					open: false,
-					checked: !entity.filtered,
-					parentId: parentId,
-					name: entity.name,
-					type: entity.type,
-					icon: icon,
-					iconSkin: "zt"
-				};
-				items.push(item);
+		var items = [];
+		var transactionEntities = searchTransactionsForZTree(entities);
 
-				if (entity.hasUnloadedChildren) {
-					const placeholderItem = {
-						id: entity.id + "-children-placeholder",
-						open: false,
-						checked: false,
-						parentId: entity.id,
-						name: "Loading children...",
-						type: entity.type
-					};
-					items.push(placeholderItem);
-				}
+		if(transactionEntities.length < 1){
+			return items;
+		}
+
+		transactionEntities.forEach(function (transactionEntity){
+
+			if(elementsMap.has(transactionEntity.type)){
+				
+				var transactionItems = createItemsForTransactions(transactionEntity, "");
+				items.push(...transactionItems);
+
 			}
 		});
 
@@ -220,21 +213,43 @@ var packageExplorerController = (function () {
 			}
 
 			return 0;
-		});
+		}); 
 
 		return items;
 	}
 
-	function zTreeOnCheck(event, treeId, treeNode) {
+	function getAllCalledByElements(entity){
+
+        var calledByItems = [];
+
+		var calledElements = entity.calls;
+
+		if(!calledElements || calledElements.length < 1){
+			return calledByItems;
+		}
+
+		calledElements.forEach(function (calledElement) {
+			calledByItems.push(calledElement);
+
+			const grandChildren = getAllCalledByElements(calledElement);
+	        calledByItems = calledByItems.concat(grandChildren);
+		});
+
+		return calledByItems;
+
+	}
+
+    function zTreeOnCheck(event, treeId, treeNode) {
 
 		//node.checkedOld = node.checked; //fix zTree bug on getChangeCheckedNodes
 
 		const entity = model.getEntityById(treeNode.id);
-		const children = model.getAllChildrenOfEntity(entity);
+		//const children = model.getAllChildrenOfEntity(entity);
+		var children = getAllCalledByElements(entity);
 		const entities = [entity, ...children];
 
 		const applicationEvent = {
-			sender: packageExplorerController,
+			sender: transactionExplorerController,
 			entities: entities
 		};
 
@@ -254,7 +269,7 @@ var packageExplorerController = (function () {
 		}
 	}
 
-	function publishSelectEvent(treeEvent, treeId, treeNode, eventObject) {
+    function publishSelectEvent(treeEvent, treeId, treeNode, eventObject) {
 
 		const clickedEntity = model.getEntityById(treeNode.id);
 		// do nothing when selecting an invisible entity
@@ -265,7 +280,7 @@ var packageExplorerController = (function () {
 		//always deselect the previously selected entities
 		if (selectedEntities.size != 0) {
 			const unselectEvent = {
-				sender: packageExplorerController,
+				sender: transactionExplorerController,
 				entities: selectedEntities
 			}
 
@@ -278,12 +293,14 @@ var packageExplorerController = (function () {
 			let newSelectedEntities = [clickedEntity];
 
 			if (controllerConfig.useMultiselect) {
-				const visibleChildren = model.getAllChildrenOfEntity(clickedEntity).filter(entity => !entity.filtered);
+				//const visibleChildren = model.getAllChildrenOfEntity(clickedEntity).filter(entity => !entity.filtered);
+				var visibleChildren = getAllCalledByElements(clickedEntity).filter(entity => !entity.filtered);
+			
 				newSelectedEntities = newSelectedEntities.concat(visibleChildren);
 			}
 
 			const selectEvent = {
-				sender: packageExplorerController,
+				sender: transactionExplorerController,
 				entities: newSelectedEntities
 			};
 			events.selected.on.publish(selectEvent);
@@ -315,7 +332,7 @@ var packageExplorerController = (function () {
 
 	function onEntitiesUnfiltered(applicationEvent) {
 		// only catch events from elsewhere - if they come from here, the tree will already be updated
-		if (applicationEvent.sender !== packageExplorerController) {
+		if (applicationEvent.sender !== transactionExplorerController) {
 			// put all ids into a set, so we can use its constant-time has() to find the matching ZTree objects more efficiently
 			const entityIdSet = new Set();
 			for (const entity of applicationEvent.entities) {
@@ -363,6 +380,7 @@ var packageExplorerController = (function () {
 			$("#" + domIDs.searchInput).val("");
 		}
 	}
+
 
 	return {
 		initialize: initialize,
