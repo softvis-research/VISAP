@@ -52,7 +52,7 @@ if (isset($_GET["lazy"])) {
 </script>
 
 <html>
-<title>Getaviz</title>
+<title>VISAP</title>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">
 
