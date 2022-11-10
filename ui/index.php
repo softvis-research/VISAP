@@ -57,13 +57,13 @@ if (isset($_GET["lazy"])) {
 <link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">
 
 <!--Main-->
-<script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
-<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+<script type="text/javascript" src="libs/jquery.min.js"></script>
+<script type="text/javascript" src="libs/aframe-1.0.4.min.js"></script>
 
 <!--jqwidgets-->
-<script type="text/javascript" src="node_modules/jqwidgets-scripts/jqwidgets/jqxcore.js"></script>
-<script type="text/javascript" src="node_modules/jqwidgets-scripts/jqwidgets/jqxbuttons.js"></script>
-<script type="text/javascript" src="node_modules/jqwidgets-scripts/jqwidgets/jqxsplitter.js"></script>
+<script type="text/javascript" src="libs/jqwidgets-scripts/jqxcore.js"></script>
+<script type="text/javascript" src="libs/jqwidgets-scripts/jqxbuttons.js"></script>
+<script type="text/javascript" src="libs/jqwidgets-scripts/jqxsplitter.js"></script>
 
 <!-- orbitcam -->
 <script type="text/javascript" src="scripts/ABAP/aframe-orbit-camera-component.js"></script>
