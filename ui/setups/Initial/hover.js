@@ -1,68 +1,42 @@
 ﻿var setup = {
-
 	controllers: [
 
-		{ 	name: 	"defaultLogger",
+		{
+		    name: 	"defaultLogger",
 
 			logActionConsole	: false,
 			logEventConsole		: false
-		},		
-
-		
-		{	name: 	"canvasHoverController",
 		},
-
-		{	name: 	"canvasSelectController"
+		{
+		    name: 	"canvasHoverController",
 		},
-
-		{ 	name: 	"canvasResetViewController"
-		},
-
 	],
 
-
 	uis: [
-
-		
 		{	name: "UI0",
 
 			navigation: {
 				//examine, walk, fly, helicopter, lookAt, turntable, game
 				type:	"examine",
 				//speed: 10
-			},	
-
-
-
+			},
 			area: {
 				name: "top",
 				orientation: "horizontal",
-
-				first: {
-					size: "10%",
-
-					controllers: [
-						{ name: "canvasResetViewController" },
-					],
-				},
+				first: { },
 				second: {
-					size: "90%",	
-					collapsible: false,
+				    size: "100%",
+				    collapsible: false,
+				    name: "canvas",
+				    canvas: { },
 
+				    controllers: [
+				    	{ name: "defaultLogger" },
 
-
-					canvas: { },
-					
-					controllers: [
-						{ name: "defaultLogger" },												
-
-						{ name: "canvasHoverController" },
-						{ name: "canvasSelectController" },
-					],						
+				    	{ name: "canvasHoverController" },
+				    ],
 				}
 			}
-			
 		}
-	
 	]
 };

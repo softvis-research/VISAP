@@ -70,13 +70,7 @@ if (isset($_GET["lazy"])) {
 <script type="text/javascript" src="scripts/ABAP/aframe-orbit-camera-component.js"></script>
 
 <!-- controller -->
-<script type="text/javascript" src="scripts/CanvasFilter/CanvasFilterController.js"></script>
-<script type="text/javascript" src="scripts/CanvasMark/CanvasMarkController.js"></script>
 <script type="text/javascript" src="scripts/CanvasHover/AframeCanvasHoverController.js"></script>
-<script type="text/javascript" src="scripts/CanvasFlyTo/CanvasFlyToController.js"></script>
-<script type="text/javascript" src="scripts/CanvasSelect/CanvasSelectController.js"></script>
-<script type="text/javascript" src="scripts/CanvasResetView/CanvasResetViewController.js"></script>
-<script type="text/javascript" src="scripts/CanvasGrid/CanvasGridController.js"></script>
 
 <!--user interface-->
 <script type="text/javascript" src="scripts/DefaultLogger.js"></script>
@@ -84,7 +78,6 @@ if (isset($_GET["lazy"])) {
 <script type="text/javascript" src="scripts/Events.js"></script>
 <script type="text/javascript" src="scripts/AframeCanvasManipulator.js"></script>
 <script type="text/javascript" src="scripts/AframeActionController.js"></script>
-<script type="text/javascript" src="scripts/ModelLoader.js"></script>
 
 <script type="text/javascript" src="scripts/Application.js"></script>
 <link rel="stylesheet" href="Style.css" type="text/css" />
