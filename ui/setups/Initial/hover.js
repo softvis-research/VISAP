@@ -1,6 +1,5 @@
 ﻿var setup = {
 	controllers: [
-
 		{
 		    name: 	"defaultLogger",
 
@@ -13,11 +12,12 @@
 	],
 
 	uis: [
-		{	name: "UI0",
+		{
+		    name: "UI0",
 
 			navigation: {
 				//examine, walk, fly, helicopter, lookAt, turntable, game
-				type:	"examine",
+				type: "examine",
 				//speed: 10
 			},
 			area: {

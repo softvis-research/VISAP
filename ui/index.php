@@ -66,7 +66,6 @@ if (isset($_GET["lazy"])) {
 <script type="text/javascript" src="node_modules/jqwidgets-scripts/jqwidgets/jqxsplitter.js"></script>
 
 <!-- orbitcam -->
-
 <script type="text/javascript" src="scripts/ABAP/aframe-orbit-camera-component.js"></script>
 
 <!-- controller -->
