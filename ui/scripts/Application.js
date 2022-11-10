@@ -145,8 +145,6 @@ var application = (function () {
 		} catch (err) {
 			events.log.error.publish({ text: err.message });
 		}
-
-		macroExplorerController.sendInitialEvent();
 	}
 
 
