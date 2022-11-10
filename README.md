@@ -34,10 +34,6 @@ The resulting model files (model.html and metaData.json) are placed in the neo4j
 
 ### Displaying a Model in the Browser
 
-| :warning: WARNING                                                                                                                                                                                                     |
-|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Before you get started with displaying your model in the browser, you will need a ```node_modules/``` folder in the ```ui/``` folder. Unfortunately, we are currently unable to upload this folder to the repository. |
-
 After following the instructions in section [Generating a Model](#generating-a-model), two files will have been generated for you: model.html and metaData.json.
 
 To display the model in the browser, first navigate to the folder ```ui/data/```. Create a subfolder with a name of your liking, for example ```Test```. Inside the newly created subfolder, create another subfolder named ```model```. Copy both the model.html file and the metaData.json file into this subfolder.
