@@ -57,8 +57,8 @@ if (isset($_GET["lazy"])) {
 <link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">
 
 <!--Main-->
-<script type="text/javascript" src="libs/jquery.min.js"></script>
-<script type="text/javascript" src="libs/aframe-1.0.4.min.js"></script>
+		<script type="text/javascript" src="libs/jquery-3.6.1.min.js"></script>
+		<script type="text/javascript" src="libs/aframe-1.0.4.min.js"></script>
 
 <!--jqwidgets-->
 <script type="text/javascript" src="libs/jqwidgets-scripts/jqxcore.js"></script>
