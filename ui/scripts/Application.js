@@ -1,4 +1,6 @@
-$(document).ready(function () {
+$(document).ready(async function () {
+	// get setup file
+	await new Promise((resolve, reject) => $.getScript(setupPath, resolve).fail(reject));
 
 	//parse setup if defined
 	if (!window["setup"]) {
@@ -19,7 +21,7 @@ $(document).ready(function () {
 		});
 	}
 	//load famix data
-	$.getJSON(metaDataJsonUrl, initializeApplication);
+	$.getJSON(metaDataPath, initializeApplication);
 });
 
 function initializeApplication(metaDataJson) {
