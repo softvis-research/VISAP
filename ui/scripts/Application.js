@@ -27,39 +27,24 @@ $(document).ready(async function () {
 function initializeApplication(metaDataJson) {
 	//wait for canvas to be loaded full here...
 	var canvas = document.getElementById(canvasId);
-	if (!canvas && !lazyLoadingEnabled) {
+	if (!canvas) {
 		setTimeout(function () { initializeApplication(metaDataJson); }, 100);
 		return;
 	}
 
 	model.initialize();
+	model.createEntititesFromMetadata(metaDataJson);
 
-	var loaderPromise;
-	//create entity model
-	if (lazyLoadingEnabled) {
-		neo4jModelLoadController.initialize();
-		loaderPromise = neo4jModelLoadController.loadInitialData();
-	} else {
-		// this is synchronous, but if we wrap it into a promise we can use the same handling as for the async version
-		loaderPromise = new Promise((resolve) => resolve(model.createEntititesFromMetadata(metaDataJson)));
+	actionController.initialize();
+	canvasManipulator.initialize();
+	application.initialize();
+
+	if (setup.loadPopUp) {
+		$("#RootLoadPopUp").jqxWindow("close");
 	}
-
-	loaderPromise.then(() => {
-		actionController.initialize();
-		canvasManipulator.initialize();
-
-		//initialize application
-		application.initialize();
-
-		if (setup.loadPopUp) {
-			$("#RootLoadPopUp").jqxWindow("close");
-		}
-	});
 }
 
 var application = (function () {
-
-	var controllerFileFolder = "scripts/";
 
 	var controllers = new Map();
 	var activeControllers = new Map();
@@ -324,8 +309,6 @@ var application = (function () {
 		if (configPart.navigation !== undefined) {
 			createNavigationMode(configPart.navigation);
 		}
-
-
 
 	}
 
