@@ -284,18 +284,11 @@ var application = (function () {
 
 		//canvas
 		if (configPart.canvas !== undefined) {
-			if (visMode != "aframe") {
-				var canvasParentElement = canvasElement.parentElement;
-				canvasParentElement.removeChild(canvasElement);
+			var canvasParentElement = canvasElement.parentElement;
+			canvasParentElement.removeChild(canvasElement);
 
-				parent.appendChild(canvasElement);
-			} else {
-				var canvasParentElement = canvasElement.parentElement;
-				canvasParentElement.removeChild(canvasElement);
-
-				parent.appendChild(canvasElement.cloneNode(true));
-				//	evtl canvas löschen ??
-			}
+			parent.appendChild(canvasElement.cloneNode(true));
+			//	evtl canvas löschen ??
 		}
 
 		//controller
@@ -304,12 +297,6 @@ var application = (function () {
 				setActivateController(controller, parent);
 			});
 		}
-
-		//navigation
-		if (configPart.navigation !== undefined) {
-			createNavigationMode(configPart.navigation);
-		}
-
 	}
 
 
@@ -403,34 +390,6 @@ var application = (function () {
 
 	//gui creation
 	//*******************
-
-	function createNavigationMode(navigationObject) {
-		if (visMode == "x3dom") {
-			var navigationInfoElement = document.getElementById("navigationInfo");
-
-			if (!navigationInfoElement) {
-				var scene = document.getElementById("scene");
-
-				navigationInfoElement = document.createElement("NAVIGATIONINFO");
-				navigationInfoElement.id = "navigationInfo";
-
-				scene.appendChild(navigationInfoElement);
-			}
-
-			if (navigationObject.type) {
-				navigationInfoElement.setAttribute("type", navigationObject.type);
-			}
-			if (navigationObject.speed) {
-				navigationInfoElement.setAttribute("speed", navigationObject.speed);
-			}
-
-			//Turntable seems not to work with 1.7 and dynamic adding
-			if (navigationObject.typeParams) {
-				navigationInfoElement.setAttribute("typeParams", navigationObject.typeParams);
-			}
-		}
-		else console.debug("No x3dom - no navigationInfoElement");
-	}
 
 	function createPanel(areaPart) {
 		var panel = {
