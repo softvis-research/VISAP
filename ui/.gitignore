@@ -1,5 +1,4 @@
-.directory
-.idea/
-.data/**
-.data/!Example
+directory
+data/*
+!data/Example/
 node_modules/
