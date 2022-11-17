@@ -20,7 +20,6 @@ public class LoaderStep {
         boolean isSilentMode = Config.setup.silentMode();
         String pathToNodesCsv = "";
         String pathToReferenceCsv = "";
-        String pathToInheritanceCsv = "";
 
         Scanner userInput = new Scanner(System.in);
 
@@ -31,12 +30,10 @@ public class LoaderStep {
                 pathToNodesCsv = p.toString();
             } else if (p.toString().endsWith("_Reference.csv")) {
                 pathToReferenceCsv = p.toString();
-            } else if (p.toString().endsWith("_Inheritance.csv")) {
-                pathToInheritanceCsv = p.toString();
             }
         }
 
-        if (pathToNodesCsv.isEmpty() || pathToInheritanceCsv.isEmpty() || pathToReferenceCsv.isEmpty())
+        if (pathToNodesCsv.isEmpty() || pathToReferenceCsv.isEmpty())
         {
             System.out.println("Some input file wasn't found");
             System.exit(0);
@@ -94,21 +91,6 @@ public class LoaderStep {
                         "MATCH (a:Elements {element_id: row.source_id}), (b:Elements {element_id: row.target_id})\n" +
                         "CREATE (a)-[r:"+ SAPRelationLabels.REFERENCES +"]->(b)"
 
-        );
-
-        // 5. Upload Inheritances
-        System.out.println("Path to Inheritances CSV: " + pathToInheritanceCsv);
-        if (!isSilentMode) {
-            System.out.print("Creating 'INHERIT' relationships. Press any key to continue...");
-            userInput.nextLine();
-        }
-        pathToInheritanceCsv = pathToInheritanceCsv.replace("\\", "/");
-        pathToInheritanceCsv = pathToInheritanceCsv.replace(" ", "%20");
-        connector.executeWrite(
-                "LOAD CSV WITH HEADERS FROM \"file:///" + pathToInheritanceCsv + "\"\n" +
-                        "AS row FIELDTERMINATOR ';'\n" +
-                        "MATCH (a:Elements {element_id: row.subclass_id}), (b:Elements {element_id: row.superclass_id})\n" +
-                        "CREATE (a)-[r:"+ SAPRelationLabels.INHERIT +"]->(b)"
         );
 
         connector.close();
