@@ -1,4 +1,3 @@
-directory
 data/*
 !data/Example/
 node_modules/
