@@ -224,5 +224,5 @@ var canvasHoverController = (function () {
 		reset: reset,
 		handleOnMouseEnter: handleOnMouseEnter,
 		handleOnMouseLeave: handleOnMouseLeave
-    };
+	};
 })();

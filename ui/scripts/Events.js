@@ -5,9 +5,9 @@ var events = (function() {
 	let events = { };
 
 
-    //***************
-    //state events
-    //***************
+	//***************
+	//state events
+	//***************
 	const statesArray = Object.keys(model.states);
 	
 	statesArray.forEach(function(stateName){
@@ -56,13 +56,13 @@ var events = (function() {
 		};
 	});
 
-	
 
-    //**************
-    //log events
-    //**************
 
-    const logTypes = {
+	//**************
+	//log events
+	//**************
+
+	const logTypes = {
 		info			: { name: "info"},
 		warning			: { name: "warning"},
 		error			: { name: "error"},
@@ -110,8 +110,8 @@ var events = (function() {
 
 
 	//**************
-    //UI events
-    //**************
+	//UI events
+	//**************
 
 	events.ui = {};
 
@@ -130,15 +130,15 @@ var events = (function() {
 	events.ui.buttonClick = buttonClick;
 	
 	//**************
-    //Config events
-    //**************
+	//Config events
+	//**************
 	
 	const configTypes = {
 		weight				: { name: "weight"},
 		innerClasses		: { name: "innerClasses"},
 		bundledEdges		: { name: "bundledEdges"},
 		filterSettings		: { name: "filterSettings"},
-        issues              : { name: "issues"}
+		issues				: { name: "issues"}
 	};
 	events.config = {};
 	const configTypeArray = Object.keys(configTypes);

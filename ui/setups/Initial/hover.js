@@ -1,19 +1,19 @@
 ﻿var setup = {
 	controllers: [
 		{
-		    name: 	"defaultLogger",
+			name: 	"defaultLogger",
 
 			logActionConsole	: false,
 			logEventConsole		: false
 		},
 		{
-		    name: 	"canvasHoverController",
+			name: 	"canvasHoverController",
 		},
 	],
 
 	uis: [
 		{
-		    name: "UI0",
+			name: "UI0",
 
 			navigation: {
 				//examine, walk, fly, helicopter, lookAt, turntable, game
@@ -25,16 +25,16 @@
 				orientation: "horizontal",
 				first: { },
 				second: {
-				    size: "100%",
-				    collapsible: false,
-				    name: "canvas",
-				    canvas: { },
+					size: "100%",
+					collapsible: false,
+					name: "canvas",
+					canvas: { },
 
-				    controllers: [
-				    	{ name: "defaultLogger" },
+					controllers: [
+						{ name: "defaultLogger" },
 
-				    	{ name: "canvasHoverController" },
-				    ],
+						{ name: "canvasHoverController" },
+					],
 				}
 			}
 		}

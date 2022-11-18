@@ -17,11 +17,11 @@ var defaultLogger = (function() {
 	var eventLogQueue = new Array(); 
 	var manipulationLogQueue = new Array(); 
 
-	function initialize(setupConfig){ 	
+	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
-    }	
+	}
 	
-	function activate(){
+	function activate() {
 		events.log.info.subscribe(logInfo);
 		events.log.warning.subscribe(logWarning);
 		events.log.error.subscribe(logError);
@@ -30,96 +30,93 @@ var defaultLogger = (function() {
 		events.log.manipulation.subscribe(logManipulation);
 	}
 	
-	function logInfo(logObject){		
+	function logInfo(logObject) {
 		infoLogQueue.push({ 
 			text: "INFO: " + logObject.text, 
 			logObject: logObject 
 		});
-		if(infoLogQueue.length > controllerConfig.logQueueSize){
+		if(infoLogQueue.length > controllerConfig.logQueueSize) {
 			infoLogQueue.shift();
 		}
 
-		if(controllerConfig.logInfoConsole){
+		if(controllerConfig.logInfoConsole) {
 			console.log("INFO: " + logObject.text );
-		}		
+		}
 	}
 
-	function logWarning(logObject){			
+	function logWarning(logObject) {
 		warningLogQueue.push({ 
 			text: "WARNING: " + logObject.text, 
 			logObject: logObject 
 		});
-		if(warningLogQueue.length > controllerConfig.logQueueSize){
+		if(warningLogQueue.length > controllerConfig.logQueueSize) {
 			warningLogQueue.shift();
 		}
 
-		if(controllerConfig.logWarningConsole){			
-			console.log("WARNING: " + logObject.text );		
+		if(controllerConfig.logWarningConsole) {
+			console.log("WARNING: " + logObject.text );
 		}
 	}
 
-	function logError(logObject){					
+	function logError(logObject) {
 		errorLogQueue.push({ 
 			text: "ERROR: " + logObject.text, 
 			logObject: logObject 
 		});
-		if(errorLogQueue.length > controllerConfig.logQueueSize){
+		if(errorLogQueue.length > controllerConfig.logQueueSize) {
 			errorLogQueue.shift();
 		}
 
-		if(controllerConfig.logErrorConsole){	
+		if(controllerConfig.logErrorConsole) {
 			console.log("ERROR: " + logObject.text );
 		}		
 	}
 
-	function logAction(logObject){		
+	function logAction(logObject) {
 		actionLogQueue.push({ 
 			text: "ACTION: " + logObject.actionObject.type + " " + logObject.eventObject.which, 
 			logObject: logObject 
 		});
-		if(actionLogQueue.length > controllerConfig.logQueueSize){
+		if(actionLogQueue.length > controllerConfig.logQueueSize) {
 			actionLogQueue.shift();
 		}
 
-		if(controllerConfig.logActionConsole){				
-			console.log("ACTION: " + logObject.actionObject.type + " " + logObject.eventObject.which );		
+		if(controllerConfig.logActionConsole) {
+			console.log("ACTION: " + logObject.actionObject.type + " " + logObject.eventObject.which );
 		}
 	}
 
-	function logEvent(logObject){		
+	function logEvent(logObject) {
 		eventLogQueue.push({ 
 			text: "EVENT: " + logObject.eventTypeName, 
 			logObject: logObject 
 		});
-		if(eventLogQueue.length > controllerConfig.logQueueSize){
+		if(eventLogQueue.length > controllerConfig.logQueueSize) {
 			eventLogQueue.shift();
 		}
 
-		if(controllerConfig.logEventConsole){				
-			console.log("EVENT: " + logObject.eventTypeName);		
+		if(controllerConfig.logEventConsole) {
+			console.log("EVENT: " + logObject.eventTypeName);
 		}
 	}
 
-	function logManipulation(logObject){		
+	function logManipulation(logObject) {
 		manipulationLogQueue.push({ 
 			text: "MANIPULATION: " + logObject.manipulation.manipulationFunction, 
 			logObject: logObject 
 		});
-		if(manipulationLogQueue.length > controllerConfig.logQueueSize){
+		if(manipulationLogQueue.length > controllerConfig.logQueueSize) {
 			manipulationLogQueue.shift();
 		}
 
-		if(controllerConfig.logManipulationConsole){				
-			console.log("MANIPULATION: " + logObject.manipulation.manipulationFunction );		
+		if(controllerConfig.logManipulationConsole) {
+			console.log("MANIPULATION: " + logObject.manipulation.manipulationFunction );
 		}
 	}
 
 
 
-
-
-
-	function getLogQueues(){
+	function getLogQueues() {
 		return {
 			infoLogQueue 			: infoLogQueue,
 			warningLogQueue 		: warningLogQueue,
@@ -134,5 +131,5 @@ var defaultLogger = (function() {
 		initialize			: initialize,
 		activate			: activate,
 		getLogQueues 		: getLogQueues	
-	};    
+	};
 })();

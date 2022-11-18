@@ -170,7 +170,7 @@ var model = (function () {
 							entity.calledBy = [];
 						}
 						break;
-                case "Reference":
+				case "Reference":
 					if (element.rcData) {
 						entity.rcData = element.rcData.split(",");
 					} else {
