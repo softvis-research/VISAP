@@ -24,13 +24,6 @@ public class AElementArranger {
                 continue;
             }
 
-            // for RefBuildings
-            if (recElement.getSourceNode() == null && refBuilding != null) {
-                if (refBuilding == CityElement.CitySubType.Sea || refBuilding == CityElement.CitySubType.Mountain) {
-                    originSet.add(element);
-                }
-            }
-
             // for Elements with SourceNode
             if (recElement.getSourceNode() != null && refBuilding == null) {
 

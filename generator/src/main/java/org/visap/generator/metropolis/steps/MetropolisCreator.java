@@ -37,8 +37,6 @@ public class MetropolisCreator {
         log.info("Create City Relations");
         createAllMetropolisRelations(nodeRepository);
 
-        log.info("Create ReferenceBuildings");
-        createReferenceBuildingRelations();
 
         log.info("Delete empty Districts");
         deleteEmptyDistricts();
@@ -81,60 +79,6 @@ public class MetropolisCreator {
         createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.Building, SAPNodeProperties.type_name, SAPNodeTypes.Method);
         createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.Building, SAPNodeProperties.type_name, SAPNodeTypes.Attribute);
     }
-
-    private void createReferenceBuildingRelations() {
-
-        Collection<CityElement> packageDistricts = repository.getElementsByTypeAndSourceProperty(CityElement.CityType.District, SAPNodeProperties.type_name, SAPNodeTypes.Namespace.toString());
-        log.info(packageDistricts.size() + "  districts loaded");
-
-        long mountainCounter = 0;
-        long seaCounter = 0;
-        long cloudCounter = 0;
-
-        for (CityElement packageDistrict: packageDistricts){
-
-            // nur für Hauptpaket (Iteration 0)
-            String iterationString = packageDistrict.getSourceNodeProperty(SAPNodeProperties.iteration);
-            int iterationInt = Integer.parseInt(iterationString);
-
-            Collection<CityElement> subElements = packageDistrict.getSubElements();
-
-            if(iterationInt == 0) {
-
-                if (!subElements.isEmpty()) {
-
-                    if (Config.Visualization.Metropolis.ReferenceBuilding.show.mountain()) {
-                        createRefBuilding(packageDistrict, CityElement.CitySubType.Mountain);
-                        mountainCounter++;
-                    }
-
-                    if (Config.Visualization.Metropolis.ReferenceBuilding.show.sea()) {
-                        createRefBuilding(packageDistrict, CityElement.CitySubType.Sea);
-                        seaCounter++;
-                    }
-                }
-            }
-
-            if (Config.Visualization.Metropolis.ReferenceBuilding.show.cloud()) {
-                for (CityElement subElement : subElements) { //SubElements = Class/Repo/FuGr-District
-
-                    if (subElement.getType().equals(CityElement.CityType.District)) {
-                        String migrationFindingsString = subElement.getSourceNodeProperty(SAPNodeProperties.migration_findings);
-                        if (migrationFindingsString.equals("true")) {
-                            createRefBuilding(subElement, CityElement.CitySubType.Cloud);
-                            cloudCounter++;
-
-                        }
-                    }
-                }
-            }
-        }
-
-        log.info(mountainCounter + " refBuildings of type mountain created");
-        log.info(seaCounter + " refBuildings of type sea created");
-        log.info(cloudCounter + " refBuildings of type cloud created");
-    }
-
 
     private CityElement createRefBuilding(CityElement packageDistrict, CityElement.CitySubType refBuildingType) {
         CityElement refBuilding = new CityElement(CityElement.CityType.Reference);

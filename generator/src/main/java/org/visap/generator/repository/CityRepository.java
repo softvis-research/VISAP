@@ -58,28 +58,6 @@ public class CityRepository {
         return new ArrayList(elementsByTypeMap.values());
     }
 
-    public Collection<CityElement> getElementsByRefBuildingType(CityElement.CitySubType refBuildingType){
-
-        Collection<CityElement> buildings  = getElementsByType(CityElement.CityType.Building);
-        List<CityElement> referenceBuildingElements = new ArrayList<>();
-
-        for ( CityElement building : buildings) {
-            CityElement.CitySubType buildingSubType = building.getSubType();
-
-            if (buildingSubType == null) {
-                continue;
-            }
-
-            if(refBuildingType.equals(buildingSubType)) {
-                if (refBuildingType.equals(CityElement.CitySubType.Sea)) {
-                    referenceBuildingElements.add(building);
-                } else if (refBuildingType.equals(CityElement.CitySubType.Mountain)) {
-                    referenceBuildingElements.add(building);
-                }
-            }
-        }
-        return referenceBuildingElements;
-    }
 
     public Collection<CityElement> getElementsByTypeAndSourceProperty(CityElement.CityType type, SAPNodeProperties sourceProperty, String sourcePropertyValue){
         Collection<CityElement> elementsByType = getElementsByType(type);

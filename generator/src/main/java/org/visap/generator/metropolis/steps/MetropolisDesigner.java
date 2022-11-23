@@ -72,7 +72,6 @@ public class MetropolisDesigner {
             switch (cityType) {
                 case District: designDistrict(cityElement); break;
                 case Building: designBuilding(cityElement); break;
-                case Reference: designReference(cityElement); break;
                 default:
                     designBuilding(cityElement);
                     log.error(cityType.name() + "is not a valid cityType");
@@ -130,13 +129,6 @@ public class MetropolisDesigner {
                 break;
             case FunctionGroup: district.setColor(Config.Visualization.Metropolis.color.functionGroupDistrict());
                 break;
-            case Table:
-            case TableType:     district.setColor(Config.Visualization.Metropolis.color.tableDistrict());
-                district.setHeight(Config.Visualization.Metropolis.district.districtHeight()); break;
-            case Structure:     district.setColor(Config.Visualization.Metropolis.color.structureDistrict());
-                district.setHeight(Config.Visualization.Metropolis.district.districtHeight()); break;
-            case DataElement:   district.setColor(Config.Visualization.Metropolis.color.dataElementDistrict());
-                district.setHeight(Config.Visualization.Metropolis.district.districtHeight()); break;
             default:            district.setColor(Config.Visualization.Metropolis.color.defaultDistrictValue());
                 log.error(district.getSubType().name() + " is not a valid type for \"district\"");
                 district.setHeight(Config.Visualization.Metropolis.district.districtHeight()); break;
@@ -148,31 +140,6 @@ public class MetropolisDesigner {
 
         if (building.getSourceNode() == null && refBuildingType == null) {
             return;
-        } else if ( refBuildingType != null) {
-            switch (refBuildingType) {
-                case Sea:
-                    building.setColor(Config.Visualization.Metropolis.color.seaReferenceBuilding());
-                    building.setShape(CityElement.CityShape.Circle);
-                    building.setTextureSource("#sea");
-                    building.setRotation(Config.Visualization.Metropolis.building.rotation());
-                    building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
-                    building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
-                    break;
-                case Mountain:
-                    building.setColor(Config.Visualization.Metropolis.color.mountainReferenceBuilding());
-                    building.setShape(CityElement.CityShape.Entity);
-                    building.setModel(Config.Visualization.Metropolis.model.mountainModel());
-                    building.setModelScale(Config.Visualization.Metropolis.model.mountainScale());
-                    building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
-                    building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
-                    break;
-                case Cloud:
-                    building.setShape(CityElement.CityShape.Entity);
-                    building.setModel(Config.Visualization.Metropolis.model.cloudModel());
-                    building.setModelScale(Config.Visualization.Metropolis.model.cloudScale());
-                    building.setYPosition(55);
-                    break;
-            }
         } else {
 
             String propertyTypeName = building.getSourceNodeProperty(SAPNodeProperties.type_name);
@@ -215,77 +182,12 @@ public class MetropolisDesigner {
                     building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
                     building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
                     break;
-                case Table:
-                    building.setColor(Config.Visualization.Metropolis.color.tableBuilding());
-                    building.setShape(Config.Visualization.Metropolis.shape.tableBuilding());
-                    building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
-                    building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
-                    break;
-                case DataElement:
-                    building.setColor(Config.Visualization.Metropolis.color.dataElementBuilding());
-                    building.setShape(Config.Visualization.Metropolis.shape.dataElementBuilding());
-                    building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
-                    building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
-                    break;
-                case Domain:
-                    building.setColor(Config.Visualization.Metropolis.color.domainBuilding());
-                    building.setShape(Config.Visualization.Metropolis.shape.domainBuilding());
-                    building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
-                    building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
-                    break;
-                case StructureElement:
-                    building.setColor(Config.Visualization.Metropolis.color.structureBuilding());
-                    building.setShape(Config.Visualization.Metropolis.shape.structureBuilding());
-                    building.setWidth(Config.Visualization.Metropolis.building.structureBuildingWidth());
-                    building.setLength(Config.Visualization.Metropolis.building.structureBuildingLength());
-                    break;
-                case TableType:
-                    building.setColor(Config.Visualization.Metropolis.color.tableTypeBuilding());
-                    building.setShape(Config.Visualization.Metropolis.shape.tableTypeBuilding());
-                    building.setWidth(Config.Visualization.Metropolis.building.tableTypeBuildingWidth());
-                    building.setLength(Config.Visualization.Metropolis.building.tableTypeBuildingLength());
-                    break;
                 default:
                     building.setColor(Config.Visualization.Metropolis.color.defaultBuildingValue());
                     building.setShape(Config.Visualization.Metropolis.shape.defaultBuildingValue());
                     building.setWidth(Config.Visualization.Metropolis.building.defaultBuildingWidth());
                     building.setLength(Config.Visualization.Metropolis.building.defaultBuildingLength());
                     log.error(propertyTypeName + " is not a valid type for \"building\"");
-                    break;
-            }
-        }
-    }
-
-    private void designReference(CityElement building) {
-
-        CityElement.CitySubType refBuildingType = building.getSubType();
-
-        if (building.getSourceNode() == null && refBuildingType == null) {
-            return;
-        } else if ( refBuildingType != null) {
-            switch (refBuildingType) {
-                case Sea:
-                    building.setColor(Config.Visualization.Metropolis.color.seaReferenceBuilding());
-                    building.setShape(CityElement.CityShape.Circle);
-                    building.setTextureSource("#sea");
-                    building.setRotation(Config.Visualization.Metropolis.building.rotation());
-                    building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
-                    building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
-                    break;
-                case Mountain:
-                    building.setColor(Config.Visualization.Metropolis.color.mountainReferenceBuilding());
-                    building.setShape(CityElement.CityShape.Entity);
-                    building.setModel(Config.Visualization.Metropolis.model.mountainModel());
-                    building.setModelScale(Config.Visualization.Metropolis.model.mountainScale());
-                    building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
-                    building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
-                    building.setYPosition(building.getYPosition() + Config.Visualization.Metropolis.building.adjustReferenceYPosition());
-                    break;
-                case Cloud:
-                    building.setShape(CityElement.CityShape.Entity);
-                    building.setModel(Config.Visualization.Metropolis.model.cloudModel());
-                    building.setModelScale(Config.Visualization.Metropolis.model.cloudScale());
-                    building.setYPosition(55);
                     break;
             }
         }

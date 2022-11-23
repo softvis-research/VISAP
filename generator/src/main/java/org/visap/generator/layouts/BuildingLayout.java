@@ -30,25 +30,7 @@ public class BuildingLayout {
         CityElement.CitySubType referenceBuildingType = building.getSubType();
 
         if(referenceBuildingType != null) {
-            switch (referenceBuildingType) {
-                case Sea:
-                    building.setHeight(Config.Visualization.Metropolis.ReferenceBuilding.height.sea());
-                    building.setWidth(Config.Visualization.Metropolis.ReferenceBuilding.width.sea());
-                    building.setLength(Config.Visualization.Metropolis.ReferenceBuilding.length.sea());
-                    break;
-
-                case Mountain:
-                    building.setHeight(Config.Visualization.Metropolis.ReferenceBuilding.height.mountain());
-                    building.setWidth(Config.Visualization.Metropolis.ReferenceBuilding.width.mountain());
-                    building.setLength(Config.Visualization.Metropolis.ReferenceBuilding.length.mountain());
-                    break;
-
-                case Cloud:
-                    building.setHeight(Config.Visualization.Metropolis.ReferenceBuilding.height.cloud());
-                    building.setWidth(Config.Visualization.Metropolis.ReferenceBuilding.width.cloud());
-                    building.setLength(Config.Visualization.Metropolis.ReferenceBuilding.length.cloud());
-                    break;
-            }
+            //In current Version, Reference buildings are not visualized
         } else {
             building.setWidth(Config.Visualization.Metropolis.building.defaultWidth());
             building.setLength(Config.Visualization.Metropolis.building.defaultLength());

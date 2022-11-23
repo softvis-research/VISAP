@@ -160,10 +160,6 @@ public class DistrictLightMapLayout {
 
         for (CityElement element : elements) {
 
-            if(element.getSubType() != null){
-                if(element.getSubType().equals(CityElement.CitySubType.Cloud)){
-                    continue;
-                }}
             double width = element.getWidth();
             double length = element.getLength();
 

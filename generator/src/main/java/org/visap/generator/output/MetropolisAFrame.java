@@ -32,13 +32,7 @@ public class MetropolisAFrame implements OutputFormat {
                 "\n" +
                 "\t\t\t\t <img id=\"sky\" crossorigin=\"anonymous\" src=\"" + Config.assets.sky()  +  "\">" +
                 "\n" +
-                "\t\t\t\t <img id=\"sea\" crossorigin=\"anonymous\" src=\"" + Config.assets.sea()  +  "\">" +
-                "\n" +
                 "\t\t\t\t <img id=\"ground\" crossorigin=\"anonymous\" src=\"" + Config.assets.ground()  + "\">" +
-                "\n" +
-                "\t\t\t\t <a-asset-item id=\"mountain\" src=\"" + Config.assets.mountain()  +  "\"></a-asset-item>" +
-                "\n" +
-                "\t\t\t\t <a-asset-item id=\"cloud_black\" src=\"" + Config.assets.cloud()  +  "\"></a-asset-item>" +
                 "\n" +
                 "\t\t\t </a-assets>" +
                 "\n" +

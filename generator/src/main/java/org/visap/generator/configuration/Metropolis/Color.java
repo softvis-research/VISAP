@@ -12,9 +12,6 @@ public interface Color extends Config {
      String localInterfaceDistrict();
      String reportDistrict();
      String functionGroupDistrict();
-     String tableDistrict();
-     String structureDistrict();
-     String dataElementDistrict();
      String defaultDistrictValue();
 
      String attributeBuilding();
@@ -23,14 +20,6 @@ public interface Color extends Config {
      String reportBuilding();
      String formRoutineBuilding();
      String functionModuleBuilding();
-     String tableBuilding();
-     String dataElementBuilding();
-     String domainBuilding();
-     String structureBuilding();
-     String tableTypeBuilding();
-
-     String seaReferenceBuilding();
-     String mountainReferenceBuilding();
 
      String defaultBuildingValue();
 }

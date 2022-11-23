@@ -8,9 +8,4 @@ public interface Assets extends Config {
 
     String ground();
 
-    String mountain();
-
-    String sea();
-
-    String cloud();
 }

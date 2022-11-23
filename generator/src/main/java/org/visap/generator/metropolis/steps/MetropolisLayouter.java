@@ -35,11 +35,6 @@ public class MetropolisLayouter {
         log.info(buildings.size() + " buildings loaded");
         layoutBuildings(buildings);
 
-        // layout reference elements
-        Collection<CityElement> referenceElements = repository.getElementsByType(CityElement.CityType.Reference);
-        log.info(referenceElements.size() + " reference elements loaded");
-        layoutReferenceElements(referenceElements);
-
         // layout districts
         Collection<CityElement> packageDistricts = repository.getElementsByTypeAndSourceProperty(CityElement.CityType.District, SAPNodeProperties.type_name, "Namespace");
         layoutDistricts(packageDistricts);
@@ -51,12 +46,6 @@ public class MetropolisLayouter {
     private void layoutBuildings(Collection<CityElement> buildings) {
         for (CityElement building: buildings) {
             layoutBuilding(building);
-        }
-    }
-
-    private void layoutReferenceElements(Collection<CityElement> referenceElements) {
-        for (CityElement referenceElement: referenceElements) {
-            layoutReference(referenceElement);
         }
     }
 
@@ -104,31 +93,6 @@ public class MetropolisLayouter {
     private void layoutBuilding(CityElement building) {
         BuildingLayout buildingLayout = new BuildingLayout(building);
         buildingLayout.calculate();
-    }
-
-    private void layoutReference(CityElement referenceElement) {
-        CityElement.CitySubType referenceBuildingType = referenceElement.getSubType();
-
-        switch (referenceBuildingType) {
-            case Sea:
-                referenceElement.setHeight(Config.Visualization.Metropolis.ReferenceBuilding.height.sea());
-                referenceElement.setWidth(Config.Visualization.Metropolis.ReferenceBuilding.width.sea());
-                referenceElement.setLength(Config.Visualization.Metropolis.ReferenceBuilding.length.sea());
-                referenceElement.setYPosition(referenceElement.getHeight() / 2);
-                break;
-
-            case Mountain:
-                referenceElement.setHeight(Config.Visualization.Metropolis.ReferenceBuilding.height.mountain());
-                referenceElement.setWidth(Config.Visualization.Metropolis.ReferenceBuilding.width.mountain());
-                referenceElement.setLength(Config.Visualization.Metropolis.ReferenceBuilding.length.mountain());
-                break;
-
-            case Cloud:
-                referenceElement.setHeight(Config.Visualization.Metropolis.ReferenceBuilding.height.cloud());
-                referenceElement.setWidth(Config.Visualization.Metropolis.ReferenceBuilding.width.cloud());
-                referenceElement.setLength(Config.Visualization.Metropolis.ReferenceBuilding.length.cloud());
-                break;
-        }
     }
 
     private void layoutVirtualRootDistrict(Collection<CityElement> districts){
