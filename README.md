@@ -34,13 +34,9 @@ The resulting model files (model.html and metaData.json) are placed in the neo4j
 
 ### Displaying a Model in the Browser
 
-| :warning: WARNING                                                                                                                                                                                                     |
-|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Before you get started with displaying your model in the browser, you will need a ```node_modules/``` folder in the ```ui/``` folder. Unfortunately, we are currently unable to upload this folder to the repository. |
+After following the instructions in section [Generating a Model](#generating-a-model), two files will have been generated for you: model.html and metaData.json.
 
-After following the instructions in section [Generating a Model](#generating-a-model), two files will have been generated for you: ```model.html``` and ```metaData.json```.
-
-To display the model in the browser, first navigate to the folder ```ui/data/```. Create a subfolder with a name of your liking, for example ```Test/```. Inside the newly created subfolder, create another subfolder named ```model/```. Copy both the ```model.html``` file and the ```metaData.json``` file into this subfolder.
+To display the model in the browser, first navigate to the folder ```ui/data/```. Create a subfolder with a name of your liking, for example ```Test```. Inside the newly created subfolder, create another subfolder named ```model```. Copy both the model.html file and the metaData.json file into this subfolder.
 
 Next, you will need a webserver. We recommend [XAMPP](https://www.apachefriends.org/download.html).
 
@@ -53,13 +49,21 @@ Click on the config for Apache and select Apache (httpd.conf). Change the path b
 Save the config, close it, and start the Apache Module.
 
 You should now be able to view the visualization in the browser.
-Enter the URL http://localhost/index.php?setup=ABAP/PackageExplorer&model={folderName}, where ```{folderName}``` is the name of the folder inside which you created the ```model/``` subfolder.
+Enter the URL http://localhost/index.php?setup={setupPath}&model={folderName}, where ```{folderName}``` is the name of the folder inside which you created the ```model/``` subfolder. ```{setupPath}``` is where the setup lives inside the ```ui/setups/``` folder. For now, the only available setup is Initial/hover.
 
-In our example, it is named ```Test```, so the complete URL will be http://localhost/index.php?setup=ABAP/PackageExplorer&model=Test.
+Hence, with our folderName being Test, the complete URL will be http://localhost/index.php?setup=Initial/hover&model=Test.
 
 The visualization will look similar to this:
 
 ![visualization.png](images/visualization.png)
+
+## Testing Changes
+
+When testing changes, make sure that your browser doesn't cache previous visits to the localhost.
+
+Refresh the page with Ctrl-F5 to request an uncached version of the page.
+
+Alternatively, disable caching in your browser entirely. In Chrome, open the Developer Tools with F12, select the Network tab, then select the checkbox "Disable Cache". In Firefox, enter ```about:config``` in the address bar, search for ```browser.cache.disk.enable``` and set it to ```false```.
 
 ## Documentation
 The development team actively uses and maintains https://miro.com/app/board/uXjVOGFnA-M=/ for project coordination and documentation. The Miro board also includes instructions for installation and usage. Access requests will generally be accepted. Most documentation is currently available in German only.

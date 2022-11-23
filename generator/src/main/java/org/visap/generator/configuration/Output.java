@@ -5,7 +5,10 @@ import org.visap.generator.output.MetaDataOutput;
 
 @Config.Sources("file:${user.dir}/src/main/java/properties/metropolis/exporter/Output.properties")
 public interface Output extends Config {
+    @DefaultValue("BOTH")
     MetaDataOutput metaData();
+    @DefaultValue("src/neo4jexport")
     String mapPath();
-    Boolean writeRepToDb();
+    @DefaultValue("true")
+    boolean writeRepToDb();
 }

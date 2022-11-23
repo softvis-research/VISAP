@@ -95,24 +95,24 @@ public class AFrameExporter {
         double targetY = 0;
         double targetZ = minZ + (maxSideLength * 0.2);
 
-        return "\t\t\t <a-entity id=\"camera\" camera=\"fov: 80; zoom: 1;\"\n" +
-                "\t\t    \t position=\"" + cameraX + " " + cameraY + " " + cameraZ + "\"\n" +
-                "\t\t    \t rotation=\"0 -90 0\"\n" +
-                "\t\t    \t orbit-camera=\"\n" +
-                "\t\t    \t   \t target: " + targetX + " " + targetY + " " + targetZ + ";\n" +
-                "\t\t    \t   \t enableDamping: true;\n" +
-                "\t\t    \t   \t dampingFactor: 0.25;\n" +
-                "\t\t    \t   \t rotateSpeed: 0.25;\n" +
-                "\t\t    \t   \t panSpeed: 0.25;\n" +
-                "\t\t    \t   \t invertZoom: true;\n" +
-                "\t\t    \t   \t logPosition: false;\n" +
-                "\t\t    \t   \t minDistance:0;\n" +
-                "\t\t    \t   \t maxDistance:1000;\n" +
-                "\t\t    \t   \t \"\n" +
-                "\t\t    \t mouse-cursor=\"\"\n" +
-                "\t\t   \t\t >" +
-                "\n" +
-                "\t\t\t </a-entity>\n";
+        return "\t\t\t<a-entity id=\"camera\" camera=\"fov: 80; zoom: 1;\"\n" +
+               "\t\t\t\tposition=\"" + cameraX + " " + cameraY + " " + cameraZ + "\"\n" +
+               "\t\t\t\trotation=\"0 -90 0\"\n" +
+               "\t\t\t\torbit-camera=\"\n" +
+               "\t\t\t\t\ttarget: " + targetX + " " + targetY + " " + targetZ + ";\n" +
+               "\t\t\t\t\tenableDamping: true;\n" +
+               "\t\t\t\t\tdampingFactor: 0.25;\n" +
+               "\t\t\t\t\trotateSpeed: 0.25;\n" +
+               "\t\t\t\t\tpanSpeed: 0.25;\n" +
+               "\t\t\t\t\tinvertZoom: true;\n" +
+               "\t\t\t\t\tlogPosition: false;\n" +
+               "\t\t\t\t\tminDistance:0;\n" +
+               "\t\t\t\t\tmaxDistance:1000;\n" +
+               "\t\t\t\t\t\"\n" +
+               "\t\t\t\tmouse-cursor=\"\"\n" +
+               "\t\t\t\t>" +
+               "\n" +
+               "\t\t\t</a-entity>\n";
     }
 
     private String createAFrameRepositoryExport() {
@@ -198,40 +198,40 @@ public class AFrameExporter {
 
         builder.append("<" + getShapeExport(element.getShape()) + " id=\"" + element.getHash() + "\"");
         builder.append("\n");
-        builder.append("\t position=\"" + element.getXPosition() + " " + element.getYPosition() + " " + element.getZPosition() + "\"");
+        builder.append("\tposition=\"" + element.getXPosition() + " " + element.getYPosition() + " " + element.getZPosition() + "\"");
         builder.append("\n");
-        builder.append("\t height=\"" + element.getHeight() + "\"");
+        builder.append("\theight=\"" + element.getHeight() + "\"");
         builder.append("\n");
 
         if(element.getShape() == CityElement.CityShape.Box || element.getShape() == CityElement.CityShape.Entity){
-            builder.append("\t width=\"" + element.getWidth() + "\"");
+            builder.append("\twidth=\"" + element.getWidth() + "\"");
             builder.append("\n");
-            builder.append("\t depth=\"" + element.getLength() + "\"");
+            builder.append("\tdepth=\"" + element.getLength() + "\"");
             builder.append("\n");
         } else {
-            builder.append("\t radius=\"" + (element.getWidth() / 2) + "\"");
+            builder.append("\tradius=\"" + (element.getWidth() / 2) + "\"");
             builder.append("\n");
         }
 
-        builder.append("\t color=\"" + element.getColor() + "\"");
+        builder.append("\tcolor=\"" + element.getColor() + "\"");
         builder.append("\n");
 
         if (element.getTextureSource() != null){
-            builder.append("\t src=\"" + element.getTextureSource() + "\"");
+            builder.append("\tsrc=\"" + element.getTextureSource() + "\"");
             builder.append("\n");
         }
         if (element.getRotation() != null){
-            builder.append("\t rotation=\"" + element.getRotation() + "\"");
+            builder.append("\trotation=\"" + element.getRotation() + "\"");
             builder.append("\n");
         }
         if(element.getModel() != null){
-            builder.append("\t scale=\"" + element.getModelScale() + "\"");
+            builder.append("\tscale=\"" + element.getModelScale() + "\"");
             builder.append("\n");
-            builder.append("\t gltf-model=\"" + element.getModel() + "\"");
+            builder.append("\tgltf-model=\"" + element.getModel() + "\"");
             builder.append("\n");
         }
 
-        builder.append("\t shadow");
+        builder.append("\tshadow");
         builder.append(">");
 
         builder.append("\n");
