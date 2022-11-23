@@ -35,6 +35,7 @@ function initializeApplication(metaDataJson) {
 	model.initialize();
 	model.createEntititesFromMetadata(metaDataJson);
 
+	defaultLogger.activate();
 	actionController.initialize();
 	canvasManipulator.initialize();
 	application.initialize();

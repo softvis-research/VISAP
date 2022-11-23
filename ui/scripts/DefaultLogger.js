@@ -40,7 +40,7 @@ var defaultLogger = (function() {
 		}
 
 		if(controllerConfig.logInfoConsole) {
-			console.log("INFO: " + logObject.text );
+			console.log("INFO: " + logObject.text);
 		}
 	}
 
@@ -54,7 +54,7 @@ var defaultLogger = (function() {
 		}
 
 		if(controllerConfig.logWarningConsole) {
-			console.log("WARNING: " + logObject.text );
+			console.log("WARNING: " + logObject.text);
 		}
 	}
 
@@ -68,7 +68,7 @@ var defaultLogger = (function() {
 		}
 
 		if(controllerConfig.logErrorConsole) {
-			console.log("ERROR: " + logObject.text );
+			console.error("ERROR: " + logObject.text);
 		}		
 	}
 
@@ -110,7 +110,7 @@ var defaultLogger = (function() {
 		}
 
 		if(controllerConfig.logManipulationConsole) {
-			console.log("MANIPULATION: " + logObject.manipulation.manipulationFunction );
+			console.log("MANIPULATION: " + logObject.manipulation.manipulationFunction);
 		}
 	}
 
