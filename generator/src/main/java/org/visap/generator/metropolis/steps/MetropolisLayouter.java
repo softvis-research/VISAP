@@ -39,8 +39,6 @@ public class MetropolisLayouter {
         Collection<CityElement> packageDistricts = repository.getElementsByTypeAndSourceProperty(CityElement.CityType.District, SAPNodeProperties.type_name, "Namespace");
         layoutDistricts(packageDistricts);
 
-        // layout cloud elements
-        layoutCloudModel();
     }
 
     private void layoutBuildings(Collection<CityElement> buildings) {
@@ -57,37 +55,6 @@ public class MetropolisLayouter {
         }
 
         layoutVirtualRootDistrict(districtElements);
-    }
-
-    private void layoutCloudModel() {
-        Collection<CityElement> districtsWithFindings = repository.getElementsByTypeAndSourceProperty(
-                CityElement.CityType.District, SAPNodeProperties.migration_findings, "true"
-        );
-
-        for (CityElement districtWithFinding: districtsWithFindings) {
-
-            Collection<CityElement> cloudSubElements = districtWithFinding.getSubElements();
-
-            for (CityElement cloudSubElement : cloudSubElements) {
-
-                if (cloudSubElement.getType().equals(CityElement.CityType.Reference) &&
-                        cloudSubElement.getSubType().equals(CityElement.CitySubType.Cloud)) {
-
-                    cloudSubElement.setWidth(0);
-                    cloudSubElement.setLength(0);
-                    cloudSubElement.setYPosition(55);
-
-                    double parentDistrictXPosition = cloudSubElement.getParentElement().getXPosition();
-                    double parentDistrictZPosition = cloudSubElement.getParentElement().getZPosition();
-
-                    cloudSubElement.setXPosition(parentDistrictXPosition);
-                    cloudSubElement.setZPosition(parentDistrictZPosition);
-
-                    cloudSubElement.setWidth(0);
-                    cloudSubElement.setLength(0);
-                }
-            }
-        }
     }
 
     private void layoutBuilding(CityElement building) {
@@ -143,10 +110,8 @@ public class MetropolisLayouter {
         boolean isEmpty = true;
 
         for (CityElement subElement: subElements) {
-            if(!subElement.getType().equals(CityElement.CityType.Reference)){
                 isEmpty = false;
                 break;
-            }
         }
 
         return isEmpty;

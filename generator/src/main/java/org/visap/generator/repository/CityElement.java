@@ -34,19 +34,15 @@ public class CityElement {
 
 
     public enum CityType {
-        District, Building, Floor, Chimney,
+        District, Building, Floor, Chimney
 
-        //additional for Metropolis
-        Reference
     }
 
     public enum CitySubType {
-        Class, Report, FunctionGroup, Table, DDIC
+        Class, Report, FunctionGroup
 
         // additional subTypes for metropolis
-        , Interface, DataElement, Structure
-
-        , Sea, Mountain, Cloud
+        , Interface
     }
 
 

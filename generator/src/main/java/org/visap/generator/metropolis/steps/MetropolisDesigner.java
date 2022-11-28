@@ -36,8 +36,6 @@ public class MetropolisDesigner {
 
         designMetropolisElementsByType(CityElement.CityType.Building);
 
-        designMetropolisElementsByType(CityElement.CityType.Reference);
-
         designMetropolisElementsByType(CityElement.CityType.Floor);
 
     }

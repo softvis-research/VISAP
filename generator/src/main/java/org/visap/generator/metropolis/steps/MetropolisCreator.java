@@ -80,18 +80,6 @@ public class MetropolisCreator {
         createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.Building, SAPNodeProperties.type_name, SAPNodeTypes.Attribute);
     }
 
-    private CityElement createRefBuilding(CityElement packageDistrict, CityElement.CitySubType refBuildingType) {
-        CityElement refBuilding = new CityElement(CityElement.CityType.Reference);
-        refBuilding.setSubType(refBuildingType);
-
-        repository.addElement(refBuilding);
-
-        packageDistrict.addSubElement(refBuilding);
-        refBuilding.setParentElement(packageDistrict);
-
-        return refBuilding;
-    }
-
     private void createAllMetropolisRelations(SourceNodeRepository nodeRepository) {
         createMetropolisRelations(nodeRepository, CityElement.CityType.District);
         createMetropolisRelations(nodeRepository, CityElement.CityType.Building);
