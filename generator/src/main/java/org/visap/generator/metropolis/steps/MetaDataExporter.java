@@ -52,12 +52,7 @@ public class MetaDataExporter {
 
             // skip reference buildings (only Metropolis)
             if (element.getSourceNode() == null) {
-                if (element.getType() == CityElement.CityType.Reference) {
-                    String metaData = toMetaDataForReferenceElements(element);
-                    element.setMetaData("{" + metaData + "}");
-                } else {
-                    continue;
-                }
+                continue;
             } else {
                 String metaData = toMetaData(element);
                 element.setMetaData("{" + metaData + "}");
@@ -73,19 +68,7 @@ public class MetaDataExporter {
 
 
             if (element.getSourceNode() == null) {
-                if (element.getType() == CityElement.CityType.Reference) {
-                    if (!hasElements) {
-                        hasElements = true;
-                        metaDataFile.append("[{");
-                    } else {
-                        metaDataFile.append("\n},{");
-                    }
-                    metaDataFile.append("\n");
-                    metaDataFile.append(toMetaDataForReferenceElements(element));
-                } else {
                     continue;
-                }
-
             } else {
 
 
@@ -145,11 +128,6 @@ public class MetaDataExporter {
         // Add Type
         builder.append("\"name\": \"" + element.getSubType() + "\",\n");
 
-        // Add additional meta for clouds
-        if(element.getSubType() == CityElement.CitySubType.Cloud) {
-            builder.append(getMigrationRelation(element));
-        }
-
         // Make sure we have the right syntax -> no commas at the end
         char lastChar = builder.charAt(builder.length() - 1);
         if (Character.compare(lastChar, '\n') == 0) {
@@ -187,9 +165,6 @@ public class MetaDataExporter {
         Collection<CityElement> buildingsWithMigrationFindings = district.getSubElements();
 
         for (CityElement buildingsWithMigrationFinding: buildingsWithMigrationFindings) {
-            if (buildingsWithMigrationFinding.getType() == CityElement.CityType.Reference) {
-                continue;
-            }
 
             // only subElements with the flag "migrationFindings" matters
             String migrationFindingsString = buildingsWithMigrationFinding.getSourceNodeProperty(SAPNodeProperties.migration_findings);
