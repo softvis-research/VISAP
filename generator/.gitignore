@@ -12,8 +12,8 @@ target/
 *.iml
 
 # Neo4jexport
-neo4jexport/*
-!neo4jexport/Example/
+/src/neo4jexport/*
+!/src/neo4jexport/Example/
 
 # Model output
 model.html
