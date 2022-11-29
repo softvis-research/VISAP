@@ -40,7 +40,7 @@ To display the model in the browser, first navigate to the folder ```ui/data/```
 
 Next, you will need a local server. You can get one by installing [NPM](https://www.npmjs.com/) and running the command ```npm install -g live-server && live-server``` inside the UI folder.
 Once the web server is set up, it will automatically open up in the browser. The URL will look similar to this: http://127.0.0.1:8080.
-Further information about setting up a local server can be found under https://aframe.io/docs/0.5.0/introduction/installation.html#local-development
+Further information about setting up a local server can be found under https://aframe.io/docs/0.5.0/introduction/installation.html#local-development.
 
 You should now be able to view the visualization in the browser.
 Enter the URL {localhost}/index.html?setup={setupPath}&model={folderName}, where ```{localhost}``` is the URL to the webserver, and ```{folderName}``` is the name of the folder inside which you created the ```model/``` subfolder. Instead of the folder you created yourself, you can also use ```Example```. ```{setupPath}``` is where the setup lives inside the ```ui/setups/``` folder. For now, the only available setup is Initial/hover.
