@@ -11,6 +11,10 @@ target/
 # iml files
 *.iml
 
+# Neo4jexport
+neo4jexport/*
+!neo4jexport/Example/
+
 # Model output
 model.html
 metaData.json
