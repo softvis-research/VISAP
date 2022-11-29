@@ -1,10 +1,6 @@
-/**
- * Example component for A-Frame.
- */
 AFRAME.registerComponent('orbit-camera', {
 	dependencies: ['camera', 'position', 'rotation'],
 	schema: {
-
 		enabled: { type: 'boolean', default: true },
 		target: { type: 'vec3', default: { x: 0, y: 0, z: 0 } },
 
@@ -37,21 +33,15 @@ AFRAME.registerComponent('orbit-camera', {
 		maxDistance: { type: 'number', default: Infinity },
 
 		logPosition: { type: 'boolean', default: false },
-
 	},
 
-	/**
-	 * Initial Setup
-	 */
 	init: function () {
 		globalCamera = this;
 		this.sceneEl = this.el.sceneEl;
 		this.object = this.el.object3D;
 		this.canvasEl = this.sceneEl.canvas;
-		var targetVec = this.data.target;
+		const targetVec = this.data.target;
 		this.target = new THREE.Vector3(targetVec.x, targetVec.y, targetVec.z);
-
-		console.log('enabled: ', this.data.enabled);
 
 		this.dolly = new THREE.Object3D();
 		this.dolly.position.copy(this.object.position);
@@ -107,7 +97,6 @@ AFRAME.registerComponent('orbit-camera', {
 	 * updates the entity based on the data.
 	 */
 	update: function (oldData) {
-		console.log('component update');
 		this.updateView();
 		this.addEventListeners();
 	},
@@ -124,15 +113,12 @@ AFRAME.registerComponent('orbit-camera', {
 	 * Called on each scene tick.
 	 */
 	tick: function (t) {
-		var render = this.data.enabled ? this.updateView() : false;
+		const render = this.data.enabled ? this.updateView() : false;
 		if (render === true && this.data.logPosition === true) {
 			console.log(this.el.object3D.position);
 		}
 	},
 
-	/*
-	 * Bind this to all event handlera
-	 */
 	bindMethods: function () {
 		this.onContextMenu = this.onContextMenu.bind(this);
 		this.onMouseDown = this.onMouseDown.bind(this);
@@ -141,9 +127,6 @@ AFRAME.registerComponent('orbit-camera', {
 		this.onMouseUp = this.onMouseUp.bind(this);
 	},
 
-	/*
-	 * Add event listeners
-	 */
 	addEventListeners: function () {
 		this.canvasEl.addEventListener('contextmenu', this.onContextMenu, false);
 		this.canvasEl.addEventListener('mousedown', this.onMouseDown, false);
@@ -151,9 +134,6 @@ AFRAME.registerComponent('orbit-camera', {
 		this.canvasEl.addEventListener('MozMousePixelScroll', this.onMouseWheel, false);  // firefox
 	},
 
-	/*
-	 * Remove event listeners
-	 */
 	removeEventListeners: function () {
 		if (this.canvasEl) {
 			this.canvasEl.removeEventListener('contextmenu', this.onContextMenu, false);
@@ -171,32 +151,24 @@ AFRAME.registerComponent('orbit-camera', {
 	 * EVENT LISTENERS
 	 */
 
-	/*
-	 * Called when right clicking the A-Frame component
-	 */
 	onContextMenu: function (event) {
+		// don't show context menu when right-clicking
 		event.preventDefault();
 	},
 
-	/*
-	 * MOUSE CLICK EVENT LISTENERS
-	 */
-
 	onMouseDown: function (event) {
-
-		// console.log('onMouseDown');
 		if (!this.data.enabled) return;
 
 		event.preventDefault();
 
 		switch (event.button) {
 			case this.data.rotateKey:
-					if (this.data.enablePan === false) return;
+				if (this.data.enablePan === false) return;
 
-					this.panOffset.set(0, 0, 0);
-					if (this.data.enableRotate === false) return;
-					this.handleMouseDownRotate(event);
-					this.state = this.STATE.ROTATE;
+				this.panOffset.set(0, 0, 0);
+				if (this.data.enableRotate === false) return;
+				this.handleMouseDownRotate(event);
+				this.state = this.STATE.ROTATE;
 				break;
 			case this.data.panKey:
 				if (this.data.enablePan === false) return;
@@ -214,8 +186,6 @@ AFRAME.registerComponent('orbit-camera', {
 	},
 
 	onMouseMove: function (event) {
-
-		// console.log('onMouseMove');
 		if (!this.data.enabled) return;
 
 		event.preventDefault();
@@ -234,12 +204,9 @@ AFRAME.registerComponent('orbit-camera', {
 				this.handleMouseMovePan(event);
 				break;
 		}
-
 	},
 
 	onMouseUp: function (event) {
-
-		// console.log('onMouseUp');
 		if (!this.data.enabled) return;
 
 		event.preventDefault();
@@ -252,16 +219,9 @@ AFRAME.registerComponent('orbit-camera', {
 		this.canvasEl.removeEventListener('mouseout', this.onMouseUp, false);
 
 		this.state = this.STATE.NONE;
-
 	},
 
-	/*
-	 * MOUSE WHEEL EVENT LISTENERS
-	 */
-
 	onMouseWheel: function (event) {
-
-		// console.log('onMouseWheel');
 		if (!this.data.enabled ||
 			this.data.enableZoom === false ||
 			(this.state !== this.STATE.NONE && this.state !== this.STATE.ROTATE))
@@ -272,33 +232,27 @@ AFRAME.registerComponent('orbit-camera', {
 		this.handleMouseWheel(event);
 	},
 
-
 	/*
 	 * EVENT HANDLERS
 	 */
 
 	handleMouseDownRotate: function (event) {
-		// console.log( 'handleMouseDownRotate' );
 		this.rotateStart.set(event.clientX, event.clientY);
 	},
 
 	handleMouseDownDolly: function (event) {
-		// console.log( 'handleMouseDownDolly' );
 		this.dollyStart.set(event.clientX, event.clientY);
 	},
 
 	handleMouseDownPan: function (event) {
-		// console.log( 'handleMouseDownPan' );
 		this.panStart.set(event.clientX, event.clientY);
 	},
 
 	handleMouseMoveRotate: function (event) {
-
-		// console.log( 'handleMouseMoveRotate' );
 		this.rotateEnd.set(event.clientX, event.clientY);
 		this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart);
 
-		var canvas =
+		const canvas =
 			this.canvasEl === document ? this.canvasEl.body : this.canvasEl;
 
 		// rotating across whole screen goes 360 degrees around
@@ -306,8 +260,7 @@ AFRAME.registerComponent('orbit-camera', {
 			2 * Math.PI * this.rotateDelta.x / canvas.clientWidth *
 			this.data.rotateSpeed);
 
-		// rotating up and down along whole screen attempts to go 360, but limited
-		// to 180
+		// rotating up and down along whole screen attempts to go 360, but limited to 180
 		this.rotateUp(
 			2 * Math.PI * this.rotateDelta.y / canvas.clientHeight *
 			this.data.rotateSpeed);
@@ -318,8 +271,6 @@ AFRAME.registerComponent('orbit-camera', {
 	},
 
 	handleMouseMoveDolly: function (event) {
-
-		// console.log( 'handleMouseMoveDolly' );
 		this.dollyEnd.set(event.clientX, event.clientY);
 		this.dollyDelta.subVectors(this.dollyEnd, this.dollyStart);
 
@@ -337,8 +288,6 @@ AFRAME.registerComponent('orbit-camera', {
 	},
 
 	handleMouseMovePan: function (event) {
-
-		// console.log( 'handleMouseMovePan' );
 		this.panEnd.set(event.clientX, event.clientY);
 		this.panDelta.subVectors(this.panEnd, this.panStart).multiplyScalar(this.data.panSpeed);
 		this.pan(this.panDelta.x, this.panDelta.y);
@@ -348,13 +297,10 @@ AFRAME.registerComponent('orbit-camera', {
 	},
 
 	handleMouseUp: function (event) {
-		// console.log( 'handleMouseUp' );
 	},
 
 	handleMouseWheel: function (event) {
-
-		// console.log( 'handleMouseWheel' );
-		var delta = 0;
+		let delta = 0;
 		if (event.wheelDelta !== undefined) {
 			// WebKit / Opera / Explorer 9
 			delta = event.wheelDelta;
@@ -374,9 +320,6 @@ AFRAME.registerComponent('orbit-camera', {
 		this.updateView();
 	},
 
-	/*
-	 * Internal functions
-	 */
 
 	getZoomScale: function () {
 		return Math.pow(0.95, this.data.zoomSpeed);
@@ -387,7 +330,7 @@ AFRAME.registerComponent('orbit-camera', {
 	},
 
 	rotateUp: function (angle) {
-			this.sphericalDelta.phi -= angle;
+		this.sphericalDelta.phi -= angle;
 	},
 
 	/*
@@ -410,23 +353,22 @@ AFRAME.registerComponent('orbit-camera', {
 
 	==> x-axis from screen coos is like the x-axis from camera coos
 	==> delta x on screen <=> delta x on camera
-	
+
 	==> y-axis from screen coos is like the inverse y-axis from camera coos
-	==> delta y on screen <==> -1 * delta y on camera 
-	
+	==> delta y on screen <==> -1 * delta y on camera
+
 	navigation <=> move the model <=> move the camera inverted(!)
 
 	panLeft on screen <=> move model to the left <=> move camera to the right
 	move model 10px on screen coos <=> move model 10px on camera coos <=> move camera -10px on camera coos
-	 
+
 	panUp on screen <=> move model to the top <=> move camera to the bottom
 	move model 10px on screen coos <=> move model -10px on camera coos <=> move camera 10px on camera coos
 	*/
 
 	panLeft: function (distance, objectMatrix) {
-		var v = new THREE.Vector3();
+		const v = new THREE.Vector3();
 		v.setFromMatrixColumn(objectMatrix, 0);  // get X column of objectMatrix
-		// v.multiplyScalar(-distance);
 		// We don't want to get closer to the x-z-plane
 		// so the delta of y (height) should be 0
 		v.x *= (-distance);
@@ -436,9 +378,8 @@ AFRAME.registerComponent('orbit-camera', {
 	},
 
 	panUp: function (distance, objectMatrix) {
-		var v = new THREE.Vector3();
+		const v = new THREE.Vector3();
 		v.setFromMatrixColumn(objectMatrix, 1);  // get Z column of objectMatrix
-		// v.multiplyScalar(distance);
 		// We don't want to get closer to the x-z-plane
 		// so the delta of y (height) should be 0
 		v.x *= distance;
@@ -448,13 +389,12 @@ AFRAME.registerComponent('orbit-camera', {
 	},
 
 	pan: function (deltaX, deltaY) {  // deltaX and deltaY are in pixels; right and down are positive
+		const offset = new THREE.Vector3();
+		const canvas = this.canvasEl === document ? this.canvasEl.body : this.canvasEl;
 
-		var offset = new THREE.Vector3();
-		var canvas = this.canvasEl === document ? this.canvasEl.body : this.canvasEl;
-
-		var position = this.object.position;
+		const position = this.object.position;
 		offset.copy(position).sub(this.target);
-		var targetDistance = offset.length();
+		let targetDistance = offset.length();
 		// half of the fov is center to top of screen
 		targetDistance *= Math.tan((this.el.components.camera.data.fov / 2) * Math.PI / 180.0);
 		// we actually don't use screenWidth, since
@@ -472,20 +412,17 @@ AFRAME.registerComponent('orbit-camera', {
 	},
 
 	lookAtTarget: function (object, target) {
-		var v = new THREE.Vector3();
+		const v = new THREE.Vector3();
 		v.subVectors(object.position, target).add(object.position);
 		object.lookAt(v);
 	},
 
-	/*
-	 * VIEW UPDATE
-	 */
 	updateView: function () {
-		var offset = new THREE.Vector3();
+		const offset = new THREE.Vector3();
 
 		// so camera.up is the orbit axis
-		var quat = new THREE.Quaternion().setFromUnitVectors(this.dolly.up, new THREE.Vector3(0, 1, 0));
-		var quatInverse = quat.clone().inverse();
+		const quat = new THREE.Quaternion().setFromUnitVectors(this.dolly.up, new THREE.Vector3(0, 1, 0));
+		const quatInverse = quat.clone().inverse();
 
 		offset.copy(this.dolly.position).sub(this.target);
 		offset.applyQuaternion(quat);  // rotate offset to "y-axis-is-up" space
@@ -545,13 +482,12 @@ AFRAME.registerComponent('orbit-camera', {
 		// update condition is:
 		// min(camera displacement, camera rotation in radians)^2 > EPS
 		// using small-angle approximation cos(x/2) = 1 - x^2 / 8
-
 		if (this.zoomChanged ||
 			this.lastPosition.distanceToSquared(this.dolly.position) > this.EPS ||
 			8 * (1 - this.lastQuaternion.dot(this.dolly.quaternion)) > this.EPS) {
 
-			var hmdQuaternion = this.calculateHMDQuaternion();
-			var hmdEuler = new THREE.Euler();
+			const hmdQuaternion = this.calculateHMDQuaternion();
+			const hmdEuler = new THREE.Euler();
 			hmdEuler.setFromQuaternion(hmdQuaternion, 'YXZ');
 
 			this.el.setAttribute('position', {
@@ -578,11 +514,10 @@ AFRAME.registerComponent('orbit-camera', {
 	},
 
 	calculateHMDQuaternion: (function () {
-		var hmdQuaternion = new THREE.Quaternion();
+		const hmdQuaternion = new THREE.Quaternion();
 		return function () {
 			hmdQuaternion.copy(this.dolly.quaternion);
 			return hmdQuaternion;
 		};
 	})()
-
 });
