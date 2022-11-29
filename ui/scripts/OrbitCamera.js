@@ -258,21 +258,14 @@ AFRAME.registerComponent('orbit-camera', {
 	},
 
 	handleMouseWheel: function (event) {
-		let delta = 0;
-		if (event.wheelDelta !== undefined) {
-			// WebKit / Opera / Explorer 9
-			delta = event.wheelDelta;
-		} else if (event.detail !== undefined) {
-			// Firefox
-			delta = -event.detail;
-		}
+		const delta = event.deltaY;
 
-		if (delta > 0) {
-			!this.data.invertZoom ? this.dollyOut(this.getZoomScale()) :
-				this.dollyIn(this.getZoomScale());
-		} else if (delta < 0) {
-			!this.data.invertZoom ? this.dollyIn(this.getZoomScale()) :
+		if (delta < 0) { // scrolling up
+			this.data.invertZoom ? this.dollyIn(this.getZoomScale()) :
 				this.dollyOut(this.getZoomScale());
+		} else if (delta > 0) { // scrolling down
+			this.data.invertZoom ? this.dollyOut(this.getZoomScale()) :
+				this.dollyIn(this.getZoomScale());
 		}
 
 		this.updateView();
