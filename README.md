@@ -51,7 +51,7 @@ Save the config, close it, and start the Apache Module.
 You should now be able to view the visualization in the browser.
 Enter the URL http://localhost/index.php?setup={setupPath}&model={folderName}, where ```{folderName}``` is the name of the folder inside which you created the ```model/``` subfolder. ```{setupPath}``` is where the setup lives inside the ```ui/setups/``` folder. For now, the only available setup is Initial/hover.
 
-Hence, with our folderName being Test, the complete URL will be http://localhost/index.php?setup=Initial/hover&model=Test.
+Hence, with our folderName being Test, the complete URL will be http://localhost/index.html?setup=Initial/hover&model=Example.
 
 The visualization will look similar to this:
 
