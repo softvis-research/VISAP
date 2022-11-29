@@ -46,13 +46,10 @@ AFRAME.registerComponent('orbit-camera', {
 		this.dolly = new THREE.Object3D();
 		this.dolly.position.copy(this.object.position);
 
-		this.savedPose = null;
-
 		this.STATE = {
 			NONE: -1,
 			ROTATE: 0,
-			DOLLY: 1,
-			PAN: 2,
+			PAN: 1,
 		};
 
 		this.state = this.STATE.NONE;
@@ -75,13 +72,6 @@ AFRAME.registerComponent('orbit-camera', {
 		this.panEnd = new THREE.Vector2();
 		this.panDelta = new THREE.Vector2();
 		this.panOffset = new THREE.Vector3();
-
-		this.dollyStart = new THREE.Vector2();
-		this.dollyEnd = new THREE.Vector2();
-		this.dollyDelta = new THREE.Vector2();
-
-		this.vector = new THREE.Vector3();
-		this.desiredPosition = new THREE.Vector3();
 
 		this.mouseButtons = {
 			LEFT: THREE.MOUSE.LEFT,
@@ -130,16 +120,14 @@ AFRAME.registerComponent('orbit-camera', {
 	addEventListeners: function () {
 		this.canvasEl.addEventListener('contextmenu', this.onContextMenu, false);
 		this.canvasEl.addEventListener('mousedown', this.onMouseDown, false);
-		this.canvasEl.addEventListener('mousewheel', this.onMouseWheel, false);
-		this.canvasEl.addEventListener('MozMousePixelScroll', this.onMouseWheel, false);  // firefox
+		this.canvasEl.addEventListener('wheel', this.onMouseWheel, false);
 	},
 
 	removeEventListeners: function () {
 		if (this.canvasEl) {
 			this.canvasEl.removeEventListener('contextmenu', this.onContextMenu, false);
 			this.canvasEl.removeEventListener('mousedown', this.onMouseDown, false);
-			this.canvasEl.removeEventListener('mousewheel', this.onMouseWheel, false);
-			this.canvasEl.removeEventListener('MozMousePixelScroll', this.onMouseWheel, false);  // firefox
+			this.canvasEl.removeEventListener('wheel', this.onMouseWheel, false);
 
 			this.canvasEl.removeEventListener('mousemove', this.onMouseMove, false);
 			this.canvasEl.removeEventListener('mouseup', this.onMouseUp, false);
@@ -195,10 +183,6 @@ AFRAME.registerComponent('orbit-camera', {
 				if (this.data.enableRotate === false) return;
 				this.handleMouseMoveRotate(event);
 				break;
-			case this.STATE.DOLLY:
-				if (this.data.enableZoom === false) return;
-				this.handleMouseMoveDolly(event);
-				break;
 			case this.STATE.PAN:
 				if (this.data.enablePan === false) return;
 				this.handleMouseMovePan(event);
@@ -211,8 +195,6 @@ AFRAME.registerComponent('orbit-camera', {
 
 		event.preventDefault();
 		event.stopPropagation();
-
-		this.handleMouseUp(event);
 
 		this.canvasEl.removeEventListener('mousemove', this.onMouseMove, false);
 		this.canvasEl.removeEventListener('mouseup', this.onMouseUp, false);
@@ -238,10 +220,6 @@ AFRAME.registerComponent('orbit-camera', {
 
 	handleMouseDownRotate: function (event) {
 		this.rotateStart.set(event.clientX, event.clientY);
-	},
-
-	handleMouseDownDolly: function (event) {
-		this.dollyStart.set(event.clientX, event.clientY);
 	},
 
 	handleMouseDownPan: function (event) {
@@ -270,23 +248,6 @@ AFRAME.registerComponent('orbit-camera', {
 		this.updateView();
 	},
 
-	handleMouseMoveDolly: function (event) {
-		this.dollyEnd.set(event.clientX, event.clientY);
-		this.dollyDelta.subVectors(this.dollyEnd, this.dollyStart);
-
-		if (this.dollyDelta.y > 0) {
-			!this.data.invertZoom ? this.dollyIn(this.getZoomScale()) :
-				this.dollyOut(this.getZoomScale());
-		} else if (this.dollyDelta.y < 0) {
-			!this.data.invertZoom ? this.dollyOut(this.getZoomScale()) :
-				this.dollyIn(this.getZoomScale());
-		}
-
-		this.dollyStart.copy(this.dollyEnd);
-
-		this.updateView();
-	},
-
 	handleMouseMovePan: function (event) {
 		this.panEnd.set(event.clientX, event.clientY);
 		this.panDelta.subVectors(this.panEnd, this.panStart).multiplyScalar(this.data.panSpeed);
@@ -294,9 +255,6 @@ AFRAME.registerComponent('orbit-camera', {
 		this.panStart.copy(this.panEnd);
 
 		this.updateView();
-	},
-
-	handleMouseUp: function (event) {
 	},
 
 	handleMouseWheel: function (event) {
