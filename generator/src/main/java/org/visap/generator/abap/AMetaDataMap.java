@@ -24,14 +24,6 @@ public class AMetaDataMap {
         metaDataProperties.put(SAPNodeProperties.created.name(), "created");
         metaDataProperties.put(SAPNodeProperties.changed_by.name(), "changed_by");
         metaDataProperties.put(SAPNodeProperties.changed.name(), "changed");
-        metaDataProperties.put(SAPNodeProperties.datatype.name(), "datatype");
-        metaDataProperties.put(SAPNodeProperties.rowtype.name(), "rowtype");
-        metaDataProperties.put(SAPNodeProperties.length.name(), "length");
-        metaDataProperties.put(SAPNodeProperties.decimals.name(), "decimals");
-        metaDataProperties.put(SAPNodeProperties.domname.name(), "domname");
-        metaDataProperties.put(SAPNodeProperties.dataelement.name(), "dataelement");
-        metaDataProperties.put(SAPNodeProperties.structure.name(), "structure");
-        metaDataProperties.put(SAPNodeProperties.modifiers.name(), "modifiers");
         metaDataProperties.put(SAPNodeProperties.number_of_statements.name(), "number_of_statements");
         metaDataProperties.put(SAPNodeProperties.local_class.name(), "local_class");
 

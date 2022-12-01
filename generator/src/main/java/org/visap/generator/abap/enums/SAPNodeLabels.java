@@ -4,13 +4,9 @@ public enum SAPNodeLabels {
 
     Package,
 
-    Class, Interface, Report, FunctionGroup, Table,
+    Class, Interface, Report, FunctionGroup,
 
     Method, Attribute, FormRoutine, FunctionModule,
-
-    Structure, Domain, DataElement, TableType,
-
-    TableElement, StructureElement,
 
     Elements
 }

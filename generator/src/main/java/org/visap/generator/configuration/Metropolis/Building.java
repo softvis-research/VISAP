@@ -25,18 +25,6 @@ public interface Building extends Config {
     double adjustWidth();
     @DefaultValue("0.2")
     double adjustLength();
-
-    @DefaultValue("0.1")
-    double adjustReferenceYPosition();
-
-    @DefaultValue("0.1")
-    double tableTypeBuildingWidth();
-    @DefaultValue("0.1")
-    double tableTypeBuildingLength();
-    @DefaultValue("0.1")
-    double structureBuildingWidth();
-    @DefaultValue("0.1")
-    double structureBuildingLength();
     @DefaultValue("0.1")
     double defaultBuildingWidth();
     @DefaultValue("0.1")

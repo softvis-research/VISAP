@@ -27,11 +27,6 @@ public class BuildingLayout {
     }
 
     private void setSizeOfBuilding() {
-        CityElement.CitySubType referenceBuildingType = building.getSubType();
-
-        if(referenceBuildingType != null) {
-            //In current Version, Reference buildings are not visualized
-        } else {
             building.setWidth(Config.Visualization.Metropolis.building.defaultWidth());
             building.setLength(Config.Visualization.Metropolis.building.defaultLength());
 
@@ -41,7 +36,6 @@ public class BuildingLayout {
             } else {
                 building.setHeight(getScaledHeight(Double.valueOf(nos)));
             }
-        }
     }
 
     private double getScaledHeight(double unscaledHeight) {

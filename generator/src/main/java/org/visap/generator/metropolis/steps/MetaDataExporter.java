@@ -116,32 +116,6 @@ public class MetaDataExporter {
         return builder.toString();
     }
 
-    private String toMetaDataForReferenceElements(CityElement element) {
-        StringBuilder builder = new StringBuilder();
-
-        // Add element hash
-        builder.append("\"id\": \"" + element.getHash() + "\"," +"\n");
-        // Add Belongs to
-        builder.append("\"belongsTo\": \"" + element.getParentElement().getHash() + "\",\n");
-        // Add Name
-        builder.append("\"type\": \"" + element.getType() + "\",\n");
-        // Add Type
-        builder.append("\"name\": \"" + element.getSubType() + "\",\n");
-
-        // Make sure we have the right syntax -> no commas at the end
-        char lastChar = builder.charAt(builder.length() - 1);
-        if (Character.compare(lastChar, '\n') == 0) {
-            lastChar = builder.charAt(builder.length() - 2);
-
-            if (Character.compare(lastChar, ',') == 0) {
-                builder.deleteCharAt(builder.length() - 1); // Delete '\n'
-                builder.deleteCharAt(builder.length() - 1); // Delete ,
-            }
-        }
-
-        return builder.toString();
-    }
-
     private String getMigrationRelation(CityElement element) {
 
         StringBuilder builder = new StringBuilder();
