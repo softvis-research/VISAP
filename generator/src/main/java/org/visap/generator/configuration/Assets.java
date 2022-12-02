@@ -2,7 +2,7 @@ package org.visap.generator.configuration;
 
 import org.aeonbits.owner.Config;
 
-@Config.Sources("file:${user.dir}/src/main/java/properties/metropolis/exporter/Assets.properties")
+@Config.Sources("file:${user.dir}/src/main/java/properties/Assets.properties")
 public interface Assets extends Config {
     @DefaultValue("assets/sky_pano.jpg")
     String sky();

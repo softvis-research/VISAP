@@ -3,7 +3,7 @@ package org.visap.generator.configuration;
 import org.aeonbits.owner.Config;
 import org.visap.generator.output.MetaDataOutput;
 
-@Config.Sources("file:${user.dir}/src/main/java/properties/metropolis/exporter/Output.properties")
+@Config.Sources("file:${user.dir}/src/main/java/properties/Output.properties")
 public interface Output extends Config {
     @DefaultValue("BOTH")
     MetaDataOutput metaData();
