@@ -11,8 +11,8 @@
 			const searchParams = new URLSearchParams(window.location.search);
 
 			const modelName = searchParams.get('model') || 'City';
-			const modelDir = searchParams.get('srcDir') || 'data';
-			const modelRootPath = `${modelDir}/${modelName}/model`;
+			const modelDir = searchParams.get('srcDir') || 'model';
+			const modelRootPath = `${modelDir}/${modelName}`;
 			const modelPath = `${modelRootPath}/model.html`;
 			const metaDataPath = `${modelRootPath}/metaData.json`;
 
