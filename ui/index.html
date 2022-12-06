@@ -14,7 +14,7 @@
 			const modelDir = searchParams.get('srcDir') || 'model';
 			const modelRootPath = `${modelDir}/${modelName}`;
 			const modelPath = `${modelRootPath}/model.html`;
-			const metaDataPath = `${modelRootPath}/metaData.json`;
+			const metadataPath = `${modelRootPath}/metaData.json`;
 
 			const setupName = searchParams.get('setup') || 'minimal/hover';
 			const setupPath = `setups/${setupName}.js`;
@@ -50,11 +50,6 @@
 
 	<body>
 		<div id="canvas">
-			<script>
-				$(function() {
-					$("#canvas").load(encodeURI(modelPath));
-				});
-			</script>
 		</div>
 	</body>
 
