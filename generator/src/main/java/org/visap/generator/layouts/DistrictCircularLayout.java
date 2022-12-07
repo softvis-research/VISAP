@@ -47,11 +47,11 @@ public class DistrictCircularLayout {
     private void setNewPositionFromNode(CityRectangle rectangle, CityKDTreeNode fitNode) {
         CityElement element = rectangleElementsMap.get(rectangle);
 
-        double xPosition = fitNode.getCityRectangle().getCenterX();// - config.getBuildingHorizontalGap() / 2;
+        double xPosition = fitNode.getCityRectangle().getCenterX();
         double xPositionDelta = xPosition - element.getXPosition();
         element.setXPosition(xPosition);
 
-        double zPosition = fitNode.getCityRectangle().getCenterY();//- config.getBuildingHorizontalGap() / 2;
+        double zPosition = fitNode.getCityRectangle().getCenterY();
         double zPositionDelta = zPosition - element.getZPosition();
         element.setZPosition(zPosition);
 
@@ -65,11 +65,10 @@ public class DistrictCircularLayout {
         for (CityElement element : elements) {
 
             double centerX = element.getXPosition();
-            double centerY = element.getYPosition();
             double centerZ = element.getZPosition();
 
             double newXPosition = centerX + parentX + Config.Visualization.Metropolis.district.horizontalBuildingMargin();
-            double newZPosition = centerZ + parentZ + Config.Visualization.Metropolis.district.horizontalBuildingGap();
+            double newZPosition = centerZ + parentZ + Config.Visualization.Metropolis.district.horizontalBuildingMargin();
 
             element.setXPosition(newXPosition);
             element.setZPosition(newZPosition);
@@ -97,7 +96,6 @@ public class DistrictCircularLayout {
         Collections.sort(elements);
         Collections.reverse(elements);
 
-        // TODO: Review
         List<CityRectangle> originSet;
         List<CityRectangle> customCode;
         List<CityRectangle> standardCode;
@@ -223,10 +221,8 @@ public class DistrictCircularLayout {
                     CityRectangle currentRec = elements.get(i);
 
                     double previousRadius = previousRec.getPerimeterRadius();
-                    //+ config.getBuildingHorizontalGap();
 
                     double currentRadius = currentRec.getPerimeterRadius();
-                    //+ config.getBuildingHorizontalGap();
 
                     double rotationAngle = 0;
 
