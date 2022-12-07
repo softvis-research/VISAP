@@ -1,3 +1,3 @@
-data/*
-!data/Example/
+model/*
+!model/example/
 node_modules/
