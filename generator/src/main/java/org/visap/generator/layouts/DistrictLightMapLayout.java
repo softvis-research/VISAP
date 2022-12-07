@@ -75,7 +75,7 @@ public class DistrictLightMapLayout {
             element.setXPosition(newXPosition);
 
             double centerZ = element.getZPosition();
-            double newZPosition = centerZ + parentZ + Config.Visualization.Metropolis.district.horizontalBuildingGap();
+            double newZPosition = centerZ + parentZ + Config.Visualization.Metropolis.district.horizontalBuildingMargin();
             element.setZPosition(newZPosition);
 
             Collection<CityElement> subElements = element.getSubElements();
