@@ -97,6 +97,7 @@ public class AFrameExporterStep {
         }
 
         System.out.println("\nA-Frame Exporter step was completed");
+        userInput.close();
         connector.close();
     }
 }

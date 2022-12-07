@@ -93,6 +93,7 @@ public class LoaderStep {
 
         );
 
+        userInput.close();
         connector.close();
         System.out.println("Loader step was completed");
     }
