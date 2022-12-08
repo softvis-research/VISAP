@@ -78,46 +78,16 @@ var model = (function () {
 
 			entity.hasUnloadedChildren = !areChildrenLoaded;
 
-			if (element.created) {
-				//format: YYYY-MM-DD
-				var dateString = element.created.toString().slice(0, 4) + "-" + element.created.toString().slice(4, 6) + "-" + element.created.toString().slice(6, 8);
-
-				entity.dateOfCreation = new Date(dateString);
-			} else {
-				entity.dateOfCreation = new Date(0);
-			}
-
-			if (element.changed) {
-				//format: YYYY-MM-DD
-				var dateString = element.changed.toString().slice(0, 4) + "-" + element.changed.toString().slice(4, 6) + "-" + element.changed.toString().slice(6, 8);
-
-				entity.dateOfLastChange = new Date(dateString);
-			} else {
-				entity.dateOfLastChange = new Date(0);
-			}
+			entity.dateOfCreation = parseDate(element.created);
+			entity.dateOfLastChange = parseDate(element.changed);
 
 			switch (entity.type) {
 				case "text":
-					entity.versions = element.versions.split(",");
-					for (let i = 0; i < entity.versions.length; ++i) {
-						entity.versions[i] = entity.versions[i].trim();
-					}
-					entity.versions.forEach(function (version) {
-						if (version !== undefined) {
-							if (entitiesByVersion.has(version)) {
-								let map = entitiesByVersion.get(version);
-								map.push(entity);
-								entitiesByVersion.set(version, map);
-							} else {
-								addVersion(version);
-								let map = [];
-								map.push(entity);
-								entitiesByVersion.set(version, map);
-							}
-						}
-					});
+					entity.versions = splitByCommaIfNotEmpty(element.versions);
+					entity.versions.forEach((version) => addToMultimap(entitiesByVersion, version, entity));
 					labels.push(entity);
 					break;
+
 				case "issue":
 					entity.open = (element.open === "true");
 					entity.security = (element.security === "true");
@@ -132,124 +102,61 @@ var model = (function () {
 					entity.role = element.role;
 					paths.push(entity);
 					break;
+
 				case "stk":
-					entity.versions = element.versions.split(",");
-					for (let i = 0; i < entity.versions.length; ++i) {
-						entity.versions[i] = entity.versions[i].trim();
-					}
+					entity.versions = splitByCommaIfNotEmpty(element.versions);
 					return;
+
 				case "component":
-					entity.components = element.components.split(",");
-					entity.versions = element.versions.split(",");
+					entity.components = splitByCommaIfNotEmpty(element.components);
+					entity.versions = splitByCommaIfNotEmpty(element.versions);
 					return;
+
 				case "Project":
 				case "Namespace":
 					entity.version = element.version;
-					if (entity.version !== undefined) {
-						if (entitiesByVersion.has(entity.version)) {
-							let map = entitiesByVersion.get(entity.version);
-							map.push(entity);
-							entitiesByVersion.set(entity.version, map);
-						} else {
-							addVersion(entity.version);
-							let map = [];
-							map.push(entity);
-							entitiesByVersion.set(entity.version, map);
-						}
-					}
+					addToMultimap(entitiesByVersion, element.version, entity);
 					break;
-					case "Transaction":
-						if (element.calls) {
-							entity.calls = element.calls.split(",");
-						} else {
-							entity.calls = [];
-						}
-						if (element.calledBy) {
-							entity.calledBy = element.calledBy.split(",");
-						} else {
-							entity.calledBy = [];
-						}
-						break;
+
+				case "Transaction":
+					entity.calls = splitByCommaIfNotEmpty(element.calls);
+					entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
+					break;
+
 				case "Reference":
-					if (element.rcData) {
-						entity.rcData = element.rcData.split(",");
-					} else {
-						entity.rcData = [];
-					}
+					entity.rcData = splitByCommaIfNotEmpty(element.rcData);
 					break;
+
 				case "Class":
 				case "Interface":
-					entity.superTypes = element.subClassOf.split(",");
-					entity.subTypes = element.superClassOf.split(",");
-					if (element.reaches !== undefined) {
-						entity.reaches = element.reaches.split(",");
-					} else {
-						entity.reaches = [];
-					}
+					entity.superTypes = splitByCommaIfNotEmpty(element.subClassOf);
+					entity.subTypes = splitByCommaIfNotEmpty(element.superClassOf);
+					entity.reaches = splitByCommaIfNotEmpty(element.reaches);
 					entity.reachedBy = [];
-					if (entity.antipattern !== false) {
-						entity.antipattern = element.antipattern.split(",");
-					} else {
-						entity.antipattern = [];
-					}
-					if (entity.roles !== undefined) {
-						entity.roles = element.roles.split(",");
-					} else {
-						entity.roles = [];
-					}
+					entity.antipattern = splitByCommaIfNotEmpty(element.antipattern);
+					entity.roles = splitByCommaIfNotEmpty(element.roles);
 					entity.component = element.component;
 					entity.version = element.version;
+					addToMultimap(entitiesByVersion, element.version, entity);
 					entity.betweennessCentrality = element.betweennessCentrality;
 					entity.changeFrequency = element.changeFrequency;
-					if (entity.version !== undefined) {
-						if (entitiesByVersion.has(entity.version)) {
-							let map = entitiesByVersion.get(entity.version);
-							map.push(entity);
-							entitiesByVersion.set(entity.version, map);
-						} else {
-							addVersion(entity.version);
-							let map = [];
-							map.push(entity);
-							entitiesByVersion.set(entity.version, map);
-						}
-					}
-					if (element.issues !== undefined) {
-						entity.issues = element.issues.split(",");
-					} else {
-						entity.issues = [];
-					}
-					for (let i = 0; i < entity.issues.length; ++i) {
-						entity.issues[i] = entity.issues[i].trim();
-					}
-					entity.issues.forEach(function (issue) {
-						if (entitiesByIssue.has(issue)) {
-							let map = entitiesByIssue.get(issue);
-							map.push(entity);
-							entitiesByIssue.set(issue, map);
-						} else {
-							addIssue(issue);
-							let map = [];
-							map.push(entity);
-							entitiesByIssue.set(issue, map);
-						}
-					});
+					entity.issues = splitByCommaIfNotEmpty(element.issues);
+					entity.issues.forEach((issue) => addToMultimap(entitiesByIssue, issue, entity));
 					entity.numberOfOpenIssues = element.numberOfOpenIssues;
 					entity.numberOfClosedIssues = element.numberOfClosedIssues;
 					entity.numberOfClosedSecurityIssues = element.numberOfClosedSecurityIssues;
 					entity.numberOfOpenSecurityIssues = element.numberOfOpenSecurityIssues;
+					break;
 
-					break;
 				case "ParameterizableClass":
-					entity.superTypes = element.subClassOf.split(",");
-					entity.subTypes = element.superClassOf.split(",");
+					entity.superTypes = splitByCommaIfNotEmpty(element.subClassOf);
+					entity.subTypes = splitByCommaIfNotEmpty(element.superClassOf);
 					break;
+
 				case "Attribute":
-					if (element.accessedBy) {
-						entity.accessedBy = element.accessedBy.split(",");
-					} else {
-						entity.accessedBy = [];
-					}
+					entity.accessedBy = splitByCommaIfNotEmpty(element.accessedBy);
 					break;
+
 				case "Method":
 					entity.signature = element.signature;
 
@@ -273,72 +180,32 @@ var model = (function () {
 						entity.qualifiedName = element.qualifiedName;
 					}
 
-					if (element.calls) {
-						entity.calls = element.calls.split(",");
-					} else {
-						entity.calls = [];
-					}
-					if (element.calledBy) {
-						entity.calledBy = element.calledBy.split(",");
-					} else {
-						entity.calledBy = [];
-					}
-					if (element.accesses) {
-						entity.accesses = element.accesses.split(",");
-					} else {
-						entity.accesses = [];
-					}
-
+					entity.calls = splitByCommaIfNotEmpty(element.calls);
+					entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
+					entity.accesses = splitByCommaIfNotEmpty(element.accesses);
 					entity.numberOfStatements = element.number_of_statements;
-
 					break;
+
 				case "Function":
 					entity.signature = element.signature;
 					entity.qualifiedName = element.qualifiedName;
-
-					if (element.calls) {
-						entity.calls = element.calls.split(",");
-					} else {
-						entity.calls = [];
-					}
-					if (element.calledBy) {
-						entity.calledBy = element.calledBy.split(",");
-					} else {
-						entity.calledBy = [];
-					}
-					if (element.accesses) {
-						entity.accesses = element.accesses.split(",");
-					} else {
-						entity.accesses = [];
-					}
-
+					entity.calls = splitByCommaIfNotEmpty(element.calls);
+					entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
+					entity.accesses = splitByCommaIfNotEmpty(element.accesses);
 					entity.dependsOn = element.dependsOn;
 					entity.filename = element.filename;
-
 					break;
+
 				case "FunctionModule":
 				case "Report":
 				case "FormRoutine":
-					if (element.calls) {
-						entity.calls = element.calls.split(",");
-					} else {
-						entity.calls = [];
-					}
-					if (element.calledBy) {
-						entity.calledBy = element.calledBy.split(",");
-					} else {
-						entity.calledBy = [];
-					}
-
+					entity.calls = splitByCommaIfNotEmpty(element.calls);
+					entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
 					entity.numberOfStatements = element.number_of_statements;
-
 					break;
+
 				case "Variable":
-					if (element.accessedBy) {
-						entity.accessedBy = element.accessedBy.split(",");
-					} else {
-						entity.accessedBy = [];
-					}
+					entity.accessedBy = splitByCommaIfNotEmpty(element.accessedBy);
 
 					if (element.declaredType) {
 						//if variable is of type array, [] is put after the variable name
@@ -354,28 +221,25 @@ var model = (function () {
 
 					entity.dependsOn = element.dependsOn;
 					entity.filename = element.filename;
-
 					break;
+
 				case "TranslationUnit":
 					entity.filename = element.filename;
 					break;
+
 				case "Macro":
 					macrosById.set(element.id, entity);
 					break;
+
 				case "And":
 				case "Or":
-					if (element.connected) {
-						entity.connected = element.connected.split(",");
-						for (let i = 0; i < entity.connected.length; ++i) {
-							entity.connected[i] = entity.connected[i].trim();
-						}
-					} else {
-						entity.connected = [];
-					}
+					entity.connected = splitByCommaIfNotEmpty(element.connected);
 					break;
+
 				case "Negation":
 					entity.negated = element.negated;
 					break;
+
 				case "Struct":
 				case "Union":
 				case "Enum":
@@ -383,6 +247,7 @@ var model = (function () {
 					entity.dependsOn = element.dependsOn;
 					entity.filename = element.filename;
 					break;
+
 				default:
 					break;
 			}
@@ -393,6 +258,31 @@ var model = (function () {
 
 		setReferencesToEntities(newElements);
 		return newElements;
+	}
+
+	function splitByCommaIfNotEmpty(string) {
+		if (string) {
+			return string.split(',').map(element => element.trim());
+		} else {
+			return [];
+		}
+	}
+
+	function addToMultimap(map, key, entity) {
+		if (key === undefined) return;
+
+		const currentEntriesForKey = map.get(key) || [];
+		currentEntriesForKey.push(entity);
+		map.set(key, currentEntriesForKey);
+	}
+
+	function parseDate(date) {
+		if (!date) return new Date(0);
+
+		date = date.toString();
+		// change to YYYY-MM-DD because that's the only one JS can parse by default
+		const dateString = date.slice(0, 4) + "-" + date.slice(4, 6) + "-" + date.slice(6, 8);
+		return new Date(dateString);
 	}
 
 	function replaceIdsWithReferences(entity, relationName) {
@@ -447,6 +337,7 @@ var model = (function () {
 				case "Project":
 				case "text":
 					break;
+
 				case "issue":
 					break;
 
@@ -454,10 +345,10 @@ var model = (function () {
 					replaceIdsWithReferences(entity, 'components');
 					break;
 
-
 				case "Class":
 					replaceIdsWithReferences(entity, 'superTypes');
 					replaceIdsWithReferences(entity, 'subTypes');
+					replaceIdsWithReferences(entity, 'antipattern');
 
 					let reaches = [];
 					entity.reaches.forEach(function (reachesId) {
@@ -468,11 +359,7 @@ var model = (function () {
 						}
 					});
 					entity.reaches = reaches;
-
-					replaceIdsWithReferences(entity, 'antipattern');
-
 					entity.roles = entity.roles.map(roleId => roleId.trim());
-
 					break;
 
 				case "ParameterizableClass":
@@ -503,6 +390,7 @@ var model = (function () {
 						retrieveAllUsedMacros(entity.dependsOn, entity.id);
 					}
 					break;
+
 				case "Transaction":
 					replaceIdsWithReferences(entity, 'calls');
 					replaceIdsWithReferences(entity, 'calledBy');
@@ -542,6 +430,7 @@ var model = (function () {
 						retrieveAllUsedMacros(entity.dependsOn, entity.id);
 					}
 					break;
+
 				default:
 					break;
 			}
@@ -603,8 +492,6 @@ var model = (function () {
 		entitiesById.delete(id);
 	}
 
-
-
 	function getAllParentsOfEntity(entity) {
 		let parents = [];
 
@@ -622,13 +509,11 @@ var model = (function () {
 	function getAllChildrenOfEntity(entity) {
 		let children = [];
 
-		if (entity.children.length != 0) {
-			entity.children.forEach(function(child) {
-				children.push(child);
-				const grandChildren = getAllChildrenOfEntity(child);
-				children = children.concat(grandChildren);
-			})
-		}
+		entity.children.forEach(function(child) {
+			children.push(child);
+			const grandChildren = getAllChildrenOfEntity(child);
+			children = children.concat(grandChildren);
+		});
 
 		return children;
 	}
@@ -638,16 +523,8 @@ var model = (function () {
 
 		switch (conditionEntity.type) {
 			case "Macro":
-				var modelEntity = getEntityById(modelElementId);
-				if (modelElementsByMacro.get(conditionEntity.id) === undefined) {
-					var modelElements = [];
-					modelElements.push(modelEntity);
-					modelElementsByMacro.set(conditionEntity.id, modelElements);
-				} else {
-					var modelElements = modelElementsByMacro.get(conditionEntity.id);
-					modelElements.push(modelEntity);
-					modelElementsByMacro.set(conditionEntity.id, modelElements);
-				}
+				const modelEntity = getEntityById(modelElementId);
+				addToMultimap(modelElementsByMacro, conditionEntity.id, modelEntity);
 				break;
 			case "And":
 			case "Or":
@@ -694,78 +571,31 @@ var model = (function () {
 	}
 
 	function getAllSecureEntities() {
-		let entities = [];
-		entitiesById.forEach(function (entity) {
-			if (entity.type === "Class" && entity.numberOfOpenSecurityIssues === 0) {
-				entities.push(entity);
-			}
-		});
-		return entities;
+		return entitiesById.filter(entity => entity.type === "Class" && entity.numberOfOpenSecurityIssues === 0);
 	}
 
 	function getAllCorrectEntities() {
-		let entities = [];
-		entitiesById.forEach(function (entity) {
-			if (entity.type === "Class" && entity.numberOfOpenIssues === 0 && entity.numberOfOpenSecurityIssues === 0) {
-				entities.push(entity);
-			}
-		});
-		return entities;
+		return entitiesById.filter(entity => entity.type === "Class" && entity.numberOfOpenSecurityIssues === 0 && entity.numberOfOpenIssues === 0);
 	}
 
 	function getEntitiesByComponent(component) {
-		let entities = [];
-		entitiesById.forEach(function (entity) {
-			if (entity.component === component) {
-				entities.push(entity);
-			}
-		});
-		return entities;
+		return entitiesById.filter(entity => entity.component === component);
 	}
 
 	function getRole(start, pattern) {
-		let result = "";
-		paths.forEach(function (path) {
-			if (start === path.start && path.belongsTo.id === pattern) {
-				result = path.role;
-			}
-		});
-		return result;
+		return paths.findLast(path => path.start === start && path.belongsTo.id === pattern);
 	}
 
 	function getRoleBetween(start, end) {
-		for (let i = 0; i < paths.length; ++i) {
-			const path = paths[i];
-			if (path.start === start && path.end === end) {
-				return path.role;
-			}
-		}
+		return paths.find(path => path.start === start && path.end === end);
 	}
 
 	function getPaths(start, pattern) {
-		let targets = [];
-		paths.forEach(function (path) {
-			if (start === path.start && path.belongsTo.id === pattern) {
-				targets.push((path.end));
-			}
-		});
-		return targets;
+		return paths.filter(path => path.start === start && path.belongsTo.id === pattern).map(path => path.end);
 	}
 
 	function getEntitiesByAntipattern(antipatternID) {
-		let entities = [];
-		entitiesById.forEach(function (entity) {
-			let antipattern = [];
-			if (entity.type === "Class") {
-				antipattern = entity.antipattern;
-				for (let i = 0; i < antipattern.length; i++) {
-					if (antipattern[i].id === antipatternID) {
-						entities.push(entity);
-					}
-				}
-			}
-		});
-		return entities;
+		return entitiesById.filter(entity => entity.type === "Class" && entity.antipattern.includes(antipatternID));
 	}
 
 	function removeVersion(version) {
@@ -803,23 +633,12 @@ var model = (function () {
 	}
 
 	function getEntitiesByType(type) {
-		let entities = [];
-		entitiesById.forEach(function (value) {
-			if (value.type === type) {
-				entities.push(value)
-			}
-		});
-		return entities;
+		return entitiesById.filter(entity => entity.type === type);
 	}
 
-	function getCodeEntities(type) {
-		let entities = [];
-		entitiesById.forEach(function (value) {
-			if (value.type !== "Negation" && value.type !== "Macro" && value.type !== "And" && value.type !== "Or") {
-				entities.push(value)
-			}
-		});
-		return entities;
+	function getCodeEntities() {
+		const ignoredTypes = ["Negation", "Macro", "And", "Or"];
+		return entitiesById.filter(entity => !ignoredTypes.includes(entity.type));
 	}
 
 	function getLabels() {

@@ -1,40 +1,23 @@
-$(document).ready(async function () {
-	// get setup file
-	await new Promise((resolve, reject) => $.getScript(setupPath, resolve).fail(reject));
-
-	//parse setup if defined
-	if (!window["setup"]) {
-		console.log("No setup definition found!");
-		return;
-	}
-
-	if (setup.loadPopUp) {
-		var loadPopup = application.createPopup("Load Visualization", "Visualization is loading...", "RootLoadPopUp");
-		document.body.appendChild(loadPopup);
-		$("#RootLoadPopUp").jqxWindow({
-			theme: "metro",
-			width: 200,
-			height: 200,
-			isModal: true,
-			autoOpen: true,
-			resizable: false
-		});
-	}
-	//load famix data
-	$.getJSON(metaDataPath, initializeApplication);
+$(document).ready(function () {
+	initializeApplication();
 });
 
-function initializeApplication(metaDataJson) {
-	//wait for canvas to be loaded full here...
-	var canvas = document.getElementById(canvasId);
-	if (!canvas) {
-		setTimeout(function () { initializeApplication(metaDataJson); }, 100);
+async function initializeApplication() {
+	// load setup, metadata and model in parallel
+	// parsing the setup happens later, since it requires controllers to be running
+	const setupLoaded = application.startLoadingSetup(setupPath);
+	const metadataLoaded = application.startLoadingMetadata(metadataPath);
+	const modelLoaded = application.startLoadingModel(modelPath);
+
+	try {
+		await Promise.all([setupLoaded, metadataLoaded, modelLoaded]);
+	} catch (error) {
+		console.error(error);
 		return;
 	}
+	// from here on, setup/metadata/model are sure to have been loaded
 
-	model.initialize();
-	model.createEntititesFromMetadata(metaDataJson);
-
+	defaultLogger.initialize();
 	defaultLogger.activate();
 	actionController.initialize();
 	canvasManipulator.initialize();
@@ -64,15 +47,7 @@ var application = (function () {
 	//*******************
 
 	function initialize() {
-
-		//parse setup if defined
-		if (!window["setup"]) {
-			events.log.error.publish({ text: "No setup configured" });
-			return;
-		}
-
 		//first ui config is initial config
-
 		if (setup.uis && setup.uis.length && setup.uis[0]) {
 			setup.uis.forEach(function (uiConfig) {
 				uiConfigs.set(uiConfig.name, uiConfig);
@@ -92,16 +67,14 @@ var application = (function () {
 			loadAndInitializeController(controller);
 		});
 
-		//for ajax loading
-		setTimeout(startConfigParsingAfterControllerLoading, 1);
+		startConfigParsingAfterControllerLoading();
 	}
 
 
 	function startConfigParsingAfterControllerLoading() {
-		//check that all controllers loaded
+		//check if all controllers loaded
 		if (setup.controllers.length !== controllers.size) {
-			console.debug("controllers not loaded yet...");
-			setTimeout(startConfigParsingAfterControllerLoading, 1);
+			events.log.error.publish({ text: "One or more controllers failed to load, aborting" });
 			return;
 		}
 
@@ -133,6 +106,48 @@ var application = (function () {
 		} catch (err) {
 			events.log.error.publish({ text: err.message });
 		}
+	}
+
+	async function startLoadingSetup(setupPath) {
+		return new Promise(
+				(resolve) => $.getScript(setupPath, resolve).fail((response) => mapResponseToError(response, setupPath))
+			).then(() => {
+				if (!window.setup) {
+					throw new Error("No setup definition found!");
+				} else if (setup.loadPopUp) {
+					const loadPopup = application.createPopup("Load Visualization", "Visualization is loading...", "RootLoadPopUp");
+					document.body.appendChild(loadPopup);
+					$("#RootLoadPopUp").jqxWindow({
+						theme: "metro",
+						width: 200,
+						height: 200,
+						isModal: true,
+						autoOpen: true,
+						resizable: false
+					});
+				}
+		});
+	}
+
+	async function startLoadingMetadata(metadataPath) {
+		return fetch(encodeURI(metadataPath))
+			.then(response => {
+				if (!response.ok) mapResponseToError(response, metadataPath);
+				else return response.json();
+			}).then(metadataJson => {
+				model.initialize();
+				model.createEntititesFromMetadata(metadataJson);
+		});
+	}
+
+	async function startLoadingModel(modelPath) {
+		return fetch(encodeURI(modelPath))
+			.then(response => {
+				if (!response.ok) mapResponseToError(response, modelPath);
+				else return response.text();
+			}).then(modelHtml => {
+				$("#canvas").append(modelHtml);
+		});
 	}
 
 
@@ -483,7 +498,10 @@ var application = (function () {
 				events.log.warning.publish({ text: "setup property: " + property + " not in controller config" });
 			}
 		}
+	}
 
+	function mapResponseToError(response, path) {
+		throw new Error(`Error ${response.status} ${response.statusText} for ${path}`);
 	}
 
 
@@ -492,11 +510,11 @@ var application = (function () {
 		loadUIConfig: loadUIConfig,
 		transferConfigParams: transferConfigParams,
 		createPopup: createPopup,
-		reset: resetApplication
+		reset: resetApplication,
+
+		startLoadingSetup: startLoadingSetup,
+		startLoadingMetadata: startLoadingMetadata,
+		startLoadingModel: startLoadingModel
 	};
 
 })();
-
-
-
-

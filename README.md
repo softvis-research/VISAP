@@ -14,11 +14,10 @@ The generator project is built using Maven. Open the project in your IDE of choi
 
 ### Initializing the Graph Database
 
-VISAP uses a local Neo4J graph database to generate its model. Download a current version of Neo4J, then set up a new local project there. Setting a password is required, but authorization will be disabled during development.
+VISAP uses a local Neo4J graph database to generate its model. Download a current version of Neo4J, then set up a new local project there. Setting a password is required, make sure it matches with the password in the "generator/src/java/properties/setup.properties" File, the default value is "123".
 
 Make the following changes to the configuration of that database (… > Settings):
 - Comment out ```dbms.directories.import=import``` by prepending #
-- Set ```dbms.security.auth_enabled``` to ```false```
 - De-comment ```dbms.security.allow_csv_import_from_file_urls=true``` by removing the leading #
 
 Then, start the database. The authorization being disabled may cause warnings on start-up, which can be dismissed.

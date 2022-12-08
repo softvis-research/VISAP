@@ -36,7 +36,6 @@ AFRAME.registerComponent('orbit-camera', {
 	},
 
 	init: function () {
-		globalCamera = this;
 		this.sceneEl = this.el.sceneEl;
 		this.object = this.el.object3D;
 		this.canvasEl = this.sceneEl.canvas;

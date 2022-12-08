@@ -15,16 +15,12 @@ var canvasManipulator = (function () {
 	}
 
 	let scene = {};
-
 	let entityEffectMap = new Map();
-
 	let hiddenEntitiesMap = new Map();
-
 	let notificationCallbackQueue = [];
 
 
 	function initialize() {
-
 		scene = document.querySelector("a-scene");
 
 		//this is a workaround for a bug of a-frame
@@ -250,8 +246,7 @@ var canvasManipulator = (function () {
 			);
 
 			setColor(component, color);
-		}
-		);
+		});
 	}
 
 	function resetColorOfEntities(entities, controller) {
@@ -285,7 +280,6 @@ var canvasManipulator = (function () {
 				}
 				setColor(component, colorList[colorList.length - 1].value);
 			}
-
 		});
 	}
 
@@ -351,13 +345,6 @@ var canvasManipulator = (function () {
 		resetTransparencyOfEntities(entities, controller);
 	}
 
-	function flyToEntity(entity) {
-		setCenterOfRotation(entity);
-		let object = document.getElementById(entity.id);
-		let boundingSphereRadius = object.object3DMap.mesh.geometry.boundingSphere.radius;
-		//globalCamera.scale = boundingSphereRadius/globalCamera.spherical.radius;
-	}
-
 	function addElement(element) {
 		const addedElements = document.getElementById("addedElements");
 		addedElements.appendChild(element);
@@ -365,13 +352,6 @@ var canvasManipulator = (function () {
 
 	function removeElement(element) {
 		element.parentNode.removeChild(element);
-	}
-
-
-	function setCenterOfRotation(entity) {
-		let offset = new THREE.Vector3();
-		//offset.subVectors(getCenterOfEntity(entity), globalCamera.target).multiplyScalar(globalCamera.data.panSpeed);
-		//globalCamera.panOffset.add(offset);
 	}
 
 	function getCenterOfEntity(entity) {
@@ -385,10 +365,6 @@ var canvasManipulator = (function () {
 		object.setAttribute('material', {
 			opacity: 1 - value
 		});
-	}
-
-	function setVisibility(object, visibility) {
-		object.object3D.visible = visibility;
 	}
 
 	function mapAframeDataToHTML(element) {
@@ -454,12 +430,9 @@ var canvasManipulator = (function () {
 		highlightEntities: highlightEntities,
 		unhighlightEntities: unhighlightEntities,
 
-		flyToEntity: flyToEntity,
-
 		addElement: addElement,
 		removeElement: removeElement,
 
-		setCenterOfRotation: setCenterOfRotation,
 		getCenterOfEntity: getCenterOfEntity,
 
 		addElementsFromAframeData: addElementsFromAframeData,
