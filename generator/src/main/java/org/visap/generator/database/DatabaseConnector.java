@@ -3,6 +3,7 @@ package org.visap.generator.database;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.types.Node;
+import org.visap.generator.configuration.Config;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class DatabaseConnector implements AutoCloseable {
 
     private DatabaseConnector(String URL) {
         DatabaseConnector.URL = URL;
-        driver = GraphDatabase.driver(URL);
+        driver = GraphDatabase.driver(URL, AuthTokens.basic(Config.setup.username(), Config.setup.password()));
     }
 
     public static String getDatabaseURL() {
