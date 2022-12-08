@@ -67,8 +67,8 @@ public class DistrictCircularLayout {
             double centerX = element.getXPosition();
             double centerZ = element.getZPosition();
 
-            double newXPosition = centerX + parentX + Config.Visualization.Metropolis.district.horizontalBuildingMargin();
-            double newZPosition = centerZ + parentZ + Config.Visualization.Metropolis.district.horizontalBuildingMargin();
+            double newXPosition = centerX + parentX + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
+            double newZPosition = centerZ + parentZ + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
 
             element.setXPosition(newXPosition);
             element.setZPosition(newZPosition);

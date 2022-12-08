@@ -10,7 +10,7 @@ public interface District extends Config {
     @DefaultValue("3.0")
     double horizontalBuildingGap();
     @DefaultValue("0.0")
-    double horizontalBuildingMargin();
+    double horizontalDistrictMargin();
     @DefaultValue("0.0")
     double horizontalDistrictGap();
 

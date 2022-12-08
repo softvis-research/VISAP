@@ -71,11 +71,11 @@ public class DistrictLightMapLayout {
         for (CityElement element : elements) {
 
             double centerX = element.getXPosition();
-            double newXPosition = centerX + parentX + Config.Visualization.Metropolis.district.horizontalBuildingMargin();
+            double newXPosition = centerX + parentX + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
             element.setXPosition(newXPosition);
 
             double centerZ = element.getZPosition();
-            double newZPosition = centerZ + parentZ + Config.Visualization.Metropolis.district.horizontalBuildingMargin();
+            double newZPosition = centerZ + parentZ + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
             element.setZPosition(newZPosition);
 
             Collection<CityElement> subElements = element.getSubElements();
