@@ -9,6 +9,6 @@ public interface Output extends Config {
     MetaDataOutput metaData();
     @DefaultValue("src/neo4jexport")
     String mapPath();
-    @DefaultValue("true")
+    @DefaultValue("false")
     boolean writeRepToDb();
 }
