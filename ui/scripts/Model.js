@@ -1,6 +1,5 @@
 var model = (function () {
 
-	//states
 	const states = {
 		selected: { name: "selected" },
 		marked: { name: "marked" },
@@ -9,24 +8,11 @@ var model = (function () {
 		tmpFiltered: { name: "tmpFiltered" },
 		added: { name: "added" },
 		componentSelected: { name: "componentSelected" },
-		antipattern: { name: "antipattern" },
-		versionSelected: { name: "versionSelected" },
-		macroChanged: { name: "macroChanged" },
 		loaded: { name: "loaded" },
 	};
 
 	let entitiesById = new Map();
 	let eventEntityMap = new Map();
-	let entitiesByVersion = new Map();
-	let entitiesByIssue = new Map();
-	let selectedVersions = [];
-	let selectedIssues = [];
-	let issues = [];
-	let issuesById = new Map();
-	let paths = [];
-	let labels = [];
-	let macrosById = new Map();
-	let modelElementsByMacro = new Map();
 	let entitiesByContainedUnloadedProperty = new Map();
 
 	function initialize() {
@@ -68,10 +54,6 @@ var model = (function () {
 				element.name,
 				element.qualifiedName,
 				element.belongsTo,
-				element.antipattern,
-				element.roles,
-				element.isTransparent,
-				element.version
 			);
 
 			entity.isTransparent = false;
@@ -82,40 +64,8 @@ var model = (function () {
 			entity.dateOfLastChange = parseDate(element.changed);
 
 			switch (entity.type) {
-				case "text":
-					entity.versions = splitByCommaIfNotEmpty(element.versions);
-					entity.versions.forEach((version) => addToMultimap(entitiesByVersion, version, entity));
-					labels.push(entity);
-					break;
-
-				case "issue":
-					entity.open = (element.open === "true");
-					entity.security = (element.security === "true");
-					entity.qualifiedName = entity.id;
-					issues.push(entity);
-					issuesById.set(entity.id, entity);
-					break;
-
-				case "path":
-					entity.start = element.start;
-					entity.end = element.end;
-					entity.role = element.role;
-					paths.push(entity);
-					break;
-
-				case "stk":
-					entity.versions = splitByCommaIfNotEmpty(element.versions);
-					return;
-
-				case "component":
-					entity.components = splitByCommaIfNotEmpty(element.components);
-					entity.versions = splitByCommaIfNotEmpty(element.versions);
-					return;
-
-				case "Project":
 				case "Namespace":
 					entity.version = element.version;
-					addToMultimap(entitiesByVersion, element.version, entity);
 					break;
 
 				case "Transaction":
@@ -133,19 +83,6 @@ var model = (function () {
 					entity.subTypes = splitByCommaIfNotEmpty(element.superClassOf);
 					entity.reaches = splitByCommaIfNotEmpty(element.reaches);
 					entity.reachedBy = [];
-					entity.antipattern = splitByCommaIfNotEmpty(element.antipattern);
-					entity.roles = splitByCommaIfNotEmpty(element.roles);
-					entity.component = element.component;
-					entity.version = element.version;
-					addToMultimap(entitiesByVersion, element.version, entity);
-					entity.betweennessCentrality = element.betweennessCentrality;
-					entity.changeFrequency = element.changeFrequency;
-					entity.issues = splitByCommaIfNotEmpty(element.issues);
-					entity.issues.forEach((issue) => addToMultimap(entitiesByIssue, issue, entity));
-					entity.numberOfOpenIssues = element.numberOfOpenIssues;
-					entity.numberOfClosedIssues = element.numberOfClosedIssues;
-					entity.numberOfClosedSecurityIssues = element.numberOfClosedSecurityIssues;
-					entity.numberOfOpenSecurityIssues = element.numberOfOpenSecurityIssues;
 					break;
 
 				case "ParameterizableClass":
@@ -206,38 +143,12 @@ var model = (function () {
 
 				case "Variable":
 					entity.accessedBy = splitByCommaIfNotEmpty(element.accessedBy);
-
-					if (element.declaredType) {
-						//if variable is of type array, [] is put after the variable name
-						if (element.declaredType.includes("[")) {
-							let parts = element.declaredType.split("[");
-							entity.displayText = parts[0] + entity.name + "[" + parts[1];
-						} else {
-							entity.displayText = element.declaredType + " " + element.name;
-						}
-					} else {
-						entity.displayText = element.name;
-					}
-
 					entity.dependsOn = element.dependsOn;
 					entity.filename = element.filename;
 					break;
 
 				case "TranslationUnit":
 					entity.filename = element.filename;
-					break;
-
-				case "Macro":
-					macrosById.set(element.id, entity);
-					break;
-
-				case "And":
-				case "Or":
-					entity.connected = splitByCommaIfNotEmpty(element.connected);
-					break;
-
-				case "Negation":
-					entity.negated = element.negated;
 					break;
 
 				case "Struct":
@@ -268,14 +179,6 @@ var model = (function () {
 		}
 	}
 
-	function addToMultimap(map, key, entity) {
-		if (key === undefined) return;
-
-		const currentEntriesForKey = map.get(key) || [];
-		currentEntriesForKey.push(entity);
-		map.set(key, currentEntriesForKey);
-	}
-
 	function parseDate(date) {
 		if (!date) return new Date(0);
 
@@ -285,13 +188,24 @@ var model = (function () {
 		return new Date(dateString);
 	}
 
-	function replaceIdsWithReferences(entity, relationName) {
-		const propertiesAsReferences = entity[relationName]
-			.filter(id => id && id.length)
+	// removes duplicates by identity, does not guarantee order
+	function removeDuplicates(arr) {
+		return [...new Set(arr)];
+	}
+
+	// maps array of ids to arrray of pairs [id, <entity ref or undefinde>]
+	function findEntitiesForIds(idArray) {
+		return removeDuplicates(idArray)
+			.filter(id => id && typeof id === 'string') // empty and non-string entries are dismissed
 			.map(id => [id.trim(), entitiesById.get(id.trim())]);
+	}
+
+	function replaceIdsWithReferences(entity, relationName) {
+		const idsForRelation = entity[relationName];
+		const idsMappedToEntities = findEntitiesForIds(idsForRelation);
 		entity[relationName] = [];
 
-		propertiesAsReferences.forEach(pair => {
+		idsMappedToEntities.forEach(pair => {
 			const [relationTargetId, relationTargetEntity] = pair;
 			if (relationTargetEntity === undefined) {
 				// no entity matching the id was found - store it to be replaced later
@@ -334,32 +248,12 @@ var model = (function () {
 			}
 
 			switch (entity.type) {
-				case "Project":
-				case "text":
-					break;
-
-				case "issue":
-					break;
-
-				case "component":
-					replaceIdsWithReferences(entity, 'components');
-					break;
-
 				case "Class":
 					replaceIdsWithReferences(entity, 'superTypes');
 					replaceIdsWithReferences(entity, 'subTypes');
 					replaceIdsWithReferences(entity, 'antipattern');
-
-					let reaches = [];
-					entity.reaches.forEach(function (reachesId) {
-						const relatedEntity = entitiesById.get(reachesId.trim());
-						if (relatedEntity !== undefined) {
-							reaches.push(relatedEntity);
-							relatedEntity.reachedBy.push(entity);
-						}
-					});
-					entity.reaches = reaches;
-					entity.roles = entity.roles.map(roleId => roleId.trim());
+					replaceIdsWithReferences(entity, 'reaches');
+					entity.reaches.forEach(reachedEntity => reachedEntity.reachedBy.push(entity));
 					break;
 
 				case "ParameterizableClass":
@@ -385,10 +279,6 @@ var model = (function () {
 					replaceIdsWithReferences(entity, 'calls');
 					replaceIdsWithReferences(entity, 'calledBy');
 					replaceIdsWithReferences(entity, 'accesses');
-
-					if (entity.dependsOn !== undefined && entity.dependsOn !== "") {
-						retrieveAllUsedMacros(entity.dependsOn, entity.id);
-					}
 					break;
 
 				case "Transaction":
@@ -409,26 +299,7 @@ var model = (function () {
 					break;
 
 				case "Variable":
-					let variableAccessedBy = [];
-					entity.accessedBy.forEach(function (accessedById) {
-						let relatedEntity = entitiesById.get(accessedById.trim());
-						if (relatedEntity !== undefined && !variableAccessedBy.includes(relatedEntity)) {
-							variableAccessedBy.push(relatedEntity);
-						}
-					});
-					entity.accessedBy = variableAccessedBy;
-
-					if (entity.dependsOn !== undefined && entity.dependsOn !== "") {
-						retrieveAllUsedMacros(entity.dependsOn, entity.id);
-					}
-					break;
-
-				case "Struct":
-				case "Union":
-				case "Enum":
-					if (entity.dependsOn !== undefined && entity.dependsOn !== "") {
-						retrieveAllUsedMacros(entity.dependsOn, entity.id);
-					}
+					replaceIdsWithReferences(entity, 'accessedBy');
 					break;
 
 				default:
@@ -449,22 +320,19 @@ var model = (function () {
 			}
 		});
 
-		//set all parents attribute
 		entitiesById.forEach(function (entity) {
 			entity.allParents = getAllParentsOfEntity(entity);
 		});
 	}
 
 	function reset() {
-		eventEntityMap.forEach(function (entityMap, eventKey, map) {
-			entityMap.forEach(function (entity, entityId) {
+		eventEntityMap.forEach(function (entityMap, eventKey) {
+			entityMap.forEach(function (entity) {
 				entity[eventKey.name] = false;
 			});
 			entityMap.clear();
 		});
 	}
-
-
 
 	function createEntity(type, id, name, qualifiedName, belongsTo) {
 		let entity = {
@@ -499,8 +367,10 @@ var model = (function () {
 			const parent = entity.belongsTo;
 			parents.push(parent);
 
-			const parentParents = getAllParentsOfEntity(parent);
-			parents = parents.concat(parentParents);
+			if (parent !== entity) {
+				const parentParents = getAllParentsOfEntity(parent);
+				parents = parents.concat(parentParents);
+			}
 		}
 
 		return parents;
@@ -518,30 +388,6 @@ var model = (function () {
 		return children;
 	}
 
-	function retrieveAllUsedMacros(conditionId, modelElementId) {
-		var conditionEntity = getEntityById(conditionId);
-
-		switch (conditionEntity.type) {
-			case "Macro":
-				const modelEntity = getEntityById(modelElementId);
-				addToMultimap(modelElementsByMacro, conditionEntity.id, modelEntity);
-				break;
-			case "And":
-			case "Or":
-				var connectedElementIds = conditionEntity.connected;
-				connectedElementIds.forEach(function (connectedEntityId) {
-					retrieveAllUsedMacros(String(connectedEntityId), modelElementId);
-				});
-				break;
-			case "Negation":
-				let negatedElementId = conditionEntity.negated;
-				retrieveAllUsedMacros(negatedElementId, modelElementId);
-				break;
-			default:
-				break;
-		}
-	}
-
 	function getAllEntities() {
 		return entitiesById;
 	}
@@ -550,103 +396,12 @@ var model = (function () {
 		return entitiesById.get(id);
 	}
 
-	function getIssuesById(id) {
-		return issuesById.get(id);
-	}
-
-	function getAllVersions() {
-		return entitiesByVersion;
-	}
-
-	function getAllIssues() {
-		return issues;
-	}
-
-	function getAllMacrosById() {
-		return macrosById;
-	}
-
-	function getModelElementsByMacro(id) {
-		return modelElementsByMacro.get(id);
-	}
-
-	function getAllSecureEntities() {
-		return entitiesById.filter(entity => entity.type === "Class" && entity.numberOfOpenSecurityIssues === 0);
-	}
-
-	function getAllCorrectEntities() {
-		return entitiesById.filter(entity => entity.type === "Class" && entity.numberOfOpenSecurityIssues === 0 && entity.numberOfOpenIssues === 0);
-	}
-
-	function getEntitiesByComponent(component) {
-		return entitiesById.filter(entity => entity.component === component);
-	}
-
-	function getRole(start, pattern) {
-		return paths.findLast(path => path.start === start && path.belongsTo.id === pattern);
-	}
-
-	function getRoleBetween(start, end) {
-		return paths.find(path => path.start === start && path.end === end);
-	}
-
-	function getPaths(start, pattern) {
-		return paths.filter(path => path.start === start && path.belongsTo.id === pattern).map(path => path.end);
-	}
-
-	function getEntitiesByAntipattern(antipatternID) {
-		return entitiesById.filter(entity => entity.type === "Class" && entity.antipattern.includes(antipatternID));
-	}
-
-	function removeVersion(version) {
-		const index = selectedVersions.indexOf(version);
-		if (index > -1) {
-			selectedVersions.splice(index, 1);
-		}
-	}
-
-	function removeIssue(issue) {
-		const index = selectedIssues.indexOf(issue);
-		if (index > -1) {
-			selectedIssues.splice(index, 1);
-		}
-	}
-
-	function addVersion(version) {
-		selectedVersions.push(version);
-	}
-
-	function addIssue(issue) {
-		selectedIssues.push(issue);
-	}
-
 	function getEntitiesByState(stateEventObject) {
 		return eventEntityMap.get(stateEventObject);
 	}
 
-	function getEntitiesByVersion(versionId) {
-		return entitiesByVersion.get(versionId);
-	}
-
-	function getEntitiesByIssue(issue) {
-		return entitiesByIssue.get(issue);
-	}
-
 	function getEntitiesByType(type) {
 		return entitiesById.filter(entity => entity.type === type);
-	}
-
-	function getCodeEntities() {
-		const ignoredTypes = ["Negation", "Macro", "And", "Or"];
-		return entitiesById.filter(entity => !ignoredTypes.includes(entity.type));
-	}
-
-	function getLabels() {
-		return labels;
-	}
-
-	function getSelectedVersions() {
-		return selectedVersions;
 	}
 
 	return {
@@ -655,36 +410,15 @@ var model = (function () {
 		states: states,
 
 		getAllEntities: getAllEntities,
-		getAllSecureEntities: getAllSecureEntities,
-		getAllCorrectEntities: getAllCorrectEntities,
 		getEntityById: getEntityById,
 		getEntitiesByState: getEntitiesByState,
-		getEntitiesByComponent: getEntitiesByComponent,
-		getEntitiesByAntipattern: getEntitiesByAntipattern,
-		getEntitiesByVersion: getEntitiesByVersion,
-		getEntitiesByIssue: getEntitiesByIssue,
 		getEntitiesByType: getEntitiesByType,
 		getAllParentsOfEntity: getAllParentsOfEntity,
 		getAllChildrenOfEntity: getAllChildrenOfEntity,
-		getAllVersions: getAllVersions,
-		getAllIssues: getAllIssues,
-		getIssuesById: getIssuesById,
-		getAllMacrosById: getAllMacrosById,
-		getModelElementsByMacro: getModelElementsByMacro,
+
 		createEntity: createEntity,
 		removeEntity: removeEntity,
 		createEntititesFromMetadata: createEntititesFromMetadata,
-
-		addVersion: addVersion,
-		removeVersion: removeVersion,
-		addIssue: addIssue,
-		removeIssue: removeIssue,
-		getSelectedVersions: getSelectedVersions,
-		getPaths: getPaths,
-		getRole: getRole,
-		getRoleBetween: getRoleBetween,
-		getLabels: getLabels,
-		getCodeEntities: getCodeEntities
 	};
 
 })();
