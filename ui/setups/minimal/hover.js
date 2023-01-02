@@ -11,32 +11,30 @@
 		},
 	],
 
-	uis: [
-		{
-			name: "UI0",
+	ui: {
+		name: "UI0",
 
-			navigation: {
-				//examine, walk, fly, helicopter, lookAt, turntable, game
-				type: "examine",
-				//speed: 10
-			},
-			area: {
-				name: "top",
-				orientation: "horizontal",
-				first: { },
-				second: {
-					size: "100%",
-					collapsible: false,
-					name: "canvas",
-					canvas: { },
+		navigation: {
+			//examine, walk, fly, helicopter, lookAt, turntable, game
+			type: "examine",
+			//speed: 10
+		},
+		area: {
+			name: "top",
+			orientation: "horizontal",
+			first: { },
+			second: {
+				size: "100%",
+				collapsible: false,
+				name: "canvas",
+				canvas: { },
 
-					controllers: [
-						{ name: "defaultLogger" },
+				controllers: [
+					{ name: "defaultLogger" },
 
-						{ name: "canvasHoverController" },
-					],
-				}
+					{ name: "canvasHoverController" },
+				],
 			}
 		}
-	]
+	}
 };

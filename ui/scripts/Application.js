@@ -30,79 +30,49 @@ async function initializeApplication() {
 
 var application = (function () {
 
-	var controllers = new Map();
-	var activeControllers = new Map();
+	let controllers = new Map();
+	let controllerDivs = new Map();
+	let uiConfig = null;
 
-	var newActiveControllers = [];
-	var oldActiveControllers = [];
-
-	var uiConfigs = new Map();
-	var currentUIConfig = null;
-
-	var bodyElement;
-	var canvasElement;
+	let bodyElement;
+	let canvasElement;
 
 
-	//initialize application
-	//*******************
+	// initialize application
 
 	function initialize() {
-		//first ui config is initial config
-		if (setup.uis && setup.uis.length && setup.uis[0]) {
-			setup.uis.forEach(function (uiConfig) {
-				uiConfigs.set(uiConfig.name, uiConfig);
-			});
-			currentUIConfig = setup.uis[0];
-		} else if (setup.ui) {
-			currentUIConfig = setup.ui;
-		}
-
-		if (currentUIConfig === null) {
+		if (!setup.ui) {
 			events.log.error.publish({ text: "No UI config in setup found" });
 			return;
 		}
 
-		//initialize controllers
-		setup.controllers.forEach(function (controller) {
-			loadAndInitializeController(controller);
-		});
+		uiConfig = setup.ui;
 
-		startConfigParsingAfterControllerLoading();
-	}
-
-
-	function startConfigParsingAfterControllerLoading() {
-		//check if all controllers loaded
+		controllers = getControllerObjects(setup.controllers);
 		if (setup.controllers.length !== controllers.size) {
 			events.log.error.publish({ text: "One or more controllers failed to load, aborting" });
 			return;
 		}
 
-		//get body and canvas elements
+		createUiLayout();
+
+		setup.controllers.forEach((controllerSetup) => {
+			const controllerObject = controllers.get(controllerSetup.name);
+			initializeController(controllerObject, controllerSetup);
+			activateController(controllerObject);
+		});
+	}
+
+	function createUiLayout() {
 		bodyElement = document.body;
 		canvasElement = document.getElementById("canvas");
 
-		//create ui div element
-		/*	AFRAME-WORKAROUND
-		FÜR AFRAME - existierendes DIV statt neuem UI aus aframe.html
-		id von "ui" zu "canvas" geändert
-		var uiDIV = document.getElementById("canvas");*/
-
-		var uiDIV = document.createElement("DIV");
-		uiDIV.id = "ui";
-		bodyElement.appendChild(uiDIV);
-		currentUIConfig.uiDIV = uiDIV;
-
-		//activate controller
-		newActiveControllers = [];
+		const uiDiv = createDivAsChildOf(bodyElement, "ui");
+		uiConfig.uiDiv = uiDiv;
 
 		try {
-			//parse ui config
-			parseUIConfig(currentUIConfig.name, currentUIConfig, uiDIV);
-
-			//activate controller
-			activateController();
-			events.log.info.publish({ text: "new config loaded: " + currentUIConfig.name });
+			parseUIConfig(uiConfig.name, uiConfig, uiDiv);
+			events.log.info.publish({ text: "new config loaded: " + uiConfig.name });
 		} catch (err) {
 			events.log.error.publish({ text: err.message });
 		}
@@ -150,342 +120,168 @@ var application = (function () {
 		});
 	}
 
-
-	function resetApplication() {
-
-		//controller reset
-		activeControllers.forEach(function (controllerDiv, controllerObject, map) {
-			if (controllerObject.reset) {
-				controllerObject.reset();
-			}
-		});
-
-		//model reset
-		model.reset();
-
-		//canvas reset
-		canvasManipulator.reset();
-	}
-
-
-	function loadUIConfig(uiConfigName) {
-
-		resetApplication();
-
-		//same ui? -> nothing to do
-		if (uiConfigName === currentUIConfig.name) {
-			return;
-		}
-
-		var nextUIConfig = uiConfigs.get(uiConfigName);
-
-		if (nextUIConfig === undefined) {
-			events.log.error.publish({ text: "No UI config with name " + uiConfigName + " found" });
-			return;
-		}
-
-		//create ui div element
-		var uiDIV = document.createElement("DIV");
-		uiDIV.id = "ui";
-		bodyElement.appendChild(uiDIV);
-
-		//remove current ui div
-		var currentUIDIV = currentUIConfig.uiDIV;
-		var currentUIDIVParent = currentUIDIV.parentElement;
-		currentUIDIVParent.removeChild(currentUIDIV);
-
-		//create new ui
-		currentUIConfig = nextUIConfig;
-		currentUIConfig.uiDIV = uiDIV;
-
-		//collect old active controllers for deactivation
-		oldActiveControllers = Array.from(activeControllers.keys());
-		newActiveControllers = [];
-
-		try {
-			//parse new ui config
-			parseUIConfig(currentUIConfig.name, currentUIConfig, uiDIV);
-
-			//deactive controller
-			deactivateController(oldActiveControllers);
-
-			//activate controller
-			activateController();
-
-			events.log.info.publish({ text: "new config loaded: " + currentUIConfig.name });
-		} catch (err) {
-			events.log.error.publish({ text: err.message });
-		}
-	}
-
-
-	//config parser
-	//*******************
-
 	function parseUIConfig(configName, configPart, parent) {
-
-		//areas
+		// areas
 		if (configPart.area !== undefined) {
-			var area = configPart.area;
-			if (area.orientation === undefined) {
-				area.orientation = "vertical"
-			}
+			const area = configPart.area;
+			const splitterName = `${configName}_${area.name}`;
+			const splitterId = `#${splitterName}`;
+			const splitterOrientation = area.orientation ?? "vertical";
+			const splitterResizable = area.resizable ?? true;
 
-			var splitterName = configName + "_" + area.name;
-			var splitterId = "#" + splitterName;
-
-			var splitterOrientation = area.orientation;
-
-			var splitterResizable = true;
-			if (area.resizable === false) {
-				splitterResizable = area.resizable;
-			}
-
-
-			var firstPart = area.first;
-			var secondPart = area.second;
-
-			if (firstPart === undefined) {
-				console.log("abc")
-				console.log(area)
-			}
-
-
-			if (secondPart === undefined) {
-				console.log("xyz")
-				console.log(area)
-			}
-
-
-			//create jqwidget splitter
-			var splitterObject = createSplitter(splitterName);
-
-			//add splitter to parent
+			const splitterObject = createSplitter(splitterName);
 			parent.appendChild(splitterObject.splitter);
 
-			var firstPanel = createPanel(firstPart);
-			var secondPanel = createPanel(secondPart);
+			const firstPart = area.first;
+			const secondPart = area.second;
+			const firstPanel = createPanel(firstPart);
+			const secondPanel = createPanel(secondPart);
 
 			$(splitterId).jqxSplitter({ theme: "metro", width: "100%", height: "100%", resizable: splitterResizable, orientation: splitterOrientation, panels: [firstPanel, secondPanel] });
 
-			$(splitterId).on("resize", function(event) { canvasManipulator.resizeScene() });
+			$(splitterId).on("resize", () => { canvasManipulator.resizeScene() });
 
-			//pars area parts as config parts
+			// recursively parse layout of the children
 			parseUIConfig(configName, firstPart, splitterObject.firstPanel);
 			if (secondPart !== undefined) {
 				parseUIConfig(configName, secondPart, splitterObject.secondPanel);
 			}
 		}
 
-		//expander
+		// expanders
 		if (configPart.expanders !== undefined) {
-			configPart.expanders.forEach(function (expander) {
-				var expanderName = configName + "_" + expander.name;
-				var expanderId = "#" + expanderName;
-				var expanderTitle = expander.title;
-
-				var expanderObject = createExpander(expanderName, expanderTitle);
+			configPart.expanders.forEach((expander) => {
+				const expanderName = `${configName}_${expander.name}`;
+				const expanderId = `#${expanderName}`;
+				const expanderTitle = expander.title;
+				const expanderObject = createExpander(expanderName, expanderTitle);
 
 				parent.appendChild(expanderObject.expander);
 
 				$(expanderId).jqxExpander({ theme: "metro", width: "100%", height: "100%" });
 
-				//pars expander parts as config parts
-				var expanderContent = document.createElement("DIV");
+				// recursively parse layout of the children
+				const expanderContent = createDiv();
 				parseUIConfig(configName, expander, expanderContent);
 
 				$(expanderId).jqxExpander('setContent', expanderContent);
 			});
 		}
 
-		//canvas
+		// canvas
 		if (configPart.canvas !== undefined) {
-			var canvasParentElement = canvasElement.parentElement;
+			const canvasParentElement = canvasElement.parentElement;
 			canvasParentElement.removeChild(canvasElement);
-
 			parent.appendChild(canvasElement.cloneNode(true));
-			//	evtl canvas löschen ??
 		}
 
-		//controller
+		// controller divs
 		if (configPart.controllers !== undefined) {
-			configPart.controllers.forEach(function (controller) {
-				setActivateController(controller, parent);
+			configPart.controllers.forEach((controller) => {
+				addControllerDiv(controller, parent);
 			});
 		}
 	}
 
 
-	//controller handling
-	//*******************
+	// controller handling
 
-	function loadAndInitializeController(controller) {
-		var controllerName = controller.name;
-
-		//controller allready loaded by html-file?
-		if (window[controllerName]) {
-			var controllerObject = window[controllerName];
-
-			if (controllerObject.initialize) {
-				controllerObject.initialize(controller);
-
-				controllers.set(controllerName, controllerObject);
+	function getControllerObjects(controllerSetupArray) {
+		const controllers = new Map();
+		for (const controllerSetup of controllerSetupArray) {
+			const controllerObject = window[controllerSetup.name];
+			if (!controllerObject) {
+				events.log.error.publish({ text: "Controller " + controllerSetup.name + " not found!" });
 			}
-		} else {
-			events.log.error.publish({ text: "Controller " + controllerName + " not loaded!" });
+			controllers.set(controllerSetup.name, controllerObject);
+		}
+		return controllers;
+	}
+
+	function initializeController(controllerObject, controllerSetup) {
+		if (typeof controllerObject.initialize === 'function') {
+			controllerObject.initialize(controllerSetup);
 		}
 	}
 
-
-
-	function setActivateController(controller, parent) {
-
-		var controllerName = controller.name;
-		var controllerObject = controllers.get(controllerName);
-
-		if (controllerObject === undefined) {
-			events.log.error.publish({ text: "controller " + controllerName + " undefined" });
-			return;
-		}
-
-		if (activeControllers.has(controllerObject)) {
-
-			let controllerDiv = activeControllers.get(controllerObject);
-
-			let controllerDivParent = controllerDiv.parentElement;
-			controllerDivParent.removeChild(controllerDiv);
-
-			parent.appendChild(controllerDiv);
-
-		} else {
-
-			let controllerDiv = document.createElement("DIV");
-			parent.appendChild(controllerDiv);
-
-			activeControllers.set(controllerObject, controllerDiv);
-
-			newActiveControllers.push(controllerObject);
-		}
-
-		//conroller also in new ui -> no deactivation
-		if (oldActiveControllers.length !== 0) {
-			let indexOfController = oldActiveControllers.indexOf(controllerObject);
-			if (indexOfController !== -1) {
-				oldActiveControllers.splice(indexOfController, 1);
-			}
+	function activateController(controllerObject) {
+		const controllerDiv = controllerDivs.get(controllerObject.name);
+		if (typeof controllerObject.activate === 'function') {
+			controllerObject.activate(controllerDiv);
 		}
 	}
 
-	function activateController() {
-		newActiveControllers.forEach(function (controllerObject) {
-			if (controllerObject.activate) {
-				var controllerDiv = activeControllers.get(controllerObject);
-
-				controllerObject.activate(controllerDiv);
-			}
-		});
+	function addControllerDiv(controller, parent) {
+		const controllerName = controller.name;
+		if (!controllerDivs.has(controllerName)) {
+			const controllerDiv = createDivAsChildOf(parent);
+			controllerDivs.set(controllerName, controllerDiv);
+		}
 	}
 
-
-	function deactivateController(oldControllers) {
-
-		oldControllers.forEach(function (controller) {
-			if (!controller.deactivate) {
-				return;
-			}
-
-			controller.deactivate();
-
-			activeControllers.delete(controller);
-		});
-
-	}
-
-
-
-
-	//gui creation
-	//*******************
+	// gui creation
 
 	function createPanel(areaPart) {
-		var panel = {
-			size: areaPart.size
+		const panel = {
+			size: areaPart.size,
+			min: areaPart.min,
+			collapsible: areaPart.collapsible
 		};
-		if (areaPart.min !== undefined) {
-			panel.min = areaPart.min;
-		}
-		if (areaPart.collapsible !== undefined) {
-			panel.collapsible = areaPart.collapsible;
-		}
 		return panel;
 	}
 
-
 	function createSplitter(id) {
-		var splitterDivElement = document.createElement("DIV");
-		splitterDivElement.id = id;
-
-		var firstPanelDivElement = document.createElement("DIV");
-		firstPanelDivElement.id = id + "firstPanel";
-
-		var secondPanelDivElement = document.createElement("DIV");
-		secondPanelDivElement.id = id + "secondPanel";
-
-		splitterDivElement.appendChild(firstPanelDivElement);
-		splitterDivElement.appendChild(secondPanelDivElement);
+		const splitter = createDiv(id);
+		const firstPanel = createDivAsChildOf(splitter, `${id}firstPanel`);
+		const secondPanel = createDivAsChildOf(splitter, `${id}secondPanel`);
 
 		return {
-			splitter: splitterDivElement,
-			firstPanel: firstPanelDivElement,
-			secondPanel: secondPanelDivElement
+			splitter: splitter,
+			firstPanel: firstPanel,
+			secondPanel: secondPanel
 		};
 	}
 
 	function createExpander(id, title) {
-
-		var expanderDivElement = document.createElement("DIV");
-		expanderDivElement.id = id;
-
-		var expanderHeadDivElement = document.createElement("DIV");
-		expanderHeadDivElement.innerHTML = title;
-		expanderDivElement.appendChild(expanderHeadDivElement);
-
-		var expanderContentDivElement = document.createElement("DIV");
-		expanderDivElement.appendChild(expanderContentDivElement);
+		const expander = createDiv(id);
+		const expanderHead = createDivAsChildOf(expander);
+		expanderHead.innerHTML = title;
+		const expanderContent = createDivAsChildOf(expander);
 
 		return {
-			expander: expanderDivElement,
-			head: expanderHeadDivElement,
-			content: expanderContentDivElement
+			expander: expander,
+			head: expanderHead,
+			content: expanderContent
 		};
 	}
 
-
-	function createPopup(title, text, popupId, okButtonId) {
-
-		var popupWindowDiv = document.createElement("DIV");
-		popupWindowDiv.id = popupId;
-
-		var popupTitleDiv = document.createElement("DIV");
-		popupWindowDiv.appendChild(popupTitleDiv);
-		popupTitleDiv.innerHTML = title;
-
-		var popupContentDiv = document.createElement("DIV");
-		popupWindowDiv.appendChild(popupContentDiv);
-
-		//Text
-		var popupText = document.createElement("DIV");
-		popupContentDiv.appendChild(popupText);
+	function createPopup(title, text, popupId) {
+		const popupWindow = createDiv(popupId);
+		const popupTitle = createDivAsChildOf(popupWindow);
+		popupTitle.innerHTML = title;
+		const popupContent = createDivAsChildOf(popupWindow);
+		const popupText = createDivAsChildOf(popupContent);
 		popupText.innerHTML = text;
 
 		return popupWindowDiv;
 	}
 
+	function createDivAsChildOf(parent, newDivId) {
+		const div = createDiv(newDivId);
+		parent.appendChild(div);
+		return div;
+	}
 
-	//Helper
+	function createDiv(id) {
+		const div = document.createElement("DIV");
+		if (id) {
+			div.id = id;
+		}
+		return div;
+	}
 
 	function transferConfigParams(setupConfig, controllerConfig) {
-		for (var property in setupConfig) {
+		for (const property in setupConfig) {
 			if (property === "name") {
 				continue;
 			}
@@ -507,14 +303,11 @@ var application = (function () {
 
 	return {
 		initialize: initialize,
-		loadUIConfig: loadUIConfig,
 		transferConfigParams: transferConfigParams,
 		createPopup: createPopup,
-		reset: resetApplication,
 
 		startLoadingSetup: startLoadingSetup,
 		startLoadingMetadata: startLoadingMetadata,
 		startLoadingModel: startLoadingModel
 	};
-
 })();
