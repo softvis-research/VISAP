@@ -1,2 +1,4 @@
 .idea/
 .vscode/
+ui/package-lock.json
+ui/package.json
