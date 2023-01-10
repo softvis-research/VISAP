@@ -34,11 +34,11 @@ public class CityRepository {
 
     public Collection<CityElement> getAllElements() {
         // return new ArrayList(elementsBySourceID.values());
-        return new ArrayList(elementsByHash.values());
+        return new ArrayList<CityElement>(elementsByHash.values());
     }
 
     public Collection<CityElement> getAllElementsByHash() {
-        return new ArrayList(elementsByHash.values());
+        return new ArrayList<CityElement>(elementsByHash.values());
     }
 
     public CityElement getElementBySourceID(Long sourceID){
@@ -55,7 +55,7 @@ public class CityRepository {
         }
 
         Map<String, CityElement> elementsByTypeMap = elementsByType.get(type);
-        return new ArrayList(elementsByTypeMap.values());
+        return new ArrayList<CityElement>(elementsByTypeMap.values());
     }
 
 

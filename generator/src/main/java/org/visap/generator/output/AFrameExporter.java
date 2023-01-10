@@ -1,11 +1,8 @@
 package org.visap.generator.output;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.repository.CityElement;
 import org.visap.generator.repository.CityRepository;
-import org.visap.generator.database.DatabaseConnector;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -14,17 +11,11 @@ import java.io.Writer;
 import java.util.Collection;
 
 public class AFrameExporter {
-
-    private Log log = LogFactory.getLog(this.getClass());
-    private DatabaseConnector connector;
-
     private CityRepository repository;
 
     private OutputFormat aframeOutput;
 
     public AFrameExporter(CityRepository cityRepository, String aframeOutputName) {
-        this.connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
-
         repository = cityRepository;
 
         switch(aframeOutputName){
@@ -239,7 +230,7 @@ public class AFrameExporter {
     }
 
     private String getShapeExport(CityElement.CityShape shape) {
-        switch (shape){
+        switch (shape) {
             case Box: return "a-box";
             case Cylinder: return "a-cylinder";
             case Cone: return "a-cone";

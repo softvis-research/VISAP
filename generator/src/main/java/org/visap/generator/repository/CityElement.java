@@ -58,7 +58,6 @@ public class CityElement {
 
 
     private Long nodeID;
-    private Long sourceNodeID;
 
     private Node sourceNode;
 
@@ -221,7 +220,7 @@ public class CityElement {
     }
 
     public Collection<CityElement> getSubElements() {
-        return new ArrayList(subElements);
+        return new ArrayList<CityElement>(subElements);
     }
 
     public Collection<CityElement> getSubElementsOfType(CityType elementType) {

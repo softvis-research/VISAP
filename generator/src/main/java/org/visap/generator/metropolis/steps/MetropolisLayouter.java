@@ -18,12 +18,10 @@ import java.util.*;
 public class MetropolisLayouter {
     private Log log = LogFactory.getLog(this.getClass());
 
-    private SourceNodeRepository nodeRepository;
     private CityRepository repository;
 
     public MetropolisLayouter(CityRepository cityRepository, SourceNodeRepository sourceNodeRepository) {
         repository = cityRepository;
-        nodeRepository = sourceNodeRepository;
 
         log.info("*****************************************************************************************************************************************");
         log.info("created");

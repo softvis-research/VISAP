@@ -18,12 +18,10 @@ public class MetropolisDesigner {
 
     private Log log = LogFactory.getLog(this.getClass());
 
-    private SourceNodeRepository nodeRepository;
     private CityRepository repository;
 
     public MetropolisDesigner(CityRepository cityRepository, SourceNodeRepository sourceNodeRepository) {
         repository = cityRepository;
-        nodeRepository = sourceNodeRepository;
 
         log.info("*****************************************************************************************************************************************");
         log.info("created");
@@ -38,23 +36,6 @@ public class MetropolisDesigner {
 
         designMetropolisElementsByType(CityElement.CityType.Floor);
 
-    }
-
-    private void designMetropolisElementsByMigrationFindings() {
-
-        Collection<CityElement> migrationElements = repository.getElementsBySourceProperty(SAPNodeProperties.migration_findings, "true");
-
-        for ( CityElement migrationElement: migrationElements) {
-
-            if (!migrationElement.getSourceNodeType().equals(SAPNodeTypes.Namespace.name())) {
-                migrationElement.setColor(Config.Visualization.Metropolis.color.migrationElement());
-
-                String typeParent = String.valueOf(migrationElement.getParentElement().getSourceNodeType());
-                if(typeParent.equals(SAPNodeTypes.Report.name())){
-                    migrationElement.getParentElement().setColor("#FF8C00");
-                }
-            }
-        }
     }
 
     private void designMetropolisElementsByType(CityElement.CityType cityType){

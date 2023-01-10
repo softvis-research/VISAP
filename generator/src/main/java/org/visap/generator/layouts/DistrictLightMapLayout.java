@@ -1,7 +1,5 @@
 package org.visap.generator.layouts;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.visap.generator.layouts.kdtree.CityKDTree;
 import org.visap.generator.layouts.kdtree.CityKDTreeNode;
 import org.visap.generator.layouts.kdtree.CityRectangle;
@@ -14,8 +12,6 @@ import java.util.*;
 
 public class DistrictLightMapLayout {
     // Old coding -> Refactor, generalize and maybe reimplement
-
-    private Log log = LogFactory.getLog(this.getClass());
 
     private CityElement district;
     private Collection<CityElement> subElements;
@@ -84,12 +80,6 @@ public class DistrictLightMapLayout {
             }
         }
     }
-
-
-
-
-
-
 
     /*
         Copied from CityLayout

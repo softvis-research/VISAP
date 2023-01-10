@@ -264,27 +264,11 @@ public class SourceNodeRepository {
             Map<Long, Node> nodeIDMap = nodesByLabel.get(label);
 
             Long nodeID = node.id();
-            if( !nodeIDMap.containsValue(nodeID)){
+            if(!nodeIDMap.containsValue(nodeID)){
                 nodeIDMap.put(nodeID, node);
             }
         });
     }
-
-    private void addNodeByLabel(Node node){
-        node.labels().forEach( (label)->{
-            if( !nodesByLabel.containsKey(label)){
-                Map<Long, Node> nodeIDMap = new HashMap<>();
-                nodesByLabel.put(label, nodeIDMap);
-            }
-            Map<Long, Node> nodeIDMap = nodesByLabel.get(label);
-
-            Long nodeID = node.id();
-            if( !nodeIDMap.containsValue(nodeID)){
-                nodeIDMap.put(nodeID, node);
-            }
-        });
-    }
-
 
     private void addNodesByRelation(Node mNode, Node nNode, String relationName) {
 

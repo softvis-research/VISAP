@@ -116,48 +116,6 @@ public class MetaDataExporter {
         return builder.toString();
     }
 
-    private String getMigrationRelation(CityElement element) {
-
-        StringBuilder builder = new StringBuilder();
-
-        //new hash list for all migrationRelations
-        List<String> migrationHashes = new ArrayList<>();
-
-        // Parent for specific cloud
-        CityElement district = element.getParentElement();
-
-        // get subElements of this parentDistrict with migrationFindings and fill hash value into list migrationHashes
-        getBuildingsWithMigrationFindingsHash(district, migrationHashes);
-
-        builder.append("\"rcData\": \"" + String.join(", ", migrationHashes) + "\",\n");
-
-        return builder.toString();
-    }
-
-    private Object getBuildingsWithMigrationFindingsHash(CityElement district, List<String> migrationHashes) {
-
-        Collection<CityElement> buildingsWithMigrationFindings = district.getSubElements();
-
-        for (CityElement buildingsWithMigrationFinding: buildingsWithMigrationFindings) {
-
-            // only subElements with the flag "migrationFindings" matters
-            String migrationFindingsString = buildingsWithMigrationFinding.getSourceNodeProperty(SAPNodeProperties.migration_findings);
-            if (!migrationFindingsString.equals("true")) {
-                continue;
-            } else {
-                //fill list
-                migrationHashes.add(buildingsWithMigrationFinding.getHash());
-            }
-        }
-
-        // If there is no subElement, then the relationship connector is drawn from the cloud to the district
-        if (migrationHashes.size() == 0){
-            migrationHashes.add(district.getHash());
-        }
-
-        return migrationHashes;
-    }
-
     private String getNodeMetaInfo(CityElement element) {
         StringBuilder builder = new StringBuilder();
         Node node = element.getSourceNode();
@@ -224,7 +182,7 @@ public class MetaDataExporter {
         String nodeType = node.get("type").asString();
 
         //signature for methods
-        if (node.get("type").asString().equals("METH")) {
+        if (nodeType.equals("METH")) {
             builder.append("\"signature\": \"" + "" + "\",\n");
         }
 
@@ -247,24 +205,6 @@ public class MetaDataExporter {
         String nodeName = node.get(SAPNodeProperties.object_name.name()).asString();
         qualifiedNameAsList.add(nodeName);
         return qualifiedNameAsList;
-    }
-
-    private String getContainerHash(Node node) {
-        Collection<Node> parentNodes = nodeRepository.getRelatedNodes(node, SAPRelationLabels.CONTAINS, false);
-        if (parentNodes.isEmpty()) {
-            parentNodes = nodeRepository.getRelatedNodes(node, SAPRelationLabels.USES, false);
-            if (parentNodes.isEmpty()) {
-                return "";
-            }
-        }
-
-        Node parentNode = parentNodes.iterator().next();
-
-        CityElement parentElement = cityRepository.getElementBySourceID(parentNode.id());
-        if (parentElement == null) {  // Some SAP standard packages may not included
-            return "";
-        }
-        return parentElement.getHash();
     }
 
     private String getRelations(Node node, SAPRelationLabels label, Boolean direction) {

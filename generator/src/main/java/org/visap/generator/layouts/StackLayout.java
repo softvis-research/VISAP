@@ -1,16 +1,10 @@
 package org.visap.generator.layouts;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.visap.generator.repository.CityElement;
 
 import java.util.Collection;
 
 public class StackLayout {
-
-    private Log log = LogFactory.getLog(this.getClass());
-
     private CityElement rootElement;
     private Collection<CityElement> stackElements;
 

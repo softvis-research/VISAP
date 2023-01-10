@@ -5,7 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.visap.generator.abap.enums.SAPRelationLabels;
-import org.visap.generator.configuration.Config;
 import org.visap.generator.repository.CityElement;
 import org.visap.generator.repository.CityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
@@ -208,15 +207,6 @@ public class MetropolisCreator {
                     log.info("district \"" + districtName + "\" deleted");
                 }
             }
-        }
-    }
-
-    private void removeSubElementsFromDistrict(CityElement district, Collection<CityElement> subElements) {
-        for (CityElement subElement: subElements){
-            if(subElement.getType() == CityElement.CityType.District){
-                continue;
-            }
-            district.removeSubElement(subElement);
         }
     }
 

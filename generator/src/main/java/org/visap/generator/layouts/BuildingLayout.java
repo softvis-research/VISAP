@@ -1,14 +1,10 @@
 package org.visap.generator.layouts;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.repository.CityElement;
 
 public class BuildingLayout {
-    private Log log = LogFactory.getLog(this.getClass());
-
     private CityElement building;
 
     public BuildingLayout(CityElement building) {
