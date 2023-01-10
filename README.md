@@ -25,17 +25,19 @@ Then, start the database. The authorization being disabled may cause warnings on
 ### Generating a Model
 
 - Ensure that the Neo4J database is running
-- Place input CSV files in the directory ```generator/src/neo4jexport```. This directory contains several sub-directories with example data.
+- Place input CSV files inside the directory ```generator/input/```. This directory is meant as a place to store all your model data inside appropriately named sub-directories. It also contains an example sub-directory to get you started.
 - Execute the file ```generator/src/main/java/org.visap.generator/steps/LoaderStep.java```. This will place the initial data in the local graph database. Any previously contained data is overwritten!
 - Execute the file ```generator/src/main/java/org.visap.generator/steps/AFrameExporterStep.java```. This will run all additional model-generating steps. Depending on the model size, this process can take a few minutes to finish.
 
-The resulting model files (model.html and metaData.json) are placed in the neo4jexport/ folder along with your input data.
+The resulting model files (model.html and metaData.json) are placed in the output/ folder. This folder also includes an example sub-directory.
+
+To change your input location, you can change the ```inputCSVFilePath``` property inside the ```generator/properties/Setup.properties``` file. Similarly, to change your output location, you can change the ```mapPath``` property inside the ```generator/properties/Output.properties``` file.
 
 ### Displaying a Model in the Browser
 
 After following the instructions in section [Generating a Model](#generating-a-model), two files will have been generated for you: model.html and metaData.json.
 
-To display the model in the browser, first navigate to the folder ```ui/data/```. Create a subfolder with a name of your liking, for example ```Test```. Inside the newly created subfolder, create another subfolder named ```model```. Copy both the model.html file and the metaData.json file into this subfolder.
+To display the model in the browser, first navigate to the folder ```ui/data/```. Create a subfolder with a name of your liking, for example ```Test```. Inside the newly created subfolder, create another subfolder named ```model```. Copy both the model.html file and the metaData.json file from the ```generator/output/``` directory into this subfolder.
 
 Next, you will need a local server. You can get one by installing [NPM](https://www.npmjs.com/) and running the command ```npm install -g live-server && live-server``` inside the UI folder.
 Once the web server is set up, it will automatically open up in the browser. The URL will look similar to this: http://127.0.0.1:8080.
