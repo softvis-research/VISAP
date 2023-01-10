@@ -10,7 +10,7 @@ public interface Setup extends Config {
     String username();
     @DefaultValue("123")
     String password();
-    @DefaultValue("input/")
+    @DefaultValue("input/Example/")
     String inputCSVFilePath();
     @Config.DefaultValue("true")
     boolean silentMode();
