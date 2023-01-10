@@ -1,4 +1,4 @@
-package org.visap.generator.metropolis.steps;
+package org.visap.generator.metaphors.metropolis.steps;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.visap.generator.abap.AMetaDataMap;

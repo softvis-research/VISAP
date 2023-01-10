@@ -1,4 +1,4 @@
-package org.visap.generator.layouts.kdtree;
+package org.visap.generator.metaphors.metropolis.layouts.kdtree;
 
 import org.neo4j.driver.types.Node;
 

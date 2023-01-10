@@ -1,18 +1,19 @@
 package org.visap.generator.steps;
 
 import org.visap.generator.configuration.Config;
-import org.visap.generator.output.AFrameExporter;
-import org.visap.generator.output.MetaDataOutput;
-import org.visap.generator.metropolis.steps.MetaDataExporter;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.visap.generator.abap.enums.SAPRelationLabels;
-import org.visap.generator.metropolis.steps.MetropolisCreator;
-import org.visap.generator.metropolis.steps.MetropolisDesigner;
-import org.visap.generator.metropolis.steps.MetropolisLayouter;
 import org.visap.generator.repository.CityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
 import org.visap.generator.database.DatabaseConnector;
+import org.visap.generator.metaphors.metropolis.steps.MetaDataExporter;
+import org.visap.generator.metaphors.metropolis.steps.MetropolisCreator;
+import org.visap.generator.metaphors.metropolis.steps.MetropolisDesigner;
+import org.visap.generator.metaphors.metropolis.steps.MetropolisLayouter;
+import org.visap.generator.model.AFrameExporter;
+import org.visap.generator.model.MetaDataOutput;
+
 import java.util.Scanner;
 
 public class AFrameExporterStep {

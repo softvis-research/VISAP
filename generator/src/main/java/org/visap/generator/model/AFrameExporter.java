@@ -1,4 +1,4 @@
-package org.visap.generator.output;
+package org.visap.generator.model;
 
 import org.visap.generator.configuration.Config;
 import org.visap.generator.repository.CityElement;

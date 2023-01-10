@@ -1,4 +1,4 @@
-package org.visap.generator.layouts.enums;
+package org.visap.generator.metaphors.metropolis.layouts.enums;
 
 public enum LayoutVersion {
     MINIMAL_DISTANCE,

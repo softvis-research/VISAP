@@ -2,7 +2,7 @@ package org.visap.generator.configuration.Metropolis;
 
 import org.aeonbits.owner.Config;
 
-@Config.Sources("file:${user.dir}/src/main/java/properties/metropolis/Color.properties")
+@Config.Sources("file:${user.dir}/properties/metropolis/Color.properties")
 public interface Color extends Config {
      @DefaultValue("#FF8C00")
      String migrationElement();

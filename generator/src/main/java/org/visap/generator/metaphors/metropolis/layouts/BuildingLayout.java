@@ -1,4 +1,4 @@
-package org.visap.generator.layouts;
+package org.visap.generator.metaphors.metropolis.layouts;
 
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.configuration.Config;

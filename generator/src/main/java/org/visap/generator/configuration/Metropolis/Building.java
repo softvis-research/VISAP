@@ -2,7 +2,7 @@ package org.visap.generator.configuration.Metropolis;
 
 import org.aeonbits.owner.Config;
 
-@Config.Sources({ "file:${user.dir}/src/main/java/properties/metropolis/Building.properties"})
+@Config.Sources({ "file:${user.dir}/properties/metropolis/Building.properties"})
 public interface Building extends Config {
     @DefaultValue("2")
     double defaultHeight();

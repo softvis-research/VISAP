@@ -1,7 +1,7 @@
 package org.visap.generator.abap;
 
 import org.visap.generator.abap.enums.SAPNodeProperties;
-import org.visap.generator.layouts.kdtree.CityRectangle;
+import org.visap.generator.metaphors.metropolis.layouts.kdtree.CityRectangle;
 import org.visap.generator.repository.CityElement;
 
 import java.util.ArrayList;

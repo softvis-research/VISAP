@@ -1,14 +1,14 @@
-package org.visap.generator.metropolis.steps;
+package org.visap.generator.metaphors.metropolis.steps;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.visap.generator.configuration.Config;
+import org.visap.generator.metaphors.metropolis.layouts.BuildingLayout;
+import org.visap.generator.metaphors.metropolis.layouts.DistrictCircularLayout;
+import org.visap.generator.metaphors.metropolis.layouts.DistrictLightMapLayout;
+import org.visap.generator.metaphors.metropolis.layouts.StackLayout;
+import org.visap.generator.metaphors.metropolis.layouts.enums.LayoutType;
 import org.visap.generator.abap.enums.SAPNodeProperties;
-import org.visap.generator.layouts.BuildingLayout;
-import org.visap.generator.layouts.DistrictCircularLayout;
-import org.visap.generator.layouts.DistrictLightMapLayout;
-import org.visap.generator.layouts.StackLayout;
-import org.visap.generator.layouts.enums.LayoutType;
 import org.visap.generator.repository.CityElement;
 import org.visap.generator.repository.CityRepository;
 import org.visap.generator.repository.SourceNodeRepository;

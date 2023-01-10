@@ -1,11 +1,11 @@
-package org.visap.generator.layouts;
+package org.visap.generator.metaphors.metropolis.layouts;
 
-import org.visap.generator.layouts.kdtree.CityKDTree;
-import org.visap.generator.layouts.kdtree.CityKDTreeNode;
-import org.visap.generator.layouts.kdtree.CityRectangle;
 import org.visap.generator.repository.CityElement;
 
 import org.visap.generator.configuration.Config;
+import org.visap.generator.metaphors.metropolis.layouts.kdtree.CityKDTree;
+import org.visap.generator.metaphors.metropolis.layouts.kdtree.CityKDTreeNode;
+import org.visap.generator.metaphors.metropolis.layouts.kdtree.CityRectangle;
 
 import java.math.BigDecimal;
 import java.util.*;

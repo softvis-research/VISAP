@@ -1,4 +1,4 @@
-package org.visap.generator.layouts.kdtree;
+package org.visap.generator.metaphors.metropolis.layouts.kdtree;
 
 import java.util.ArrayList;
 import java.util.List;

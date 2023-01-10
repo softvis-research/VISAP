@@ -1,4 +1,4 @@
-package org.visap.generator.output;
+package org.visap.generator.model;
 
 public interface OutputFormat {
     String head();
