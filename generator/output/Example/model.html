@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html>
+	 <head>
+		 <meta charset="utf-8">
+	    <title>Metropolis</title>
+	    <meta name="description" content="Getaviz">
+	 </head>
+	 <body>
+		 <a-scene id="aframe-canvas" cursor="rayOrigin: mouse" embedded="true" renderer="logarithmicDepthBuffer: true;">
+			 <a-assets>
+				 <img id="sky" crossorigin="anonymous" src="assets/sky_pano.jpg">
+				 <img id="ground" crossorigin="anonymous" src="assets/ground.jpg">
+			 </a-assets>
+			 <a-sky src="#sky" radius="7000"></a-sky>
+			 <a-plane src="#ground" height="5000" width="5000" rotation="-90 0 0" position="0 0 0" repeat="30 30"></a-plane>
+			<a-entity id="camera" camera="fov: 80; zoom: 1;"
+				position="-2.725 19.075 -2.725"
+				rotation="0 -90 0"
+				orbit-camera="
+					target: 10.9 0.0 10.9;
+					enableDamping: true;
+					dampingFactor: 0.25;
+					rotateSpeed: 0.25;
+					panSpeed: 0.25;
+					invertZoom: true;
+					logPosition: false;
+					minDistance:0;
+					maxDistance:1000;
+					"
+				mouse-cursor=""
+				>
+			</a-entity>
+<a-box id="ID_061e8f94-a038-4092-bd15-be9a8ff6a78a"
+	position="15.5 0.8999999999999999 5.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_09b15d34-6c25-49ee-b017-96f947273989"
+	position="33.5 1.4 15.5"
+	height="2.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_09d08532-3963-4fff-8516-a0e1c69b35b1"
+	position="34.5 0.8999999999999999 54.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#335b9c"
+	shadow>
+</a-box>
+<a-box id="ID_0d9391f0-d454-4380-a758-16fe6fcfcb0f"
+	position="38.5 1.15 5.5"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_23a16a9a-9d4b-406a-84a9-e344c2bde655"
+	position="10.5 1.15 20.5"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-cylinder id="ID_26f2d17c-c346-4312-a73f-78d91c0ee71b"
+	position="34.5 1.4 49.5"
+	height="2.0"
+	radius="0.9"
+	color="#000000"
+	shadow>
+</a-cylinder>
+<a-box id="ID_275d6dab-bbb1-4740-8fc9-2b95fe23942c"
+	position="28.5 1.4 15.5"
+	height="2.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_4a02540f-5d15-4200-88e2-b35c51feb5fb"
+	position="33.5 1.9 10.5"
+	height="3.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_4af5f5bf-41ec-431c-9cec-16f8fafad58a"
+	position="5.5 1.15 25.5"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_51a6dbb1-ff2f-4cd3-bfa7-129e6e151886"
+	position="20.5 1.15 20.5"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_582ac1ba-6e9c-4e86-afbc-dc6dabd411cd"
+	position="37.5 1.15 33.5"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_5d8abefd-73b3-4ab0-97af-ba3c91a80d92"
+	position="37.5 1.15 38.5"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_5f0fe544-4060-4faa-a0a2-e9849351bd5f"
+	position="42.5 1.15 33.5"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_62ed4cf4-eaae-4cdf-a9ad-554aa27b1761"
+	position="15.5 0.8999999999999999 15.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_6a5fe2f1-ea64-4efd-9341-6f651d9fbe29"
+	position="23.0 1.3499999999999999 35.0"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_6dc6d9e6-4853-47c3-a8e9-5cf62c28394a"
+	position="10.5 0.8999999999999999 15.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-cylinder id="ID_6f96551a-1997-41c7-a300-aa80dba46fa3"
+	position="5.5 1.4 54.5"
+	height="2.0"
+	radius="0.9"
+	color="#000000"
+	shadow>
+</a-cylinder>
+<a-box id="ID_6f9696a7-c24e-40b0-9a59-27dd7c37ef54"
+	position="28.5 0.8999999999999999 5.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_6faa7174-67a4-46fd-8d44-49f1da443e2b"
+	position="42.5 1.15 54.5"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#335b9c"
+	shadow>
+</a-box>
+<a-box id="ID_6ffa33c9-a5ca-464f-9edc-4ab9c66ca823"
+	position="33.5 1.65 5.5"
+	height="2.5"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_755e8ba0-a3bf-489b-8ee5-745723d6bf91"
+	position="38.5 1.15 15.5"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_833870c4-0dd8-4575-86f6-b277b6a35220"
+	position="20.5 1.15 5.5"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_867df4dd-049e-49b0-a557-010a64764ab1"
+	position="5.5 0.8999999999999999 20.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_8bd74bd8-b060-421f-8204-18908897c791"
+	position="5.5 1.15 5.5"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_9207f663-a8e1-4c5f-bf39-1e64cf5cdc9f"
+	position="38.5 0.8999999999999999 10.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_9717cf08-3fc7-4962-811a-ce7bf77cb6e0"
+	position="20.5 0.8999999999999999 15.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_a1c3614a-bb8c-4d14-87ba-35bf8cf3a2dc"
+	position="5.5 0.8999999999999999 41.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-cylinder id="ID_a3441137-d4bf-460f-bd9b-173b5ec4f981"
+	position="5.5 1.4 49.5"
+	height="2.0"
+	radius="0.9"
+	color="#000000"
+	shadow>
+</a-cylinder>
+<a-box id="ID_a6c3c4d2-751e-4193-b2d6-d42742e9262b"
+	position="10.5 0.8999999999999999 5.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_ac2c3b89-1b09-4ac9-aacc-557a3604efc7"
+	position="13.5 1.65 33.5"
+	height="2.5"
+	width="1.8"
+	depth="1.8"
+	color="#335b9c"
+	shadow>
+</a-box>
+<a-box id="ID_add55f0a-0cf5-4f1f-889a-065c36a5edf9"
+	position="15.5 0.8999999999999999 10.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-cylinder id="ID_ae188004-94a4-44da-81a0-afd09985bcf8"
+	position="42.5 1.4 49.5"
+	height="2.0"
+	radius="0.9"
+	color="#000000"
+	shadow>
+</a-cylinder>
+<a-box id="ID_ae5d7e34-3425-4a8b-b1d2-74f290b58f27"
+	position="18.5 1.15 54.5"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#335b9c"
+	shadow>
+</a-box>
+<a-box id="ID_aec3e38b-d9d5-498a-8da6-071036c239d5"
+	position="5.5 0.8999999999999999 15.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_b373abb8-68eb-48aa-a1ae-99c15ad4575a"
+	position="21.5 0.8999999999999999 41.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_b5bf56f8-c07a-49d8-b12b-11ba89e6a4ab"
+	position="26.5 1.15 54.5"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#335b9c"
+	shadow>
+</a-box>
+<a-box id="ID_b70d801e-012a-4a1c-b0a2-7f79c420343a"
+	position="36.5 0.8999999999999999 23.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_bf2cf88c-a7a5-4230-812b-d1e6a2c0901a"
+	position="20.5 0.8999999999999999 10.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_c028ceba-dac6-4092-b17e-b10ba03425eb"
+	position="29.5 1.4 33.5"
+	height="2.0"
+	width="1.8"
+	depth="1.8"
+	color="#335b9c"
+	shadow>
+</a-box>
+<a-cylinder id="ID_c2acfeb6-2590-4556-8da3-33332dc0c8b1"
+	position="28.5 1.4 23.5"
+	height="2.0"
+	radius="0.9"
+	color="#000000"
+	shadow>
+</a-cylinder>
+<a-box id="ID_c6c58ab4-ad16-4c87-9c87-fe229d3b0f1c"
+	position="5.5 1.15 10.5"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_cabd2699-e3bc-41a7-bc45-4edbd9281be8"
+	position="10.5 0.8999999999999999 10.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-cylinder id="ID_cd1b1302-6b4a-4714-bfa5-a841c30baa75"
+	position="18.5 1.4 49.5"
+	height="2.0"
+	radius="0.9"
+	color="#000000"
+	shadow>
+</a-cylinder>
+<a-box id="ID_d14d053b-b686-4683-ac06-19a4a76b6560"
+	position="15.5 0.8999999999999999 20.5"
+	height="1.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_e30bc010-ada2-4a9a-b8a9-16bb5f9facb0"
+	position="10.5 2.4000000000000004 49.5"
+	height="4.0"
+	width="1.8"
+	depth="1.8"
+	color="#335b9c"
+	shadow>
+</a-box>
+<a-cylinder id="ID_e37de028-afb6-47b7-a85d-75b444a77a77"
+	position="26.5 1.4 49.5"
+	height="2.0"
+	radius="0.9"
+	color="#000000"
+	shadow>
+</a-cylinder>
+<a-box id="ID_e5786145-dca9-466d-a852-2a0ff08c6fb1"
+	position="28.5 1.4 10.5"
+	height="2.0"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_ec7fc263-4df6-4d5d-b142-25234b9e6cc5"
+	position="7.0 1.3499999999999999 35.0"
+	height="1.5"
+	width="1.8"
+	depth="1.8"
+	color="#FFFFFF"
+	shadow>
+</a-box>
+<a-box id="ID_0190be5d-a551-4890-b34e-5ce7817c6816"
+	position="42.5 0.30000000000000004 52.0"
+	height="0.2"
+	width="5.0"
+	depth="10.0"
+	color="#85C1E9"
+	shadow>
+</a-box>
+<a-box id="ID_07681bde-445d-4a93-97a8-7e1f5d60594d"
+	position="34.5 0.30000000000000004 52.0"
+	height="0.2"
+	width="5.0"
+	depth="10.0"
+	color="#85C1E9"
+	shadow>
+</a-box>
+<a-box id="ID_267b8871-93bf-4ff9-ad17-ca1c78e0ee73"
+	position="23.0 0.5 35.0"
+	height="0.2"
+	width="5.0"
+	depth="5.0"
+	color="#ffe7a3"
+	shadow>
+</a-box>
+<a-box id="ID_3c9218a4-31f0-4371-8554-2e8a0a7db97e"
+	position="13.0 0.30000000000000004 15.5"
+	height="0.2"
+	width="20.0"
+	depth="25.0"
+	color="#F4D03F"
+	shadow>
+</a-box>
+<a-box id="ID_4126ad2f-d853-4eee-b252-c41999cee2d5"
+	position="7.0 0.5 35.0"
+	height="0.2"
+	width="5.0"
+	depth="5.0"
+	color="#ffe7a3"
+	shadow>
+</a-box>
+<a-box id="ID_5e5da62b-6547-44e7-946f-e7b5d6b64007"
+	position="40.0 0.30000000000000004 36.0"
+	height="0.2"
+	width="10.0"
+	depth="10.0"
+	color="#7D3C98"
+	shadow>
+</a-box>
+<a-box id="ID_6254a969-cfe5-4969-a2dc-e6f72d863cf4"
+	position="8.0 0.30000000000000004 52.0"
+	height="0.2"
+	width="10.0"
+	depth="10.0"
+	color="#85C1E9"
+	shadow>
+</a-box>
+<a-box id="ID_6c7e4196-d4cc-4cbe-923b-a1c717569219"
+	position="25.5 0.30000000000000004 37.5"
+	height="0.2"
+	width="13.0"
+	depth="13.0"
+	color="#85C1E9"
+	shadow>
+</a-box>
+<a-box id="ID_76417dc0-9f5e-484f-b6ef-91c6ec617092"
+	position="24.0 0.1 30.0"
+	height="0.2"
+	width="45.0"
+	depth="57.0"
+	color="#95A5A6"
+	shadow>
+</a-box>
+<a-box id="ID_7f8d04ed-63ba-45c9-8146-8034ffde21ae"
+	position="33.5 0.30000000000000004 10.5"
+	height="0.2"
+	width="15.0"
+	depth="15.0"
+	color="#F4D03F"
+	shadow>
+</a-box>
+<a-box id="ID_947741f1-5271-4d62-b93f-af6c01a52718"
+	position="26.5 0.30000000000000004 52.0"
+	height="0.2"
+	width="5.0"
+	depth="10.0"
+	color="#85C1E9"
+	shadow>
+</a-box>
+<a-box id="ID_a001ca96-7349-4185-bece-5401e1fca2be"
+	position="36.5 0.30000000000000004 23.5"
+	height="0.2"
+	width="5.0"
+	depth="5.0"
+	color="#7D3C98"
+	shadow>
+</a-box>
+<a-box id="ID_a60efb94-c3f5-43b9-8af8-48778718e825"
+	position="18.5 0.30000000000000004 52.0"
+	height="0.2"
+	width="5.0"
+	depth="10.0"
+	color="#85C1E9"
+	shadow>
+</a-box>
+<a-box id="ID_ac399c5c-3623-4cc4-b06b-f1636b057403"
+	position="9.5 0.30000000000000004 37.5"
+	height="0.2"
+	width="13.0"
+	depth="13.0"
+	color="#85C1E9"
+	shadow>
+</a-box>
+<a-box id="ID_bfb0b45b-1916-40ab-97fe-0afdc8e8890d"
+	position="28.5 0.30000000000000004 23.5"
+	height="0.2"
+	width="5.0"
+	depth="5.0"
+	color="#F4D03F"
+	shadow>
+</a-box>
+		 </a-scene>
+ 	 </body>
+</html>

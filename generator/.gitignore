@@ -11,13 +11,13 @@ target/
 # iml files
 *.iml
 
-# input
+# CSV file input
 /input/*
 !/input/Example/
 
 # Model output
-model.html
-metaData.json
+/output/*
+!/output/Example/
 
 # Compiled class file
 *.class
