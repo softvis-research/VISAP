@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public class AElementArranger {
-    public List<List<CityRectangle>> constructElementSets(List<CityRectangle> elements, Map<CityRectangle, CityElement> rectangleElementsMap) {
+    public List<List<CityRectangle>> constructElementSets(List<CityRectangle> elements,
+            Map<CityRectangle, CityElement> rectangleElementsMap) {
         List<CityRectangle> originSet = new ArrayList<>();
         List<CityRectangle> customCode = new ArrayList<>();
         List<CityRectangle> standardCode = new ArrayList<>();

@@ -32,30 +32,26 @@ public class CityElement {
         this.refBuilding = refBuilding;
     }
 
-
     public enum CityType {
         District, Building, Floor, Chimney
 
     }
 
     public enum CitySubType {
-        Class, Report, FunctionGroup
+        Class, Report, FunctionGroup,
 
         // additional subTypes for metropolis
-        , Interface
+        Interface
     }
 
-
     public enum CityShape {
-        Box, Cylinder, Cone
+        Box, Cylinder, Cone,
 
         // alternative shapes
-        , Sphere, Ring, Plane, Circle, Tetrahedron, Entity
+        Sphere, Ring, Plane, Circle, Tetrahedron, Entity
     }
 
     private String hash;
-
-
 
     private Long nodeID;
 
@@ -99,7 +95,6 @@ public class CityElement {
         return sourceNode.id();
     }
 
-
     public Node getSourceNode() {
         return sourceNode;
     }
@@ -108,14 +103,13 @@ public class CityElement {
         this.sourceNode = sourceNode;
     }
 
-    public SAPNodeTypes getSourceNodeType(){
+    public SAPNodeTypes getSourceNodeType() {
         Node sourceNode = getSourceNode();
-        if( sourceNode == null){
+        if (sourceNode == null) {
             return null;
         }
         return SAPNodeTypes.valueOf(sourceNode.get(SAPNodeProperties.type_name.name()).asString());
     }
-
 
     public double getHeight() {
         return height;
@@ -205,7 +199,6 @@ public class CityElement {
         this.model = gltfModel;
     }
 
-
     public CityElement getParentElement() {
         return parentElement;
     }
@@ -213,7 +206,6 @@ public class CityElement {
     public CityElement getRefBuildingData() {
         return refBuilding;
     }
-
 
     public void setParentElement(CityElement parentElement) {
         this.parentElement = parentElement;
@@ -227,9 +219,9 @@ public class CityElement {
         List<CityElement> subElementsOfType = new ArrayList<>();
 
         Collection<CityElement> subElements = getSubElements();
-        for(CityElement element : subElements){
+        for (CityElement element : subElements) {
 
-            if( element.getType() == elementType){
+            if (element.getType() == elementType) {
                 subElementsOfType.add(element);
             }
         }
@@ -240,8 +232,8 @@ public class CityElement {
 
         Node sourceNode = getSourceNode();
 
-        try{
-            if(sourceNode == null){
+        try {
+            if (sourceNode == null) {
                 throw new Exception("sourceNode is equal null");
             }
         } catch (Exception e) {
@@ -251,10 +243,10 @@ public class CityElement {
         Value propertyValue = sourceNode.get(sapNodeProperties.name());
         try {
             if (propertyValue == null) {
-                //throw new Exception("propertyValue is equal null");
+                // throw new Exception("propertyValue is equal null");
             }
         } catch (Exception e) {
-            //log.error(e.getMessage());
+            // log.error(e.getMessage());
             log.error(e + "propertyValue is equal null"); // Fehler führt schon in viel eherer Verarbeitung zum Abbruch
         }
 
@@ -287,14 +279,20 @@ public class CityElement {
         this.nodeID = nodeID;
     }
 
-    public void setMetaData(String metaData) { this.metaData = metaData; }
+    public void setMetaData(String metaData) {
+        this.metaData = metaData;
+    }
 
     public String getMetaData() {
         return metaData;
     }
 
-    public void setAframeProperty(String aframeProperty) { this.aframeProperty = aframeProperty; }
+    public void setAframeProperty(String aframeProperty) {
+        this.aframeProperty = aframeProperty;
+    }
 
-    public String getAframeProperty() { return aframeProperty; }
+    public String getAframeProperty() {
+        return aframeProperty;
+    }
 
 }

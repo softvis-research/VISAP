@@ -12,12 +12,12 @@ import java.util.Arrays;
  * available to ensure data validity, for interaction use changeRectangle
  */
 public class CityRectangle implements Comparable<CityRectangle> {
-//	@Accessors(PUBLIC_GETTER) var double width
-//	@Accessors(PUBLIC_GETTER) var double length
+	// @Accessors(PUBLIC_GETTER) var double width
+	// @Accessors(PUBLIC_GETTER) var double length
 	double width;
 	double length;
 	double area;
-//	@Accessors(PUBLIC_GETTER, PUBLIC_SETTER) var Node nodeLink
+	// @Accessors(PUBLIC_GETTER, PUBLIC_SETTER) var Node nodeLink
 	Node nodeLink;
 	double upperLeftX;
 	double upperLeftY;
@@ -85,29 +85,29 @@ public class CityRectangle implements Comparable<CityRectangle> {
 		double h = Math.abs(length);
 
 		switch (pointPosition) {
-		case 0:
-			setCornerPoints((x - w / 2), (y - h / 2), (x + w / 2), (y + h / 2));
-			break; // identifies P(x|y) as CenterPoint
-		case 1:
-			setCornerPoints(x, y, (x + w), (y + h));
-			break; // identifies P(x|y) as UpperLeft
-		case 2:
-			setCornerPoints((x - w), y, x, (y + h));
-			break; // identifies P(x|y) as UpperRight
-		case 3:
-			setCornerPoints((x - w), (y - h), x, y);
-			break; // identifies P(x|y) as BottomRight
-		case 4:
-			setCornerPoints(x, (y - h), (x + w), y);
-			break; // FOUR identifies P(x|y) as BottomLeft
-		default:
-			setCornerPoints(x, y, (x + w), (y + h));
-			break; // UNDEF identifies P(x|y) as UpperLeft
+			case 0:
+				setCornerPoints((x - w / 2), (y - h / 2), (x + w / 2), (y + h / 2));
+				break; // identifies P(x|y) as CenterPoint
+			case 1:
+				setCornerPoints(x, y, (x + w), (y + h));
+				break; // identifies P(x|y) as UpperLeft
+			case 2:
+				setCornerPoints((x - w), y, x, (y + h));
+				break; // identifies P(x|y) as UpperRight
+			case 3:
+				setCornerPoints((x - w), (y - h), x, y);
+				break; // identifies P(x|y) as BottomRight
+			case 4:
+				setCornerPoints(x, (y - h), (x + w), y);
+				break; // FOUR identifies P(x|y) as BottomLeft
+			default:
+				setCornerPoints(x, y, (x + w), (y + h));
+				break; // UNDEF identifies P(x|y) as UpperLeft
 		}
 		update();
 	}
 
-	public double getPerimeterRadius(){
+	public double getPerimeterRadius() {
 		return Math.sqrt(Math.pow(this.getWidth() / 2.0, 2) + Math.pow(this.getLength() / 2.0, 2));
 	}
 
@@ -152,43 +152,43 @@ public class CityRectangle implements Comparable<CityRectangle> {
 	public double getArea() {
 		return area;
 	}
-	
+
 	public double getLength() {
 		return length;
 	}
-	
+
 	public double getWidth() {
 		return width;
 	}
-	
+
 	public double getBottomRightX() {
 		return bottomRightX;
 	}
-	
+
 	public double getBottomRightY() {
 		return bottomRightY;
 	}
-	
+
 	public double getCenterX() {
 		return centerX;
 	}
-	
+
 	public double getCenterY() {
 		return centerY;
 	}
-	
+
 	public double getUpperLeftX() {
 		return upperLeftX;
 	}
-	
+
 	public double getUpperLeftY() {
 		return upperLeftY;
 	}
-	
+
 	public Node getNodeLink() {
 		return nodeLink;
 	}
-	
+
 	public void setNodeLink(Node nodeLink) {
 		this.nodeLink = nodeLink;
 	}

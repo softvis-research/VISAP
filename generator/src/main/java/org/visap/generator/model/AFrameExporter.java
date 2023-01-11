@@ -18,13 +18,17 @@ public class AFrameExporter {
     public AFrameExporter(CityRepository cityRepository, String aframeOutputName) {
         repository = cityRepository;
 
-        switch(aframeOutputName){
-            case "metropolis_AFrame":  aframeOutput = new MetropolisAFrame(); break;
-            case "metropolis_AFrame_UI":  aframeOutput = new MetropolisAFrameUI(); break;
+        switch (aframeOutputName) {
+            case "metropolis_AFrame":
+                aframeOutput = new MetropolisAFrame();
+                break;
+            case "metropolis_AFrame_UI":
+                aframeOutput = new MetropolisAFrameUI();
+                break;
         }
     }
 
-    public String createAFrameExportString(){
+    public String createAFrameExportString() {
 
         StringBuilder aframeExport = new StringBuilder();
 
@@ -77,7 +81,8 @@ public class AFrameExporter {
         }
         double maxSideLength = Math.max(maxX - minX, maxZ - minZ);
 
-        // these numbers are based on what looks good for a 100x100 city, scaled to match the actual proportions
+        // these numbers are based on what looks good for a 100x100 city, scaled to
+        // match the actual proportions
         double cameraX = minX - (maxSideLength * 0.05);
         double cameraY = (maxSideLength * 0.35);
         double cameraZ = minZ - (maxSideLength * 0.05);
@@ -87,23 +92,23 @@ public class AFrameExporter {
         double targetZ = minZ + (maxSideLength * 0.2);
 
         return "\t\t\t<a-entity id=\"camera\" camera=\"fov: 80; zoom: 1;\"\n" +
-               "\t\t\t\tposition=\"" + cameraX + " " + cameraY + " " + cameraZ + "\"\n" +
-               "\t\t\t\trotation=\"0 -90 0\"\n" +
-               "\t\t\t\torbit-camera=\"\n" +
-               "\t\t\t\t\ttarget: " + targetX + " " + targetY + " " + targetZ + ";\n" +
-               "\t\t\t\t\tenableDamping: true;\n" +
-               "\t\t\t\t\tdampingFactor: 0.25;\n" +
-               "\t\t\t\t\trotateSpeed: 0.25;\n" +
-               "\t\t\t\t\tpanSpeed: 0.25;\n" +
-               "\t\t\t\t\tinvertZoom: true;\n" +
-               "\t\t\t\t\tlogPosition: false;\n" +
-               "\t\t\t\t\tminDistance:0;\n" +
-               "\t\t\t\t\tmaxDistance:1000;\n" +
-               "\t\t\t\t\t\"\n" +
-               "\t\t\t\tmouse-cursor=\"\"\n" +
-               "\t\t\t\t>" +
-               "\n" +
-               "\t\t\t</a-entity>\n";
+                "\t\t\t\tposition=\"" + cameraX + " " + cameraY + " " + cameraZ + "\"\n" +
+                "\t\t\t\trotation=\"0 -90 0\"\n" +
+                "\t\t\t\torbit-camera=\"\n" +
+                "\t\t\t\t\ttarget: " + targetX + " " + targetY + " " + targetZ + ";\n" +
+                "\t\t\t\t\tenableDamping: true;\n" +
+                "\t\t\t\t\tdampingFactor: 0.25;\n" +
+                "\t\t\t\t\trotateSpeed: 0.25;\n" +
+                "\t\t\t\t\tpanSpeed: 0.25;\n" +
+                "\t\t\t\t\tinvertZoom: true;\n" +
+                "\t\t\t\t\tlogPosition: false;\n" +
+                "\t\t\t\t\tminDistance:0;\n" +
+                "\t\t\t\t\tmaxDistance:1000;\n" +
+                "\t\t\t\t\t\"\n" +
+                "\t\t\t\tmouse-cursor=\"\"\n" +
+                "\t\t\t\t>" +
+                "\n" +
+                "\t\t\t</a-entity>\n";
     }
 
     private String createAFrameRepositoryExport() {
@@ -112,7 +117,7 @@ public class AFrameExporter {
         Collection<CityElement> floors = repository.getElementsByType(CityElement.CityType.Floor);
         builder.append(createElementsExport(floors));
 
-        if(aframeOutput.equals("acity_AFrame")) {
+        if (aframeOutput.equals("acity_AFrame")) {
             Collection<CityElement> chimneys = repository.getElementsByType(CityElement.CityType.Chimney);
             builder.append(createElementsExport(chimneys));
         }
@@ -128,7 +133,7 @@ public class AFrameExporter {
 
     private String createElementsExport(Collection<CityElement> elements) {
         StringBuilder builder = new StringBuilder();
-        for (CityElement element: elements) {
+        for (CityElement element : elements) {
             builder.append(createCityElementExport(element));
         }
         return builder.toString();
@@ -142,11 +147,12 @@ public class AFrameExporter {
         builder.append("\n");
         builder.append("\"id\": " + "\"" + element.getHash() + "\",");
         builder.append("\n");
-        builder.append("\"position\": " + "\"" + element.getXPosition() + " " + element.getYPosition() + " " + element.getZPosition() + "\",");
+        builder.append("\"position\": " + "\"" + element.getXPosition() + " " + element.getYPosition() + " "
+                + element.getZPosition() + "\",");
         builder.append("\n");
         builder.append("\"height\": " + "\"" + element.getHeight() + "\",");
         builder.append("\n");
-        if(element.getShape() == CityElement.CityShape.Box){
+        if (element.getShape() == CityElement.CityShape.Box) {
             builder.append("\"width\": " + "\"" + element.getWidth() + "\",");
             builder.append("\n");
             builder.append("\"depth\": " + "\"" + element.getLength() + "\",");
@@ -180,18 +186,18 @@ public class AFrameExporter {
         return builder.toString();
     }
 
-
-    private String createCityElementExport(CityElement element){
+    private String createCityElementExport(CityElement element) {
         StringBuilder builder = new StringBuilder();
 
         builder.append("<" + getShapeExport(element.getShape()) + " id=\"" + element.getHash() + "\"");
         builder.append("\n");
-        builder.append("\tposition=\"" + element.getXPosition() + " " + element.getYPosition() + " " + element.getZPosition() + "\"");
+        builder.append("\tposition=\"" + element.getXPosition() + " " + element.getYPosition() + " "
+                + element.getZPosition() + "\"");
         builder.append("\n");
         builder.append("\theight=\"" + element.getHeight() + "\"");
         builder.append("\n");
 
-        if(element.getShape() == CityElement.CityShape.Box || element.getShape() == CityElement.CityShape.Entity){
+        if (element.getShape() == CityElement.CityShape.Box || element.getShape() == CityElement.CityShape.Entity) {
             builder.append("\twidth=\"" + element.getWidth() + "\"");
             builder.append("\n");
             builder.append("\tdepth=\"" + element.getLength() + "\"");
@@ -204,15 +210,15 @@ public class AFrameExporter {
         builder.append("\tcolor=\"" + element.getColor() + "\"");
         builder.append("\n");
 
-        if (element.getTextureSource() != null){
+        if (element.getTextureSource() != null) {
             builder.append("\tsrc=\"" + element.getTextureSource() + "\"");
             builder.append("\n");
         }
-        if (element.getRotation() != null){
+        if (element.getRotation() != null) {
             builder.append("\trotation=\"" + element.getRotation() + "\"");
             builder.append("\n");
         }
-        if(element.getModel() != null){
+        if (element.getModel() != null) {
             builder.append("\tscale=\"" + element.getModelScale() + "\"");
             builder.append("\n");
             builder.append("\tgltf-model=\"" + element.getModel() + "\"");
@@ -231,18 +237,25 @@ public class AFrameExporter {
 
     private String getShapeExport(CityElement.CityShape shape) {
         switch (shape) {
-            case Box: return "a-box";
-            case Cylinder: return "a-cylinder";
-            case Cone: return "a-cone";
-            case Ring: return "a-ring";
-            case Plane: return "a-plane";
-            case Circle: return "a-circle";
-            case Sphere: return "a-sphere";
-            case Entity: return "a-entity";
+            case Box:
+                return "a-box";
+            case Cylinder:
+                return "a-cylinder";
+            case Cone:
+                return "a-cone";
+            case Ring:
+                return "a-ring";
+            case Plane:
+                return "a-plane";
+            case Circle:
+                return "a-circle";
+            case Sphere:
+                return "a-sphere";
+            case Entity:
+                return "a-entity";
+            default:
+                return "a-sphere";
         }
-        return "a-sphere";
     }
 
-
 }
-

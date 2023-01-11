@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 public class LoaderStep {
     private static final DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
+
     public static void main(String[] args) {
         boolean isSilentMode = Config.setup.silentMode();
         String pathToNodesCsv = "";
@@ -25,7 +26,7 @@ public class LoaderStep {
 
         // Get files for nodes and relations
         List<Path> files = CSVInput.getInputCSVFiles();
-        for(Path p : files) {
+        for (Path p : files) {
             if (p.toString().endsWith("_Test.csv")) {
                 pathToNodesCsv = p.toString();
             } else if (p.toString().endsWith("_Reference.csv")) {
@@ -33,8 +34,7 @@ public class LoaderStep {
             }
         }
 
-        if (pathToNodesCsv.isEmpty() || pathToReferenceCsv.isEmpty())
-        {
+        if (pathToNodesCsv.isEmpty() || pathToReferenceCsv.isEmpty()) {
             System.out.println("Some input file wasn't found");
             System.exit(0);
         }
@@ -54,8 +54,7 @@ public class LoaderStep {
                 "LOAD CSV WITH HEADERS FROM \"file:///" + pathToNodesCsv + "\"\n" +
                         "AS row FIELDTERMINATOR ';'\n" +
                         "CREATE (n:Elements)\n" +
-                        "SET n = row"
-        );
+                        "SET n = row");
 
         // 2. Upload contains relations
         if (!isSilentMode) {
@@ -64,8 +63,7 @@ public class LoaderStep {
         }
         connector.executeWrite("MATCH (a:Elements), (b:Elements) " +
                 "WHERE a.element_id = b.container_id " +
-                "CREATE (a)-[r:" + SAPRelationLabels.CONTAINS + "]->(b)"
-        );
+                "CREATE (a)-[r:" + SAPRelationLabels.CONTAINS + "]->(b)");
 
         // 3. Upload uses relations
         if (!isSilentMode) {
@@ -74,8 +72,7 @@ public class LoaderStep {
         }
         connector.executeWrite("MATCH (a:Elements), (b:Elements) " +
                 "WHERE a.element_id = b.uses_id " +
-                "CREATE (a)-[r:" + SAPRelationLabels.USES + "]->(b)"
-        );
+                "CREATE (a)-[r:" + SAPRelationLabels.USES + "]->(b)");
 
         // 4. Upload References
         System.out.println("Path to Reference CSV: " + pathToReferenceCsv);
@@ -89,7 +86,7 @@ public class LoaderStep {
                 "LOAD CSV WITH HEADERS FROM \"file:///" + pathToReferenceCsv + "\"\n" +
                         "AS row FIELDTERMINATOR ';'\n" +
                         "MATCH (a:Elements {element_id: row.source_id}), (b:Elements {element_id: row.target_id})\n" +
-                        "CREATE (a)-[r:"+ SAPRelationLabels.REFERENCES +"]->(b)"
+                        "CREATE (a)-[r:" + SAPRelationLabels.REFERENCES + "]->(b)"
 
         );
 

@@ -25,14 +25,13 @@ public class DistrictLightMapLayout {
         rectangleElementsMap = new HashMap<>();
     }
 
-    public void calculate(){
+    public void calculate() {
         CityRectangle coveringCityRectangle = arrangeSubElements(subElements);
 
         setSizeOfDistrict(coveringCityRectangle);
 
         setPositionOfDistrict(coveringCityRectangle);
     }
-
 
     private void setSizeOfDistrict(CityRectangle coveringCityRectangle) {
         district.setWidth(coveringCityRectangle.getWidth());
@@ -58,7 +57,7 @@ public class DistrictLightMapLayout {
         element.setZPosition(zPosition);
 
         Collection<CityElement> subElements = element.getSubElements();
-        if(!subElements.isEmpty()){
+        if (!subElements.isEmpty()) {
             adjustPositionsOfSubSubElements(subElements, xPositionDelta, zPositionDelta);
         }
     }
@@ -67,25 +66,27 @@ public class DistrictLightMapLayout {
         for (CityElement element : elements) {
 
             double centerX = element.getXPosition();
-            double newXPosition = centerX + parentX + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
+            double newXPosition = centerX + parentX
+                    + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
             element.setXPosition(newXPosition);
 
             double centerZ = element.getZPosition();
-            double newZPosition = centerZ + parentZ + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
+            double newZPosition = centerZ + parentZ
+                    + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
             element.setZPosition(newZPosition);
 
             Collection<CityElement> subElements = element.getSubElements();
-            if(!subElements.isEmpty()){
-                adjustPositionsOfSubSubElements(subElements, parentX,  parentZ);
+            if (!subElements.isEmpty()) {
+                adjustPositionsOfSubSubElements(subElements, parentX, parentZ);
             }
         }
     }
 
     /*
-        Copied from CityLayout
+     * Copied from CityLayout
      */
 
-    private CityRectangle arrangeSubElements(Collection<CityElement> subElements){
+    private CityRectangle arrangeSubElements(Collection<CityElement> subElements) {
 
         CityRectangle docCityRectangle = calculateMaxAreaRoot(subElements);
         CityKDTree ptree = new CityKDTree(docCityRectangle);
@@ -121,7 +122,8 @@ public class DistrictLightMapLayout {
 
             // modify targetNode if necessary
             if (targetNode.getCityRectangle().getWidth() == el.getWidth()
-                    && targetNode.getCityRectangle().getLength() == el.getLength()) { // this if could probably be skipped,
+                    && targetNode.getCityRectangle().getLength() == el.getLength()) { // this if could probably be
+                                                                                      // skipped,
                 // trimmingNode() always returns
                 // fittingNode
                 fitNode = targetNode;
@@ -153,14 +155,14 @@ public class DistrictLightMapLayout {
             double width = element.getWidth();
             double length = element.getLength();
 
-            CityRectangle rectangle = new CityRectangle(0, 0, width + Config.Visualization.Metropolis.district.horizontalBuildingGap(),
+            CityRectangle rectangle = new CityRectangle(0, 0,
+                    width + Config.Visualization.Metropolis.district.horizontalBuildingGap(),
                     length + Config.Visualization.Metropolis.district.horizontalBuildingGap(), 1);
             rectangles.add(rectangle);
             rectangleElementsMap.put(rectangle, element);
         }
         return rectangles;
     }
-
 
     private CityRectangle calculateMaxAreaRoot(Collection<CityElement> elements) {
         double sum_width = 0;
@@ -173,7 +175,7 @@ public class DistrictLightMapLayout {
     }
 
     private void sortEmptyLeaf(CityKDTreeNode pnode, CityRectangle el, CityRectangle covrec,
-                               Map<CityKDTreeNode, Double> preservers, Map<CityKDTreeNode, Double> expanders) {
+            Map<CityKDTreeNode, Double> preservers, Map<CityKDTreeNode, Double> expanders) {
         // either element fits in current bounds (->preservers) or it doesn't
         // (->expanders)
         double nodeUpperLeftX = pnode.getCityRectangle().getUpperLeftX();
@@ -232,13 +234,12 @@ public class DistrictLightMapLayout {
         if (Math.round(node.getCityRectangle().getLength() * 1000d) != Math.round(r.getLength() * 1000d)) {
             // new child-nodes
             node.setLeftChild(new CityKDTreeNode(
-                    new CityRectangle(nodeUpperLeftX, nodeUpperLeftY, nodeBottomRightX, (nodeUpperLeftY + r.getLength()))));
+                    new CityRectangle(nodeUpperLeftX, nodeUpperLeftY, nodeBottomRightX,
+                            (nodeUpperLeftY + r.getLength()))));
             node.setRightChild(new CityKDTreeNode(new CityRectangle(nodeUpperLeftX, (nodeUpperLeftY + r.getLength()),
                     nodeBottomRightX, nodeBottomRightY)));
             // set node as occupied (only leaves can contain elements)
             node.setOccupied();
-
-
 
             return trimmingNode(node.getLeftChild(), r);
             // second split: vertical cut, if necessary
@@ -246,12 +247,12 @@ public class DistrictLightMapLayout {
         } else if (Math.round(node.getCityRectangle().getWidth() * 1000d) != Math.round(r.getWidth() * 1000d)) {
             // new child-nodes
             node.setLeftChild(new CityKDTreeNode(
-                    new CityRectangle(nodeUpperLeftX, nodeUpperLeftY, (nodeUpperLeftX + r.getWidth()), nodeBottomRightY)));
+                    new CityRectangle(nodeUpperLeftX, nodeUpperLeftY, (nodeUpperLeftX + r.getWidth()),
+                            nodeBottomRightY)));
             node.setRightChild(new CityKDTreeNode(new CityRectangle((nodeUpperLeftX + r.getWidth()), nodeUpperLeftY,
                     nodeBottomRightX, nodeBottomRightY)));
             // set node as occupied (only leaves can contain elements)
             node.setOccupied();
-
 
             return node.getLeftChild();
         } else {

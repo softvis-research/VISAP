@@ -23,24 +23,26 @@ public class MetropolisLayouter {
     public MetropolisLayouter(CityRepository cityRepository, SourceNodeRepository sourceNodeRepository) {
         repository = cityRepository;
 
-        log.info("*****************************************************************************************************************************************");
+        log.info(
+                "*****************************************************************************************************************************************");
         log.info("created");
     }
 
-    public void layoutRepository(){
+    public void layoutRepository() {
         // layout buildings
         Collection<CityElement> buildings = repository.getElementsByType(CityElement.CityType.Building);
         log.info(buildings.size() + " buildings loaded");
         layoutBuildings(buildings);
 
         // layout districts
-        Collection<CityElement> packageDistricts = repository.getElementsByTypeAndSourceProperty(CityElement.CityType.District, SAPNodeProperties.type_name, "Namespace");
+        Collection<CityElement> packageDistricts = repository.getElementsByTypeAndSourceProperty(
+                CityElement.CityType.District, SAPNodeProperties.type_name, "Namespace");
         layoutDistricts(packageDistricts);
 
     }
 
     private void layoutBuildings(Collection<CityElement> buildings) {
-        for (CityElement building: buildings) {
+        for (CityElement building : buildings) {
             layoutBuilding(building);
         }
     }
@@ -60,7 +62,7 @@ public class MetropolisLayouter {
         buildingLayout.calculate();
     }
 
-    private void layoutVirtualRootDistrict(Collection<CityElement> districts){
+    private void layoutVirtualRootDistrict(Collection<CityElement> districts) {
         log.info(districts.size() + " districts for virtual root district loaded");
 
         CityElement virtualRootDistrict = new CityElement(CityElement.CityType.District);
@@ -78,7 +80,8 @@ public class MetropolisLayouter {
         if (isDistrictEmpty(district)) {
             layoutEmptyDistrict(district);
 
-            log.info("Empty district \"" + district.getSourceNodeProperty(SAPNodeProperties.object_name) + "\" layouted");
+            log.info("Empty district \"" + district.getSourceNodeProperty(SAPNodeProperties.object_name)
+                    + "\" layouted");
         } else {
             Collection<CityElement> subElements = district.getSubElements();
 
@@ -97,7 +100,8 @@ public class MetropolisLayouter {
             StackLayout stackLayout = new StackLayout(district, subElements);
             stackLayout.calculate();
 
-            log.info("\"" + district.getSourceNodeProperty(SAPNodeProperties.object_name) + "\"" + "-District with " + subElements.size() + " subElements layouted");
+            log.info("\"" + district.getSourceNodeProperty(SAPNodeProperties.object_name) + "\"" + "-District with "
+                    + subElements.size() + " subElements layouted");
         }
     }
 
@@ -109,7 +113,7 @@ public class MetropolisLayouter {
         }
     }
 
-    private void layoutEmptyDistrict( CityElement district) {
+    private void layoutEmptyDistrict(CityElement district) {
         district.setHeight(Config.Visualization.Metropolis.district.emptyDistrictHeight());
         district.setLength(Config.Visualization.Metropolis.district.emptyDistrictLength());
         district.setWidth(Config.Visualization.Metropolis.district.emptyDistrictWidth());

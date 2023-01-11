@@ -30,16 +30,16 @@ public class MetaDataExporterStep {
         MetropolisCreator metropolisCreator = new MetropolisCreator(cityRepository, nodeRepository);
         metropolisCreator.createRepositoryFromNodeRepository();
 
-
         MetaDataExporter metaDataExporter = new MetaDataExporter(cityRepository, nodeRepository);
         metaDataOutput = Config.output.metaData();
 
-        // Depending on setting, create file or write metaData as Node's property, or both actions
-        if (metaDataOutput == MetaDataOutput.FILE || metaDataOutput == MetaDataOutput.BOTH ) {
+        // Depending on setting, create file or write metaData as Node's property, or
+        // both actions
+        if (metaDataOutput == MetaDataOutput.FILE || metaDataOutput == MetaDataOutput.BOTH) {
             metaDataExporter.exportMetaDataFile();
         }
 
-        if (metaDataOutput == MetaDataOutput.NODEPROP || metaDataOutput == MetaDataOutput.BOTH ) {
+        if (metaDataOutput == MetaDataOutput.NODEPROP || metaDataOutput == MetaDataOutput.BOTH) {
             metaDataExporter.setMetaDataPropToCityElements();
         }
 

@@ -8,31 +8,28 @@ public class StackLayout {
     private CityElement rootElement;
     private Collection<CityElement> stackElements;
 
-
-    public StackLayout(CityElement rootElement, Collection<CityElement> stackElements){
+    public StackLayout(CityElement rootElement, Collection<CityElement> stackElements) {
         this.rootElement = rootElement;
         this.stackElements = stackElements;
     }
 
-    public void calculate(){
+    public void calculate() {
         stackSubElements(stackElements, rootElement.getHeight());
     }
 
-    private void stackSubElements(Collection<CityElement> elements, double parentHeight){
+    private void stackSubElements(Collection<CityElement> elements, double parentHeight) {
         for (CityElement element : elements) {
 
-            //stack element
+            // stack element
             double stackedYPosition = element.getYPosition() + parentHeight;
             element.setYPosition(stackedYPosition);
 
-            //stack sub elements
+            // stack sub elements
             Collection<CityElement> subElements = element.getSubElements();
             if (!subElements.isEmpty()) {
                 stackSubElements(subElements, parentHeight);
             }
         }
     }
-
-
 
 }

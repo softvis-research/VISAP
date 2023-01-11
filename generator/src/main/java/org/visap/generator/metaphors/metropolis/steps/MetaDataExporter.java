@@ -63,14 +63,11 @@ public class MetaDataExporter {
     private String toJSON(Collection<CityElement> elements) {
         StringBuilder metaDataFile = new StringBuilder();
         boolean hasElements = false;
-        for (final CityElement element: elements) {
-
-
+        for (final CityElement element : elements) {
 
             if (element.getSourceNode() == null) {
-                    continue;
+                continue;
             } else {
-
 
                 if (!hasElements) {
                     hasElements = true;
@@ -92,7 +89,8 @@ public class MetaDataExporter {
         StringBuilder builder = new StringBuilder();
 
         // Add element hash
-        builder.append("\""+ AMetaDataMap.getMetaDataProperty(SAPNodeProperties.element_id.name()) + "\": \"" + element.getHash() + "\"," +"\n");
+        builder.append("\"" + AMetaDataMap.getMetaDataProperty(SAPNodeProperties.element_id.name()) + "\": \""
+                + element.getHash() + "\"," + "\n");
         // Add qualifiedName
         builder.append("\"qualifiedName\": \"" + getQualifiedName(element) + "\",\n");
         // Add node information
@@ -128,7 +126,7 @@ public class MetaDataExporter {
                 return; // already added as first prop by toMetaData()
             }
 
-            // Don't write properties  with NULL value
+            // Don't write properties with NULL value
             if (node.get(prop.toString()).isNull()) {
                 return;
             }
@@ -136,13 +134,13 @@ public class MetaDataExporter {
             // Remove extra "" (written by Neo4j)
             String propValue = node.get(prop.toString()).toString().replaceAll("\"", "");
 
-
-
             // Write strings with quotation marks and numbers without
             if (NumberUtils.isCreatable(propValue)) {
-                builder.append("\""+ AMetaDataMap.getMetaDataProperty(prop.toString()) + "\": " + propValue + "," + "\n");
+                builder.append(
+                        "\"" + AMetaDataMap.getMetaDataProperty(prop.toString()) + "\": " + propValue + "," + "\n");
             } else {
-                builder.append("\""+ AMetaDataMap.getMetaDataProperty(prop.toString()) + "\": \"" + propValue + "\"," + "\n");
+                builder.append(
+                        "\"" + AMetaDataMap.getMetaDataProperty(prop.toString()) + "\": \"" + propValue + "\"," + "\n");
             }
         });
 
@@ -181,7 +179,7 @@ public class MetaDataExporter {
         Node node = element.getSourceNode();
         String nodeType = node.get("type").asString();
 
-        //signature for methods
+        // signature for methods
         if (nodeType.equals("METH")) {
             builder.append("\"signature\": \"" + "" + "\",\n");
         }
@@ -192,7 +190,7 @@ public class MetaDataExporter {
     private String getQualifiedName(CityElement element) {
         Node node = element.getSourceNode();
         List<String> qualifiedNameAsList = getQualifiedNameAsList(node);
-        return String.join(".", qualifiedNameAsList); //returns "name1.name2.name3"
+        return String.join(".", qualifiedNameAsList); // returns "name1.name2.name3"
     }
 
     private List<String> getQualifiedNameAsList(Node node) {
@@ -214,7 +212,7 @@ public class MetaDataExporter {
         }
 
         List<String> nodesHashes = getNodesHashes(nodes);
-        return String.join(", ", nodesHashes); //returns "hash, hash_2, hash*"
+        return String.join(", ", nodesHashes); // returns "hash, hash_2, hash*"
     }
 
     private List<String> getNodesHashes(Collection<Node> nodes) {
@@ -232,4 +230,3 @@ public class MetaDataExporter {
     }
 
 }
-

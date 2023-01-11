@@ -6,12 +6,16 @@ import org.aeonbits.owner.Config;
 public interface Setup extends Config {
     @DefaultValue("bolt://localhost:7687")
     String boltAddress();
+
     @DefaultValue("neo4j")
     String username();
+
     @DefaultValue("123")
     String password();
+
     @DefaultValue("input/Example/")
     String inputCSVFilePath();
+
     @Config.DefaultValue("true")
     boolean silentMode();
 }

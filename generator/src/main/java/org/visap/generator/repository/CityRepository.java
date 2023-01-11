@@ -21,16 +21,15 @@ public class CityRepository {
 
     private Map<String, CityElement> elementsByHash;
 
-    private Map<CityElement.CityType, Map<String, CityElement> > elementsByType;
+    private Map<CityElement.CityType, Map<String, CityElement>> elementsByType;
 
-    public CityRepository(){
+    public CityRepository() {
         elementsBySourceID = new TreeMap<>();
         elementsByHash = new TreeMap<>();
         elementsByType = new TreeMap<>();
 
         log.info("created");
     }
-
 
     public Collection<CityElement> getAllElements() {
         // return new ArrayList(elementsBySourceID.values());
@@ -41,16 +40,16 @@ public class CityRepository {
         return new ArrayList<CityElement>(elementsByHash.values());
     }
 
-    public CityElement getElementBySourceID(Long sourceID){
+    public CityElement getElementBySourceID(Long sourceID) {
         return elementsBySourceID.get(sourceID);
     }
 
-    public CityElement getElementByHash(String hash){
+    public CityElement getElementByHash(String hash) {
         return elementsByHash.get(hash);
     }
 
-    public Collection<CityElement> getElementsByType(CityElement.CityType type){
-        if(!elementsByType.containsKey(type)) {
+    public Collection<CityElement> getElementsByType(CityElement.CityType type) {
+        if (!elementsByType.containsKey(type)) {
             return new ArrayList<>();
         }
 
@@ -58,19 +57,19 @@ public class CityRepository {
         return new ArrayList<CityElement>(elementsByTypeMap.values());
     }
 
-
-    public Collection<CityElement> getElementsByTypeAndSourceProperty(CityElement.CityType type, SAPNodeProperties sourceProperty, String sourcePropertyValue){
+    public Collection<CityElement> getElementsByTypeAndSourceProperty(CityElement.CityType type,
+            SAPNodeProperties sourceProperty, String sourcePropertyValue) {
         Collection<CityElement> elementsByType = getElementsByType(type);
         List<CityElement> elementsByTypeAndSourceProperty = new ArrayList<>();
 
-        for (CityElement element: elementsByType){
+        for (CityElement element : elementsByType) {
 
             Node sourceNode = element.getSourceNode();
 
-            if(sourceNode == null ){
+            if (sourceNode == null) {
                 CityElement.CitySubType subType = element.getSubType();
                 String subTypeString = subType.toString();
-                if(!subTypeString.equals(sourcePropertyValue)){
+                if (!subTypeString.equals(sourcePropertyValue)) {
                     continue;
                 }
                 elementsByTypeAndSourceProperty.add(element);
@@ -79,12 +78,12 @@ public class CityRepository {
             }
 
             Value propertyValue = sourceNode.get(sourceProperty.toString());
-            if( propertyValue == null){
+            if (propertyValue == null) {
                 continue;
             }
 
             String propertyValueString = propertyValue.asString();
-            if(!propertyValueString.equals(sourcePropertyValue)){
+            if (!propertyValueString.equals(sourcePropertyValue)) {
                 continue;
             }
 
@@ -94,18 +93,19 @@ public class CityRepository {
         return elementsByTypeAndSourceProperty;
     }
 
-    public Collection<CityElement> getElementsBySourceProperty(SAPNodeProperties sourceProperty, String sourcePropertyValue){
+    public Collection<CityElement> getElementsBySourceProperty(SAPNodeProperties sourceProperty,
+            String sourcePropertyValue) {
         Collection<CityElement> elementsByType = getAllElements();
         List<CityElement> elementsBySourceProperty = new ArrayList<>();
 
-        for (CityElement element: elementsByType){
+        for (CityElement element : elementsByType) {
 
             Node sourceNode = element.getSourceNode();
 
-            if(sourceNode == null ){
+            if (sourceNode == null) {
                 CityElement.CitySubType subType = element.getSubType();
                 String subTypeString = subType.toString();
-                if(!subTypeString.equals(sourcePropertyValue)){
+                if (!subTypeString.equals(sourcePropertyValue)) {
                     continue;
                 }
                 elementsBySourceProperty.add(element);
@@ -114,12 +114,12 @@ public class CityRepository {
             }
 
             Value propertyValue = sourceNode.get(sourceProperty.toString());
-            if( propertyValue == null){
+            if (propertyValue == null) {
                 continue;
             }
 
             String propertyValueString = propertyValue.asString();
-            if(!propertyValueString.equals(sourcePropertyValue)){
+            if (!propertyValueString.equals(sourcePropertyValue)) {
                 continue;
             }
 
@@ -129,11 +129,11 @@ public class CityRepository {
         return elementsBySourceProperty;
     }
 
-
-    //Schreiben der ACityElemente in die Neo4j-Datenbank
+    // Schreiben der ACityElemente in die Neo4j-Datenbank
     public void writeRepositoryToNeo4j() {
 
-        log.info("*****************************************************************************************************************************************");
+        log.info(
+                "*****************************************************************************************************************************************");
 
         AtomicInteger cityBuildingCounter = new AtomicInteger(0);
         AtomicInteger cityFloorCounter = new AtomicInteger(0);
@@ -141,26 +141,34 @@ public class CityRepository {
         AtomicInteger cityDistrictCounter = new AtomicInteger(0);
 
         elementsByHash.forEach((id, element) -> {
-            //TODO Node mit Hash bereits in Neo4J vorhanden? -> Update der Properties
+            // TODO Node mit Hash bereits in Neo4J vorhanden? -> Update der Properties
 
-            /*if (element.getSourceNode().id() != 0){
-                connector.executeWrite("MATCH (n:Elements) WHERE ID(n) = " + element.getNodeID() + " SET  n.properties = {" +  getACityProperties(element) + "}") ;
-            }
+            /*
+             * if (element.getSourceNode().id() != 0){
+             * connector.executeWrite("MATCH (n:Elements) WHERE ID(n) = " +
+             * element.getNodeID() + " SET  n.properties = {" + getACityProperties(element)
+             * + "}") ;
+             * }
              */
 
-            Long aCityNodeID = connector.addNode("CREATE ( n:Elements:ACityRep { " + getACityProperties(element) + "})", "n").id();
+            Long aCityNodeID = connector
+                    .addNode("CREATE ( n:Elements:ACityRep { " + getACityProperties(element) + "})", "n").id();
 
             element.setNodeID(aCityNodeID);
 
             switch (element.getType()) {
                 case Building:
-                    cityBuildingCounter.getAndAdd(1); break;
+                    cityBuildingCounter.getAndAdd(1);
+                    break;
                 case Floor:
-                    cityFloorCounter.getAndAdd(1); break;
+                    cityFloorCounter.getAndAdd(1);
+                    break;
                 case Chimney:
-                    cityChimneyCounter.getAndAdd(1); break;
+                    cityChimneyCounter.getAndAdd(1);
+                    break;
                 case District:
-                    cityDistrictCounter.getAndAdd(1); break;
+                    cityDistrictCounter.getAndAdd(1);
+                    break;
             }
         });
 
@@ -186,7 +194,7 @@ public class CityRepository {
 
             CityElement parentElement = element.getParentElement();
 
-            if (parentElement != null){
+            if (parentElement != null) {
                 String statement = "MATCH (acityNode:Elements), (acityParentNode:Elements)" +
                         "WHERE ID(acityNode) =  " + element.getNodeID() +
                         "  AND ID(acityParentNode) =  " + parentElement.getNodeID() +
@@ -202,13 +210,14 @@ public class CityRepository {
         log.info(childRelationCounter.get() + " child relations created");
     }
 
-    public void writeACityElementsToNeo4j(CityElement.CityType aCityElementType){
+    public void writeACityElementsToNeo4j(CityElement.CityType aCityElementType) {
 
         elementsByHash.forEach((id, element) -> {
-            if(element.getType() == aCityElementType) {
+            if (element.getType() == aCityElementType) {
                 connector.executeWrite("CREATE ( :Elements { " + getACityProperties(element) + "})");
 
-                Long aCityNodeID = connector.addNode("CREATE ( n:Elements { " + getACityProperties(element) + "})", "n").id();
+                Long aCityNodeID = connector.addNode("CREATE ( n:Elements { " + getACityProperties(element) + "})", "n")
+                        .id();
 
                 element.setNodeID(aCityNodeID);
             }
@@ -232,7 +241,7 @@ public class CityRepository {
         StringBuilder propertyBuilder = new StringBuilder();
 
         propertyBuilder.append(" cityType : '" + element.getType().toString() + "',");
-        propertyBuilder.append(" hash :  '"+ element.getHash() + "',");
+        propertyBuilder.append(" hash :  '" + element.getHash() + "',");
         propertyBuilder.append(" subType :  '" + element.getSubType() + "',");
         propertyBuilder.append(" color :  '" + element.getColor() + "',");
         propertyBuilder.append(" shape :  '" + element.getShape() + "',");
@@ -248,26 +257,25 @@ public class CityRepository {
         return propertyBuilder.toString();
     }
 
-
     public void addElement(CityElement element) {
         elementsByHash.put(element.getHash(), element);
 
-        //add to type map
+        // add to type map
         CityElement.CityType elementType = element.getType();
-        if (!elementsByType.containsKey(elementType)){
+        if (!elementsByType.containsKey(elementType)) {
             elementsByType.put(elementType, new TreeMap<>());
         }
         Map<String, CityElement> elementsByTypeMap = elementsByType.get(elementType);
         elementsByTypeMap.put(element.getHash(), element);
 
-        //add to source node id map
-        if (element.getSourceNode() != null){
+        // add to source node id map
+        if (element.getSourceNode() != null) {
             elementsBySourceID.put(element.getSourceNodeID(), element);
         }
     }
 
     public void addElements(List<CityElement> elements) {
-        for( CityElement element : elements ){
+        for (CityElement element : elements) {
             addElement(element);
         }
     }
@@ -275,26 +283,25 @@ public class CityRepository {
     public void deleteElement(CityElement element) {
         elementsByHash.remove(element.getHash(), element);
 
-        //delete from type map
+        // delete from type map
         CityElement.CityType elementType = element.getType();
-        if (!elementsByType.containsKey(elementType)){
+        if (!elementsByType.containsKey(elementType)) {
             elementsByType.remove(elementType, new TreeMap<>());
         }
         Map<String, CityElement> elementsByTypeMap = elementsByType.get(elementType);
         elementsByTypeMap.remove(element.getHash(), element);
 
-        //delete from source node id map
-        if (element.getSourceNode() != null){
+        // delete from source node id map
+        if (element.getSourceNode() != null) {
             elementsBySourceID.remove(element.getSourceNodeID(), element);
         }
 
-        //TODO Child and Parent delete
+        // TODO Child and Parent delete
     }
 
     public void deleteElements(Collection<CityElement> elements) {
-        for( CityElement element : elements ){
+        for (CityElement element : elements) {
             deleteElement(element);
         }
     }
 }
-

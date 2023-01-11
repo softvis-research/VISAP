@@ -23,12 +23,12 @@ public class MetropolisDesigner {
     public MetropolisDesigner(CityRepository cityRepository, SourceNodeRepository sourceNodeRepository) {
         repository = cityRepository;
 
-        log.info("*****************************************************************************************************************************************");
+        log.info(
+                "*****************************************************************************************************************************************");
         log.info("created");
     }
 
-
-    public void designRepository(){
+    public void designRepository() {
 
         designMetropolisElementsByType(CityElement.CityType.District);
 
@@ -38,7 +38,7 @@ public class MetropolisDesigner {
 
     }
 
-    private void designMetropolisElementsByType(CityElement.CityType cityType){
+    private void designMetropolisElementsByType(CityElement.CityType cityType) {
         log.info("Design " + cityType.name());
 
         Map<String, AtomicInteger> counterMap = new HashMap<>();
@@ -46,11 +46,15 @@ public class MetropolisDesigner {
         Collection<CityElement> cityElements = repository.getElementsByType(cityType);
         log.info(cityElements.size() + " " + cityType.name() + " loaded");
 
-        for (CityElement cityElement: cityElements) {
+        for (CityElement cityElement : cityElements) {
 
             switch (cityType) {
-                case District: designDistrict(cityElement); break;
-                case Building: designBuilding(cityElement); break;
+                case District:
+                    designDistrict(cityElement);
+                    break;
+                case Building:
+                    designBuilding(cityElement);
+                    break;
                 default:
                     designBuilding(cityElement);
                     log.error(cityType.name() + "is not a valid cityType");
@@ -59,31 +63,28 @@ public class MetropolisDesigner {
             countCityElementByType(counterMap, cityElement);
         }
 
-        counterMap.forEach( (propertyTypeName, counter) -> {
-            log.info(counter + " " + cityType.name() + "s of type " + propertyTypeName + " designed" );
+        counterMap.forEach((propertyTypeName, counter) -> {
+            log.info(counter + " " + cityType.name() + "s of type " + propertyTypeName + " designed");
         });
     }
 
-
-
-    private void countCityElementByType(Map<String, AtomicInteger> counterMap, CityElement cityElement){
+    private void countCityElementByType(Map<String, AtomicInteger> counterMap, CityElement cityElement) {
 
         String propertyTypeName = getPropertyTypeName(cityElement);
 
-        if(!counterMap.containsKey(propertyTypeName)){
+        if (!counterMap.containsKey(propertyTypeName)) {
             counterMap.put(propertyTypeName, new AtomicInteger(0));
         }
         AtomicInteger counterValue = counterMap.get(propertyTypeName);
         counterValue.addAndGet(1);
     }
 
-    private String getPropertyTypeName(CityElement cityElement){
-        if(cityElement.getSubType() != null){
+    private String getPropertyTypeName(CityElement cityElement) {
+        if (cityElement.getSubType() != null) {
             return cityElement.getSubType().name() + "-ReferenceBuilding";
         }
         return cityElement.getSourceNodeProperty(SAPNodeProperties.type_name);
     }
-
 
     private void designDistrict(CityElement district) {
 
@@ -92,25 +93,34 @@ public class MetropolisDesigner {
         String propertyTypeName = district.getSourceNodeProperty(SAPNodeProperties.type_name);
 
         switch (SAPNodeTypes.valueOf(propertyTypeName)) {
-            case Namespace:     district.setColor(Config.Visualization.Metropolis.color.packageDistrict());
+            case Namespace:
+                district.setColor(Config.Visualization.Metropolis.color.packageDistrict());
                 break;
             case Class:
-                if(district.getSourceNodeProperty(SAPNodeProperties.local_class).equals("true")) {
-                    district.setColor(Config.Visualization.Metropolis.color.localClassDistrict()); break;
+                if (district.getSourceNodeProperty(SAPNodeProperties.local_class).equals("true")) {
+                    district.setColor(Config.Visualization.Metropolis.color.localClassDistrict());
+                    break;
                 } else
-                    district.setColor(Config.Visualization.Metropolis.color.classDistrict()); break;
+                    district.setColor(Config.Visualization.Metropolis.color.classDistrict());
+                break;
             case Interface:
-                if(district.getSourceNodeProperty(SAPNodeProperties.local_class).equals("true")) {
-                    district.setColor(Config.Visualization.Metropolis.color.localInterfaceDistrict()); break;
+                if (district.getSourceNodeProperty(SAPNodeProperties.local_class).equals("true")) {
+                    district.setColor(Config.Visualization.Metropolis.color.localInterfaceDistrict());
+                    break;
                 } else
-                    district.setColor(Config.Visualization.Metropolis.color.interfaceDistrict()); break;
-            case Report:        district.setColor(Config.Visualization.Metropolis.color.reportDistrict());
+                    district.setColor(Config.Visualization.Metropolis.color.interfaceDistrict());
                 break;
-            case FunctionGroup: district.setColor(Config.Visualization.Metropolis.color.functionGroupDistrict());
+            case Report:
+                district.setColor(Config.Visualization.Metropolis.color.reportDistrict());
                 break;
-            default:            district.setColor(Config.Visualization.Metropolis.color.defaultDistrictValue());
+            case FunctionGroup:
+                district.setColor(Config.Visualization.Metropolis.color.functionGroupDistrict());
+                break;
+            default:
+                district.setColor(Config.Visualization.Metropolis.color.defaultDistrictValue());
                 log.error(district.getSubType().name() + " is not a valid type for \"district\"");
-                district.setHeight(Config.Visualization.Metropolis.district.districtHeight()); break;
+                district.setHeight(Config.Visualization.Metropolis.district.districtHeight());
+                break;
         }
     }
 
@@ -172,4 +182,3 @@ public class MetropolisDesigner {
         }
     }
 }
-

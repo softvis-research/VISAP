@@ -21,7 +21,7 @@ public class AFrameExporterStep {
     private static SourceNodeRepository nodeRepository;
     private static CityRepository cityRepository;
     private static MetaDataOutput metaDataOutput;
-    private static  MetaDataOutput aFrameOutput;
+    private static MetaDataOutput aFrameOutput;
 
     public static void main(String[] args) {
         boolean isSilentMode = Config.setup.silentMode();
@@ -33,7 +33,7 @@ public class AFrameExporterStep {
         nodeRepository.loadNodesByRelation(SAPRelationLabels.TYPEOF, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.REFERENCES, true);
-        //nodeRepository.loadNodesByRelation(SAPRelationLabels.INHERIT, true);
+        // nodeRepository.loadNodesByRelation(SAPRelationLabels.INHERIT, true);
 
         cityRepository = new CityRepository();
 
@@ -66,12 +66,13 @@ public class AFrameExporterStep {
         }
         MetaDataExporter metaDataExporter = new MetaDataExporter(cityRepository, nodeRepository);
         metaDataOutput = Config.output.metaData();
-        // Depending on setting, create file or write metaData as Node's property, or both actions
-        if (metaDataOutput == MetaDataOutput.FILE || metaDataOutput == MetaDataOutput.BOTH ) {
+        // Depending on setting, create file or write metaData as Node's property, or
+        // both actions
+        if (metaDataOutput == MetaDataOutput.FILE || metaDataOutput == MetaDataOutput.BOTH) {
             metaDataExporter.exportMetaDataFile();
         }
 
-        if (metaDataOutput == MetaDataOutput.NODEPROP || metaDataOutput == MetaDataOutput.BOTH ) {
+        if (metaDataOutput == MetaDataOutput.NODEPROP || metaDataOutput == MetaDataOutput.BOTH) {
             metaDataExporter.setMetaDataPropToCityElements();
         }
 
@@ -84,11 +85,11 @@ public class AFrameExporterStep {
 
         AFrameExporter aframeExporter = new AFrameExporter(cityRepository, "metropolis_AFrame_UI");
         aFrameOutput = Config.output.metaData();
-        if (aFrameOutput == MetaDataOutput.FILE || aFrameOutput == MetaDataOutput.BOTH ) {
+        if (aFrameOutput == MetaDataOutput.FILE || aFrameOutput == MetaDataOutput.BOTH) {
             aframeExporter.exportAFrame();
         }
 
-        if (aFrameOutput == MetaDataOutput.NODEPROP || aFrameOutput == MetaDataOutput.BOTH ) {
+        if (aFrameOutput == MetaDataOutput.NODEPROP || aFrameOutput == MetaDataOutput.BOTH) {
             aframeExporter.setAframePropToCityElements();
         }
 

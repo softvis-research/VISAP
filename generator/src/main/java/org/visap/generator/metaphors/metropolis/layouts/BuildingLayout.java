@@ -11,7 +11,7 @@ public class BuildingLayout {
         this.building = building;
     }
 
-    public void calculate(){
+    public void calculate() {
         setSizeOfBuilding();
         setPositionOfBuilding();
     }
@@ -23,15 +23,15 @@ public class BuildingLayout {
     }
 
     private void setSizeOfBuilding() {
-            building.setWidth(Config.Visualization.Metropolis.building.defaultWidth());
-            building.setLength(Config.Visualization.Metropolis.building.defaultLength());
+        building.setWidth(Config.Visualization.Metropolis.building.defaultWidth());
+        building.setLength(Config.Visualization.Metropolis.building.defaultLength());
 
-            String nos = building.getSourceNodeProperty(SAPNodeProperties.number_of_statements);
-            if ((nos == "null") || Double.valueOf(nos) == 0) {
-                building.setHeight(Config.Visualization.Metropolis.building.defaultHeight());
-            } else {
-                building.setHeight(getScaledHeight(Double.valueOf(nos)));
-            }
+        String nos = building.getSourceNodeProperty(SAPNodeProperties.number_of_statements);
+        if ((nos == "null") || Double.valueOf(nos) == 0) {
+            building.setHeight(Config.Visualization.Metropolis.building.defaultHeight());
+        } else {
+            building.setHeight(getScaledHeight(Double.valueOf(nos)));
+        }
     }
 
     private double getScaledHeight(double unscaledHeight) {
@@ -46,4 +46,3 @@ public class BuildingLayout {
         }
     }
 }
-
