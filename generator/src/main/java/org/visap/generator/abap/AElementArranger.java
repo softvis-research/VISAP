@@ -19,7 +19,7 @@ public class AElementArranger {
             CityElement recElement = rectangleElementsMap.get(element);
             CityElement.CitySubType refBuilding = recElement.getSubType();
 
-            //no sourceNode, no refBuilding
+            // no sourceNode, no refBuilding
             if (recElement.getSourceNode() == null && refBuilding == null) {
                 continue;
             }

@@ -11,7 +11,7 @@ import org.visap.generator.repository.CityElement;
 import java.util.*;
 
 public class DistrictCircularLayout {
-    //Old coding -> Refactor, generalize and maybe reimplement
+    // Old coding -> Refactor, generalize and maybe reimplement
     private final CityElement district;
     private final Collection<CityElement> subElements;
 
@@ -79,7 +79,6 @@ public class DistrictCircularLayout {
             }
         }
     }
-
 
     /*
         Copied from CityLayout
@@ -228,8 +227,7 @@ public class DistrictCircularLayout {
 
                     switch (version) {
                         case MINIMAL_DISTANCE ->
-//							rotationAngle = Math.acos(1 - (Math.pow(previousRadius + currentRadius, 2) / (2 * Math.pow(radius, 2))));
-                                rotationAngle = 2 * Math.asin((previousRadius + currentRadius) / (2 * radius));
+                            rotationAngle = 2 * Math.asin((previousRadius + currentRadius) / (2 * radius));
                         case FULL_CIRCLE -> {
                             double idealRotationAngle = 2 * Math.PI / elements.size() - cacheRotationAngle;
                             double leastRotationAngle = 2 * Math.asin((previousRadius + currentRadius) / (2 * radius));
@@ -241,9 +239,7 @@ public class DistrictCircularLayout {
                                 cacheRotationAngle = leastRotationAngle - idealRotationAngle;
                             }
                         }
-                        default ->
-//							rotationAngle = Math.acos(1 - (Math.pow(previousRadius + currentRadius, 2) / (2 * Math.pow(radius, 2))));
-                                rotationAngle = 2 * Math.asin((previousRadius + currentRadius) / (2 * radius));
+                        default -> rotationAngle = 2 * Math.asin((previousRadius + currentRadius) / (2 * radius));
                     }
 
                     CityElement previousRectangle = rectangleElementsMap.get(previousRec);
@@ -371,8 +367,6 @@ public class DistrictCircularLayout {
             // set node as occupied (only leaves can contain elements)
             node.setOccupied();
 
-
-
             return trimmingNode(node.getLeftChild(), r);
             // second split: vertical cut, if necessary
             // Round to 3 digits, because e.g. 12.34000000007 is declared equal to 12.34
@@ -385,10 +379,8 @@ public class DistrictCircularLayout {
             // set node as occupied (only leaves can contain elements)
             node.setOccupied();
 
-
             return node.getLeftChild();
         } else {
-
             return node;
         }
     }

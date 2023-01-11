@@ -75,16 +75,15 @@ public class MetropolisLayouter {
     }
 
     private void layoutDistrict(CityElement district) {
-        if(isDistrictEmpty(district)){
+        if (isDistrictEmpty(district)) {
             layoutEmptyDistrict(district);
 
             log.info("Empty district \"" + district.getSourceNodeProperty(SAPNodeProperties.object_name) + "\" layouted");
         } else {
-
             Collection<CityElement> subElements = district.getSubElements();
 
             // layout sub districts
-            for(CityElement subElement : subElements){
+            for (CityElement subElement : subElements) {
                 if (subElement.getType() == CityElement.CityType.District) {
                     layoutDistrict(subElement);
                 }
@@ -102,17 +101,12 @@ public class MetropolisLayouter {
         }
     }
 
-    private boolean isDistrictEmpty(CityElement district){
-        Collection<CityElement> subElements = district.getSubElements();
-
-        boolean isEmpty = true;
-
-        for (CityElement subElement: subElements) {
-                isEmpty = false;
-                break;
+    private boolean isDistrictEmpty(CityElement district) {
+        if (district.getSubElements().isEmpty()) {
+            return true;
+        } else {
+            return false;
         }
-
-        return isEmpty;
     }
 
     private void layoutEmptyDistrict( CityElement district) {
