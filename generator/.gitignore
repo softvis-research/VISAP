@@ -18,6 +18,7 @@ target/
 # Model output
 /output/*
 !/output/Example/
+!/output/YourOutput/
 
 # Compiled class file
 *.class

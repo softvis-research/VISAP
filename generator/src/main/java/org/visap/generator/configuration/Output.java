@@ -8,7 +8,7 @@ public interface Output extends Config {
     @DefaultValue("BOTH")
     MetaDataOutput metaData();
 
-    @DefaultValue("output/Example/")
+    @DefaultValue("output/YourOutput/")
     String mapPath();
 
     @DefaultValue("false")
