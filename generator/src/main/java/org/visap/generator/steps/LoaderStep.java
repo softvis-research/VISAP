@@ -26,7 +26,7 @@ public class LoaderStep {
         // Get files for nodes and relations
         List<Path> files = CSVInput.getInputCSVFiles();
         for(Path p : files) {
-            if (p.toString().endsWith("_Test.csv")) {
+            if (p.toString().endsWith("_Nodes.csv")) {
                 pathToNodesCsv = p.toString();
             } else if (p.toString().endsWith("_Reference.csv")) {
                 pathToReferenceCsv = p.toString();
