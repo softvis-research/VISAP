@@ -30,7 +30,7 @@ public class AMetaDataMap {
         // Elements, for which we want to show USES relation
         nodesWithUsesRelationByType = Arrays.asList(
                 "METH",
-                "FUMO",
+                "FUNC",
                 "REPS",
                 "FORM",
                 "FUGR");
