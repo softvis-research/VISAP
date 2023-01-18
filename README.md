@@ -55,7 +55,6 @@ Save the config, close it, and start the Apache Module.
 ### On Ubuntu
 
 Install [NPM](https://www.npmjs.com/) and run the command ```npm install -g live-server && live-server``` inside the UI folder.
-Once the web server is set up, it will automatically open up in the browser. The URL will look similar to this: http://127.0.0.1:8080.
 
 ### View in the browser
 
