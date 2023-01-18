@@ -7,8 +7,10 @@ import org.visap.generator.model.MetaDataOutput;
 public interface Output extends Config {
     @DefaultValue("BOTH")
     MetaDataOutput metaData();
+
     @DefaultValue("output/Example/")
     String mapPath();
+
     @DefaultValue("false")
     boolean writeRepToDb();
 }

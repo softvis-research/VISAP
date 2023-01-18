@@ -6,6 +6,7 @@ import org.aeonbits.owner.Config;
 public interface Assets extends Config {
     @DefaultValue("assets/sky_pano.jpg")
     String sky();
+
     @DefaultValue("assets/ground.jpg")
     String ground();
 

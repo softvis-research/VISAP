@@ -11,7 +11,7 @@ import org.visap.generator.repository.CityElement;
 import java.util.*;
 
 public class DistrictCircularLayout {
-    //Old coding -> Refactor, generalize and maybe reimplement
+    // Old coding -> Refactor, generalize and maybe reimplement
     private final CityElement district;
     private final Collection<CityElement> subElements;
 
@@ -24,12 +24,11 @@ public class DistrictCircularLayout {
         rectangleElementsMap = new HashMap<>();
     }
 
-    public void calculate(){
+    public void calculate() {
         CityRectangle coveringCityRectangle = arrangeSubElements(subElements);
         setSizeOfDistrict(coveringCityRectangle);
         setPositionOfDistrict(coveringCityRectangle);
     }
-
 
     private void setSizeOfDistrict(CityRectangle coveringCityRectangle) {
 
@@ -56,7 +55,7 @@ public class DistrictCircularLayout {
         element.setZPosition(zPosition);
 
         Collection<CityElement> subElements = element.getSubElements();
-        if(!subElements.isEmpty()){
+        if (!subElements.isEmpty()) {
             adjustPositionsOfSubSubElements(subElements, xPositionDelta, zPositionDelta);
         }
     }
@@ -67,22 +66,23 @@ public class DistrictCircularLayout {
             double centerX = element.getXPosition();
             double centerZ = element.getZPosition();
 
-            double newXPosition = centerX + parentX + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
-            double newZPosition = centerZ + parentZ + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
+            double newXPosition = centerX + parentX
+                    + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
+            double newZPosition = centerZ + parentZ
+                    + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
 
             element.setXPosition(newXPosition);
             element.setZPosition(newZPosition);
 
             Collection<CityElement> subElements = element.getSubElements();
-            if(!subElements.isEmpty()){
+            if (!subElements.isEmpty()) {
                 adjustPositionsOfSubSubElements(subElements, parentX, parentZ);
             }
         }
     }
 
-
     /*
-        Copied from CityLayout
+     * Copied from CityLayout
      */
 
     private CityRectangle arrangeSubElements(Collection<CityElement> subElements) {
@@ -130,7 +130,8 @@ public class DistrictCircularLayout {
 
             // modify targetNode if necessary
             if (targetNode.getCityRectangle().getWidth() == el.getWidth()
-                    && targetNode.getCityRectangle().getLength() == el.getLength()) { // this if could probably be skipped,
+                    && targetNode.getCityRectangle().getLength() == el.getLength()) { // this if could probably be
+                                                                                      // skipped,
                 // trimmingNode() always returns
                 // fittingNode
                 fitNode = targetNode;
@@ -151,7 +152,6 @@ public class DistrictCircularLayout {
             }
         }
 
-
         arrangeDistrictsCircular(customCode, covrec);
         arrangeDistrictsCircular(standardCode, covrec);
 
@@ -159,7 +159,8 @@ public class DistrictCircularLayout {
     }
 
     private void arrangeDistrictsCircular(List<CityRectangle> elements, CityRectangle covrec) {
-        double covrecRadius = covrec.getPerimeterRadius() + Config.Visualization.Metropolis.district.horizontalBuildingGap();
+        double covrecRadius = covrec.getPerimeterRadius()
+                + Config.Visualization.Metropolis.district.horizontalBuildingGap();
         LayoutVersion version = Config.Visualization.Metropolis.district.layoutVersion();
 
         if (elements.size() == 0)
@@ -171,9 +172,10 @@ public class DistrictCircularLayout {
             double sumOfPerimeterRadius = 0;
 
             for (CityRectangle element : elements) {
-                sumOfPerimeterRadius += element.getPerimeterRadius() + Config.Visualization.Metropolis.district.horizontalBuildingGap();
+                sumOfPerimeterRadius += element.getPerimeterRadius()
+                        + Config.Visualization.Metropolis.district.horizontalBuildingGap();
 
-                if(element.getPerimeterRadius() > maxOuterRadius) {
+                if (element.getPerimeterRadius() > maxOuterRadius) {
                     maxOuterRadius = element.getPerimeterRadius();
                     biggestRec = element;
                     elements.remove(element);
@@ -195,7 +197,6 @@ public class DistrictCircularLayout {
 
             double radius = Math.max(minRadius, maxRadius);
 
-
             CityElement biggestRectangle = rectangleElementsMap.get(biggestRec);
 
             double xPosition = covrec.getCenterX() + radius;
@@ -207,7 +208,7 @@ public class DistrictCircularLayout {
             biggestRectangle.setZPosition(zPosition);
 
             Collection<CityElement> subElements = biggestRectangle.getSubElements();
-            if(!subElements.isEmpty()){
+            if (!subElements.isEmpty()) {
                 adjustPositionsOfSubSubElements(subElements, xPositionDelta, zPositionDelta);
             }
 
@@ -228,8 +229,7 @@ public class DistrictCircularLayout {
 
                     switch (version) {
                         case MINIMAL_DISTANCE ->
-//							rotationAngle = Math.acos(1 - (Math.pow(previousRadius + currentRadius, 2) / (2 * Math.pow(radius, 2))));
-                                rotationAngle = 2 * Math.asin((previousRadius + currentRadius) / (2 * radius));
+                            rotationAngle = 2 * Math.asin((previousRadius + currentRadius) / (2 * radius));
                         case FULL_CIRCLE -> {
                             double idealRotationAngle = 2 * Math.PI / elements.size() - cacheRotationAngle;
                             double leastRotationAngle = 2 * Math.asin((previousRadius + currentRadius) / (2 * radius));
@@ -241,9 +241,7 @@ public class DistrictCircularLayout {
                                 cacheRotationAngle = leastRotationAngle - idealRotationAngle;
                             }
                         }
-                        default ->
-//							rotationAngle = Math.acos(1 - (Math.pow(previousRadius + currentRadius, 2) / (2 * Math.pow(radius, 2))));
-                                rotationAngle = 2 * Math.asin((previousRadius + currentRadius) / (2 * radius));
+                        default -> rotationAngle = 2 * Math.asin((previousRadius + currentRadius) / (2 * radius));
                     }
 
                     CityElement previousRectangle = rectangleElementsMap.get(previousRec);
@@ -256,8 +254,6 @@ public class DistrictCircularLayout {
                     double xPositionDeltaManyDistricts = newX - currentRectangle.getXPosition();
                     currentRectangle.setXPosition(newX);
 
-
-
                     double newZ = (previousRectangle.getXPosition() - covrec.getCenterX()) * Math.sin(rotationAngle)
                             + (previousRectangle.getZPosition() - covrec.getCenterY()) * Math.cos(rotationAngle)
                             + covrec.getCenterY();
@@ -265,10 +261,10 @@ public class DistrictCircularLayout {
                     double zPositionDeltaManyDistricts = newZ - currentRectangle.getZPosition();
                     currentRectangle.setZPosition(newZ);
 
-
                     Collection<CityElement> subElementsManyDistricts = currentRectangle.getSubElements();
-                    if(!subElementsManyDistricts.isEmpty()){
-                        adjustPositionsOfSubSubElements(subElementsManyDistricts, xPositionDeltaManyDistricts, zPositionDeltaManyDistricts);
+                    if (!subElementsManyDistricts.isEmpty()) {
+                        adjustPositionsOfSubSubElements(subElementsManyDistricts, xPositionDeltaManyDistricts,
+                                zPositionDeltaManyDistricts);
                     }
 
                 }
@@ -286,14 +282,14 @@ public class DistrictCircularLayout {
             double width = element.getWidth();
             double length = element.getLength();
 
-            CityRectangle rectangle = new CityRectangle(0, 0, width + Config.Visualization.Metropolis.district.horizontalBuildingGap(),
+            CityRectangle rectangle = new CityRectangle(0, 0,
+                    width + Config.Visualization.Metropolis.district.horizontalBuildingGap(),
                     length + Config.Visualization.Metropolis.district.horizontalBuildingGap(), 1);
             rectangles.add(rectangle);
             rectangleElementsMap.put(rectangle, element);
         }
         return rectangles;
     }
-
 
     private CityRectangle calculateMaxAreaRoot(Collection<CityElement> elements) {
         double sum_width = 0;
@@ -306,7 +302,7 @@ public class DistrictCircularLayout {
     }
 
     private void sortEmptyLeaf(CityKDTreeNode pnode, CityRectangle el, CityRectangle covrec,
-                               Map<CityKDTreeNode, Double> preservers, Map<CityKDTreeNode, Double> expanders) {
+            Map<CityKDTreeNode, Double> preservers, Map<CityKDTreeNode, Double> expanders) {
         // either element fits in current bounds (->preservers) or it doesn't
         // (->expanders)
         double nodeUpperLeftX = pnode.getCityRectangle().getUpperLeftX();
@@ -365,13 +361,12 @@ public class DistrictCircularLayout {
         if (Math.round(node.getCityRectangle().getLength() * 1000d) != Math.round(r.getLength() * 1000d)) {
             // new child-nodes
             node.setLeftChild(new CityKDTreeNode(
-                    new CityRectangle(nodeUpperLeftX, nodeUpperLeftY, nodeBottomRightX, (nodeUpperLeftY + r.getLength()))));
+                    new CityRectangle(nodeUpperLeftX, nodeUpperLeftY, nodeBottomRightX,
+                            (nodeUpperLeftY + r.getLength()))));
             node.setRightChild(new CityKDTreeNode(new CityRectangle(nodeUpperLeftX, (nodeUpperLeftY + r.getLength()),
                     nodeBottomRightX, nodeBottomRightY)));
             // set node as occupied (only leaves can contain elements)
             node.setOccupied();
-
-
 
             return trimmingNode(node.getLeftChild(), r);
             // second split: vertical cut, if necessary
@@ -379,16 +374,15 @@ public class DistrictCircularLayout {
         } else if (Math.round(node.getCityRectangle().getWidth() * 1000d) != Math.round(r.getWidth() * 1000d)) {
             // new child-nodes
             node.setLeftChild(new CityKDTreeNode(
-                    new CityRectangle(nodeUpperLeftX, nodeUpperLeftY, (nodeUpperLeftX + r.getWidth()), nodeBottomRightY)));
+                    new CityRectangle(nodeUpperLeftX, nodeUpperLeftY, (nodeUpperLeftX + r.getWidth()),
+                            nodeBottomRightY)));
             node.setRightChild(new CityKDTreeNode(new CityRectangle((nodeUpperLeftX + r.getWidth()), nodeUpperLeftY,
                     nodeBottomRightX, nodeBottomRightY)));
             // set node as occupied (only leaves can contain elements)
             node.setOccupied();
 
-
             return node.getLeftChild();
         } else {
-
             return node;
         }
     }

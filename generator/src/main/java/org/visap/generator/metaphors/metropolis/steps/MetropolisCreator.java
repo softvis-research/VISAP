@@ -14,7 +14,6 @@ import java.util.*;
 
 public class MetropolisCreator {
 
-
     private Log log = LogFactory.getLog(this.getClass());
     private SourceNodeRepository nodeRepository;
     private CityRepository repository;
@@ -23,19 +22,18 @@ public class MetropolisCreator {
         repository = cityRepository;
         nodeRepository = sourceNodeRepository;
 
-        log.info("*****************************************************************************************************************************************");
+        log.info(
+                "*****************************************************************************************************************************************");
         log.info("created");
     }
 
-
-    public void createRepositoryFromNodeRepository(){
+    public void createRepositoryFromNodeRepository() {
 
         log.info("Create City Elements");
         createAllMetropolisElements(nodeRepository);
 
         log.info("Create City Relations");
         createAllMetropolisRelations(nodeRepository);
-
 
         log.info("Delete empty Districts");
         deleteEmptyDistricts();
@@ -44,15 +42,15 @@ public class MetropolisCreator {
 
     private Collection<CityElement> getUsesElementsBySourceNode(SourceNodeRepository nodeRepository, Node node) {
         Collection<Node> usesNodes = nodeRepository.getRelatedNodes(node, SAPRelationLabels.USES, true);
-        if( usesNodes.isEmpty()){
+        if (usesNodes.isEmpty()) {
             return new TreeSet<>();
         }
 
         List<CityElement> usesElements = new ArrayList<>();
-        for (Node usesNode: usesNodes ) {
+        for (Node usesNode : usesNodes) {
             Long usesNodeID = usesNode.id();
             CityElement usesElement = repository.getElementBySourceID(usesNodeID);
-            if(usesElement == null){
+            if (usesElement == null) {
                 continue;
             }
             usesElements.add(usesElement);
@@ -62,21 +60,31 @@ public class MetropolisCreator {
     }
 
     private void createAllMetropolisElements(SourceNodeRepository nodeRepository) {
-        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.District, SAPNodeProperties.type_name, SAPNodeTypes.Namespace);
+        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.District, SAPNodeProperties.type_name,
+                SAPNodeTypes.Namespace);
 
-        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.District, SAPNodeProperties.type_name, SAPNodeTypes.FunctionGroup);
-        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.Building, SAPNodeProperties.type_name, SAPNodeTypes.FunctionModule);
+        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.District, SAPNodeProperties.type_name,
+                SAPNodeTypes.FunctionGroup);
+        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.Building, SAPNodeProperties.type_name,
+                SAPNodeTypes.FunctionModule);
 
-        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.District, SAPNodeProperties.type_name, SAPNodeTypes.Report);
-        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.Building, SAPNodeProperties.type_name, SAPNodeTypes.Report);
-        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.Building, SAPNodeProperties.type_name, SAPNodeTypes.FormRoutine);
+        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.District, SAPNodeProperties.type_name,
+                SAPNodeTypes.Report);
+        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.Building, SAPNodeProperties.type_name,
+                SAPNodeTypes.Report);
+        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.Building, SAPNodeProperties.type_name,
+                SAPNodeTypes.FormRoutine);
 
-        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.District, SAPNodeProperties.type_name, SAPNodeTypes.Class);
+        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.District, SAPNodeProperties.type_name,
+                SAPNodeTypes.Class);
 
-        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.District, SAPNodeProperties.type_name, SAPNodeTypes.Interface);
+        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.District, SAPNodeProperties.type_name,
+                SAPNodeTypes.Interface);
 
-        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.Building, SAPNodeProperties.type_name, SAPNodeTypes.Method);
-        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.Building, SAPNodeProperties.type_name, SAPNodeTypes.Attribute);
+        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.Building, SAPNodeProperties.type_name,
+                SAPNodeTypes.Method);
+        createACityElementsFromSourceNodes(nodeRepository, CityElement.CityType.Building, SAPNodeProperties.type_name,
+                SAPNodeTypes.Attribute);
     }
 
     private void createAllMetropolisRelations(SourceNodeRepository nodeRepository) {
@@ -84,18 +92,18 @@ public class MetropolisCreator {
         createMetropolisRelations(nodeRepository, CityElement.CityType.Building);
     }
 
-    private void createMetropolisRelations(SourceNodeRepository nodeRepository, CityElement.CityType cityType){
+    private void createMetropolisRelations(SourceNodeRepository nodeRepository, CityElement.CityType cityType) {
         Collection<CityElement> cityElements = repository.getElementsByType(cityType);
         log.info(cityElements.size() + " CityElement with type \"" + cityType.name() + "\" loaded");
 
         long relationCounter = 0;
         long relationCounterUsesRelation = 0;
-        for (CityElement element: cityElements){
+        for (CityElement element : cityElements) {
 
             Node sourceNode = element.getSourceNode();
 
-            if(element.getSourceNodeType() == SAPNodeTypes.Report) {
-                if(element.getType() == CityElement.CityType.Building){
+            if (element.getSourceNodeType() == SAPNodeTypes.Report) {
+                if (element.getType() == CityElement.CityType.Building) {
                     continue;
                 }
 
@@ -105,18 +113,21 @@ public class MetropolisCreator {
 
             Collection<CityElement> childElements = getChildElementsBySourceNode(nodeRepository, sourceNode);
 
-            for (CityElement childElement: childElements) {
+            for (CityElement childElement : childElements) {
 
-                //No nesting of packages
-                if (childElement.getType() == CityElement.CityType.District && childElement.getSourceNodeType() == SAPNodeTypes.Namespace ) {
+                // No nesting of packages
+                if (childElement.getType() == CityElement.CityType.District
+                        && childElement.getSourceNodeType() == SAPNodeTypes.Namespace) {
                     continue;
                 }
 
-                if (childElement.getType() == CityElement.CityType.Building && childElement.getSourceNodeType() == SAPNodeTypes.Report) {
+                if (childElement.getType() == CityElement.CityType.Building
+                        && childElement.getSourceNodeType() == SAPNodeTypes.Report) {
                     continue;
                 }
 
-                if (childElement.getType() == CityElement.CityType.Building && childElement.getSourceNodeType() == SAPNodeTypes.Interface) {
+                if (childElement.getType() == CityElement.CityType.Building
+                        && childElement.getSourceNodeType() == SAPNodeTypes.Interface) {
                     continue;
                 }
 
@@ -129,7 +140,7 @@ public class MetropolisCreator {
             Node sourceNodeDistrict = element.getSourceNode();
             Collection<CityElement> usesElements = getUsesElementsBySourceNode(nodeRepository, sourceNodeDistrict);
 
-            for(CityElement usesElement: usesElements) {
+            for (CityElement usesElement : usesElements) {
 
                 if (usesElement.getSourceNodeProperty(SAPNodeProperties.local_class).equals("true")) {
 
@@ -141,12 +152,12 @@ public class MetropolisCreator {
                         usesElement.setParentElement(element);
                         relationCounterUsesRelation++;
                     }
-                } else if (usesElement.getSourceNodeType() == SAPNodeTypes.Attribute){
+                } else if (usesElement.getSourceNodeType() == SAPNodeTypes.Attribute) {
 
                     String elementID = element.getSourceNodeProperty(SAPNodeProperties.element_id);
                     String usesID = usesElement.getSourceNodeProperty(SAPNodeProperties.uses_id);
 
-                    if(element.getSourceNodeType() == SAPNodeTypes.Report){
+                    if (element.getSourceNodeType() == SAPNodeTypes.Report) {
 
                         if (elementID.equals(usesID)) {
                             element.addSubElement(usesElement);
@@ -155,7 +166,7 @@ public class MetropolisCreator {
                         }
                     }
                 } else {
-                    repository.deleteElement(usesElement); //atm only for local classes, attributes are deleted
+                    repository.deleteElement(usesElement); // atm only for local classes, attributes are deleted
                 }
             }
         }
@@ -165,7 +176,8 @@ public class MetropolisCreator {
 
     }
 
-    private void createMetropolisRelationsForIdenticalNodes(SourceNodeRepository nodeRepository, Node sourceNode, CityElement element) {
+    private void createMetropolisRelationsForIdenticalNodes(SourceNodeRepository nodeRepository, Node sourceNode,
+            CityElement element) {
 
         CityElement buildingParentElements = getParentElementBySourceNode(nodeRepository, sourceNode);
 
@@ -174,13 +186,14 @@ public class MetropolisCreator {
 
         String buildingElementTypeName = element.getSourceNodeType().name();
 
-        Collection<CityElement> BuildingElements = repository.getElementsByTypeAndSourceProperty(CityElement.CityType.Building, SAPNodeProperties.type_name, buildingElementTypeName);
-        for (CityElement buildingElement: BuildingElements) {
+        Collection<CityElement> BuildingElements = repository.getElementsByTypeAndSourceProperty(
+                CityElement.CityType.Building, SAPNodeProperties.type_name, buildingElementTypeName);
+        for (CityElement buildingElement : BuildingElements) {
 
             String districtTypename = element.getSourceNodeProperty(SAPNodeProperties.element_id);
             String buildingTypeName = buildingElement.getSourceNodeProperty(SAPNodeProperties.element_id);
 
-            if(buildingTypeName.equals(districtTypename)){
+            if (buildingTypeName.equals(districtTypename)) {
 
                 element.addSubElement(buildingElement);
                 buildingElement.setParentElement(element);
@@ -191,7 +204,8 @@ public class MetropolisCreator {
 
     private void deleteEmptyDistricts() {
 
-        Collection<CityElement> districtsWithoutParents = repository.getElementsByTypeAndSourceProperty(CityElement.CityType.District, SAPNodeProperties.type_name, "Namespace");
+        Collection<CityElement> districtsWithoutParents = repository.getElementsByTypeAndSourceProperty(
+                CityElement.CityType.District, SAPNodeProperties.type_name, "Namespace");
 
         for (CityElement districtsWithoutParent : districtsWithoutParents) {
 
@@ -213,15 +227,15 @@ public class MetropolisCreator {
     private Collection<CityElement> getChildElementsBySourceNode(SourceNodeRepository nodeRepository, Node node) {
 
         Collection<Node> childNodes = nodeRepository.getRelatedNodes(node, SAPRelationLabels.CONTAINS, true);
-        if( childNodes.isEmpty()){
+        if (childNodes.isEmpty()) {
             return new TreeSet<>();
         }
 
         List<CityElement> childElements = new ArrayList<>();
-        for (Node childNode: childNodes ) {
+        for (Node childNode : childNodes) {
             Long childNodeID = childNode.id();
             CityElement childElement = repository.getElementBySourceID(childNodeID);
-            if(childElement == null){
+            if (childElement == null) {
                 continue;
             }
             childElements.add(childElement);
@@ -231,7 +245,7 @@ public class MetropolisCreator {
 
     private CityElement getParentElementBySourceNode(SourceNodeRepository nodeRepository, Node node) {
         Collection<Node> parentNodes = nodeRepository.getRelatedNodes(node, SAPRelationLabels.CONTAINS, false);
-        if(parentNodes.isEmpty()) {
+        if (parentNodes.isEmpty()) {
             return null;
         }
 
@@ -242,10 +256,12 @@ public class MetropolisCreator {
         return parentElement;
     }
 
-    private void createACityElementsFromSourceNodes(SourceNodeRepository nodeRepository, CityElement.CityType cityType, SAPNodeProperties property, SAPNodeTypes nodeType) {
+    private void createACityElementsFromSourceNodes(SourceNodeRepository nodeRepository, CityElement.CityType cityType,
+            SAPNodeProperties property, SAPNodeTypes nodeType) {
         Collection<Node> sourceNodes = nodeRepository.getNodesByProperty(property, nodeType.name());
 
-        log.info(sourceNodes.size() + " SourceNodes with property \"" + property + "\" and value \"" + nodeType.name() + "\" loaded");
+        log.info(sourceNodes.size() + " SourceNodes with property \"" + property + "\" and value \"" + nodeType.name()
+                + "\" loaded");
         List<CityElement> cityElements = createACityElements(sourceNodes, cityType);
         repository.addElements(cityElements);
 
@@ -255,7 +271,7 @@ public class MetropolisCreator {
     private List<CityElement> createACityElements(Collection<Node> sourceNodes, CityElement.CityType cityType) {
         List<CityElement> cityElements = new ArrayList<>();
 
-        for( Node sourceNode: sourceNodes ) {
+        for (Node sourceNode : sourceNodes) {
             CityElement cityElement = new CityElement(cityType);
             cityElement.setSourceNode(sourceNode);
             cityElements.add(cityElement);

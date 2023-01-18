@@ -21,14 +21,16 @@ public class CityKDTree {
 
 	private CityKDTreeNode root;
 
-	public List<CityKDTreeNode> getFittingNodes(CityRectangle r){
+	public List<CityKDTreeNode> getFittingNodes(CityRectangle r) {
 		List<CityKDTreeNode> fittingNodes = new ArrayList<CityKDTreeNode>();
 		this.root.isEmptyLeaf(r, fittingNodes);
 		return fittingNodes;
 	}
+
 	public CityKDTreeNode getRoot() {
 		return root;
 	}
+
 	public void setRoot(CityKDTreeNode root) {
 		this.root = root;
 	}

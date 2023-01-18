@@ -32,44 +32,53 @@ public class CityKDTreeNode {
 		this.rectangle = rectangle;
 		this.occupied = false;
 	}
-	
+
 	private CityKDTreeNode leftChild;
 	private CityKDTreeNode rightChild;
 	private CityRectangle rectangle;
 	private boolean occupied;
-	
-	public void isEmptyLeaf(CityRectangle r, List<CityKDTreeNode> list){
-		if(this.rectangle.getWidth() >= r.getWidth() && this.rectangle.getLength() >= r.getLength() && this.occupied == false){
+
+	public void isEmptyLeaf(CityRectangle r, List<CityKDTreeNode> list) {
+		if (this.rectangle.getWidth() >= r.getWidth() && this.rectangle.getLength() >= r.getLength()
+				&& this.occupied == false) {
 			list.add(this);
 		}
-		if(this.leftChild != null){
+		if (this.leftChild != null) {
 			this.leftChild.isEmptyLeaf(r, list);
 		}
-		if(this.rightChild != null){
+		if (this.rightChild != null) {
 			this.rightChild.isEmptyLeaf(r, list);
 		}
 	}
+
 	public CityKDTreeNode getLeftChild() {
 		return leftChild;
 	}
+
 	public void setLeftChild(CityKDTreeNode leftChild) {
 		this.leftChild = leftChild;
 	}
+
 	public CityKDTreeNode getRightChild() {
 		return rightChild;
 	}
+
 	public void setRightChild(CityKDTreeNode rightChild) {
 		this.rightChild = rightChild;
 	}
+
 	public CityRectangle getCityRectangle() {
 		return rectangle;
 	}
+
 	public void setCityRectangle(CityRectangle rectangle) {
 		this.rectangle = rectangle;
 	}
+
 	public boolean isOccupied() {
 		return occupied;
 	}
+
 	public void setOccupied() {
 		this.occupied = true;
 	}

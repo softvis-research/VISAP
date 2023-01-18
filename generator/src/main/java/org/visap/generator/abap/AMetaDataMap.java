@@ -13,7 +13,7 @@ public class AMetaDataMap {
     private static final List<String> nodesWithInheritRelationByType;
     private static final List<String> nodesWithMigrationRelationByType;
 
-    static{
+    static {
         // Change property names for metaData-output
         metaDataProperties = new HashMap<>();
         metaDataProperties.put(SAPNodeProperties.element_id.name(), "id");
@@ -27,26 +27,22 @@ public class AMetaDataMap {
         metaDataProperties.put(SAPNodeProperties.number_of_statements.name(), "number_of_statements");
         metaDataProperties.put(SAPNodeProperties.local_class.name(), "local_class");
 
-
         // Elements, for which we want to show USES relation
         nodesWithUsesRelationByType = Arrays.asList(
                 "METH",
                 "FUMO",
                 "REPS",
                 "FORM",
-                "FUGR"
-        );
+                "FUGR");
 
         // Elements, for which we want to show INHERIT relation
         nodesWithInheritRelationByType = Arrays.asList(
                 "CLAS",
-                "INTF"
-        );
+                "INTF");
 
         nodesWithMigrationRelationByType = Arrays.asList(
                 "CLAS",
-                "INTF"
-        );
+                "INTF");
     }
 
     public static Map<String, String> getMetaDataProperties() {
@@ -73,4 +69,3 @@ public class AMetaDataMap {
         return nodesWithInheritRelationByType;
     }
 }
-

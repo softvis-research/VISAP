@@ -2,6 +2,7 @@ package org.visap.generator.configuration;
 
 import org.aeonbits.owner.ConfigFactory;
 import org.visap.generator.configuration.Metropolis.*;
+
 public class Config {
     public static Setup setup = ConfigFactory.create(Setup.class);
 

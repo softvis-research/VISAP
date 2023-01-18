@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public class AElementArranger {
-    public List<List<CityRectangle>> constructElementSets(List<CityRectangle> elements, Map<CityRectangle, CityElement> rectangleElementsMap) {
+    public List<List<CityRectangle>> constructElementSets(List<CityRectangle> elements,
+            Map<CityRectangle, CityElement> rectangleElementsMap) {
         List<CityRectangle> originSet = new ArrayList<>();
         List<CityRectangle> customCode = new ArrayList<>();
         List<CityRectangle> standardCode = new ArrayList<>();
@@ -19,7 +20,7 @@ public class AElementArranger {
             CityElement recElement = rectangleElementsMap.get(element);
             CityElement.CitySubType refBuilding = recElement.getSubType();
 
-            //no sourceNode, no refBuilding
+            // no sourceNode, no refBuilding
             if (recElement.getSourceNode() == null && refBuilding == null) {
                 continue;
             }
