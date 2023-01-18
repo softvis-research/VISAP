@@ -166,7 +166,6 @@ public class DistrictCircularLayout {
         if (elements.size() == 0)
             return;
         else {
-
             CityRectangle biggestRec = elements.get(0);
             double maxOuterRadius = biggestRec.getPerimeterRadius();
             double sumOfPerimeterRadius = 0;

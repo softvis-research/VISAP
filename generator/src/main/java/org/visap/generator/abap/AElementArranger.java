@@ -18,27 +18,17 @@ public class AElementArranger {
         // order the rectangles to the fit sets
         for (CityRectangle element : elements) {
             CityElement recElement = rectangleElementsMap.get(element);
-            CityElement.CitySubType refBuilding = recElement.getSubType();
 
-            // no sourceNode, no refBuilding
-            if (recElement.getSourceNode() == null && refBuilding == null) {
-                continue;
-            }
+            String creator = recElement.getSourceNodeProperty(SAPNodeProperties.creator);
+            String iterationString = recElement.getSourceNodeProperty(SAPNodeProperties.iteration);
+            int iteration = Integer.parseInt(iterationString);
 
-            // for Elements with SourceNode
-            if (recElement.getSourceNode() != null && refBuilding == null) {
-
-                String creator = recElement.getSourceNodeProperty(SAPNodeProperties.creator);
-                String iterationString = recElement.getSourceNodeProperty(SAPNodeProperties.iteration);
-                int iteration = Integer.parseInt(iterationString);
-
-                if (iteration == 0 && (!creator.equals("SAP"))) {
-                    originSet.add(element);
-                } else if (iteration >= 1 && (!creator.equals("SAP"))) {
-                    customCode.add(element);
-                } else {
-                    standardCode.add(element);
-                }
+            if (iteration == 0 && (!creator.equals("SAP"))) {
+                originSet.add(element);
+            } else if (iteration >= 1 && (!creator.equals("SAP"))) {
+                customCode.add(element);
+            } else {
+                standardCode.add(element);
             }
         }
 
