@@ -106,11 +106,7 @@ public class MetropolisLayouter {
     }
 
     private boolean isDistrictEmpty(CityElement district) {
-        if (district.getSubElements().isEmpty()) {
-            return true;
-        } else {
-            return false;
-        }
+        return district.getSubElements().isEmpty();
     }
 
     private void layoutEmptyDistrict(CityElement district) {
