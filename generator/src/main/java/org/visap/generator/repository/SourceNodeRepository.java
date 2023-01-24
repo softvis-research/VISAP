@@ -260,9 +260,7 @@ public class SourceNodeRepository {
             Map<Long, Node> nodeIDMap = nodesByLabel.get(label);
 
             Long nodeID = node.id();
-            if (!nodeIDMap.containsValue(nodeID)) {
-                nodeIDMap.put(nodeID, node);
-            }
+            nodeIDMap.putIfAbsent(nodeID, node);
         });
     }
 
