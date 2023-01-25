@@ -79,3 +79,11 @@ Alternatively, disable caching in your browser entirely. In Chrome, open the Dev
 The development team actively uses and maintains https://miro.com/app/board/uXjVOGFnA-M=/ for project coordination and documentation. The Miro board also includes instructions for installation and usage. Access requests will generally be accepted. Most documentation is currently available in German only.
 
 If you need help or have any suggestions, we appreciate your interest in the project, and hope you will file an issue or message the contributors directly.
+
+## Coding Standards
+
+Both Java and JavaScript code roughly follow [1TBS formatting](https://en.wikipedia.org/wiki/Indentation_style#Variant:_1TBS_(OTBS)). Single lines of whitespace can be used to separate logical units in code blocks and source files, but should be minimized when not needed.
+
+JavaScript code is indented with tabs. No concessions need to be made for compatibility with older browsers, as such modern JS features are recommended to be used where applicable. Thius includes using ``let`` and ``const`` over ``var`` where possible.
+
+Java code is indented with 4 spaces. Features up to relatively recent Java versions are fair game, but check with people before pushing the current minimum version requirements (under [Compiling the Generator](README.md#compiling-the-generator)).
