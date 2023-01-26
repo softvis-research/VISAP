@@ -70,13 +70,11 @@ public class MetropolisLayouter {
 
         if (Config.Visualization.Metropolis.district.layoutType() == LayoutType.CIRCULAR) {
             AElementArranger arranger = new AElementArranger();
-            List<List<CityElement>> listOfSets = arranger.constructElementSets(districts);
+            List<List<CityElement>> codeSets = arranger.constructElementSets(districts);
+            List<CityElement> originSet = codeSets.get(0);
+            codeSets.remove(0);
 
-            List<CityElement> originSet = listOfSets.get(0);
-            List<CityElement> customCode = listOfSets.get(1);
-            List<CityElement> standardCode = listOfSets.get(2);
-
-            DistrictCircularLayout districtCircularLayout = new DistrictCircularLayout(virtualRootDistrict, districts, originSet, customCode, standardCode);
+            DistrictCircularLayout districtCircularLayout = new DistrictCircularLayout(virtualRootDistrict, districts, originSet, codeSets);
             districtCircularLayout.calculate();
         } else {
             DistrictLightMapLayout districtLightMapLayout = new DistrictLightMapLayout(virtualRootDistrict, districts);

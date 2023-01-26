@@ -14,18 +14,16 @@ public class DistrictCircularLayout {
     private final CityElement district;
     private final Collection<CityElement> subElements;
     private final List<CityElement> originSet;
-    private final List<CityElement> customCode;
-    private final List<CityElement> standardCode;
+    private final List<List<CityElement>> additionalCodeSets;
 
     private final Map<CityRectangle, CityElement> rectangleElementsMap;
 
-    public DistrictCircularLayout(CityElement district, Collection<CityElement> subElements, List<CityElement> originSet, List<CityElement> customCode, List<CityElement> standardCode) {
+    public DistrictCircularLayout(CityElement district, Collection<CityElement> subElements, List<CityElement> originSet, List<List<CityElement>> additionalCodeSets) {
         this.district = district;
         this.subElements = subElements;
 
         this.originSet = originSet;
-        this.customCode = customCode;
-        this.standardCode = standardCode;
+        this.additionalCodeSets = additionalCodeSets;
 
         rectangleElementsMap = new HashMap<>();
     }
@@ -145,11 +143,11 @@ public class DistrictCircularLayout {
                 updateCovrec(fitNode, covrec);
             }
         }
-
-        List<CityRectangle> customCodeRectangles = createCityRectanglesOfElements(customCode);
-        arrangeDistrictsCircular(customCodeRectangles, covrec);
-        List<CityRectangle> standardCodeRectangles = createCityRectanglesOfElements(standardCode);
-        arrangeDistrictsCircular(standardCodeRectangles, covrec);
+        
+        for (List<CityElement> set : additionalCodeSets) {
+            List<CityRectangle> additionalCodeRectangles = createCityRectanglesOfElements(set);
+            arrangeDistrictsCircular(additionalCodeRectangles, covrec);
+        }
 
         return covrec; // used to adjust viewpoint in x3d
     }
