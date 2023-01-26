@@ -294,5 +294,4 @@ public class CityElement {
     public String getAframeProperty() {
         return aframeProperty;
     }
-
 }

@@ -8,6 +8,7 @@ import org.visap.generator.metaphors.metropolis.layouts.DistrictCircularLayout;
 import org.visap.generator.metaphors.metropolis.layouts.DistrictLightMapLayout;
 import org.visap.generator.metaphors.metropolis.layouts.StackLayout;
 import org.visap.generator.metaphors.metropolis.layouts.enums.LayoutType;
+import org.visap.generator.abap.AElementArranger;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.repository.CityElement;
 import org.visap.generator.repository.CityRepository;
@@ -68,7 +69,14 @@ public class MetropolisLayouter {
         CityElement virtualRootDistrict = new CityElement(CityElement.CityType.District);
 
         if (Config.Visualization.Metropolis.district.layoutType() == LayoutType.CIRCULAR) {
-            DistrictCircularLayout districtCircularLayout = new DistrictCircularLayout(virtualRootDistrict, districts);
+            AElementArranger arranger = new AElementArranger();
+            List<List<CityElement>> listOfSets = arranger.constructElementSets(districts);
+
+            List<CityElement> originSet = listOfSets.get(0);
+            List<CityElement> customCode = listOfSets.get(1);
+            List<CityElement> standardCode = listOfSets.get(2);
+
+            DistrictCircularLayout districtCircularLayout = new DistrictCircularLayout(virtualRootDistrict, districts, originSet, customCode, standardCode);
             districtCircularLayout.calculate();
         } else {
             DistrictLightMapLayout districtLightMapLayout = new DistrictLightMapLayout(virtualRootDistrict, districts);
