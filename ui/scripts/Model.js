@@ -73,21 +73,12 @@ var model = (function () {
 					entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
 					break;
 
-				case "Reference":
-					entity.rcData = splitByCommaIfNotEmpty(element.rcData);
-					break;
-
 				case "Class":
 				case "Interface":
 					entity.superTypes = splitByCommaIfNotEmpty(element.subClassOf);
 					entity.subTypes = splitByCommaIfNotEmpty(element.superClassOf);
 					entity.reaches = splitByCommaIfNotEmpty(element.reaches);
 					entity.reachedBy = [];
-					break;
-
-				case "ParameterizableClass":
-					entity.superTypes = splitByCommaIfNotEmpty(element.subClassOf);
-					entity.subTypes = splitByCommaIfNotEmpty(element.superClassOf);
 					break;
 
 				case "Attribute":
@@ -123,16 +114,6 @@ var model = (function () {
 					entity.numberOfStatements = element.number_of_statements;
 					break;
 
-				case "Function":
-					entity.signature = element.signature;
-					entity.qualifiedName = element.qualifiedName;
-					entity.calls = splitByCommaIfNotEmpty(element.calls);
-					entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
-					entity.accesses = splitByCommaIfNotEmpty(element.accesses);
-					entity.dependsOn = element.dependsOn;
-					entity.filename = element.filename;
-					break;
-
 				case "FunctionModule":
 				case "Report":
 				case "FormRoutine":
@@ -143,18 +124,6 @@ var model = (function () {
 
 				case "Variable":
 					entity.accessedBy = splitByCommaIfNotEmpty(element.accessedBy);
-					entity.dependsOn = element.dependsOn;
-					entity.filename = element.filename;
-					break;
-
-				case "TranslationUnit":
-					entity.filename = element.filename;
-					break;
-
-				case "Struct":
-				case "Union":
-				case "Enum":
-				case "EnumValue":
 					entity.dependsOn = element.dependsOn;
 					entity.filename = element.filename;
 					break;
@@ -256,26 +225,11 @@ var model = (function () {
 					entity.reaches.forEach(reachedEntity => reachedEntity.reachedBy.push(entity));
 					break;
 
-				case "ParameterizableClass":
-					replaceIdsWithReferences(entity, 'superTypes');
-					replaceIdsWithReferences(entity, 'subTypes');
-					break;
-
 				case "Attribute":
 					replaceIdsWithReferences(entity, 'accessedBy');
 					break;
 
 				case "Method":
-					replaceIdsWithReferences(entity, 'calls');
-					replaceIdsWithReferences(entity, 'calledBy');
-					replaceIdsWithReferences(entity, 'accesses');
-					break;
-
-				case "Reference":
-					replaceIdsWithReferences(entity, 'rcData');
-					break;
-
-				case "Function":
 					replaceIdsWithReferences(entity, 'calls');
 					replaceIdsWithReferences(entity, 'calledBy');
 					replaceIdsWithReferences(entity, 'accesses');
