@@ -147,18 +147,17 @@ public class DistrictCircularLayout {
         }
 
         List<CityRectangle> customCodeRectangles = createCityRectanglesOfElements(customCode);
-        Collections.sort(customCodeRectangles);
-        Collections.reverse(customCodeRectangles);
         arrangeDistrictsCircular(customCodeRectangles, covrec);
         List<CityRectangle> standardCodeRectangles = createCityRectanglesOfElements(standardCode);
-        Collections.sort(standardCodeRectangles);
-        Collections.reverse(standardCodeRectangles);
         arrangeDistrictsCircular(standardCodeRectangles, covrec);
 
         return covrec; // used to adjust viewpoint in x3d
     }
 
     private void arrangeDistrictsCircular(List<CityRectangle> elements, CityRectangle covrec) {
+        Collections.sort(elements);
+        Collections.reverse(elements);
+        
         double covrecRadius = covrec.getPerimeterRadius()
                 + Config.Visualization.Metropolis.district.horizontalBuildingGap();
         LayoutVersion version = Config.Visualization.Metropolis.district.layoutVersion();
