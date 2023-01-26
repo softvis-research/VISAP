@@ -63,7 +63,7 @@ inside the UI folder.
 ### View in the browser
 
 Whichever approach for setting up a local server you used, if things went well, you should now be able to view the visualization in the browser.
-Enter the URL {localhost}/index.html?setup={setupPath}&model={folderName}, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder inside which you created the ``model/`` subfolder. Instead of the folder you created yourself, you can also use ``Example``. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is minimal/hover.
+Enter the URL ``{localhost}/index.html?setup={setupPath}&model={folderName}``, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder inside which you created the ``model/`` subfolder. Instead of the folder you created yourself, you can also use ``Example``. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is minimal/hover.
 
 When using NPM live-server, our complete URL might be http://127.0.0.1:8080/index.html?setup=minimal/hover&model=Example. When using XAMPP, it might be http://localhost/index.html?setup=minimal/hover&model=Example instead.
 
@@ -88,6 +88,6 @@ If you need help or have any suggestions, we appreciate your interest in the pro
 
 Both Java and JavaScript code roughly follow [1TBS formatting](https://en.wikipedia.org/wiki/Indentation_style#Variant:_1TBS_(OTBS)). Single lines of whitespace can be used to separate logical units in code blocks and source files, but should be minimized when not needed.
 
-JavaScript code is indented with tabs. No concessions need to be made for compatibility with older browsers, as such modern JS features are recommended to be used where applicable. This includes using ``let`` and ``const`` over ``var`` where possible.
+JavaScript code is indented with tabs. No concessions need to be made for compatibility with older browsers. As such, modern JS features are recommended to be used where applicable. This includes using ``let`` and ``const`` over ``var`` where possible.
 
 Java code is indented with 4 spaces. Features up to relatively recent Java versions are fair game, but check with people before pushing the current minimum version requirements (under [Compiling the Generator](README.md#compiling-the-generator)).
