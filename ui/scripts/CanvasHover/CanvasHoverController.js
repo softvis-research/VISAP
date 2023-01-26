@@ -1,26 +1,19 @@
 var canvasHoverController = (function () {
 
-	var isInNavigation = false;
-
-	function initialize(setupConfig) {
-		application.transferConfigParams(setupConfig, controllerConfig);
-		var cssLink = document.createElement("link");
-		cssLink.type = "text/css";
-		cssLink.rel = "stylesheet";
-		cssLink.href = "scripts/CanvasHover/ho.css";
-		document.getElementsByTagName("head")[0].appendChild(cssLink);
-	}
-
 	//config parameters
-	var controllerConfig = {
+	const controllerConfig = {
 		hoverColor: "darkred",
 		showQualifiedName: false,
 		showVersion: false,
-		showIssues: false
 	};
 
-	function activate() {
 
+	function initialize(setupConfig) {
+		application.transferConfigParams(setupConfig, controllerConfig);
+		application.loadCSS("scripts/CanvasHover/ho.css");
+	}
+
+	function activate() {
 		actionController.actions.mouse.hover.subscribe(handleOnMouseEnter);
 		actionController.actions.mouse.unhover.subscribe(handleOnMouseLeave);
 
@@ -31,10 +24,10 @@ var canvasHoverController = (function () {
 	}
 
 	function reset() {
-		var hoveredEntities = events.hovered.getEntities();
+		const hoveredEntities = events.hovered.getEntities();
 
 		hoveredEntities.forEach(function (hoveredEntity) {
-			var unHoverEvent = {
+			const unHoverEvent = {
 				sender: canvasHoverController,
 				entities: [hoveredEntity]
 			};
@@ -44,66 +37,33 @@ var canvasHoverController = (function () {
 	}
 
 	function createTooltipContainer() {
+		const canvas = document.getElementById("canvas");
 
-		var canvas = document.getElementById("canvas");
-
-		var tooltipDivElement = document.createElement("DIV");
-		tooltipDivElement.id = "tooltip";
-
-		var namePElement = document.createElement("P");
-		namePElement.id = "tooltipName";
-		tooltipDivElement.appendChild(namePElement);
-
+		const tooltipDivElement = application.createDiv("tooltip");
+		createParagraphAsChildOf(tooltipDivElement, "tooltipName");
 		if (controllerConfig.showQualifiedName) {
-			var qualifiedNamePElement = document.createElement("P");
-			qualifiedNamePElement.id = "tooltipQualifiedName";
-			tooltipDivElement.appendChild(qualifiedNamePElement);
+			createParagraphAsChildOf(tooltipDivElement, "tooltipQualifiedName");
 		}
-
 		if (controllerConfig.showVersion) {
-			var versionPElement = document.createElement("P");
-			versionPElement.id = "tooltipVersion";
-			tooltipDivElement.appendChild(versionPElement);
-		}
-		if (controllerConfig.showIssues) {
-			var openIssuesPElement = document.createElement("P");
-			openIssuesPElement.id = "tooltipOpenIssues";
-			tooltipDivElement.appendChild((openIssuesPElement));
-
-			var closedIssuesPElement = document.createElement("P");
-			closedIssuesPElement.id = "tooltipClosedIssues";
-			tooltipDivElement.appendChild((closedIssuesPElement));
-
-			var openSecurityIssuesPElement = document.createElement("P");
-			openSecurityIssuesPElement.id = "tooltipOpenSecurityIssues";
-			tooltipDivElement.appendChild((openSecurityIssuesPElement));
-
-			var closedSecurityIssuesPElement = document.createElement("P");
-			closedSecurityIssuesPElement.id = "tooltipClosedSecurityIssues";
-			tooltipDivElement.appendChild((closedSecurityIssuesPElement));
+			createParagraphAsChildOf(tooltipDivElement, "tooltipVersion");
 		}
 		canvas.appendChild(tooltipDivElement);
 	}
 
-	function handleOnMousedown(canvasEvent) {
-		isInNavigation = true;
-	}
-
-	function handleOnMouseup(canvasEvent) {
-		isInNavigation = false;
+	function createParagraphAsChildOf(parentElement, paragraphId) {
+		const paragraph = document.createElement("P");
+		paragraph.id = paragraphId;
+		parentElement.appendChild(paragraph);
+		return paragraph;
 	}
 
 	function handleOnMouseEnter(eventObject) {
-		if (isInNavigation) {
-			return;
-		}
-
-		var entity = model.getEntityById(eventObject.target.id);
+		const entity = model.getEntityById(eventObject.target.id);
 		if (entity === undefined) {
 			return;
 		}
 
-		var applicationEvent = {
+		const applicationEvent = {
 			sender: canvasHoverController,
 			entities: [entity],
 			posX: eventObject.layerX,
@@ -113,27 +73,25 @@ var canvasHoverController = (function () {
 	}
 
 	function handleOnMouseLeave(eventObject) {
-		var entity = model.getEntityById(eventObject.target.id);
+		const entity = model.getEntityById(eventObject.target.id);
 		if (entity === undefined) {
 			return;
 		}
 
-		var applicationEvent = {
+		const applicationEvent = {
 			sender: canvasHoverController,
 			entities: [entity]
 		};
-
 		events.hovered.off.publish(applicationEvent);
 	}
 
 	function onEntityHover(applicationEvent) {
-		var entity = applicationEvent.entities[0];
+		const entity = applicationEvent.entities[0];
 
 		if (entity === undefined) {
 			events.log.error.publish({ text: "Entity is not defined" });
 		}
-
-		if (entity.isTransparent === true) {
+		if (entity.isTransparent) {
 			return;
 		}
 
@@ -141,7 +99,6 @@ var canvasHoverController = (function () {
 		if (!entityIsVisible) {
 			return;
 		}
-
 		if (entity.type === "text") {
 			return;
 		}
@@ -156,65 +113,36 @@ var canvasHoverController = (function () {
 		if(controllerConfig.showVersion) {
 			$("#tooltipVersion").text("Version: " + entity.version);
 		}
-		if(controllerConfig.showIssues) {
-			let openIssuesSelector = $('#tooltipOpenIssues');
-			let closedIssuesSelector = $('#tooltipClosedIssues');
-			let openSecurityIssuesSelector = $('#tooltipOpenSecurityIssues');
-			let closedSecurityIssuesSelector = $('#tooltipClosedSecurityIssues');
-			if (entity.type === "Namespace") {
-				openIssuesSelector.css("display", "none");
-				closedIssuesSelector.css("display", "none");
-				openSecurityIssuesSelector.css("display", "none");
-				closedSecurityIssuesSelector.css("display", "none");
-			} else {
-				openIssuesSelector.text("Open Issues: " + entity.numberOfOpenIssues);
-				closedIssuesSelector.text("Closed Issues: " + entity.numberOfClosedIssues);
-				openSecurityIssuesSelector.text("Open Security Issues: " + entity.numberOfOpenSecurityIssues);
-				closedSecurityIssuesSelector.text("Closed Security Issues: " + entity.numberOfClosedSecurityIssues);
-				openIssuesSelector.css("display", "block");
-				closedIssuesSelector.css("display", "block");
-				openSecurityIssuesSelector.css("display", "block");
-				closedSecurityIssuesSelector.css("display", "block");
-			}
-		}
 
-		var tooltip = $("#tooltip");
+		const tooltip = $("#tooltip");
 		tooltip.css("top", applicationEvent.posY + 50 + "px");
 		tooltip.css("left", applicationEvent.posX + 50 + "px");
 		tooltip.css("display", "block");
 	}
 
 	function onEntityUnhover(applicationEvent) {
-		var entity = applicationEvent.entities[0];
-
+		const entity = applicationEvent.entities[0];
 		canvasManipulator.resetColorOfEntities([entity], { name: "canvasHoverController" });
 
 		$("#tooltip").css("display", "none");
-
 	}
 
 	function getTooltipName(entity) {
-
 		if(entity.type === "Reference"){
-			return "Reference: " + entity.name;
-		}
-
-
-		if (entity.type === "Namespace") {
-			return "Package: " + entity.name;
+			return `Reference: ${entity.name}`;
+		} else if (entity.type === "Namespace") {
+			return `Package: ${entity.name}`;
 		} else {
-			var packages = entity.allParents.filter(parent => parent.type == "Namespace");
-
-			if (packages.length == 0) {
-				return entity.type + ": " + entity.name;
+			const packages = entity.allParents.filter(parent => parent.type === "Namespace");
+			if (packages.length === 0) {
+				return `${entity.type}: ${entity.name}`;
 			}
 
+			const namespace = packages[0].name;
 			if (entity.type === "Method" && entity.signature != "") {
-				return "Package: " + packages[0].name //namespace
-					+ "<br/>" + entity.type + ": " + entity.signature;
+				return `Package: ${namespace}<br/>${entity.type}: ${entity.signature}`;
 			}
-			return "Package: " + packages[0].name //namespace
-				+ "<br/>" + entity.type + ": " + entity.name;
+			return `Package: ${namespace}<br/>${entity.type}: ${entity.name}`;
 		}
 	}
 

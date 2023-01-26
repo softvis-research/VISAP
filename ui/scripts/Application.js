@@ -296,6 +296,14 @@ var application = (function () {
 		}
 	}
 
+	function loadCSS(cssPath) {
+		const cssLink = document.createElement("link");
+		cssLink.type = "text/css";
+		cssLink.rel = "stylesheet";
+		cssLink.href = cssPath;
+		document.getElementsByTagName("head")[0].appendChild(cssLink);
+	}
+
 	function mapResponseToError(response, path) {
 		throw new Error(`Error ${response.status} ${response.statusText} for ${path}`);
 	}
@@ -304,7 +312,10 @@ var application = (function () {
 	return {
 		initialize: initialize,
 		transferConfigParams: transferConfigParams,
+		loadCSS: loadCSS,
 		createPopup: createPopup,
+		createDiv: createDiv,
+		createDivAsChildOf: createDivAsChildOf,
 
 		startLoadingSetup: startLoadingSetup,
 		startLoadingMetadata: startLoadingMetadata,
