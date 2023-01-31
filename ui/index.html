@@ -7,44 +7,7 @@
 		<link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">
 
 		<script type="text/javascript">
-			
-			function checkFileExist(urlToFile) {
-    		 	xhr = new XMLHttpRequest();
-   				 xhr.open('HEAD', urlToFile, false);
-   				 xhr.send();
-     
-    			if (xhr.status == "404") {
-        			return false;
-    			} else {
-        			return true;
-    			}
-			}
-
-			// parse URL arguments
-			const searchParams = new URLSearchParams(window.location.search);
-
-			const modelName = searchParams.get('model') || 'City';
-			const modelDir = searchParams.get('srcDir') || 'model';
-			var modelRootPath = `${modelDir}/${modelName}`;
-
-			//check if Model exists - if not -> changed to example
-			if(!checkFileExist(modelRootPath)){
-				modelRootPath = `${modelDir}/example`;
-				alert("Model doesn't exists and an example is presented.")
-			}
-
-			const modelPath = `${modelRootPath}/model.html`;
-			const metadataPath = `${modelRootPath}/metaData.json`;
-			var setupName = searchParams.get('setup') || 'minimal/hover';
-
-			//check if Setup exists - if not -> change to minimal
-			if(!checkFileExist(`setups/${setupName}.js`)){
-				setupName = 'minimal/hover';
-				alert("Setup doesn't exists and got changed to minimal/hover.");
-			}
-			const setupPath = `setups/${setupName}.js`;
 			const canvasId = "aframe-canvas";
-			
 		</script>
 
 		<!--Main-->
@@ -55,6 +18,8 @@
 		<script type="text/javascript" src="libs/jqwidgets-scripts/jqxcore.js"></script>
 		<script type="text/javascript" src="libs/jqwidgets-scripts/jqxbuttons.js"></script>
 		<script type="text/javascript" src="libs/jqwidgets-scripts/jqxsplitter.js"></script>
+		<script type="text/javascript" src="libs/jqwidgets-scripts/jqxexpander.js"></script>
+		<script type="text/javascript" src="libs/jqwidgets-scripts/jqxwindow.js"></script>
 
 		<!-- orbitcam -->
 		<script type="text/javascript" src="scripts/OrbitCamera.js"></script>

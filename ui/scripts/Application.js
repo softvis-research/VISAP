@@ -3,11 +3,13 @@ $(document).ready(function () {
 });
 
 async function initializeApplication() {
+	const paths = application.getResourcePaths();
+
 	// load setup, metadata and model in parallel
 	// parsing the setup happens later, since it requires controllers to be running
-	const setupLoaded = application.startLoadingSetup(setupPath);
-	const metadataLoaded = application.startLoadingMetadata(metadataPath);
-	const modelLoaded = application.startLoadingModel(modelPath);
+	const setupLoaded = application.startLoadingSetup(paths.setupPath, paths.defaultSetupPath);
+	const metadataLoaded = application.startLoadingMetadata(paths.metadataPath, paths.defaultMetadataPath);
+	const modelLoaded = application.startLoadingModel(paths.modelPath, paths.defaultModeLPath);
 
 	try {
 		await Promise.all([setupLoaded, metadataLoaded, modelLoaded]);
@@ -78,31 +80,58 @@ var application = (function () {
 		}
 	}
 
-	async function startLoadingSetup(setupPath) {
+	function getResourcePaths() {
+		// parse URL arguments
+		const searchParams = new URLSearchParams(window.location.search);
+
+		const defaultModelName = 'example';
+		const defaultModelDir = 'model';
+		const defaultSetupName = 'minimal/hover';
+
+		const modelName = searchParams.get('model') || defaultModelName;
+		const modelDir = searchParams.get('srcDir') || defaultModelDir;
+		const setupName = searchParams.get('setup') || defaultSetupName;
+
+		return {
+			modelPath: `${modelDir}/${modelName}/model.html`,
+			metadataPath: `${modelDir}/${modelName}/metaData.json`,
+			setupPath: `setups/${setupName}.js`,
+
+			defaultModeLPath: `${defaultModelDir}/${defaultModelName}/model.html`,
+			defaultMetadataPath: `${defaultModelDir}/${defaultModelName}/metaData.json`,
+			defaultSetupPath: `setups/${defaultSetupName}.js`,
+		};
+	}
+
+	async function startLoadingSetup(setupPath, defaultSetupPath) {
 		return new Promise(
-				(resolve) => $.getScript(setupPath, resolve).fail((response) => mapResponseToError(response, setupPath))
-			).then(() => {
+				(resolve, reject) => $.getScript(setupPath, resolve).fail(reject)
+			).catch(response => {
+				const errorMessage = "Failed to load setup: " + mapResponseToErrorMessage(response, setupPath) + "\n" + "Loading default setup instead.";
+				alert(errorMessage);
+				return new Promise(
+					(resolve, reject) => $.getScript(defaultSetupPath, resolve).fail(reject)
+				);
+			}).then(() => {
 				if (!window.setup) {
 					throw new Error("No setup definition found!");
 				} else if (setup.loadPopUp) {
-					const loadPopup = application.createPopup("Load Visualization", "Visualization is loading...", "RootLoadPopUp");
-					document.body.appendChild(loadPopup);
-					$("#RootLoadPopUp").jqxWindow({
-						theme: "metro",
-						width: 200,
-						height: 200,
-						isModal: true,
-						autoOpen: true,
-						resizable: false
-					});
+					application.createModalPopup("Load Visualization", "Visualization is loading...", "RootLoadPopUp");
 				}
 		});
 	}
 
-	async function startLoadingMetadata(metadataPath) {
+	async function startLoadingMetadata(metadataPath, defaultMetadataPath) {
 		return fetch(encodeURI(metadataPath))
-			.then(response => {
-				if (!response.ok) mapResponseToError(response, metadataPath);
+			.then((response) => {
+				if (!response.ok) throw new Error(response);
+				return response;
+			}).catch(response => {
+				const errorMessage = "Failed to load metadata: " + mapResponseToErrorMessage(response, metadataPath) + "\n" + "Loading default metadata instead.";
+				alert(errorMessage);
+				return fetch(encodeURI(defaultMetadataPath));
+			}).then(response => {
+				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultMetadataPath));
 				else return response.json();
 			}).then(metadataJson => {
 				model.initialize();
@@ -110,10 +139,17 @@ var application = (function () {
 		});
 	}
 
-	async function startLoadingModel(modelPath) {
+	async function startLoadingModel(modelPath, defaultModeLPath) {
 		return fetch(encodeURI(modelPath))
-			.then(response => {
-				if (!response.ok) mapResponseToError(response, modelPath);
+			.then((response) => {
+				if (!response.ok) throw new Error(response);
+				return response;
+			}).catch(response => {
+				const errorMessage = "Failed to load model: " + mapResponseToErrorMessage(response, modelPath) + "\n" + "Loading default model instead.";
+				alert(errorMessage);
+				return fetch(encodeURI(defaultModeLPath));
+			}).then(response => {
+				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultModeLPath));
 				else return response.text();
 			}).then(modelHtml => {
 				$("#canvas").append(modelHtml);
@@ -255,7 +291,7 @@ var application = (function () {
 		};
 	}
 
-	function createPopup(title, text, popupId) {
+	function createModalPopup(title, text, popupId) {
 		const popupWindow = createDiv(popupId);
 		const popupTitle = createDivAsChildOf(popupWindow);
 		popupTitle.innerHTML = title;
@@ -263,7 +299,15 @@ var application = (function () {
 		const popupText = createDivAsChildOf(popupContent);
 		popupText.innerHTML = text;
 
-		return popupWindowDiv;
+		document.body.appendChild(popupWindow);
+		$("#" + popupId).jqxWindow({
+			theme: "metro",
+			width: 200,
+			height: 200,
+			isModal: true,
+			autoOpen: true,
+			resizable: false
+		});
 	}
 
 	function createDivAsChildOf(parent, newDivId) {
@@ -304,16 +348,17 @@ var application = (function () {
 		document.getElementsByTagName("head")[0].appendChild(cssLink);
 	}
 
-	function mapResponseToError(response, path) {
-		throw new Error(`Error ${response.status} ${response.statusText} for ${path}`);
+	function mapResponseToErrorMessage(response, path) {
+		return `Error ${response.status} ${response.statusText} for ${path}`;
 	}
 
 
 	return {
 		initialize: initialize,
+		getResourcePaths: getResourcePaths,
 		transferConfigParams: transferConfigParams,
 		loadCSS: loadCSS,
-		createPopup: createPopup,
+		createModalPopup: createModalPopup,
 		createDiv: createDiv,
 		createDivAsChildOf: createDivAsChildOf,
 
