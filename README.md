@@ -63,9 +63,9 @@ inside the UI folder.
 ### View in the browser
 
 Whichever approach for setting up a local server you used, if things went well, you should now be able to view the visualization in the browser.
-Enter the URL ``{localhost}/index.html?setup={setupPath}&model={folderName}``, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder inside which you created the ``model/`` subfolder. Instead of the folder you created yourself, you can also use ``Example``. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is minimal/hover.
+Enter the URL ``{localhost}/index.html?setup={setupPath}&model={folderName}``, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder inside which you created the ``model/`` subfolder. Instead of the folder you created yourself, you can also use ``Example``. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is ``minimal``.
 
-When using NPM live-server, our complete URL might be http://127.0.0.1:8080/index.html?setup=minimal/hover&model=Example. When using XAMPP, it might be http://localhost/index.html?setup=minimal/hover&model=Example instead.
+When using NPM live-server, our complete URL might be http://127.0.0.1:8080/index.html?setup=minimal&model=Example. When using XAMPP, it might be http://localhost/index.html?setup=minimal&model=Example instead.
 
 The visualization will look similar to this:
 

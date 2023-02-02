@@ -32,6 +32,10 @@ async function initializeApplication() {
 
 var application = (function () {
 
+	const defaultModelName = 'example';
+	const defaultModelDir = 'model';
+	const defaultSetupName = 'minimal';
+
 	let controllers = new Map();
 	let controllerDivs = new Map();
 	let uiConfig = null;
@@ -83,11 +87,6 @@ var application = (function () {
 	function getResourcePaths() {
 		// parse URL arguments
 		const searchParams = new URLSearchParams(window.location.search);
-
-		const defaultModelName = 'example';
-		const defaultModelDir = 'model';
-		const defaultSetupName = 'minimal/hover';
-
 		const modelName = searchParams.get('model') || defaultModelName;
 		const modelDir = searchParams.get('srcDir') || defaultModelDir;
 		const setupName = searchParams.get('setup') || defaultSetupName;
