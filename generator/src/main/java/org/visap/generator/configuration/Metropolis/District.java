@@ -22,10 +22,10 @@ public interface District extends Config {
     @DefaultValue("0.2")
     double emptyDistrictHeight();
 
-    @DefaultValue("0.2")
+    @DefaultValue("3.0")
     double emptyDistrictLength();
 
-    @DefaultValue("0.2")
+    @DefaultValue("3.0")
     double emptyDistrictWidth();
 
     @DefaultValue("CIRCULAR")
