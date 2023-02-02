@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 public class AMetaDataMap {
     private static final Map<String, String> metaDataProperties;
-    private static final List<String> nodesWithUsesRelationByType;
+    private static final List<String> nodesWithReferencesRelationByType;
     private static final List<String> nodesWithInheritRelationByType;
     private static final List<String> nodesWithMigrationRelationByType;
 
@@ -27,8 +27,8 @@ public class AMetaDataMap {
         metaDataProperties.put(SAPNodeProperties.number_of_statements.name(), "number_of_statements");
         metaDataProperties.put(SAPNodeProperties.local_class.name(), "local_class");
 
-        // Elements, for which we want to show USES relation
-        nodesWithUsesRelationByType = Arrays.asList(
+        // Elements, for which we want to show REFERENCES relation
+        nodesWithReferencesRelationByType = Arrays.asList(
                 "METH",
                 "FUNC",
                 "REPS",
@@ -62,7 +62,7 @@ public class AMetaDataMap {
     }
 
     public static List<String> getNodesWithReferencesRelationByType() {
-        return nodesWithUsesRelationByType;
+        return nodesWithReferencesRelationByType;
     }
 
     public static List<String> getNodesWithInheritRelationByType() {

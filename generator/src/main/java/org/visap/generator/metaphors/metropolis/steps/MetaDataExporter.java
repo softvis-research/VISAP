@@ -154,7 +154,7 @@ public class MetaDataExporter {
             builder.append("\"belongsTo\": \"" + element.getParentElement().getHash() + "\",\n");
         }
 
-        // Add USES and INHERIT relations
+        // Add REFERENCES and INHERIT relations
         String nodeType = node.get("type").asString();
         if (AMetaDataMap.getNodesWithReferencesRelationByType().contains(nodeType)) {
             builder.append("\"calls\": \"" + getRelations(node, SAPRelationLabels.REFERENCES, true) + "\",\n");

@@ -29,12 +29,10 @@ public class AFrameExporterStep {
         nodeRepository = new SourceNodeRepository();
         nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
-        nodeRepository.loadNodesByRelation(SAPRelationLabels.USES, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.TYPEOF, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.REFERENCES, true);
-        // nodeRepository.loadNodesByRelation(SAPRelationLabels.INHERIT, true);
-
+        
         cityRepository = new CityRepository();
 
         Scanner userInput = new Scanner(System.in);

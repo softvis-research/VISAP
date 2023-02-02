@@ -33,22 +33,21 @@ public class CityElement {
     }
 
     public enum CityType {
-        District, Building, Floor, Chimney
-
+        District, Building,
     }
 
     public enum CitySubType {
         Class, Report, FunctionGroup,
 
         // additional subTypes for metropolis
-        Interface
+        Interface,
     }
 
     public enum CityShape {
         Box, Cylinder, Cone,
 
         // alternative shapes
-        Sphere, Ring, Plane, Circle, Tetrahedron, Entity
+        Sphere, Ring, Plane, Circle, Tetrahedron, Entity,
     }
 
     private String hash;

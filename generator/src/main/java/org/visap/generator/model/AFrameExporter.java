@@ -114,14 +114,6 @@ public class AFrameExporter {
     private String createAFrameRepositoryExport() {
         StringBuilder builder = new StringBuilder();
 
-        Collection<CityElement> floors = repository.getElementsByType(CityElement.CityType.Floor);
-        builder.append(createElementsExport(floors));
-
-        if (aframeOutput.equals("acity_AFrame")) {
-            Collection<CityElement> chimneys = repository.getElementsByType(CityElement.CityType.Chimney);
-            builder.append(createElementsExport(chimneys));
-        }
-
         Collection<CityElement> buildings = repository.getElementsByType(CityElement.CityType.Building);
         builder.append(createElementsExport(buildings));
 

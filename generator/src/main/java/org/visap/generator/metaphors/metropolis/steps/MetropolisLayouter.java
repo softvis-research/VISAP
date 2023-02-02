@@ -24,8 +24,7 @@ public class MetropolisLayouter {
     public MetropolisLayouter(CityRepository cityRepository, SourceNodeRepository sourceNodeRepository) {
         repository = cityRepository;
 
-        log.info(
-                "*****************************************************************************************************************************************");
+        log.info("*****************************************************************************************************************************************");
         log.info("created");
     }
 
@@ -39,7 +38,6 @@ public class MetropolisLayouter {
         Collection<CityElement> packageDistricts = repository.getElementsByTypeAndSourceProperty(
                 CityElement.CityType.District, SAPNodeProperties.type_name, "Namespace");
         layoutDistricts(packageDistricts);
-
     }
 
     private void layoutBuildings(Collection<CityElement> buildings) {

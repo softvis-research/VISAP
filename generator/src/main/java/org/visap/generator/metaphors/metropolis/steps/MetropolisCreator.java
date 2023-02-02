@@ -37,24 +37,6 @@ public class MetropolisCreator {
         deleteEmptyDistricts();
     }
 
-    private Collection<CityElement> getUsesElementsBySourceNode(SourceNodeRepository nodeRepository, Node node) {
-        Collection<Node> usesNodes = nodeRepository.getRelatedNodes(node, SAPRelationLabels.USES, true);
-        if (usesNodes.isEmpty()) {
-            return new TreeSet<>();
-        }
-
-        List<CityElement> usesElements = new ArrayList<>();
-        for (Node usesNode : usesNodes) {
-            Long usesNodeID = usesNode.id();
-            CityElement usesElement = repository.getElementBySourceID(usesNodeID);
-            if (usesElement == null) {
-                continue;
-            }
-            usesElements.add(usesElement);
-        }
-        return usesElements;
-    }
-
     private void createAllMetropolisElements(SourceNodeRepository nodeRepository) {
         Map<SAPNodeTypes, List<CityElement.CityType>> typeMapping = Map.of(
                 SAPNodeTypes.Namespace, List.of(CityElement.CityType.District),
@@ -86,7 +68,6 @@ public class MetropolisCreator {
         log.info(cityElements.size() + " CityElement with type \"" + cityType.name() + "\" loaded");
 
         long relationCounter = 0;
-        long relationCounterUsesRelation = 0;
 
         for (CityElement element : cityElements) {
             Node sourceNode = element.getSourceNode();
@@ -123,40 +104,9 @@ public class MetropolisCreator {
                 childElement.setParentElement(element);
                 relationCounter++;
             }
-
-            // for uses-relation
-            Node sourceNodeDistrict = element.getSourceNode();
-            Collection<CityElement> usesElements = getUsesElementsBySourceNode(nodeRepository, sourceNodeDistrict);
-
-            for (CityElement usesElement : usesElements) {
-                if (usesElement.getSourceNodeProperty(SAPNodeProperties.local_class).equals("true")) {
-                    String elementID = element.getSourceNodeProperty(SAPNodeProperties.element_id);
-                    String usesID = usesElement.getSourceNodeProperty(SAPNodeProperties.uses_id);
-
-                    if (elementID.equals(usesID)) {
-                        element.addSubElement(usesElement);
-                        usesElement.setParentElement(element);
-                        relationCounterUsesRelation++;
-                    }
-                } else if (usesElement.getSourceNodeType() == SAPNodeTypes.Attribute) {
-                    String elementID = element.getSourceNodeProperty(SAPNodeProperties.element_id);
-                    String usesID = usesElement.getSourceNodeProperty(SAPNodeProperties.uses_id);
-
-                    if (element.getSourceNodeType() == SAPNodeTypes.Report) {
-                        if (elementID.equals(usesID)) {
-                            element.addSubElement(usesElement);
-                            usesElement.setParentElement(element);
-                            relationCounterUsesRelation++;
-                        }
-                    }
-                } else {
-                    repository.deleteElement(usesElement); // atm only for local classes, attributes are deleted
-                }
-            }
         }
 
         log.info(relationCounter + " childRelations for relation \"CONTAINS\" created");
-        log.info(relationCounterUsesRelation + " usesRelations for relation \"USES\" created");
     }
 
     private void createMetropolisRelationsForIdenticalNodes(SourceNodeRepository nodeRepository, Node sourceNode,

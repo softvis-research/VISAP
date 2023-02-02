@@ -136,21 +136,9 @@ public class CityRepository {
                 "*****************************************************************************************************************************************");
 
         AtomicInteger cityBuildingCounter = new AtomicInteger(0);
-        AtomicInteger cityFloorCounter = new AtomicInteger(0);
-        AtomicInteger cityChimneyCounter = new AtomicInteger(0);
         AtomicInteger cityDistrictCounter = new AtomicInteger(0);
 
         elementsByHash.forEach((id, element) -> {
-            // TODO Node mit Hash bereits in Neo4J vorhanden? -> Update der Properties
-
-            /*
-             * if (element.getSourceNode().id() != 0){
-             * connector.executeWrite("MATCH (n:Elements) WHERE ID(n) = " +
-             * element.getNodeID() + " SET  n.properties = {" + getACityProperties(element)
-             * + "}") ;
-             * }
-             */
-
             Long aCityNodeID = connector
                     .addNode("CREATE ( n:Elements:ACityRep { " + getACityProperties(element) + "})", "n").id();
 
@@ -160,21 +148,13 @@ public class CityRepository {
                 case Building:
                     cityBuildingCounter.getAndAdd(1);
                     break;
-                case Floor:
-                    cityFloorCounter.getAndAdd(1);
-                    break;
-                case Chimney:
-                    cityChimneyCounter.getAndAdd(1);
-                    break;
                 case District:
                     cityDistrictCounter.getAndAdd(1);
                     break;
             }
         });
 
-        log.info(cityFloorCounter + " new Floors added to Neo4j");
         log.info(cityBuildingCounter + " new Buildings added to Neo4j");
-        log.info(cityChimneyCounter + " new Chimneys added to Neo4j");
         log.info(cityDistrictCounter + " new Districts added to Neo4j");
 
         AtomicInteger sourceRelationCounter = new AtomicInteger(0);
@@ -295,8 +275,6 @@ public class CityRepository {
         if (element.getSourceNode() != null) {
             elementsBySourceID.remove(element.getSourceNodeID(), element);
         }
-
-        // TODO Child and Parent delete
     }
 
     public void deleteElements(Collection<CityElement> elements) {

@@ -23,8 +23,7 @@ public class MetropolisDesigner {
     public MetropolisDesigner(CityRepository cityRepository, SourceNodeRepository sourceNodeRepository) {
         repository = cityRepository;
 
-        log.info(
-                "*****************************************************************************************************************************************");
+        log.info("*****************************************************************************************************************************************");
         log.info("created");
     }
 
@@ -33,9 +32,6 @@ public class MetropolisDesigner {
         designMetropolisElementsByType(CityElement.CityType.District);
 
         designMetropolisElementsByType(CityElement.CityType.Building);
-
-        designMetropolisElementsByType(CityElement.CityType.Floor);
-
     }
 
     private void designMetropolisElementsByType(CityElement.CityType cityType) {
