@@ -1,14 +1,18 @@
 controllers.events = (function() {
 
-	let events = { };
-
+	let events = {};
+	//event to listener map
+	let eventMap = new Map();
+	//event to model listener map
+	let eventModelMap = new Map();
 
 	//***************
 	//state events
 	//***************
+
 	const modelStates = controllers.model.states;
 
-	modelStates.forEach(function(stateName) {
+	for (const stateName of modelStates) {
 		let on = {
 			name : "on" + stateName.charAt(0).toUpperCase() + stateName.slice(1) + "Event",
 
@@ -49,7 +53,7 @@ controllers.events = (function() {
 				return model.getEntitiesByState(this);
 			}
 		};
-	});
+	};
 
 
 	//**************
@@ -100,7 +104,6 @@ controllers.events = (function() {
 	//**************
 
 	events.ui = {};
-
 	const buttonClick = {
 		type: "buttonClickEvent",
 
@@ -112,59 +115,12 @@ controllers.events = (function() {
 			publishEvent(this, logEvent);
 		}
 	};
-
 	events.ui.buttonClick = buttonClick;
 
-	//**************
-	//Config events
-	//**************
-
-	const configTypes = {
-		weight: { name: "weight"},
-		innerClasses: { name: "innerClasses"},
-		bundledEdges: { name: "bundledEdges"},
-		filterSettings: { name: "filterSettings"},
-		issues: { name: "issues"}
-	};
-	events.config = {};
-	const configTypeArray = Object.keys(configTypes);
-
-	configTypeArray.forEach(function(configTypeName) {
-		const configType = configTypes[configTypeName];
-
-		const config = {
-			type: "config" + configType.name.charAt(0).toUpperCase() + configType.name.slice(1) + "Event",
-
-			subscribe: function(listener) {
-				subscribeEvent(this, listener);
-			},
-
-			publish: function(logEvent) {
-				// if logging has no listeners, hard write to console
-				let eventListenerArray = eventMap.get(this);
-				if (eventListenerArray === undefined) {
-					if (logEvent.text) {
-						console.log("NO LOGGER for " + this.type + " subscribed! - " + logEvent.text);
-					} else {
-						console.log("NO LOGGER for " + this.type + " subscribed!");
-					}
-					return;
-				}
-				publishEvent(this, logEvent);
-			}
-		};
-
-		events.config[configTypeName] = config;
-	});
-
-	//event to listener map
-	let eventMap = new Map();
-	//event to model listener map
-	let eventModelMap = new Map();
 
 	function subscribeEvent(eventType, listener) {
 		if (!eventType in events) {
-			events.log.error.publish({ text: "event " + eventType.name +" not in events"});
+			events.log.error.publish({ text: "event " + eventType.name + " not in events"});
 			return;
 		}
 
@@ -188,7 +144,7 @@ controllers.events = (function() {
 
 	function unsubscribeEvent(eventType, listener) {
 		if (!eventType in events) {
-			events.log.error.publish({ text: "event " + eventType.name +" not in events"});
+			events.log.error.publish({ text: "event " + eventType.name + " not in events"});
 			return;
 		}
 
@@ -207,7 +163,7 @@ controllers.events = (function() {
 		try {
 			publishEvent(eventType, applicationEvent);
 		} catch(exception) {
-			events.log.error.publish({text: exception + "[" + exception.fileName + "-" + exception.lineNumber + "-" + exception.columnNumber + "]" });
+			events.log.error.publish({text: `${exception}[${exception.fileName}-${exception.lineNumber}-${exception.columnNumber}]` });
 		}
 	}
 
@@ -227,7 +183,7 @@ controllers.events = (function() {
 			try {
 				listener(applicationEvent);
 			} catch(exception) {
-				events.log.error.publish({text: exception + "[" + exception.fileName + "-" + exception.lineNumber + "-" + exception.columnNumber + "]" });
+				events.log.error.publish({text: `${exception}[${exception.fileName}-${exception.lineNumber}-${exception.columnNumber}]` });
 			}
 		});
 
