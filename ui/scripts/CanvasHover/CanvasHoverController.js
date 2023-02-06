@@ -1,4 +1,4 @@
-var canvasHoverController = (function () {
+controllers.canvasHoverController = (function () {
 
 	//config parameters
 	const controllerConfig = {
@@ -110,7 +110,7 @@ var canvasHoverController = (function () {
 		if (controllerConfig.showQualifiedName) {
 			$("#tooltipQualifiedName").text(entity.qualifiedName);
 		}
-		if(controllerConfig.showVersion) {
+		if (controllerConfig.showVersion) {
 			$("#tooltipVersion").text("Version: " + entity.version);
 		}
 
@@ -128,7 +128,7 @@ var canvasHoverController = (function () {
 	}
 
 	function getTooltipName(entity) {
-		if(entity.type === "Reference"){
+		if (entity.type === "Reference") {
 			return `Reference: ${entity.name}`;
 		} else if (entity.type === "Namespace") {
 			return `Package: ${entity.name}`;

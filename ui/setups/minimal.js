@@ -1,4 +1,4 @@
-﻿var setup = {
+﻿const setup = {
 	controllers: [
 		{
 			name: 	"defaultLogger",
@@ -31,7 +31,6 @@
 
 				controllers: [
 					{ name: "defaultLogger" },
-
 					{ name: "canvasHoverController" },
 				],
 			}

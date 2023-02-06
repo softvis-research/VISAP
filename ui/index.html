@@ -6,11 +6,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">
 
-		<script type="text/javascript">
-			const canvasId = "aframe-canvas";
-		</script>
-
-		<!--Main-->
+		<!-- main dependencies-->
 		<script type="text/javascript" src="libs/jquery/jquery-3.6.1.min.js"></script>
 		<script type="text/javascript" src="libs/aframe/aframe-v1.0.4.min.js"></script>
 
@@ -21,20 +17,22 @@
 		<script type="text/javascript" src="libs/jqwidgets-scripts/jqxexpander.js"></script>
 		<script type="text/javascript" src="libs/jqwidgets-scripts/jqxwindow.js"></script>
 
-		<!-- orbitcam -->
-		<script type="text/javascript" src="scripts/OrbitCamera.js"></script>
-
-		<!-- controller -->
-		<script type="text/javascript" src="scripts/CanvasHover/CanvasHoverController.js"></script>
-
-		<!--user interface-->
+		<!-- core controllers/logic -->
+		<script type="text/javascript">
+			const canvasId = "aframe-canvas";
+			const controllers = Object.create(null);
+		</script>
 		<script type="text/javascript" src="scripts/DefaultLogger.js"></script>
 		<script type="text/javascript" src="scripts/Model.js"></script>
 		<script type="text/javascript" src="scripts/Events.js"></script>
 		<script type="text/javascript" src="scripts/CanvasManipulator.js"></script>
 		<script type="text/javascript" src="scripts/ActionController.js"></script>
-
+		<script type="text/javascript" src="scripts/OrbitCamera.js"></script>
 		<script type="text/javascript" src="scripts/Application.js"></script>
+
+		<!-- optional controllers -->
+		<script type="text/javascript" src="scripts/CanvasHover/CanvasHoverController.js"></script>
+
 		<link rel="stylesheet" href="Style.css" type="text/css" />
 	</head>
 

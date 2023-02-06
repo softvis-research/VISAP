@@ -1,4 +1,10 @@
-$(document).ready(function () {
+$(function () {
+	// make all controllers accessible globally, but as read-only references
+	for (const [name, controller] of Object.entries(controllers)) {
+		Object.defineProperty(window, name, {value: controller});
+	}
+	Object.freeze(controllers);
+
 	initializeApplication();
 });
 
@@ -30,13 +36,12 @@ async function initializeApplication() {
 	}
 }
 
-var application = (function () {
+controllers.application = (function () {
 
 	const defaultModelName = 'example';
 	const defaultModelDir = 'model';
 	const defaultSetupName = 'minimal';
 
-	let controllers = new Map();
 	let controllerDivs = new Map();
 	let uiConfig = null;
 
@@ -54,16 +59,16 @@ var application = (function () {
 
 		uiConfig = setup.ui;
 
-		controllers = getControllerObjects(setup.controllers);
-		if (setup.controllers.length !== controllers.size) {
-			events.log.error.publish({ text: "One or more controllers failed to load, aborting" });
+		const unavailableControllers = setup.controllers.map(c => c.name).filter(controllerName => !controllers[controllerName]);
+		if (unavailableControllers.size > 0) {
+			events.log.error.publish({ text: "Aborting - failed to load the following controllers: " + unavailableControllers.join(', ') });
 			return;
 		}
 
 		createUiLayout();
 
 		setup.controllers.forEach((controllerSetup) => {
-			const controllerObject = controllers.get(controllerSetup.name);
+			const controllerObject = controllers[controllerSetup.name];
 			initializeController(controllerObject, controllerSetup);
 			activateController(controllerObject);
 		});
@@ -112,7 +117,7 @@ var application = (function () {
 					(resolve, reject) => $.getScript(defaultSetupPath, resolve).fail(reject)
 				);
 			}).then(() => {
-				if (!window.setup) {
+				if (!setup) {
 					throw new Error("No setup definition found!");
 				} else if (setup.loadPopUp) {
 					application.createModalPopup("Load Visualization", "Visualization is loading...", "RootLoadPopUp");
@@ -220,18 +225,6 @@ var application = (function () {
 
 
 	// controller handling
-
-	function getControllerObjects(controllerSetupArray) {
-		const controllers = new Map();
-		for (const controllerSetup of controllerSetupArray) {
-			const controllerObject = window[controllerSetup.name];
-			if (!controllerObject) {
-				events.log.error.publish({ text: "Controller " + controllerSetup.name + " not found!" });
-			}
-			controllers.set(controllerSetup.name, controllerObject);
-		}
-		return controllers;
-	}
 
 	function initializeController(controllerObject, controllerSetup) {
 		if (typeof controllerObject.initialize === 'function') {

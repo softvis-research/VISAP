@@ -1,4 +1,4 @@
-var canvasManipulator = (function () {
+controllers.canvasManipulator = (function () {
 
 	const colors = {
 		darkred: "darkred",
