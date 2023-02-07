@@ -1,6 +1,5 @@
 package org.visap.generator.metaphors.metropolis.layouts;
 
-import org.visap.generator.abap.AElementArranger;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.metaphors.metropolis.layouts.enums.LayoutVersion;
 import org.visap.generator.metaphors.metropolis.layouts.kdtree.CityKDTree;
@@ -14,12 +13,17 @@ public class DistrictCircularLayout {
     // Old coding -> Refactor, generalize and maybe reimplement
     private final CityElement district;
     private final Collection<CityElement> subElements;
+    private final List<CityElement> originSet;
+    private final List<List<CityElement>> additionalCodeSets;
 
     private final Map<CityRectangle, CityElement> rectangleElementsMap;
 
-    public DistrictCircularLayout(CityElement district, Collection<CityElement> subElements) {
+    public DistrictCircularLayout(CityElement district, Collection<CityElement> subElements, List<CityElement> originSet, List<List<CityElement>> additionalCodeSets) {
         this.district = district;
         this.subElements = subElements;
+
+        this.originSet = originSet;
+        this.additionalCodeSets = additionalCodeSets;
 
         rectangleElementsMap = new HashMap<>();
     }
@@ -92,22 +96,10 @@ public class DistrictCircularLayout {
 
         CityRectangle covrec = new CityRectangle();
 
-        List<CityRectangle> elements = createCityRectanglesOfElements(subElements);
-        Collections.sort(elements);
-        Collections.reverse(elements);
-
-        List<CityRectangle> originSet;
-        List<CityRectangle> customCode;
-        List<CityRectangle> standardCode;
-
-        AElementArranger arranger = new AElementArranger();
-        List<List<CityRectangle>> listOfSets = arranger.constructElementSets(elements, rectangleElementsMap);
-        originSet = listOfSets.get(0);
-        customCode = listOfSets.get(1);
-        standardCode = listOfSets.get(2);
+        List<CityRectangle> originRectangles = createCityRectanglesOfElements(originSet);
 
         // Light Map algorithm for the origin set
-        for (CityRectangle el : originSet) {
+        for (CityRectangle el : originRectangles) {
             Map<CityKDTreeNode, Double> preservers = new LinkedHashMap<>();
             Map<CityKDTreeNode, Double> expanders = new LinkedHashMap<>();
             CityKDTreeNode targetNode = new CityKDTreeNode();
@@ -151,14 +143,19 @@ public class DistrictCircularLayout {
                 updateCovrec(fitNode, covrec);
             }
         }
-
-        arrangeDistrictsCircular(customCode, covrec);
-        arrangeDistrictsCircular(standardCode, covrec);
+        
+        for (List<CityElement> set : additionalCodeSets) {
+            List<CityRectangle> additionalCodeRectangles = createCityRectanglesOfElements(set);
+            arrangeDistrictsCircular(additionalCodeRectangles, covrec);
+        }
 
         return covrec; // used to adjust viewpoint in x3d
     }
 
     private void arrangeDistrictsCircular(List<CityRectangle> elements, CityRectangle covrec) {
+        Collections.sort(elements);
+        Collections.reverse(elements);
+        
         double covrecRadius = covrec.getPerimeterRadius()
                 + Config.Visualization.Metropolis.district.horizontalBuildingGap();
         LayoutVersion version = Config.Visualization.Metropolis.district.layoutVersion();
@@ -180,7 +177,6 @@ public class DistrictCircularLayout {
                     elements.remove(element);
                     elements.add(0, biggestRec);
                 }
-
             }
 
             double minRadius = maxOuterRadius

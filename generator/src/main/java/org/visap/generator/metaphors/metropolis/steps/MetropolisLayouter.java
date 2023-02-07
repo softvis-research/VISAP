@@ -8,6 +8,7 @@ import org.visap.generator.metaphors.metropolis.layouts.DistrictCircularLayout;
 import org.visap.generator.metaphors.metropolis.layouts.DistrictLightMapLayout;
 import org.visap.generator.metaphors.metropolis.layouts.StackLayout;
 import org.visap.generator.metaphors.metropolis.layouts.enums.LayoutType;
+import org.visap.generator.abap.AElementArranger;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.repository.CityElement;
 import org.visap.generator.repository.CityRepository;
@@ -23,8 +24,7 @@ public class MetropolisLayouter {
     public MetropolisLayouter(CityRepository cityRepository, SourceNodeRepository sourceNodeRepository) {
         repository = cityRepository;
 
-        log.info(
-                "*****************************************************************************************************************************************");
+        log.info("*****************************************************************************************************************************************");
         log.info("created");
     }
 
@@ -38,7 +38,6 @@ public class MetropolisLayouter {
         Collection<CityElement> packageDistricts = repository.getElementsByTypeAndSourceProperty(
                 CityElement.CityType.District, SAPNodeProperties.type_name, "Namespace");
         layoutDistricts(packageDistricts);
-
     }
 
     private void layoutBuildings(Collection<CityElement> buildings) {
@@ -68,7 +67,12 @@ public class MetropolisLayouter {
         CityElement virtualRootDistrict = new CityElement(CityElement.CityType.District);
 
         if (Config.Visualization.Metropolis.district.layoutType() == LayoutType.CIRCULAR) {
-            DistrictCircularLayout districtCircularLayout = new DistrictCircularLayout(virtualRootDistrict, districts);
+            AElementArranger arranger = new AElementArranger();
+            List<List<CityElement>> codeSets = arranger.constructElementSets(districts);
+            List<CityElement> originSet = codeSets.get(0);
+            codeSets.remove(0);
+
+            DistrictCircularLayout districtCircularLayout = new DistrictCircularLayout(virtualRootDistrict, districts, originSet, codeSets);
             districtCircularLayout.calculate();
         } else {
             DistrictLightMapLayout districtLightMapLayout = new DistrictLightMapLayout(virtualRootDistrict, districts);
@@ -106,11 +110,7 @@ public class MetropolisLayouter {
     }
 
     private boolean isDistrictEmpty(CityElement district) {
-        if (district.getSubElements().isEmpty()) {
-            return true;
-        } else {
-            return false;
-        }
+        return district.getSubElements().isEmpty();
     }
 
     private void layoutEmptyDistrict(CityElement district) {

@@ -7,18 +7,6 @@
 		<link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">
 
 		<script type="text/javascript">
-			// parse URL arguments
-			const searchParams = new URLSearchParams(window.location.search);
-
-			const modelName = searchParams.get('model') || 'City';
-			const modelDir = searchParams.get('srcDir') || 'model';
-			const modelRootPath = `${modelDir}/${modelName}`;
-			const modelPath = `${modelRootPath}/model.html`;
-			const metadataPath = `${modelRootPath}/metaData.json`;
-
-			const setupName = searchParams.get('setup') || 'minimal/hover';
-			const setupPath = `setups/${setupName}.js`;
-
 			const canvasId = "aframe-canvas";
 		</script>
 
@@ -30,6 +18,8 @@
 		<script type="text/javascript" src="libs/jqwidgets-scripts/jqxcore.js"></script>
 		<script type="text/javascript" src="libs/jqwidgets-scripts/jqxbuttons.js"></script>
 		<script type="text/javascript" src="libs/jqwidgets-scripts/jqxsplitter.js"></script>
+		<script type="text/javascript" src="libs/jqwidgets-scripts/jqxexpander.js"></script>
+		<script type="text/javascript" src="libs/jqwidgets-scripts/jqxwindow.js"></script>
 
 		<!-- orbitcam -->
 		<script type="text/javascript" src="scripts/OrbitCamera.js"></script>

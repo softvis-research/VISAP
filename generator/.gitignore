@@ -18,7 +18,8 @@ target/
 # Model output
 /output/*
 !/output/Example/
-!/output/YourOutput/
+# This file currently needs to be re-committed whenever the git cache has been cleared
+# !/output/YourOutput/
 
 # Compiled class file
 *.class

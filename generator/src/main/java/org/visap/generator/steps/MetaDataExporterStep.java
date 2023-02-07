@@ -22,7 +22,6 @@ public class MetaDataExporterStep {
         nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.TYPEOF, true);
-        nodeRepository.loadNodesByRelation(SAPRelationLabels.USES, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.INHERIT, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.REFERENCES, true);
         cityRepository = new CityRepository();

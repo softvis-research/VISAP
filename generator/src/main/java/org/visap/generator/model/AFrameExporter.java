@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 
 public class AFrameExporter {
@@ -46,9 +49,9 @@ public class AFrameExporter {
     public void exportAFrame() {
         Writer fw = null;
         try {
-            File currentDir = new File(Config.output.mapPath());
-            String path = currentDir.getAbsolutePath() + "/model.html";
-            fw = new FileWriter(path);
+            Path outputDir = Files.createDirectories(Paths.get(Config.output.mapPath()));
+            Path modelPath = outputDir.resolve("model.html").toAbsolutePath();
+            fw = new FileWriter(modelPath.toString());
             fw.write(createAFrameExportString());
         } catch (IOException e) {
             System.out.println(e);
@@ -113,14 +116,6 @@ public class AFrameExporter {
 
     private String createAFrameRepositoryExport() {
         StringBuilder builder = new StringBuilder();
-
-        Collection<CityElement> floors = repository.getElementsByType(CityElement.CityType.Floor);
-        builder.append(createElementsExport(floors));
-
-        if (aframeOutput.equals("acity_AFrame")) {
-            Collection<CityElement> chimneys = repository.getElementsByType(CityElement.CityType.Chimney);
-            builder.append(createElementsExport(chimneys));
-        }
 
         Collection<CityElement> buildings = repository.getElementsByType(CityElement.CityType.Building);
         builder.append(createElementsExport(buildings));

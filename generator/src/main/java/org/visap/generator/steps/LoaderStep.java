@@ -65,16 +65,7 @@ public class LoaderStep {
                 "WHERE a.element_id = b.container_id " +
                 "CREATE (a)-[r:" + SAPRelationLabels.CONTAINS + "]->(b)");
 
-        // 3. Upload uses relations
-        if (!isSilentMode) {
-            System.out.print("Creating 'USES' relationships. Press any key to continue...");
-            userInput.nextLine();
-        }
-        connector.executeWrite("MATCH (a:Elements), (b:Elements) " +
-                "WHERE a.element_id = b.uses_id " +
-                "CREATE (a)-[r:" + SAPRelationLabels.USES + "]->(b)");
-
-        // 4. Upload References
+        // 3. Upload References
         System.out.println("Path to Reference CSV: " + pathToReferenceCsv);
         if (!isSilentMode) {
             System.out.print("Creating 'REFERENCE' relationships. Press any key to continue...");

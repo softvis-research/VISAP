@@ -14,6 +14,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.*;
@@ -30,9 +33,9 @@ public class MetaDataExporter {
     public void exportMetaDataFile() {
         Writer fw = null;
         try {
-            File outputDir = new File(Config.output.mapPath());
-            String path = outputDir.getAbsolutePath() + "/metaData.json";
-            fw = new FileWriter(path);
+            Path outputDir = Files.createDirectories(Paths.get(Config.output.mapPath()));
+            Path metadataPath = outputDir.resolve("metaData.json").toAbsolutePath();
+            fw = new FileWriter(metadataPath.toString());
             fw.write(toJSON(cityRepository.getAllElements()));
         } catch (IOException e) {
             System.out.println(e);
@@ -154,7 +157,7 @@ public class MetaDataExporter {
             builder.append("\"belongsTo\": \"" + element.getParentElement().getHash() + "\",\n");
         }
 
-        // Add USES and INHERIT relations
+        // Add REFERENCES and INHERIT relations
         String nodeType = node.get("type").asString();
         if (AMetaDataMap.getNodesWithReferencesRelationByType().contains(nodeType)) {
             builder.append("\"calls\": \"" + getRelations(node, SAPRelationLabels.REFERENCES, true) + "\",\n");

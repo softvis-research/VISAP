@@ -25,7 +25,11 @@ Then, start the database. The authorization being disabled may cause warnings on
 ### Generating a Model
 
 - Ensure that the Neo4J database is running
+<<<<<<< HEAD
 - Place input CSV files inside the directory ``generator/input/``. This directory is meant as a place to store all your model data inside appropriately named sub-directories. It also contains an example sub-directory to get you started.
+=======
+- Place input CSV files inside the directory ```generator/input/```. This directory is meant as a place to store all your model data inside appropriately named sub-directories. It also contains an example sub-directory to get you started.
+>>>>>>> cadb4e18324fc788a16092a5922514bd488ba4b4
 - Execute the file ``generator/src/main/java/org.visap.generator/steps/LoaderStep.java``. This will place the initial data in the local graph database. Any previously contained data is overwritten!
 - Execute the file ``generator/src/main/java/org.visap.generator/steps/AFrameExporterStep.java``. This will run all additional model-generating steps. Depending on the model size, this process can take a few minutes to finish.
 
@@ -58,15 +62,22 @@ Install [NPM](https://www.npmjs.com/) and run the command
 ```bash
 npm install -g live-server && live-server
 ```
+<<<<<<< HEAD
 
+=======
+>>>>>>> cadb4e18324fc788a16092a5922514bd488ba4b4
 inside the UI folder.
 
 ### View in the browser
 
 Whichever approach for setting up a local server you used, if things went well, you should now be able to view the visualization in the browser.
+<<<<<<< HEAD
 Enter the URL {localhost}/index.html?setup={setupPath}&model={folderName}, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder inside which you created the ``model/`` subfolder. Instead of the folder you created yourself, you can also use ``Example``. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is minimal/hover.
+=======
+Enter the URL ``{localhost}/index.html?setup={setupPath}&model={folderName}``, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder inside which you created the ``model/`` subfolder. Instead of the folder you created yourself, you can also use ``Example``. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is ``minimal``.
+>>>>>>> cadb4e18324fc788a16092a5922514bd488ba4b4
 
-When using NPM live-server, our complete URL might be http://127.0.0.1:8080/index.html?setup=minimal/hover&model=Example. When using XAMPP, it might be http://localhost/index.html?setup=minimal/hover&model=Example instead.
+When using NPM live-server, our complete URL might be http://127.0.0.1:8080/index.html?setup=minimal&model=Example. When using XAMPP, it might be http://localhost/index.html?setup=minimal&model=Example instead.
 
 The visualization will look similar to this:
 
@@ -87,8 +98,8 @@ If you need help or have any suggestions, we appreciate your interest in the pro
 
 ## Coding Standards
 
-Both Java and JavaScript code roughly follow [1TBS formatting](https://en.wikipedia.org/wiki/Indentation_style#Variant:_1TBS_(OTBS)). Single lines of whitespace can be used to separate logical units in code blocks and source files, but should be minimized when not needed.
+Both Java and JavaScript code roughly follow [1TBS formatting](https://en.wikipedia.org/wiki/Indentation_style#Variant:_1TBS_(OTBS)). Single lines of whitespace (rarely two) can be used to separate logical units in code blocks and source files. Padding out the beginnings and ends of blocks is generally not necessary, though you might still find it in older code.
 
-JavaScript code is indented with tabs. No concessions need to be made for compatibility with older browsers, as such modern JS features are recommended to be used where applicable. This includes using ``let`` and ``const`` over ``var`` where possible.
+JavaScript code is indented with tabs. No concessions need to be made for compatibility with older browsers. As such, modern JS features are recommended to be used where applicable. This includes using ``let`` and ``const`` over ``var`` where possible. The file ``ui/scripts/CanvasHover/CanvasHoverController.js`` is representative of what style and formatting should resemble.
 
-Java code is indented with 4 spaces. Features up to relatively recent Java versions are fair game, but check with people before pushing the current minimum version requirements (under [Compiling the Generator](README.md#compiling-the-generator)).
+Java code is indented with 4 spaces. Features up to relatively recent Java versions are fair game, but check with people before pushing the current minimum version requirements (under [Compiling the Generator](README.md#compiling-the-generator)). Line lengths should stay within 120 characters, line break if necessary. The file ``generator/src/main/java/org/visap/generator/metaphors/metropolis/steps/MetropolisCreator.java`` is representative of what style and formatting should resemble.
