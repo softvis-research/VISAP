@@ -25,11 +25,7 @@ Then, start the database. The authorization being disabled may cause warnings on
 ### Generating a Model
 
 - Ensure that the Neo4J database is running
-<<<<<<< HEAD
 - Place input CSV files inside the directory ``generator/input/``. This directory is meant as a place to store all your model data inside appropriately named sub-directories. It also contains an example sub-directory to get you started.
-=======
-- Place input CSV files inside the directory ```generator/input/```. This directory is meant as a place to store all your model data inside appropriately named sub-directories. It also contains an example sub-directory to get you started.
->>>>>>> cadb4e18324fc788a16092a5922514bd488ba4b4
 - Execute the file ``generator/src/main/java/org.visap.generator/steps/LoaderStep.java``. This will place the initial data in the local graph database. Any previously contained data is overwritten!
 - Execute the file ``generator/src/main/java/org.visap.generator/steps/AFrameExporterStep.java``. This will run all additional model-generating steps. Depending on the model size, this process can take a few minutes to finish.
 
@@ -62,20 +58,12 @@ Install [NPM](https://www.npmjs.com/) and run the command
 ```bash
 npm install -g live-server && live-server
 ```
-<<<<<<< HEAD
-
-=======
->>>>>>> cadb4e18324fc788a16092a5922514bd488ba4b4
 inside the UI folder.
 
 ### View in the browser
 
 Whichever approach for setting up a local server you used, if things went well, you should now be able to view the visualization in the browser.
-<<<<<<< HEAD
-Enter the URL {localhost}/index.html?setup={setupPath}&model={folderName}, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder inside which you created the ``model/`` subfolder. Instead of the folder you created yourself, you can also use ``Example``. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is minimal/hover.
-=======
 Enter the URL ``{localhost}/index.html?setup={setupPath}&model={folderName}``, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder inside which you created the ``model/`` subfolder. Instead of the folder you created yourself, you can also use ``Example``. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is ``minimal``.
->>>>>>> cadb4e18324fc788a16092a5922514bd488ba4b4
 
 When using NPM live-server, our complete URL might be http://127.0.0.1:8080/index.html?setup=minimal&model=Example. When using XAMPP, it might be http://localhost/index.html?setup=minimal&model=Example instead.
 
