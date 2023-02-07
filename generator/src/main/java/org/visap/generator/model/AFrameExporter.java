@@ -4,7 +4,6 @@ import org.visap.generator.configuration.Config;
 import org.visap.generator.repository.CityElement;
 import org.visap.generator.repository.CityRepository;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
