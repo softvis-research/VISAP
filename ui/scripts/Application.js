@@ -60,7 +60,7 @@ controllers.application = (function () {
 		uiConfig = setup.ui;
 
 		const unavailableControllers = setup.controllers.map(c => c.name).filter(controllerName => !controllers[controllerName]);
-		if (unavailableControllers.size > 0) {
+		if (unavailableControllers.length > 0) {
 			events.log.error.publish({ text: "Aborting - failed to load the following controllers: " + unavailableControllers.join(', ') });
 			return;
 		}
