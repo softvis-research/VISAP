@@ -20,7 +20,7 @@ async function initializeApplication() {
 	try {
 		await Promise.all([setupLoaded, metadataLoaded, modelLoaded]);
 	} catch (error) {
-		console.error(error);
+		alert(error);
 		return;
 	}
 	// from here on, setup/metadata/model are sure to have been loaded
@@ -53,7 +53,7 @@ controllers.application = (function () {
 
 	function initialize() {
 		if (!setup.ui) {
-			events.log.error.publish({ text: "No UI config in setup found" });
+			alert("No UI config in setup found");
 			return;
 		}
 
@@ -61,7 +61,7 @@ controllers.application = (function () {
 
 		const unavailableControllers = setup.controllers.map(c => c.name).filter(controllerName => !controllers[controllerName]);
 		if (unavailableControllers.length > 0) {
-			events.log.error.publish({ text: "Aborting - failed to load the following controllers: " + unavailableControllers.join(', ') });
+			alert("Aborting - failed to load the following controllers: " + unavailableControllers.join(', '));
 			return;
 		}
 
@@ -85,7 +85,7 @@ controllers.application = (function () {
 			parseUIConfig(uiConfig.name, uiConfig, uiDiv);
 			events.log.info.publish({ text: "new config loaded: " + uiConfig.name });
 		} catch (err) {
-			events.log.error.publish({ text: err.message });
+			alert(err.message);
 		}
 	}
 
