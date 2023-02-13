@@ -1,15 +1,6 @@
-var model = (function () {
+controllers.model = (function () {
 
-	const states = {
-		selected: { name: "selected" },
-		marked: { name: "marked" },
-		hovered: { name: "hovered" },
-		filtered: { name: "filtered" },
-		tmpFiltered: { name: "tmpFiltered" },
-		added: { name: "added" },
-		componentSelected: { name: "componentSelected" },
-		loaded: { name: "loaded" },
-	};
+	const states = ["selected", "marked", "hovered", "filtered", "tmpFiltered", "added", "componentSelected", "loaded"];
 
 	let entitiesById = new Map();
 	let eventEntityMap = new Map();
@@ -17,9 +8,7 @@ var model = (function () {
 
 	function initialize() {
 		//subscribe for changing status of entities on events
-		let eventArray = Object.keys(states);
-		eventArray.forEach(function (eventName) {
-
+		states.forEach(function (eventName) {
 			let event = events[eventName];
 
 			let eventMap = new Map();
@@ -300,8 +289,7 @@ var model = (function () {
 			unloadedRelationships: {}
 		};
 
-		const statesArray = Object.keys(states);
-		statesArray.forEach(function (stateName) {
+		states.forEach((stateName) => {
 			entity[stateName] = false;
 		});
 

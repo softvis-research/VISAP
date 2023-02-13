@@ -1,4 +1,10 @@
-$(document).ready(function () {
+$(function () {
+	// make all controllers accessible globally, but as read-only references
+	for (const [name, controller] of Object.entries(controllers)) {
+		Object.defineProperty(window, name, {value: controller});
+	}
+	Object.freeze(controllers);
+
 	initializeApplication();
 });
 
@@ -14,7 +20,7 @@ async function initializeApplication() {
 	try {
 		await Promise.all([setupLoaded, metadataLoaded, modelLoaded]);
 	} catch (error) {
-		console.error(error);
+		alert(error);
 		return;
 	}
 	// from here on, setup/metadata/model are sure to have been loaded
@@ -30,13 +36,12 @@ async function initializeApplication() {
 	}
 }
 
-var application = (function () {
+controllers.application = (function () {
 
 	const defaultModelName = 'example';
 	const defaultModelDir = 'model';
 	const defaultSetupName = 'minimal';
 
-	let controllers = new Map();
 	let controllerDivs = new Map();
 	let uiConfig = null;
 
@@ -48,22 +53,22 @@ var application = (function () {
 
 	function initialize() {
 		if (!setup.ui) {
-			events.log.error.publish({ text: "No UI config in setup found" });
+			alert("No UI config in setup found");
 			return;
 		}
 
 		uiConfig = setup.ui;
 
-		controllers = getControllerObjects(setup.controllers);
-		if (setup.controllers.length !== controllers.size) {
-			events.log.error.publish({ text: "One or more controllers failed to load, aborting" });
+		const unavailableControllers = setup.controllers.map(c => c.name).filter(controllerName => !controllers[controllerName]);
+		if (unavailableControllers.length > 0) {
+			alert("Aborting - failed to load the following controllers: " + unavailableControllers.join(', '));
 			return;
 		}
 
 		createUiLayout();
 
 		setup.controllers.forEach((controllerSetup) => {
-			const controllerObject = controllers.get(controllerSetup.name);
+			const controllerObject = controllers[controllerSetup.name];
 			initializeController(controllerObject, controllerSetup);
 			activateController(controllerObject);
 		});
@@ -80,7 +85,7 @@ var application = (function () {
 			parseUIConfig(uiConfig.name, uiConfig, uiDiv);
 			events.log.info.publish({ text: "new config loaded: " + uiConfig.name });
 		} catch (err) {
-			events.log.error.publish({ text: err.message });
+			alert(err.message);
 		}
 	}
 
@@ -112,7 +117,7 @@ var application = (function () {
 					(resolve, reject) => $.getScript(defaultSetupPath, resolve).fail(reject)
 				);
 			}).then(() => {
-				if (!window.setup) {
+				if (!setup) {
 					throw new Error("No setup definition found!");
 				} else if (setup.loadPopUp) {
 					application.createModalPopup("Load Visualization", "Visualization is loading...", "RootLoadPopUp");
@@ -220,18 +225,6 @@ var application = (function () {
 
 
 	// controller handling
-
-	function getControllerObjects(controllerSetupArray) {
-		const controllers = new Map();
-		for (const controllerSetup of controllerSetupArray) {
-			const controllerObject = window[controllerSetup.name];
-			if (!controllerObject) {
-				events.log.error.publish({ text: "Controller " + controllerSetup.name + " not found!" });
-			}
-			controllers.set(controllerSetup.name, controllerObject);
-		}
-		return controllers;
-	}
 
 	function initializeController(controllerObject, controllerSetup) {
 		if (typeof controllerObject.initialize === 'function') {

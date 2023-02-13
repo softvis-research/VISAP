@@ -1,4 +1,4 @@
-var actionController = (function () {
+controllers.actionController = (function () {
 
 
 //*********************************
@@ -88,7 +88,7 @@ var actionController = (function () {
 
 //*********************************
 //	Initialization
-//*********************************	
+//*********************************
 
 
 	function initialize() {
@@ -97,7 +97,7 @@ var actionController = (function () {
 		AFRAME.registerComponent('mouselistener', {
 			init: function () {
 				this.el.addEventListener("mouseup", function (eventObject) {
-					if(eventObject.target.id != canvasId) {
+					if (eventObject.target.id != canvasId) {
 						eventObject.component = hoveredEntity;
 						eventObject.which = latestMouseButtonPressed;
 						upAction(actions.mouse.key[getMouseButton(eventObject)], eventObject);
@@ -122,7 +122,7 @@ var actionController = (function () {
 					if (component != null) {
 						hoveredEntity = component;
 					}
-					if(eventObject.target.id != canvasId) {
+					if (eventObject.target.id != canvasId) {
 						eventObject.layerX = cursorX;
 						eventObject.layerY = cursorY;
 						hoverAction(actions.mouse, eventObject);
@@ -133,7 +133,7 @@ var actionController = (function () {
 					}
 				});
 				this.el.addEventListener("mouseleave", function (eventObject) {
-					if(eventObject.target.id != canvasId) {
+					if (eventObject.target.id != canvasId) {
 						eventObject.layerX = cursorX;
 						eventObject.layerY = cursorY;
 						unhoverAction(actions.mouse, eventObject);
@@ -267,7 +267,7 @@ var actionController = (function () {
 
 //*********************************
 //	Actions
-//*********************************	
+//*********************************
 
 	function downAction(action, eventObject) {
 		events.log.action.publish({actionObject: action.down, eventObject: eventObject});
@@ -276,7 +276,7 @@ var actionController = (function () {
 		action.startTime = Date.now();
 		action.lastTick = Date.now();
 
-		if(eventObject.component != null && eventObject.component.id != canvasId) {
+		if (eventObject.component != null && eventObject.component.id != canvasId) {
 			eventObject.entity = model.getEntityById(eventObject.component.id);
 		}
 

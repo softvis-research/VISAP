@@ -1,4 +1,4 @@
-var defaultLogger = (function() {
+controllers.defaultLogger = (function() {
 
 	const controllerConfig = {
 		logInfoConsole : false,
@@ -35,11 +35,11 @@ var defaultLogger = (function() {
 			text: "INFO: " + logObject.text,
 			logObject: logObject
 		});
-		if(infoLogQueue.length > controllerConfig.logQueueSize) {
+		if (infoLogQueue.length > controllerConfig.logQueueSize) {
 			infoLogQueue.shift();
 		}
 
-		if(controllerConfig.logInfoConsole) {
+		if (controllerConfig.logInfoConsole) {
 			console.log("INFO: " + logObject.text);
 		}
 	}
@@ -49,11 +49,11 @@ var defaultLogger = (function() {
 			text: "WARNING: " + logObject.text,
 			logObject: logObject
 		});
-		if(warningLogQueue.length > controllerConfig.logQueueSize) {
+		if (warningLogQueue.length > controllerConfig.logQueueSize) {
 			warningLogQueue.shift();
 		}
 
-		if(controllerConfig.logWarningConsole) {
+		if (controllerConfig.logWarningConsole) {
 			console.log("WARNING: " + logObject.text);
 		}
 	}
@@ -63,11 +63,11 @@ var defaultLogger = (function() {
 			text: "ERROR: " + logObject.text,
 			logObject: logObject
 		});
-		if(errorLogQueue.length > controllerConfig.logQueueSize) {
+		if (errorLogQueue.length > controllerConfig.logQueueSize) {
 			errorLogQueue.shift();
 		}
 
-		if(controllerConfig.logErrorConsole) {
+		if (controllerConfig.logErrorConsole) {
 			console.error("ERROR: " + logObject.text);
 		}
 	}
@@ -77,11 +77,11 @@ var defaultLogger = (function() {
 			text: "ACTION: " + logObject.actionObject.type + " " + logObject.eventObject.which,
 			logObject: logObject
 		});
-		if(actionLogQueue.length > controllerConfig.logQueueSize) {
+		if (actionLogQueue.length > controllerConfig.logQueueSize) {
 			actionLogQueue.shift();
 		}
 
-		if(controllerConfig.logActionConsole) {
+		if (controllerConfig.logActionConsole) {
 			console.log("ACTION: " + logObject.actionObject.type + " " + logObject.eventObject.which );
 		}
 	}
@@ -91,11 +91,11 @@ var defaultLogger = (function() {
 			text: "EVENT: " + logObject.eventTypeName,
 			logObject: logObject
 		});
-		if(eventLogQueue.length > controllerConfig.logQueueSize) {
+		if (eventLogQueue.length > controllerConfig.logQueueSize) {
 			eventLogQueue.shift();
 		}
 
-		if(controllerConfig.logEventConsole) {
+		if (controllerConfig.logEventConsole) {
 			console.log("EVENT: " + logObject.eventTypeName);
 		}
 	}
@@ -105,11 +105,11 @@ var defaultLogger = (function() {
 			text: "MANIPULATION: " + logObject.manipulation.manipulationFunction,
 			logObject: logObject
 		});
-		if(manipulationLogQueue.length > controllerConfig.logQueueSize) {
+		if (manipulationLogQueue.length > controllerConfig.logQueueSize) {
 			manipulationLogQueue.shift();
 		}
 
-		if(controllerConfig.logManipulationConsole) {
+		if (controllerConfig.logManipulationConsole) {
 			console.log("MANIPULATION: " + logObject.manipulation.manipulationFunction);
 		}
 	}
