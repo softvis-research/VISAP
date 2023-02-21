@@ -10,7 +10,6 @@ import org.visap.generator.repository.CityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
 import org.neo4j.driver.types.Node;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
