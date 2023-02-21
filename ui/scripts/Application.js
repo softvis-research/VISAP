@@ -70,7 +70,7 @@ controllers.application = (function () {
 		setup.controllers.forEach((controllerSetup) => {
 			const controllerObject = controllers[controllerSetup.name];
 			initializeController(controllerObject, controllerSetup);
-			activateController(controllerObject);
+			activateController(controllerObject, controllerSetup);
 		});
 	}
 
@@ -232,8 +232,8 @@ controllers.application = (function () {
 		}
 	}
 
-	function activateController(controllerObject) {
-		const controllerDiv = controllerDivs.get(controllerObject.name);
+	function activateController(controllerObject, controllerSetup) {
+		const controllerDiv = controllerDivs.get(controllerSetup.name);
 		if (typeof controllerObject.activate === 'function') {
 			controllerObject.activate(controllerDiv);
 		}
