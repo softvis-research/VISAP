@@ -37,7 +37,7 @@ To change your input location, you can change the ``inputCSVFilePath`` property 
 
 After following the instructions in section [Generating a Model](#generating-a-model), two files will have been generated for you: model.html and metaData.json.
 
-To display the model in the browser, first navigate to the folder ``ui/data/``. Create a subfolder with a name of your liking, for example ``Test``. Inside the newly created subfolder, create another subfolder named ``model``. Copy both the model.html file and the metaData.json file from the ``generator/output/`` directory into this subfolder.
+To display the model in the browser, first navigate to the folder ``ui/model/``. Create a subfolder with a name of your liking, for example ``myFirstModel``. Copy both the model.html file and the metaData.json file from the ``generator/output/`` directory into this subfolder.
 
 Next, you will need a local server. Based on your operating system, we recommend different practices. If these don't work for you, further information about setting up a local server can be found [here](https://aframe.io/docs/0.5.0/introduction/installation.html#local-development).
 
@@ -60,10 +60,10 @@ npm install -g live-server && live-server
 ```
 inside the UI folder.
 
-### View in the browser
+### Final Steps
 
 Whichever approach for setting up a local server you used, if things went well, you should now be able to view the visualization in the browser.
-Enter the URL ``{localhost}/index.html?setup={setupPath}&model={folderName}``, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder inside which you created the ``model/`` subfolder. Instead of the folder you created yourself, you can also use ``Example``. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is ``minimal``.
+Enter the URL ``{localhost}/index.html?setup={setupPath}&model={folderName}``, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder inside which you created the ``model/`` subfolder. Instead of the folder you created yourself, you can also use ``example``. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is ``minimal``.
 
 When using NPM live-server, our complete URL might be http://127.0.0.1:8080/index.html?setup=minimal&model=Example. When using XAMPP, it might be http://localhost/index.html?setup=minimal&model=Example instead.
 
