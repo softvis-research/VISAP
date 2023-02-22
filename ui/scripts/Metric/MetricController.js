@@ -1,11 +1,5 @@
-<<<<<<< Updated upstream
 controllers.metricController = (function () {
-    var controllerConfig = {
-=======
-var metricController = (function () {
-
     const controllerConfig = {
->>>>>>> Stashed changes
         metrics: [
             metrics.numberOfStatements,
             metrics.dateOfCreation,
@@ -21,34 +15,19 @@ var metricController = (function () {
         ]
     };
 
-<<<<<<< Updated upstream
-    var domHelper;
-
-    var layerCounter = 0;
-    var layers = [];
-
-    var metricDefault = {
-        variant: metrics.numberOfStatements,
-=======
     let domHelper;
 
-    const layerCounter = 0;
-    const layers = [];
+    let layerCounter = 0;
+    let layers = [];
 
     const metricDefault = {
-        constant: metrics.numberOfStatements,
->>>>>>> Stashed changes
+        variant: metrics.numberOfStatements,
         from: 0,
         to: 0
     }
 
-<<<<<<< Updated upstream
-    var mappingDefault = {
-        variant: mappings.color,
-=======
     const mappingDefault = {
-        constant: mappings.color,
->>>>>>> Stashed changes
+        variant: mappings.color,
         color: "black",
         startColor: "blue",
         endColor: "red",
@@ -84,11 +63,7 @@ var metricController = (function () {
     }
 
     function addLayer() {
-<<<<<<< Updated upstream
-        var newLayer = new MetricLayer(++layerCounter);
-=======
         const newLayer = new MetricLayer(++layerCounter);
->>>>>>> Stashed changes
         layers.push(newLayer);
 
         domHelper.buildUiLayer(layerCounter);
