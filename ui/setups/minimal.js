@@ -1,10 +1,10 @@
 ﻿const setup = {
 	controllers: [
 		{
-			name: 	"defaultLogger",
+			name: "defaultLogger",
 
-			logActionConsole	: false,
-			logEventConsole		: false
+			logActionConsole: false,
+			logEventConsole: false,
 		},
 		{
 			name: 	"canvasHoverController",

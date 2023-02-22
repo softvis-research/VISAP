@@ -173,7 +173,7 @@ controllers.model = (function () {
 					entity.unloadedRelationships[relationName].push(relationTargetId);
 				}
 
-				// store the mapping the other way round as well, so we easily know what to replace when we do load that entity
+				// store the mapping the other way around as well, so we easily know what to replace when we do load that entity
 				const entitiesContainingThis = entitiesByContainedUnloadedProperty.get(relationTargetId);
 				const referenceReminder = {
 					entity: entity,

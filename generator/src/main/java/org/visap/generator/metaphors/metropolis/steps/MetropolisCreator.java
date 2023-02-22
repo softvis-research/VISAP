@@ -42,7 +42,7 @@ public class MetropolisCreator {
                 SAPNodeTypes.Namespace, List.of(CityElement.CityType.District),
                 SAPNodeTypes.FunctionGroup, List.of(CityElement.CityType.District),
                 SAPNodeTypes.FunctionModule, List.of(CityElement.CityType.Building),
-                // handling Report/Building before Report/District leads to duplicated elements - TODO: why?
+                // handling Report/Building before Report/District leads to duplicated elements
                 SAPNodeTypes.Report, List.of(CityElement.CityType.District, CityElement.CityType.Building),
                 SAPNodeTypes.FormRoutine, List.of(CityElement.CityType.Building),
                 SAPNodeTypes.Class, List.of(CityElement.CityType.District),
