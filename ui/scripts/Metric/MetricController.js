@@ -43,7 +43,7 @@ controllers.metricController = (function () {
                     {
                         metric: { "variant": "amountOfCommam", "from": 1, "to": 2 },
                         mapping: { "variant": "Flashing", "color": "orange", "startColor": "", "endColor": "", "transparency": 0, "period": "1000", "scale": 0 }
-                    }
+                    },
                 ]
             },
             {
@@ -64,7 +64,7 @@ controllers.metricController = (function () {
                     {
                         metric: { "variant": "amountOfDynsta", "from": 1, "to": 5 },
                         mapping: { "variant": "Transparency", "color": "", "startColor": "", "endColor": "", "transparency": 0.01, "period": 0, "scale": 0 }
-                    }
+                    },
                 ]
             },
             {
@@ -81,10 +81,10 @@ controllers.metricController = (function () {
                     {
                         metric: { "variant": "amountOfSlin", "from": 1, "to": 5 },
                         mapping: { "variant": "Pulsation", "color": "", "startColor": "", "endColor": "", "transparency": 0, "period": "1000", "scale": "3" }
-                    }
+                    },
                 ]
-            }
-        ]
+            },
+        ],
     };
 
     let domHelper;
@@ -135,6 +135,10 @@ controllers.metricController = (function () {
         }
 
         setTimeout(executeMapping, 10);
+
+        if (typeof(viewConfig) === 'undefined') {
+            return;
+        }
 
         if (!viewEqualToMetricMappings(viewConfig, layers)) {
             $(cssIDs.viewDropDown).jqxDropDownList('clearSelection', true);
@@ -196,31 +200,6 @@ controllers.metricController = (function () {
 
         if (layerCounter > 0) {
             $(cssIDs.deleteButton + layerCounter).jqxButton({ disabled: false });
-        }
-    }
-
-    // Universal method to load a data from Neo4j using imported cypher-query
-    async function getNeo4jData(cypherQuery) {
-        const payload = {
-            'statements': [
-                // neo4j requires keyword "statement", so leave as is
-                { 'statement': `${cypherQuery}` }
-            ]
-        }
-
-        try {
-            const response = await fetch('http://localhost:7474/db/data/transaction/commit', {
-                method: 'POST',
-                body: JSON.stringify(payload),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            const data = await response.json();
-            return data.results;
-        } catch (error) {
-            events.log.warning.publish({ text: error });
         }
     }
 
@@ -303,10 +282,9 @@ controllers.metricController = (function () {
         reset: reset,
 
         removeLayer: removeLayer,
-        getNeo4jData: getNeo4jData,
 
         metricDefault: metricDefault,
-        mappingDefault: mappingDefault
+        mappingDefault: mappingDefault,
     }
 
 })();
