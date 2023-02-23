@@ -84,56 +84,6 @@ class MetricLayer {
         })
     }
 
-    //currently not used
-    async getMatchingEntitiesOutOfNeo4j() {
-        var response = await metricController.getNeo4jData(this.buildCypherQuery());
-
-        response[0].data.forEach(element => {
-            this.entities.push(model.getEntityById(element.row[0]));
-            this.entityMetricMap.set(element.row[0], element.row[1]);
-        });
-    }
-
-    buildCypherQuery() {
-        var cypherQuery = "";
-
-        switch (this.metric.variant) {
-            default:
-            case metrics.numberOfStatements:
-                if (this.metric.from == "" && this.metric.to == "")
-                    cypherQuery = "MATCH (n)-[:SOURCE]->(p) where p.number_of_statements > 10 RETURN n.hash, p.number_of_statements";
-                else if (this.metric.from != "" && this.metric.to == "")
-                    cypherQuery = "MATCH (n)-[:SOURCE]->(p) where p.number_of_statements >= " + this.metric.from + " RETURN n.hash, p.number_of_statements";
-                else if (this.metric.from == "" && this.metric.to != "")
-                    cypherQuery = "MATCH (n)-[:SOURCE]->(p) where p.number_of_statements <= " + this.metric.to + " RETURN n.hash, p.number_of_statements";
-                else if (this.metric.from != "" && this.metric.to != "")
-                    cypherQuery = "MATCH (n)-[:SOURCE]->(p) where " + this.metric.from + " <= p.number_of_statements <= " + this.metric.to + " RETURN n.hash, p.number_of_statements";
-                break;
-            case metrics.dateOfCreation:
-                if (this.metric.from == "" && this.metric.to == "")
-                    cypherQuery = "MATCH (n)-[:SOURCE]->(p) where p.created >= date('20200101') RETURN n.hash, p.created";
-                else if (this.metric.from != "" && this.metric.to == "")
-                    cypherQuery = "MATCH (n)-[:SOURCE]->(p) where p.created >= date('" + this.metric.from + "') RETURN n.hash, p.created";
-                else if (this.metric.from == "" && this.metric.to != "")
-                    cypherQuery = "MATCH (n)-[:SOURCE]->(p) where p.created <= date('" + this.metric.to + "') RETURN n.hash, p.created";
-                else if (this.metric.from != "" && this.metric.to != "")
-                    cypherQuery = "MATCH (n)-[:SOURCE]->(p) where date('" + this.metric.from + "') <= p.created <= date('" + this.metric.to + "') RETURN n.hash, p.created";
-                break;
-            case metrics.dateOfLastChange:
-                if (this.metric.from == "" && this.metric.to == "")
-                    cypherQuery = "MATCH (n)-[:SOURCE]->(p) where p.changed >= date('20200101') RETURN n.hash, p.changed";
-                else if (this.metric.from != "" && this.metric.to == "")
-                    cypherQuery = "MATCH (n)-[:SOURCE]->(p) where p.changed >= date('" + this.metric.from + "') RETURN n.hash, p.changed";
-                else if (this.metric.from == "" && this.metric.to != "")
-                    cypherQuery = "MATCH (n)-[:SOURCE]->(p) where p.changed <= date('" + this.metric.to + "') RETURN n.hash, p.changed";
-                else if (this.metric.from != "" && this.metric.to != "")
-                    cypherQuery = "MATCH (n)-[:SOURCE]->(p) where date('" + this.metric.from + "') <= p.changed <= date('" + this.metric.to + "') RETURN n.hash, p.changed";
-                break;
-        }
-
-        return cypherQuery;
-    }
-
     doMapping() {
         switch (this.mapping.variant) {
             default:
@@ -159,8 +109,8 @@ class MetricLayer {
     }
 
     setColorGradient() {
-        var minValue;
-        var maxValue;
+        let minValue;
+        let maxValue;
 
         this.entityMetricMap.forEach(function (metricValue) {
             if (minValue >= metricValue || minValue == undefined) {
@@ -171,10 +121,10 @@ class MetricLayer {
             }
         })
 
-        var colorGradient = new ColorGradient(this.mapping.startColor, this.mapping.endColor, minValue, maxValue);
+        const colorGradient = new ColorGradient(this.mapping.startColor, this.mapping.endColor, minValue, maxValue);
 
         this.entities.forEach(function (entity) {
-            var gradientColor = colorGradient.calculateGradientColor(this.entityMetricMap.get(entity.id));
+            const gradientColor = colorGradient.calculateGradientColor(this.entityMetricMap.get(entity.id));
             canvasManipulator.changeColorOfEntities([entity], gradientColor.r + " " + gradientColor.g + " " + gradientColor.b, { name: "metricController - layer " + this.id });
         }, this)
 

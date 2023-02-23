@@ -1,6 +1,6 @@
 controllers.metricController = (function () {
 
-    var controllerConfig = {
+    const controllerConfig = {
         metrics: [
             metrics.numberOfStatements,
             metrics.dateOfCreation,
@@ -87,19 +87,19 @@ controllers.metricController = (function () {
         ]
     };
 
-    var domHelper;
+    let domHelper;
 
-    var layerCounter = 0;
-    var layers = [];
-    var viewConfig;
+    let layerCounter = 0;
+    let layers = [];
+    let viewConfig;
 
-    var metricDefault = {
+    const metricDefault = {
         variant: metrics.numberOfStatements,
         from: 0,
         to: 0
     }
 
-    var mappingDefault = {
+    const mappingDefault = {
         variant: mappings.color,
         color: "white",
         startColor: "blue",
@@ -170,7 +170,7 @@ controllers.metricController = (function () {
     }
 
     function addLayer(event, metricMapping) {
-        var newLayer = new MetricLayer(++layerCounter);
+        const newLayer = new MetricLayer(++layerCounter);
 
         if (metricMapping !== undefined) {
             newLayer.metric = metricMapping.metric;
@@ -209,7 +209,7 @@ controllers.metricController = (function () {
         }
 
         try {
-            let response = await fetch('http://localhost:7474/db/data/transaction/commit', {
+            const response = await fetch('http://localhost:7474/db/data/transaction/commit', {
                 method: 'POST',
                 body: JSON.stringify(payload),
                 headers: {
@@ -217,7 +217,7 @@ controllers.metricController = (function () {
                 }
             });
 
-            let data = await response.json();
+            const data = await response.json();
             return data.results;
         } catch (error) {
             events.log.warning.publish({ text: error });
@@ -225,8 +225,8 @@ controllers.metricController = (function () {
     }
 
     function downloadViewConfig(event) {
-        let viewName = prompt("Please enter View name", "View");
-        var text = '{\n\tname: "' + viewName + '",\n\tviewMappings: [';
+        const viewName = prompt("Please enter View name", "View");
+        let text = '{\n\tname: "' + viewName + '",\n\tviewMappings: [';
 
         for (let layer of layers) {
             layer.readUIData();
@@ -240,7 +240,7 @@ controllers.metricController = (function () {
     }
 
     function downloadObjectAsTxt(filename, text) {
-        var pom = document.createElement('a');
+        const pom = document.createElement('a');
         pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
         pom.setAttribute('download', filename);
         document.body.appendChild(pom); // required for firefox
@@ -263,16 +263,15 @@ controllers.metricController = (function () {
     }
 
     function isEqual(obj1, obj2) {
-        var props1 = Object.getOwnPropertyNames(obj1);
-        var props2 = Object.getOwnPropertyNames(obj2);
+        const props1 = Object.getOwnPropertyNames(obj1);
+        const props2 = Object.getOwnPropertyNames(obj2);
         if (props1.length != props2.length) {
             return false;
         }
-        for (var i = 0; i < props1.length; i++) {
-            let val1 = obj1[props1[i]];
-            let val2 = obj2[props1[i]];
-            let isObjects = isObject(val1) && isObject(val2);
-            if (isObjects && !isEqual(val1, val2) || !isObjects && val1 !== val2) {
+        for (let i = 0; i < props1.length; i++) {
+            const [val1, val2] = (obj1[props1[i]], obj2[props1[i]]);
+            const areObjects = isObject(val1) && isObject(val2);
+            if (areObjects && !isEqual(val1, val2) || !areObjects && val1 !== val2) {
                 return false;
             }
         }

@@ -56,7 +56,7 @@ class ColorGradient {
             return;
         }
 
-        var proportion = (value - this.minValue) / (this.maxValue - this.minValue);
+        const proportion = (value - this.minValue) / (this.maxValue - this.minValue);
 
         return {
             r: (1 - proportion) * this.startColor.r + proportion * this.endColor.r,

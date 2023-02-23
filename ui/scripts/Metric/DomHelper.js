@@ -22,41 +22,41 @@ class DomHelper {
         document.getElementsByTagName("head")[0].appendChild(cssLink);
 
 
-        var viewControllerHeaderDiv = document.createElement("div");
+        const viewControllerHeaderDiv = document.createElement("div");
         viewControllerHeaderDiv.id = domIDs.viewControllerHeader;
 
 
-        var headerTextNode = document.createElement("label");
+        const headerTextNode = document.createElement("label");
         headerTextNode.id = domIDs.headerTextNode;
         headerTextNode.textContent = "Metric View";
         viewControllerHeaderDiv.appendChild(headerTextNode);
 
 
-        var executeButtonDiv = document.createElement("div");
+        const executeButtonDiv = document.createElement("div");
         executeButtonDiv.id = domIDs.executeButton;
         executeButtonDiv.textContent = "Execute";
         viewControllerHeaderDiv.appendChild(executeButtonDiv);
 
 
-        var resetButtonDiv = document.createElement("div");
+        const resetButtonDiv = document.createElement("div");
         resetButtonDiv.id = domIDs.resetButton;
         resetButtonDiv.textContent = "Reset";
         viewControllerHeaderDiv.appendChild(resetButtonDiv);
 
 
-        var addLayerButtonDiv = document.createElement("div");
+        const addLayerButtonDiv = document.createElement("div");
         addLayerButtonDiv.id = domIDs.addLayerButton;
         addLayerButtonDiv.textContent = "Add Metric-Layer";
         viewControllerHeaderDiv.appendChild(addLayerButtonDiv);
 
 
-        var downloadViewConfigButtonDiv = document.createElement("div");
+        const downloadViewConfigButtonDiv = document.createElement("div");
         downloadViewConfigButtonDiv.id = domIDs.downloadViewConfigButton;
         downloadViewConfigButtonDiv.textContent = "Download View Config";
         viewControllerHeaderDiv.appendChild(downloadViewConfigButtonDiv);
 
 
-        var viewDropDownDiv = document.createElement("div");
+        const viewDropDownDiv = document.createElement("div");
         viewDropDownDiv.id = domIDs.viewDropDown;
         viewDropDownDiv.classList.add(domClasses.viewDropDown);
         viewControllerHeaderDiv.appendChild(viewDropDownDiv);
@@ -87,51 +87,51 @@ class DomHelper {
     }
 
     buildMetricArea(layerID) {
-        var metricDiv = document.createElement("div");
+        const metricDiv = document.createElement("div");
         metricDiv.id = domIDs.metricDiv + layerID;
         metricDiv.classList.add(domClasses.metricDiv, domClasses.layer + layerID);
 
-        var metricTextNode = document.createElement("label");
+        const metricTextNode = document.createElement("label");
         metricTextNode.id = domIDs.metricTextNode + layerID;
         metricTextNode.classList.add(domClasses.metricTextNode, domClasses.layer + layerID, domClasses.textLabel);
         metricTextNode.textContent = "Metric";
         metricDiv.appendChild(metricTextNode);
 
-        var metricDropDownDiv = document.createElement("div");
+        const metricDropDownDiv = document.createElement("div");
         metricDropDownDiv.id = domIDs.metricDropDown + layerID;
         metricDropDownDiv.classList.add(domClasses.metricDropDown, domClasses.layer + layerID);
         metricDiv.appendChild(metricDropDownDiv);
 
-        var metricFromTextNode = document.createElement("label");
+        const metricFromTextNode = document.createElement("label");
         metricFromTextNode.id = domIDs.metricFromText + layerID;
         metricFromTextNode.classList.add(domClasses.metricParameter, domClasses.metricParameter + layerID, domClasses.layer + layerID, domClasses.textLabel);
         metricFromTextNode.textContent = "From";
         metricDiv.appendChild(metricFromTextNode);
 
-        var metricFromInput = document.createElement("input");
+        const metricFromInput = document.createElement("input");
         metricFromInput.type = "number";
         metricFromInput.id = domIDs.metricFromInput + layerID;
         metricFromInput.classList.add(domClasses.metricParameter, domClasses.metricParameter + layerID, domClasses.layer + layerID);
         metricDiv.appendChild(metricFromInput);
 
-        var metricFromDateInput = document.createElement("div");
+        const metricFromDateInput = document.createElement("div");
         metricFromDateInput.id = domIDs.metricFromDateInput + layerID;
         metricFromDateInput.classList.add(domClasses.metricParameter, domClasses.metricParameter + layerID, domClasses.layer + layerID);
         metricDiv.appendChild(metricFromDateInput);
 
-        var metricToTextNode = document.createElement("label");
+        const metricToTextNode = document.createElement("label");
         metricToTextNode.id = domIDs.metricToText + layerID;
         metricToTextNode.classList.add(domClasses.metricParameter, domClasses.metricParameter + layerID, domClasses.layer + layerID, domClasses.textLabel);
         metricToTextNode.textContent = "To";
         metricDiv.appendChild(metricToTextNode);
 
-        var metricToInput = document.createElement("input");
+        const metricToInput = document.createElement("input");
         metricToInput.type = "number";
         metricToInput.id = domIDs.metricToInput + layerID;
         metricToInput.classList.add(domClasses.metricParameter, domClasses.metricParameter + layerID, domClasses.layer + layerID);
         metricDiv.appendChild(metricToInput);
 
-        var metricToDateInput = document.createElement("div");
+        const metricToDateInput = document.createElement("div");
         metricToDateInput.id = domIDs.metricToDateInput + layerID;
         metricToDateInput.classList.add(domClasses.metricParameter, domClasses.metricParameter + layerID, domClasses.layer + layerID);
         metricDiv.appendChild(metricToDateInput);
@@ -202,84 +202,84 @@ class DomHelper {
     }
 
     buildMappingArea(layerID) {
-        var mappingDiv = document.createElement("div");
+        const mappingDiv = document.createElement("div");
         mappingDiv.id = domIDs.mappingDiv + layerID;
         mappingDiv.classList.add(domClasses.mappingDiv, domClasses.layer + layerID);
 
-        var mappingTextNode = document.createElement("label");
+        const mappingTextNode = document.createElement("label");
         mappingTextNode.id = domIDs.mappingTextNode + layerID;
         mappingTextNode.classList.add(domClasses.mappingTextNode, domClasses.layer + layerID, domClasses.textLabel);
         mappingTextNode.textContent = "Mapping";
         mappingDiv.appendChild(mappingTextNode);
 
-        var mappingDropDownDiv = document.createElement("div");
+        const mappingDropDownDiv = document.createElement("div");
         mappingDropDownDiv.id = domIDs.mappingDropDown + layerID;
         mappingDropDownDiv.classList.add(domClasses.mappingDropDown, domClasses.layer + layerID);
         mappingDiv.appendChild(mappingDropDownDiv);
 
-        var mappingFromTextNode = document.createElement("label");
+        const mappingFromTextNode = document.createElement("label");
         mappingFromTextNode.id = domIDs.mappingFromText + layerID;
         mappingFromTextNode.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID, domClasses.textLabel);
         mappingFromTextNode.textContent = "Mapping - From";
         mappingDiv.appendChild(mappingFromTextNode);
 
-        var mappingFromInput = document.createElement("input");
+        const mappingFromInput = document.createElement("input");
         mappingFromInput.type = "text";
         mappingFromInput.id = domIDs.mappingFromInput + layerID;
         mappingFromInput.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
         mappingDiv.appendChild(mappingFromInput);
 
-        var mappingToTextNode = document.createElement("label");
+        const mappingToTextNode = document.createElement("label");
         mappingToTextNode.id = domIDs.mappingToText + layerID;
         mappingToTextNode.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID, domClasses.textLabel);
         mappingToTextNode.textContent = "Mapping - To";
         mappingDiv.appendChild(mappingToTextNode);
 
-        var mappingToInput = document.createElement("input");
+        const mappingToInput = document.createElement("input");
         mappingToInput.type = "text";
         mappingToInput.id = domIDs.mappingToInput + layerID;
         mappingToInput.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
         mappingDiv.appendChild(mappingToInput);
 
-        var mappingColorDropDownDiv = document.createElement("div");
+        const mappingColorDropDownDiv = document.createElement("div");
         mappingColorDropDownDiv.id = domIDs.mappingColorDropDown + layerID;
         mappingColorDropDownDiv.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
         mappingDiv.appendChild(mappingColorDropDownDiv);
 
-        var mappingStartColorDropDownDiv = document.createElement("div");
+        const mappingStartColorDropDownDiv = document.createElement("div");
         mappingStartColorDropDownDiv.id = domIDs.mappingStartColorDropDown + layerID;
         mappingStartColorDropDownDiv.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
         mappingDiv.appendChild(mappingStartColorDropDownDiv);
 
-        var mappingEndColorDropDownDiv = document.createElement("div");
+        const mappingEndColorDropDownDiv = document.createElement("div");
         mappingEndColorDropDownDiv.id = domIDs.mappingEndColorDropDown + layerID;
         mappingEndColorDropDownDiv.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
         mappingDiv.appendChild(mappingEndColorDropDownDiv);
 
-        var transparencyInputDiv = document.createElement("div");
+        const transparencyInputDiv = document.createElement("div");
         transparencyInputDiv.id = domIDs.mappingTransparencyInput + layerID;
         transparencyInputDiv.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
         mappingDiv.appendChild(transparencyInputDiv);
 
-        var mappingPeriodTextNode = document.createElement("label");
+        const mappingPeriodTextNode = document.createElement("label");
         mappingPeriodTextNode.id = domIDs.mappingPeriodText + layerID;
         mappingPeriodTextNode.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID, domClasses.textLabel);
         mappingPeriodTextNode.textContent = "Period in ms";
         mappingDiv.appendChild(mappingPeriodTextNode);
 
-        var mappingPeriodInput = document.createElement("input");
+        const mappingPeriodInput = document.createElement("input");
         mappingPeriodInput.type = "number";
         mappingPeriodInput.id = domIDs.mappingPeriodInput + layerID;
         mappingPeriodInput.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
         mappingDiv.appendChild(mappingPeriodInput);
 
-        var mappingScaleTextNode = document.createElement("label");
+        const mappingScaleTextNode = document.createElement("label");
         mappingScaleTextNode.id = domIDs.mappingScaleText + layerID;
         mappingScaleTextNode.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID, domClasses.textLabel);
         mappingScaleTextNode.textContent = "Scale";
         mappingDiv.appendChild(mappingScaleTextNode);
 
-        var mappingScaleInput = document.createElement("input");
+        const mappingScaleInput = document.createElement("input");
         mappingScaleInput.type = "number";
         mappingScaleInput.id = domIDs.mappingScaleInput + layerID;
         mappingScaleInput.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
@@ -373,7 +373,7 @@ class DomHelper {
     }
 
     buildDeleteButton(layerID) {
-        var deleteButtonDiv = document.createElement("div");
+        const deleteButtonDiv = document.createElement("div");
         deleteButtonDiv.id = domIDs.deleteButton + layerID;
         deleteButtonDiv.classList.add(domClasses.deleteButton, domClasses.layer + layerID);
         this.rootDiv.appendChild(deleteButtonDiv);
