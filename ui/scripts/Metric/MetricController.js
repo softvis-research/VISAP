@@ -1,9 +1,24 @@
 controllers.metricController = (function () {
-    const controllerConfig = {
+
+    var controllerConfig = {
         metrics: [
             metrics.numberOfStatements,
             metrics.dateOfCreation,
-            metrics.dateOfLastChange
+            metrics.dateOfLastChange,
+            metrics.amountOfResults,
+            metrics.amountOfNamspa,
+            metrics.amountOfChnhis,
+            metrics.amountOfCodlen,
+            metrics.amountOfCommam,
+            metrics.amountOfDynsta,
+            metrics.amountOfEnhmod,
+            metrics.amountOfFormty,
+            metrics.amountOfNomac,
+            metrics.amountOfObjnam,
+            metrics.amountOfPraefi,
+            metrics.amountOfSlin,
+            metrics.amountOfSql,
+            metrics.amountOfTodo
         ],
         mappings: [
             mappings.color,
@@ -12,23 +27,81 @@ controllers.metricController = (function () {
             mappings.pulsation,
             mappings.flashing,
             mappings.rotation,
+        ],
+        views: [ 
+            {
+                name: "View 1",
+                viewMappings: [
+                    {
+                        metric: { "variant": "amountOfChnhis", "from": 1, "to": 2 },
+                        mapping: { "variant": "Pulsation", "color": "", "startColor": "", "endColor": "", "transparency": 0, "period": "1000", "scale": "2" }
+                    },
+                    {
+                        metric: { "variant": "amountOfNamspa", "from": 1, "to": 2 },
+                        mapping: { "variant": "Color", "color": "red", "startColor": "", "endColor": "", "transparency": 0, "period": 0, "scale": 0 }
+                    },
+                    {
+                        metric: { "variant": "amountOfCommam", "from": 1, "to": 2 },
+                        mapping: { "variant": "Flashing", "color": "orange", "startColor": "", "endColor": "", "transparency": 0, "period": "1000", "scale": 0 }
+                    }
+                ]
+            },
+            {
+                name: "View 2",
+                viewMappings: [
+                    {
+                        metric: { "variant": "amountOfNomac", "from": 0, "to": 0 },
+                        mapping: { "variant": "Transparency", "color": "", "startColor": "", "endColor": "", "transparency": 0.65, "period": 0, "scale": 0 }
+                    },
+                    {
+                        metric: { "variant": "amountOfNomac", "from": 1, "to": 30 },
+                        mapping: { "variant": "Flashing", "color": "red", "startColor": "", "endColor": "", "transparency": 0, "period": "1000", "scale": 0 }
+                    },
+                    {
+                        metric: { "variant": "amountOfDynsta", "from": 1, "to": 5 },
+                        mapping: { "variant": "Pulsation", "color": "", "startColor": "", "endColor": "", "transparency": 0, "period": "1000", "scale": "3" }
+                    },
+                    {
+                        metric: { "variant": "amountOfDynsta", "from": 1, "to": 5 },
+                        mapping: { "variant": "Transparency", "color": "", "startColor": "", "endColor": "", "transparency": 0.01, "period": 0, "scale": 0 }
+                    }
+                ]
+            },
+            {
+                name: "View 3",
+                viewMappings: [
+                    {
+                        metric: { "variant": "dateOfLastChange", "from": 1546300800000, "to": 1649808000000 },
+                        mapping: { "variant": "Transparency", "color": "", "startColor": "", "endColor": "", "transparency": 0.7, "period": 0, "scale": 0 }
+                    },
+                    {
+                        metric: { "variant": "amountOfTodo", "from": 1, "to": 5 },
+                        mapping: { "variant": "Flashing", "color": "red", "startColor": "", "endColor": "", "transparency": 0, "period": "500", "scale": 0 }
+                    },
+                    {
+                        metric: { "variant": "amountOfSlin", "from": 1, "to": 5 },
+                        mapping: { "variant": "Pulsation", "color": "", "startColor": "", "endColor": "", "transparency": 0, "period": "1000", "scale": "3" }
+                    }
+                ]
+            }
         ]
     };
 
-    let domHelper;
+    var domHelper;
 
-    let layerCounter = 0;
-    let layers = [];
+    var layerCounter = 0;
+    var layers = [];
+    var viewConfig;
 
-    const metricDefault = {
+    var metricDefault = {
         variant: metrics.numberOfStatements,
         from: 0,
         to: 0
     }
 
-    const mappingDefault = {
+    var mappingDefault = {
         variant: mappings.color,
-        color: "black",
+        color: "white",
         startColor: "blue",
         endColor: "red",
         transparency: 0.5,
@@ -45,25 +118,65 @@ controllers.metricController = (function () {
         domHelper = new DomHelper(rootDiv, controllerConfig);
         domHelper.buildUiHead();
 
-        addLayer(rootDiv);
+        addLayer();
 
         $(cssIDs.executeButton).click(executeButtonClicked);
-        $(cssIDs.resetButton).click(reset);
+        $(cssIDs.resetButton).click(resetButtonClicked);
         $(cssIDs.addLayerButton).click(addLayer);
+        $(cssIDs.downloadViewConfigButton).click(downloadViewConfig);
+        $(cssIDs.viewDropDown).on('change', changeView);
     }
 
     function executeButtonClicked(event) {
         for (let layer of layers) {
+            layer.reset();
+
             layer.readUIData();
+        }
 
-            layer.getMatchingEntities();
+        setTimeout(executeMapping, 10);
 
-            layer.doMapping()
+        if (!viewEqualToMetricMappings(viewConfig, layers)) {
+            $(cssIDs.viewDropDown).jqxDropDownList('clearSelection', true);
         }
     }
 
-    function addLayer() {
-        const newLayer = new MetricLayer(++layerCounter);
+    function changeView(event) {
+        controllerConfig.views.forEach(function (view) {
+            if (view.name == $(cssIDs.viewDropDown).val()) {
+                viewConfig = view;
+            }
+        });
+
+        reset();
+
+        viewConfig.viewMappings.forEach(function (metricMapping) {
+            addLayer('', metricMapping);
+        })
+
+        for (let layer of layers) {
+            domHelper.setLayerUI(layer);
+        }
+
+        setTimeout(executeMapping, 10);
+    }
+
+    function executeMapping() {
+        for (let layer of layers) {
+            layer.getMatchingEntities();
+
+            layer.doMapping();
+        }
+    }
+
+    function addLayer(event, metricMapping) {
+        var newLayer = new MetricLayer(++layerCounter);
+
+        if (metricMapping !== undefined) {
+            newLayer.metric = metricMapping.metric;
+            newLayer.mapping = metricMapping.mapping;
+        }
+
         layers.push(newLayer);
 
         domHelper.buildUiLayer(layerCounter);
@@ -78,18 +191,12 @@ controllers.metricController = (function () {
             return;
         }
 
-        if (layerCounter == 1) {
-            reset();
-        } else {
+        layers.pop().reset();
+        domHelper.destroyLayerUI(layerCounter--);
 
-            layers.pop().reset();
-            domHelper.destroyLayerUI(layerCounter--);
-
-            //really necessary?
-            // layers.forEach(layer => layer.doMapping());
+        if (layerCounter > 0) {
+            $(cssIDs.deleteButton + layerCounter).jqxButton({ disabled: false });
         }
-
-        $(cssIDs.deleteButton + layerCounter).jqxButton({ disabled: false });
     }
 
     // Universal method to load a data from Neo4j using imported cypher-query
@@ -117,13 +224,77 @@ controllers.metricController = (function () {
         }
     }
 
-    function reset() {
-        while (layerCounter > 1) {
-            removeLayer();
+    function downloadViewConfig(event) {
+        let viewName = prompt("Please enter View name", "View");
+        var text = '{\n\tname: "' + viewName + '",\n\tviewMappings: [';
+
+        for (let layer of layers) {
+            layer.readUIData();
+            text += '\n\t\t{\n\t\t\tmetric: ' + JSON.stringify(layer.metric) + ',\n\t\t\tmapping: ' + JSON.stringify(layer.mapping) + '\n\t\t},';
         }
 
-        layers[0].reset();
-        domHelper.resetLayerUI(1);
+        text = text.slice(0, -1);
+        text += '\n\t]\n}'
+
+        downloadObjectAsTxt('viewConfig' + viewName + '.txt', text);
+    }
+
+    function downloadObjectAsTxt(filename, text) {
+        var pom = document.createElement('a');
+        pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        pom.setAttribute('download', filename);
+        document.body.appendChild(pom); // required for firefox
+        pom.click();
+        pom.remove();
+    }
+
+    function viewEqualToMetricMappings(view, layers) {
+        if (view.viewMappings.length != layers.length) {
+            return false;
+        }
+
+        for (let layer of layers) {
+            if (isEqual(view.viewMappings[layers.indexOf(layer)].metric, layer.metric) && isEqual(view.viewMappings[layers.indexOf(layer)].mapping, layer.mapping)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    function isEqual(obj1, obj2) {
+        var props1 = Object.getOwnPropertyNames(obj1);
+        var props2 = Object.getOwnPropertyNames(obj2);
+        if (props1.length != props2.length) {
+            return false;
+        }
+        for (var i = 0; i < props1.length; i++) {
+            let val1 = obj1[props1[i]];
+            let val2 = obj2[props1[i]];
+            let isObjects = isObject(val1) && isObject(val2);
+            if (isObjects && !isEqual(val1, val2) || !isObjects && val1 !== val2) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function isObject(object) {
+        return object != null && typeof object === 'object';
+    }
+
+    function resetButtonClicked() {
+        $(cssIDs.viewDropDown).jqxDropDownList("clearSelection");
+
+        reset();
+
+        addLayer();
+    }
+
+    function reset() {
+        while (layerCounter > 0) {
+            removeLayer();
+        }
     }
 
 

@@ -1,11 +1,19 @@
 const domIDs = {
+    viewControllerHeader: "viewControllerHeader",
+    metricDiv: "metricDiv",
+    mappingDiv: "mappingDiv",
+    
+    downloadViewConfigButton: "downloadViewConfigButton",
     executeButton: "executeButton",
     resetButton: "resetButton",
     addLayerButton: "addLayerButton",
 
-    metrics: "metrics",
-    mappings: "mappings",
+    headerTextNode: "headerTextNode",
+    metricTextNode: "metricTextNode",
+    mappingTextNode: "mappingTextNode",
 
+    viewDropDown: "viewDropDown",
+    
     metricDropDown: "metricDropDown",
     mappingDropDown: "mappingDropDown",
 
@@ -38,13 +46,16 @@ const domIDs = {
 };
 
 const cssIDs = {
+    downloadViewConfigButton: "#" + domIDs.downloadViewConfigButton,
     executeButton: "#" + domIDs.executeButton,
     resetButton: "#" + domIDs.resetButton,
     addLayerButton: "#" + domIDs.addLayerButton,
 
-    metrics: "#" + domIDs.metrics,
-    mappings: "#" + domIDs.mappings,
+    metricTextNode: "#" + domIDs.metricTextNode,
+    mappingTextNode: "#" + domIDs.mappingTextNode,
 
+    viewDropDown: "#" + domIDs.viewDropDown,
+    
     metricDropDown: "#" + domIDs.metricDropDown,
     mappingDropDown: "#" + domIDs.mappingDropDown,
 
@@ -77,14 +88,19 @@ const cssIDs = {
 };
 
 const domClasses = {
-    metrics: "metrics",
-    mappings: "mappings",
+    metricDiv: "metricDiv",
+    mappingDiv: "mappingDiv",
+    
+    metricTextNode: "metricTextNode",
+    mappingTextNode: "mappingTextNode",
 
     layer: "layer",
 
     metricParameter: "metricParameter",
     mappingParameter: "mappingParameter",
 
+    viewDropDown: "viewDropDown",
+    
     metricDropDown: "metricDropDown",
     mappingDropDown: "mappingDropDown",
 
@@ -94,13 +110,15 @@ const domClasses = {
 }
 
 const cssClasses = {
-    metrics: "." + domClasses.metrics,
-    mappings: "." + domClasses.mappings,
+    metricTextNode: "." + domClasses.metricTextNode,
+    mappingTextNode: "." + domClasses.mappingTextNode,
 
     layer: "." + domClasses.layer,
-
+    
     metricParameter: "." + domClasses.metricParameter,
     mappingParameter: "." + domClasses.mappingParameter,
+
+    viewDropDown: "." + domClasses.viewDropDown,
 
     metricDropDown: "." + domClasses.metricDropDown,
     mappingDropDown: "." + domClasses.mappingDropDown,
@@ -110,6 +128,20 @@ const cssClasses = {
 
 const metrics = {
     numberOfStatements: "numberOfStatements",
+    amountOfResults: "amountOfResults",
+    amountOfNamspa: "amountOfNamspa",
+    amountOfChnhis: "amountOfChnhis",
+    amountOfCodlen: "amountOfCodlen",
+    amountOfCommam: "amountOfCommam",
+    amountOfDynsta: "amountOfDynsta",
+    amountOfEnhmod: "amountOfEnhmod",
+    amountOfFormty: "amountOfFormty",
+    amountOfNomac: "amountOfNomac",
+    amountOfObjnam: "amountOfObjnam",
+    amountOfPraefi: "amountOfPraefi",
+    amountOfSlin: "amountOfSlin",
+    amountOfSql: "amountOfSql",
+    amountOfTodo: "amountOfTodo",
     dateOfCreation: "dateOfCreation",
     dateOfLastChange: "dateOfLastChange"
 };
@@ -133,11 +165,15 @@ const colors = [
 ];
 
 const widgetSize = {
-    buttonHeight: 20,
-    dropDownHeight: 30,
-    inputHeight: 30,
-    deleteButtonHeight: 30,
+    buttonHeight: 25,
+    headerDropDownHeight: 27,
+    dropDownHeight: 25,
+    inputHeight: 25,
+    deleteButtonHeight: 27,
 
-    dropDownWidth: "15%",
-    inputWidth: "8%",
+    dropDownWidth: 150,
+    buttonWidth: 125,
+    inputWidthMapping: 73,
+    inputWidthMetric: 100,
+    deleteButtonWidth: "3.6%",
 }
