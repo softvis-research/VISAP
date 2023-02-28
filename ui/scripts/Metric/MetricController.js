@@ -94,7 +94,7 @@ controllers.metricController = (function () {
     let viewConfig;
 
     const metricDefault = {
-        variant: metrics.numberOfStatements,
+        variant: undefined,
         from: 0,
         to: 0
     }
