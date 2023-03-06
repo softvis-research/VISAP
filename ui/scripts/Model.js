@@ -56,19 +56,8 @@ controllers.model = (function () {
 				case "Namespace":
 					entity.version = element.version;
 					entity.amountOfResults = element.amount_of_results;
-					entity.amountOfNamspa = element.amount_of_namspa;
-					entity.amountOfChnhis = element.amount_of_chnhis;
-					entity.amountOfCodlen = element.amount_of_codlen;
-					entity.amountOfCommam = element.amount_of_commam;
-					entity.amountOfDynsta = element.amount_of_dynsta;
-					entity.amountOfEnhmod = element.amount_of_enhmod;
-					entity.amountOfFormty = element.amount_of_formty;
-					entity.amountOfNomac = element.amount_of_nomac;
 					entity.amountOfObjnam = element.amount_of_objnam;
 					entity.amountOfPraefi = element.amount_of_praefi;
-					entity.amountOfSlin = element.amount_of_slin;
-					entity.amountOfSql = element.amount_of_sql;
-					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
 				case "Transaction":
@@ -77,17 +66,8 @@ controllers.model = (function () {
 					entity.amountOfResults = element.amount_of_results;
 					entity.amountOfNamspa = element.amount_of_namspa;
 					entity.amountOfChnhis = element.amount_of_chnhis;
-					entity.amountOfCodlen = element.amount_of_codlen;
-					entity.amountOfCommam = element.amount_of_commam;
-					entity.amountOfDynsta = element.amount_of_dynsta;
-					entity.amountOfEnhmod = element.amount_of_enhmod;
-					entity.amountOfFormty = element.amount_of_formty;
-					entity.amountOfNomac = element.amount_of_nomac;
 					entity.amountOfObjnam = element.amount_of_objnam;
 					entity.amountOfPraefi = element.amount_of_praefi;
-					entity.amountOfSlin = element.amount_of_slin;
-					entity.amountOfSql = element.amount_of_sql;
-					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
 				case "Class":
@@ -131,17 +111,8 @@ controllers.model = (function () {
 					entity.amountOfResults = element.amount_of_results;
 					entity.amountOfNamspa = element.amount_of_namspa;
 					entity.amountOfChnhis = element.amount_of_chnhis;
-					entity.amountOfCodlen = element.amount_of_codlen;
-					entity.amountOfCommam = element.amount_of_commam;
-					entity.amountOfDynsta = element.amount_of_dynsta;
-					entity.amountOfEnhmod = element.amount_of_enhmod;
-					entity.amountOfFormty = element.amount_of_formty;
-					entity.amountOfNomac = element.amount_of_nomac;
 					entity.amountOfObjnam = element.amount_of_objnam;
 					entity.amountOfPraefi = element.amount_of_praefi;
-					entity.amountOfSlin = element.amount_of_slin;
-					entity.amountOfSql = element.amount_of_sql;
-					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
 				case "Method":
@@ -243,17 +214,8 @@ controllers.model = (function () {
 					entity.amountOfResults = element.amount_of_results;
 					entity.amountOfNamspa = element.amount_of_namspa;
 					entity.amountOfChnhis = element.amount_of_chnhis;
-					entity.amountOfCodlen = element.amount_of_codlen;
-					entity.amountOfCommam = element.amount_of_commam;
-					entity.amountOfDynsta = element.amount_of_dynsta;
-					entity.amountOfEnhmod = element.amount_of_enhmod;
-					entity.amountOfFormty = element.amount_of_formty;
-					entity.amountOfNomac = element.amount_of_nomac;
 					entity.amountOfObjnam = element.amount_of_objnam;
 					entity.amountOfPraefi = element.amount_of_praefi;
-					entity.amountOfSlin = element.amount_of_slin;
-					entity.amountOfSql = element.amount_of_sql;
-					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
 				default:
