@@ -25,6 +25,19 @@ public class AMetaDataMap {
         metaDataProperties.put(SAPNodeProperties.changed_by.name(), "changed_by");
         metaDataProperties.put(SAPNodeProperties.changed.name(), "changed");
         metaDataProperties.put(SAPNodeProperties.number_of_statements.name(), "number_of_statements");
+        metaDataProperties.put(SAPNodeProperties.amount_of_namspa.name(), "amount_of_namspa");
+        metaDataProperties.put(SAPNodeProperties.amount_of_chnhis.name(), "amount_of_chnhis");
+        metaDataProperties.put(SAPNodeProperties.amount_of_codlen.name(), "amount_of_codlen");
+        metaDataProperties.put(SAPNodeProperties.amount_of_commam.name(), "amount_of_commam");
+        metaDataProperties.put(SAPNodeProperties.amount_of_dynsta.name(), "amount_of_dynsta");
+        metaDataProperties.put(SAPNodeProperties.amount_of_enhmod.name(), "amount_of_enhmod");
+        metaDataProperties.put(SAPNodeProperties.amount_of_formty.name(), "amount_of_formty");
+        metaDataProperties.put(SAPNodeProperties.amount_of_nomac.name(), "amount_of_nomac");
+        metaDataProperties.put(SAPNodeProperties.amount_of_objnam.name(), "amount_of_objnam");
+        metaDataProperties.put(SAPNodeProperties.amount_of_praefi.name(), "amount_of_praefi");
+        metaDataProperties.put(SAPNodeProperties.amount_of_slin.name(), "amount_of_slin");
+        metaDataProperties.put(SAPNodeProperties.amount_of_sql.name(), "amount_of_sql");
+        metaDataProperties.put(SAPNodeProperties.amount_of_todo.name(), "amount_of_todo");
         metaDataProperties.put(SAPNodeProperties.local_class.name(), "local_class");
 
         // Elements, for which we want to show REFERENCES relation

@@ -55,23 +55,93 @@ controllers.model = (function () {
 			switch (entity.type) {
 				case "Namespace":
 					entity.version = element.version;
+					entity.amountOfResults = element.amount_of_results;
+					entity.amountOfNamspa = element.amount_of_namspa;
+					entity.amountOfChnhis = element.amount_of_chnhis;
+					entity.amountOfCodlen = element.amount_of_codlen;
+					entity.amountOfCommam = element.amount_of_commam;
+					entity.amountOfDynsta = element.amount_of_dynsta;
+					entity.amountOfEnhmod = element.amount_of_enhmod;
+					entity.amountOfFormty = element.amount_of_formty;
+					entity.amountOfNomac = element.amount_of_nomac;
+					entity.amountOfObjnam = element.amount_of_objnam;
+					entity.amountOfPraefi = element.amount_of_praefi;
+					entity.amountOfSlin = element.amount_of_slin;
+					entity.amountOfSql = element.amount_of_sql;
+					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
 				case "Transaction":
 					entity.calls = splitByCommaIfNotEmpty(element.calls);
 					entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
+					entity.amountOfResults = element.amount_of_results;
+					entity.amountOfNamspa = element.amount_of_namspa;
+					entity.amountOfChnhis = element.amount_of_chnhis;
+					entity.amountOfCodlen = element.amount_of_codlen;
+					entity.amountOfCommam = element.amount_of_commam;
+					entity.amountOfDynsta = element.amount_of_dynsta;
+					entity.amountOfEnhmod = element.amount_of_enhmod;
+					entity.amountOfFormty = element.amount_of_formty;
+					entity.amountOfNomac = element.amount_of_nomac;
+					entity.amountOfObjnam = element.amount_of_objnam;
+					entity.amountOfPraefi = element.amount_of_praefi;
+					entity.amountOfSlin = element.amount_of_slin;
+					entity.amountOfSql = element.amount_of_sql;
+					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
 				case "Class":
+					entity.amountOfResults = element.amount_of_results;
+					entity.amountOfNamspa = element.amount_of_namspa;
+					entity.amountOfChnhis = element.amount_of_chnhis;
+					entity.amountOfCodlen = element.amount_of_codlen;
+					entity.amountOfCommam = element.amount_of_commam;
+					entity.amountOfDynsta = element.amount_of_dynsta;
+					entity.amountOfEnhmod = element.amount_of_enhmod;
+					entity.amountOfFormty = element.amount_of_formty;
+					entity.amountOfNomac = element.amount_of_nomac;
+					entity.amountOfObjnam = element.amount_of_objnam;
+					entity.amountOfPraefi = element.amount_of_praefi;
+					entity.amountOfSlin = element.amount_of_slin;
+					entity.amountOfSql = element.amount_of_sql;
+					entity.amountOfTodo = element.amount_of_todo;
 				case "Interface":
 					entity.superTypes = splitByCommaIfNotEmpty(element.subClassOf);
 					entity.subTypes = splitByCommaIfNotEmpty(element.superClassOf);
 					entity.reaches = splitByCommaIfNotEmpty(element.reaches);
 					entity.reachedBy = [];
+					entity.amountOfResults = element.amount_of_results;
+					entity.amountOfNamspa = element.amount_of_namspa;
+					entity.amountOfChnhis = element.amount_of_chnhis;
+					entity.amountOfCodlen = element.amount_of_codlen;
+					entity.amountOfCommam = element.amount_of_commam;
+					entity.amountOfDynsta = element.amount_of_dynsta;
+					entity.amountOfEnhmod = element.amount_of_enhmod;
+					entity.amountOfFormty = element.amount_of_formty;
+					entity.amountOfNomac = element.amount_of_nomac;
+					entity.amountOfObjnam = element.amount_of_objnam;
+					entity.amountOfPraefi = element.amount_of_praefi;
+					entity.amountOfSlin = element.amount_of_slin;
+					entity.amountOfSql = element.amount_of_sql;
+					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
 				case "Attribute":
 					entity.accessedBy = splitByCommaIfNotEmpty(element.accessedBy);
+					entity.amountOfResults = element.amount_of_results;
+					entity.amountOfNamspa = element.amount_of_namspa;
+					entity.amountOfChnhis = element.amount_of_chnhis;
+					entity.amountOfCodlen = element.amount_of_codlen;
+					entity.amountOfCommam = element.amount_of_commam;
+					entity.amountOfDynsta = element.amount_of_dynsta;
+					entity.amountOfEnhmod = element.amount_of_enhmod;
+					entity.amountOfFormty = element.amount_of_formty;
+					entity.amountOfNomac = element.amount_of_nomac;
+					entity.amountOfObjnam = element.amount_of_objnam;
+					entity.amountOfPraefi = element.amount_of_praefi;
+					entity.amountOfSlin = element.amount_of_slin;
+					entity.amountOfSql = element.amount_of_sql;
+					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
 				case "Method":
@@ -101,20 +171,89 @@ controllers.model = (function () {
 					entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
 					entity.accesses = splitByCommaIfNotEmpty(element.accesses);
 					entity.numberOfStatements = element.number_of_statements;
+					entity.amountOfResults = element.amount_of_results;
+					entity.amountOfNamspa = element.amount_of_namspa;
+					entity.amountOfChnhis = element.amount_of_chnhis;
+					entity.amountOfCodlen = element.amount_of_codlen;
+					entity.amountOfCommam = element.amount_of_commam;
+					entity.amountOfDynsta = element.amount_of_dynsta;
+					entity.amountOfEnhmod = element.amount_of_enhmod;
+					entity.amountOfFormty = element.amount_of_formty;
+					entity.amountOfNomac = element.amount_of_nomac;
+					entity.amountOfObjnam = element.amount_of_objnam;
+					entity.amountOfPraefi = element.amount_of_praefi;
+					entity.amountOfSlin = element.amount_of_slin;
+					entity.amountOfSql = element.amount_of_sql;
+					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
 				case "FunctionModule":
+					entity.amountOfResults = element.amount_of_results;
+					entity.amountOfNamspa = element.amount_of_namspa;
+					entity.amountOfChnhis = element.amount_of_chnhis;
+					entity.amountOfCodlen = element.amount_of_codlen;
+					entity.amountOfCommam = element.amount_of_commam;
+					entity.amountOfDynsta = element.amount_of_dynsta;
+					entity.amountOfEnhmod = element.amount_of_enhmod;
+					entity.amountOfFormty = element.amount_of_formty;
+					entity.amountOfNomac = element.amount_of_nomac;
+					entity.amountOfObjnam = element.amount_of_objnam;
+					entity.amountOfPraefi = element.amount_of_praefi;
+					entity.amountOfSlin = element.amount_of_slin;
+					entity.amountOfSql = element.amount_of_sql;
+					entity.amountOfTodo = element.amount_of_todo;
 				case "Report":
+					entity.amountOfResults = element.amount_of_results;
+					entity.amountOfNamspa = element.amount_of_namspa;
+					entity.amountOfChnhis = element.amount_of_chnhis;
+					entity.amountOfCodlen = element.amount_of_codlen;
+					entity.amountOfCommam = element.amount_of_commam;
+					entity.amountOfDynsta = element.amount_of_dynsta;
+					entity.amountOfEnhmod = element.amount_of_enhmod;
+					entity.amountOfFormty = element.amount_of_formty;
+					entity.amountOfNomac = element.amount_of_nomac;
+					entity.amountOfObjnam = element.amount_of_objnam;
+					entity.amountOfPraefi = element.amount_of_praefi;
+					entity.amountOfSlin = element.amount_of_slin;
+					entity.amountOfSql = element.amount_of_sql;
+					entity.amountOfTodo = element.amount_of_todo;
 				case "FormRoutine":
 					entity.calls = splitByCommaIfNotEmpty(element.calls);
 					entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
-					entity.numberOfStatements = element.number_of_statements;
+					entity.amountOfResults = element.amount_of_results;
+					entity.amountOfNamspa = element.amount_of_namspa;
+					entity.amountOfChnhis = element.amount_of_chnhis;
+					entity.amountOfCodlen = element.amount_of_codlen;
+					entity.amountOfCommam = element.amount_of_commam;
+					entity.amountOfDynsta = element.amount_of_dynsta;
+					entity.amountOfEnhmod = element.amount_of_enhmod;
+					entity.amountOfFormty = element.amount_of_formty;
+					entity.amountOfNomac = element.amount_of_nomac;
+					entity.amountOfObjnam = element.amount_of_objnam;
+					entity.amountOfPraefi = element.amount_of_praefi;
+					entity.amountOfSlin = element.amount_of_slin;
+					entity.amountOfSql = element.amount_of_sql;
+					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
 				case "Variable":
 					entity.accessedBy = splitByCommaIfNotEmpty(element.accessedBy);
 					entity.dependsOn = element.dependsOn;
 					entity.filename = element.filename;
+					entity.amountOfResults = element.amount_of_results;
+					entity.amountOfNamspa = element.amount_of_namspa;
+					entity.amountOfChnhis = element.amount_of_chnhis;
+					entity.amountOfCodlen = element.amount_of_codlen;
+					entity.amountOfCommam = element.amount_of_commam;
+					entity.amountOfDynsta = element.amount_of_dynsta;
+					entity.amountOfEnhmod = element.amount_of_enhmod;
+					entity.amountOfFormty = element.amount_of_formty;
+					entity.amountOfNomac = element.amount_of_nomac;
+					entity.amountOfObjnam = element.amount_of_objnam;
+					entity.amountOfPraefi = element.amount_of_praefi;
+					entity.amountOfSlin = element.amount_of_slin;
+					entity.amountOfSql = element.amount_of_sql;
+					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
 				default:

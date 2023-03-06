@@ -34,8 +34,14 @@ public class LoaderStep {
             }
         }
 
-        if (pathToNodesCsv.isEmpty() || pathToReferenceCsv.isEmpty()) {
-            System.out.println("Some input file wasn't found");
+        if (pathToNodesCsv.isEmpty() && pathToReferenceCsv.isEmpty()) {
+            System.out.println("Nodes and Reference CSV files weren't found. Please check the input folder and make sure that you are executing the program from the generator directory.");
+            System.exit(0);
+        } else if (pathToNodesCsv.isEmpty()) {
+            System.out.println("Nodes CSV file wasn't found");
+            System.exit(0);
+        } else if (pathToReferenceCsv.isEmpty()) {
+            System.out.println("Reference CSV file wasn't found");
             System.exit(0);
         }
 
