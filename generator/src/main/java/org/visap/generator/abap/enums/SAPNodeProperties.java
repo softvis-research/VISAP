@@ -9,6 +9,7 @@ public enum SAPNodeProperties {
         local_class,
         container_id,
         
+        amount_of_results,
         amount_of_namspa,
         amount_of_chnhis,
         amount_of_codlen,
