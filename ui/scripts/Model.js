@@ -67,8 +67,8 @@ controllers.model = (function () {
 					entity.amountOfChnhis = element.amount_of_chnhis;
 					entity.amountOfCommam = element.amount_of_commam;
 					entity.amountOfDynsta = element.amount_of_dynsta;
+					entity.amountOfNomac = element.amount_of_nomac;
 					entity.amountOfSlin = element.amount_of_slin;
-					entity.amountOfSql = element.amount_of_sql;
 					entity.amountOfTodo = element.amount_of_todo;
 				case "Interface":
 					entity.superTypes = splitByCommaIfNotEmpty(element.subClassOf);
@@ -76,14 +76,14 @@ controllers.model = (function () {
 					entity.reaches = splitByCommaIfNotEmpty(element.reaches);
 					entity.reachedBy = [];
 					entity.amountOfResults = element.amount_of_results;
-					entity.amountOfChnhis = element.amount_of_chnhis;
 					entity.amountOfCommam = element.amount_of_commam;
-					entity.amountOfSql = element.amount_of_sql;
+					entity.amountOfSlin = element.amount_of_slin;
 					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
 				case "Attribute":
 					entity.accessedBy = splitByCommaIfNotEmpty(element.accessedBy);
+					entity.amountOfSlin = element.amount_of_slin;
 					break;
 
 				case "Method":
@@ -114,8 +114,11 @@ controllers.model = (function () {
 					entity.accesses = splitByCommaIfNotEmpty(element.accesses);
 					entity.numberOfStatements = element.number_of_statements;
 					entity.amountOfResults = element.amount_of_results;
+					entity.amountOfChnhis = element.amount_of_chnhis;
+					entity.amountOfCommam = element.amount_of_commam;
 					entity.amountOfDynsta = element.amount_of_dynsta;
 					entity.amountOfEnhmod = element.amount_of_enhmod;
+					entity.amountOfNomac = element.amount_of_nomac;
 					entity.amountOfSlin = element.amount_of_slin;
 					entity.amountOfSql = element.amount_of_sql;
 					entity.amountOfTodo = element.amount_of_todo;
@@ -123,17 +126,19 @@ controllers.model = (function () {
 
 				case "FunctionModule":
 					entity.amountOfResults = element.amount_of_results;
+					entity.amountOfChnhis = element.amount_of_chnhis;
+					entity.amountOfCommam = element.amount_of_commam;
 					entity.amountOfDynsta = element.amount_of_dynsta;
 					entity.amountOfEnhmod = element.amount_of_enhmod;
-					entity.amountOfFormty = element.amount_of_formty;
 					entity.amountOfNomac = element.amount_of_nomac;
 					entity.amountOfSlin = element.amount_of_slin;
 					entity.amountOfSql = element.amount_of_sql;
 					entity.amountOfTodo = element.amount_of_todo;
 				case "Report":
+					entity.amountOfChnhis = element.amount_of_chnhis;
+					entity.amountOfCommam = element.amount_of_commam;
 					entity.amountOfDynsta = element.amount_of_dynsta;
 					entity.amountOfEnhmod = element.amount_of_enhmod;
-					entity.amountOfFormty = element.amount_of_formty;
 					entity.amountOfNomac = element.amount_of_nomac;
 					entity.amountOfSlin = element.amount_of_slin;
 					entity.amountOfSql = element.amount_of_sql;
@@ -141,10 +146,12 @@ controllers.model = (function () {
 				case "FormRoutine":
 					entity.calls = splitByCommaIfNotEmpty(element.calls);
 					entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
+					entity.amountOfCommam = element.amount_of_commam;
 					entity.amountOfDynsta = element.amount_of_dynsta;
 					entity.amountOfEnhmod = element.amount_of_enhmod;
 					entity.amountOfFormty = element.amount_of_formty;
 					entity.amountOfNomac = element.amount_of_nomac;
+					entity.amountOfSlin = element.amount_of_slin;
 					entity.amountOfSql = element.amount_of_sql;
 					entity.amountOfTodo = element.amount_of_todo;
 					break;
