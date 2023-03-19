@@ -6,6 +6,8 @@ import org.visap.generator.repository.CityElement;
 
 @Config.Sources("file:${user.dir}/properties/metropolis/Shape.properties")
 public interface Shape extends Config {
+    @DefaultValue("Box")
+    CityElement.CityShape tableBuilding();
     @DefaultValue("Cylinder")
     CityElement.CityShape attributeBuilding();
 

@@ -167,6 +167,12 @@ public class MetropolisDesigner {
                     building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
                     building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
                     break;
+                case Table:
+                    building.setColor(Config.Visualization.Metropolis.color.tableBuilding());
+                    building.setShape(Config.Visualization.Metropolis.shape.tableBuilding());
+                    building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
+                    building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
+                    break;
                 default:
                     building.setColor(Config.Visualization.Metropolis.color.defaultBuildingValue());
                     building.setShape(Config.Visualization.Metropolis.shape.defaultBuildingValue());

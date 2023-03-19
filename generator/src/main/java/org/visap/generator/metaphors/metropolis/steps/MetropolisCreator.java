@@ -48,7 +48,8 @@ public class MetropolisCreator {
                 SAPNodeTypes.Class, List.of(CityElement.CityType.District),
                 SAPNodeTypes.Interface, List.of(CityElement.CityType.District),
                 SAPNodeTypes.Method, List.of(CityElement.CityType.Building),
-                SAPNodeTypes.Attribute, List.of(CityElement.CityType.Building)
+                SAPNodeTypes.Attribute, List.of(CityElement.CityType.Building),
+                SAPNodeTypes.Table, List.of(CityElement.CityType.Building)
         );
 
         for (Map.Entry<SAPNodeTypes, List<CityElement.CityType>> entry : typeMapping.entrySet()) {

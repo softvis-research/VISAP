@@ -51,4 +51,10 @@ public interface Color extends Config {
 
      @DefaultValue("#FFFFFF")
      String defaultBuildingValue();
+
+
+     // Test
+     @DefaultValue("F82C00")
+     String tableBuilding();
+
 }
