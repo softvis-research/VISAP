@@ -38,23 +38,26 @@ public class MetropolisCreator {
     }
 
     private void createAllMetropolisElements(SourceNodeRepository nodeRepository) {
-        Map<SAPNodeTypes, List<CityElement.CityType>> typeMapping = Map.of(
-                SAPNodeTypes.Namespace, List.of(CityElement.CityType.District),
-                SAPNodeTypes.FunctionGroup, List.of(CityElement.CityType.District),
-                SAPNodeTypes.FunctionModule, List.of(CityElement.CityType.Building),
-                // handling Report/Building before Report/District leads to duplicated elements - TODO: why?
-                SAPNodeTypes.Report, List.of(CityElement.CityType.District, CityElement.CityType.Building),
-                SAPNodeTypes.FormRoutine, List.of(CityElement.CityType.Building),
-                SAPNodeTypes.Class, List.of(CityElement.CityType.District),
-                SAPNodeTypes.Interface, List.of(CityElement.CityType.District),
-                SAPNodeTypes.Method, List.of(CityElement.CityType.Building),
-                SAPNodeTypes.Attribute, List.of(CityElement.CityType.Building),
-                SAPNodeTypes.Table, List.of(CityElement.CityType.Building)
-        );
+        Map<SAPNodeTypes, List<CityElement.CityType>> typeMapping = new HashMap<>();
+        typeMapping.put(SAPNodeTypes.Namespace, List.of(CityElement.CityType.District));
+        typeMapping.put(SAPNodeTypes.FunctionGroup, List.of(CityElement.CityType.District));
+        typeMapping.put(SAPNodeTypes.FunctionModule, List.of(CityElement.CityType.Building));
+        typeMapping.put(SAPNodeTypes.Report, List.of(CityElement.CityType.District, CityElement.CityType.Building));
+        typeMapping.put(SAPNodeTypes.FormRoutine, List.of(CityElement.CityType.Building));
+        typeMapping.put(SAPNodeTypes.Class, List.of(CityElement.CityType.District));
+        typeMapping.put(SAPNodeTypes.Interface, List.of(CityElement.CityType.District));
+        typeMapping.put(SAPNodeTypes.Method, List.of(CityElement.CityType.Building));
+        typeMapping.put(SAPNodeTypes.Attribute, List.of(CityElement.CityType.Building));
+        typeMapping.put(SAPNodeTypes.Table, List.of(CityElement.CityType.District));
+        typeMapping.put(SAPNodeTypes.View, List.of(CityElement.CityType.Building));
+        typeMapping.put(SAPNodeTypes.Struct, List.of(CityElement.CityType.Building));
+        typeMapping.put(SAPNodeTypes.Domain, List.of(CityElement.CityType.Building));
+        typeMapping.put(SAPNodeTypes.Dataelement, List.of(CityElement.CityType.Building));
 
         for (Map.Entry<SAPNodeTypes, List<CityElement.CityType>> entry : typeMapping.entrySet()) {
             for (CityElement.CityType cityType : entry.getValue()) {
-                createACityElementsFromSourceNodes(nodeRepository, cityType, SAPNodeProperties.type_name, entry.getKey());
+                createACityElementsFromSourceNodes(nodeRepository, cityType, SAPNodeProperties.type_name,
+                        entry.getKey());
             }
         }
     }
