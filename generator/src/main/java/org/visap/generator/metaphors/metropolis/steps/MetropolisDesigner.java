@@ -115,6 +115,9 @@ public class MetropolisDesigner {
             case Table:
                 district.setColor(Config.Visualization.Metropolis.color.tableDistrict());
                 break;
+            case DDIC:
+                district.setColor(Config.Visualization.Metropolis.color.ddicDistrict());
+                break;
             default:
                 district.setColor(Config.Visualization.Metropolis.color.defaultDistrictValue());
                 log.error(district.getSubType().name() + " is not a valid type for \"district\"");

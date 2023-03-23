@@ -25,6 +25,7 @@ public class AMetaDataMap {
         metaDataProperties.put(SAPNodeProperties.changed_by.name(), "changed_by");
         metaDataProperties.put(SAPNodeProperties.changed.name(), "changed");
         metaDataProperties.put(SAPNodeProperties.number_of_statements.name(), "number_of_statements");
+        metaDataProperties.put(SAPNodeProperties.number_of_fields.name(),"number_of_fields");
         metaDataProperties.put(SAPNodeProperties.local_class.name(), "local_class");
 
         // Elements, for which we want to show REFERENCES relation
