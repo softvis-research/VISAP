@@ -1,4 +1,5 @@
 # VISAP
+
 This project aims to be a revamp of https://github.com/softvis-research/Getaviz. In particular, it aims to reduce bloat in its source code while merging a lot of the features of Getaviz that were previously built separately through the efforts of many individual contributors.
 
 ## Current State
@@ -14,11 +15,16 @@ The generator project is built using Maven. Open the project in your IDE of choi
 
 ### Initializing the Graph Database
 
-VISAP uses a local Neo4J graph database to generate its model. Download a current version of Neo4J, then set up a new local project there. Setting a password is required, make sure it matches with the password in the "generator/src/java/properties/setup.properties" File, the default value is "123".
+VISAP uses a local Neo4J graph database to generate its model. Download a current version of Neo4J, then set up a new local project there.
 
 Make the following changes to the configuration of that database (… > Settings):
 - Comment out ``dbms.directories.import=import`` by prepending #
 - De-comment ``dbms.security.allow_csv_import_from_file_urls=true`` by removing the leading #
+
+In addition, for the sake of simplicity, let's also disable authentication for now:
+- De-comment ``dbms.security.auth_enabled=false``
+
+If you want to re-enable authentication later, check out the section on [Configuration](#configuration).
 
 Then, start the database. The authorization being disabled may cause warnings on start-up, which can be dismissed.
 
@@ -42,6 +48,7 @@ To display the model in the browser, first navigate to the folder ``ui/model/``.
 Next, you will need a local server. Based on your operating system, we recommend different practices. If these don't work for you, further information about setting up a local server can be found [here](https://aframe.io/docs/0.5.0/introduction/installation.html#local-development).
 
 ### On Windows
+
 Install [XAMPP](https://www.apachefriends.org/download.html).
 
 ![xampp.png](images/xampp.png)
@@ -80,12 +87,22 @@ Refresh the page with Ctrl-F5 to request an uncached version of the page.
 Alternatively, disable caching in your browser entirely. In Chrome, open the Developer Tools with F12, select the Network tab, then select the checkbox "Disable Cache". In Firefox, enter ``about:config`` in the address bar, search for ``browser.cache.disk.enable`` and set it to ``false``.
 
 ## Documentation
+
 The development team actively uses and maintains a [Miro board](https://miro.com/app/board/uXjVOGFnA-M=/) for project coordination and documentation. The Miro board also includes instructions for installation and usage. Access requests will generally be accepted. Most documentation is currently available in German only.
 
 If you need help or have any suggestions, we appreciate your interest in the project, and hope you will file an issue or message the contributors directly.
 
 ## Configuration
-Configuration files are essential for building projects with different settings, and they can be managed project-wide or locally. To manage configurations project-wide, you can make changes to the ``generator/properties`` file. However, if you want to make local changes to your configuration, you can create a new subfolder in the ``generator`` folder called ``user-properties``. All changes made in this folder will be ignored by Git and will overwrite existing configurations.
+
+Configuration files are essential for building projects with different settings, and they can be managed project-wide or locally.
+
+To manage configurations project-wide, you can make changes to the ``generator/properties`` file. These changes will not be ignored by Git. However, if you want to make local changes to your configuration, you can create a new subfolder in the ``generator`` folder called ``user-properties``, and set your configurations there similarly to how you would in ``generator/properties``. All changes made in this folder will be ignored by Git and will overwrite existing configurations.
+
+For example, if you want to specify a password for authentication to Neo4j, you can do so by creating a file ``generator/user-properties/Setup.properties``. In here, write:
+```properties
+password=123
+```
+to set your password to 123. Also remember to enable authentication for your Neo4j database again, if you disabled it before.
 
 ## Coding Standards
 
