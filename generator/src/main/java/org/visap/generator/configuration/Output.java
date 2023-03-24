@@ -13,7 +13,7 @@ public interface Output extends Config {
     @DefaultValue("BOTH")
     MetaDataOutput metaData();
 
-    @DefaultValue("output/YourOutput/")
+    @DefaultValue("../ui/model/yourOutput")
     String mapPath();
 
     @DefaultValue("false")
