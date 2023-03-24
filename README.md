@@ -22,7 +22,7 @@ Make the following changes to the configuration of that database (… > Settings
 - De-comment ``dbms.security.allow_csv_import_from_file_urls=true`` by removing the leading #
 
 In addition, for the sake of simplicity, let's also disable authentication for now:
-- De-comment ``dbms.security.auth_enabled=false``
+- De-comment ``dbms.security.auth_enabled=false`` by removing the leading #
 
 If you want to re-enable authentication later, check out the section on [Configuration](#configuration).
 
@@ -30,22 +30,20 @@ Then, start the database. The authorization being disabled may cause warnings on
 
 ### Generating a Model
 
-- Ensure that the Neo4J database is running
+- Ensure that the Neo4J database is running.
 - Place input CSV files inside the directory ```generator/input/```. This directory is meant as a place to store all your model data inside appropriately named sub-directories. It also contains an example sub-directory to get you started.
 - Execute the file ``generator/src/main/java/org.visap.generator/steps/LoaderStep.java``. This will place the initial data in the local graph database. Any previously contained data is overwritten!
 - Execute the file ``generator/src/main/java/org.visap.generator/steps/AFrameExporterStep.java``. This will run all additional model-generating steps. Depending on the model size, this process can take a few minutes to finish.
 
-The resulting model files (model.html and metaData.json) are placed in the output/ folder. This folder also includes an example sub-directory.
+The resulting model files (model.html and metaData.json) are placed in the ui/model/yourOutput folder by default. This folder also includes an example sub-directory.
 
 To change your input location, you can change the ``inputCSVFilePath`` property inside the ``generator/properties/Setup.properties`` file. Similarly, to change your output location, you can change the ``mapPath`` property inside the ``generator/properties/Output.properties`` file.
 
 ### Displaying a Model in the Browser
 
-After following the instructions in section [Generating a Model](#generating-a-model), two files will have been generated for you: model.html and metaData.json.
+After following the instructions in section [Generating a Model](#generating-a-model), two files will have been generated for you: model.html and metaData.json. By default, these will be placed inside ``ui/model/yourOutput/``, but you can specify a different location in your configuration.
 
-To display the model in the browser, first navigate to the folder ``ui/model/``. Create a subfolder with a name of your liking, for example ``myFirstModel``. Copy both the model.html file and the metaData.json file from the ``generator/output/`` directory into this subfolder.
-
-Next, you will need a local server. Based on your operating system, we recommend different practices. If these don't work for you, further information about setting up a local server can be found [here](https://aframe.io/docs/0.5.0/introduction/installation.html#local-development).
+Next, you will need a local server. Based on your operating system, we recommend different practices. If these don't work for you, further information about setting up a local server can be found [here](https://aframe.io/docs/1.4.0/introduction/installation.html#use-a-local-server).
 
 ### On Windows
 
@@ -70,9 +68,9 @@ inside the UI folder.
 ### Final Steps
 
 Whichever approach for setting up a local server you used, if things went well, you should now be able to view the visualization in the browser.
-Enter the URL ``{localhost}/index.html?setup={setupPath}&model={folderName}``, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder inside which you created the ``model/`` subfolder. Instead of the folder you created yourself, you can also use ``example``. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is ``minimal``.
+Enter the URL ``{localhost}/index.html?setup={setupPath}&model={folderName}``, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder that holds the model files (which is going to be yourOutput if you made no changes to the configuration). You can also use ``example`` as the folderName to use an example model. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is ``minimal``.
 
-When using NPM live-server, our complete URL might be http://127.0.0.1:8080/index.html?setup=minimal&model=Example. When using XAMPP, it might be http://localhost/index.html?setup=minimal&model=Example instead.
+When using NPM live-server, our complete URL might be http://127.0.0.1:8080/?setup=minimal&model=Example. When using XAMPP, it might be http://localhost/index.html?setup=minimal&model=Example instead.
 
 The visualization will look similar to this:
 
