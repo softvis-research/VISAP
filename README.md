@@ -84,6 +84,9 @@ The development team actively uses and maintains a [Miro board](https://miro.com
 
 If you need help or have any suggestions, we appreciate your interest in the project, and hope you will file an issue or message the contributors directly.
 
+## Configuration
+Configuration files are essential for building projects with different settings, and they can be managed project-wide or locally. To manage configurations project-wide, you can make changes to the ``generator/properties`` file. However, if you want to make local changes to your configuration, you can create a new subfolder in the ``generator`` folder called ``user-properties``. All changes made in this folder will be ignored by Git and will overwrite existing configurations.
+
 ## Coding Standards
 
 Both Java and JavaScript code roughly follow [1TBS formatting](https://en.wikipedia.org/wiki/Indentation_style#Variant:_1TBS_(OTBS)). Single lines of whitespace (rarely two) can be used to separate logical units in code blocks and source files. Padding out the beginnings and ends of blocks is generally not necessary, though you might still find it in older code.
