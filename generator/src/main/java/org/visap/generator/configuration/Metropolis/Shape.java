@@ -1,10 +1,15 @@
-
 package org.visap.generator.configuration.Metropolis;
 
-import org.aeonbits.owner.Config;
 import org.visap.generator.repository.CityElement;
 
-@Config.Sources("file:${user.dir}/properties/metropolis/Shape.properties")
+import org.aeonbits.owner.Config;
+import org.aeonbits.owner.Config.LoadPolicy;
+
+@LoadPolicy(Config.LoadType.MERGE)
+@Config.Sources({
+    "file:${user.dir}/user-properties/Shape.properties",
+    "file:${user.dir}/properties/Shape.properties",
+})
 public interface Shape extends Config {
     @DefaultValue("Cylinder")
     CityElement.CityShape attributeBuilding();

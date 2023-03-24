@@ -1,11 +1,17 @@
 package org.visap.generator.configuration.Metropolis;
 
-import org.aeonbits.owner.Config;
 import org.visap.generator.metaphors.metropolis.layouts.enums.LayoutType;
 import org.visap.generator.metaphors.metropolis.layouts.enums.LayoutVersion;
 import org.visap.generator.repository.CityElement;
 
-@Config.Sources({ "file:${user.dir}/properties/metropolis/District.properties" })
+import org.aeonbits.owner.Config;
+import org.aeonbits.owner.Config.LoadPolicy;
+
+@LoadPolicy(Config.LoadType.MERGE)
+@Config.Sources({
+    "file:${user.dir}/user-properties/District.properties",
+    "file:${user.dir}/properties/District.properties",
+})
 public interface District extends Config {
     @DefaultValue("3.0")
     double horizontalBuildingGap();
