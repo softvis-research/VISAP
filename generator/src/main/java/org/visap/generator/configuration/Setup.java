@@ -18,7 +18,7 @@ public interface Setup extends Config {
     @DefaultValue("123")
     String password();
 
-    @DefaultValue("input/Example/")
+    @DefaultValue("input/example/")
     String inputCSVFilePath();
 
     @Config.DefaultValue("true")
