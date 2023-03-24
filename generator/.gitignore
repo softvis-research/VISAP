@@ -11,6 +11,9 @@ target/
 # iml files
 *.iml
 
+# user-specific properties
+user-properties/
+
 # CSV file input
 /input/*
 !/input/Example/
