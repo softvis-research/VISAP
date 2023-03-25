@@ -1,10 +1,12 @@
 package org.visap.generator.abap.enums;
 
-public enum SAPNodeTypes {
+import org.visap.generator.metaphors.metropolis.steps.MetropolisCreator;
+
+public enum SAPNodeTypes{
     Namespace,
 
     Table, DDIC,
-    View, Struct, Domain, Dataelement,
+    View, Struct, Domain, Dataelement, Tablebuilding,
 
     Class, Interface, Report, FunctionGroup,
 

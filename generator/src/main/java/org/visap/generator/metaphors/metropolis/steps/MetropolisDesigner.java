@@ -173,7 +173,7 @@ public class MetropolisDesigner {
                     building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
                     building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
                     break;
-                case Table:
+                case Tablebuilding:
                     building.setColor(Config.Visualization.Metropolis.color.tableBuilding());
                     building.setShape(Config.Visualization.Metropolis.shape.tableBuilding());
                     building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
@@ -194,14 +194,14 @@ public class MetropolisDesigner {
                 case Dataelement:
                     building.setColor(Config.Visualization.Metropolis.color.dataelementBuilding());
                     building.setShape(Config.Visualization.Metropolis.shape.dataelementBuilding());
-                    building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
-                    building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
+                    building.setWidth(Config.Visualization.Metropolis.building.defaultDDICWidth());
+                    building.setLength(Config.Visualization.Metropolis.building.defaultDDICLength());
                     break;
                 case Domain:
                     building.setColor(Config.Visualization.Metropolis.color.domainBuilding());
                     building.setShape(Config.Visualization.Metropolis.shape.domainBuilding());
-                    building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
-                    building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
+                    building.setWidth(Config.Visualization.Metropolis.building.defaultDDICWidth());
+                    building.setLength(Config.Visualization.Metropolis.building.defaultDDICLength());
                     break;
                 default:
                     building.setColor(Config.Visualization.Metropolis.color.defaultBuildingValue());

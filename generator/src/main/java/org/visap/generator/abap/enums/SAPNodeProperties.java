@@ -1,6 +1,8 @@
 package org.visap.generator.abap.enums;
 
-public enum SAPNodeProperties {
+import org.visap.generator.metaphors.metropolis.steps.MetropolisCreator;
+
+public enum SAPNodeProperties{
         // alle Elemente
         element_id, object_name, type, type_name, creator, created, changed_by, changed, iteration,
 

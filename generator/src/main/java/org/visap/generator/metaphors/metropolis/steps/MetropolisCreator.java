@@ -48,12 +48,13 @@ public class MetropolisCreator {
         typeMapping.put(SAPNodeTypes.Interface, List.of(CityElement.CityType.District));
         typeMapping.put(SAPNodeTypes.Method, List.of(CityElement.CityType.Building));
         typeMapping.put(SAPNodeTypes.Attribute, List.of(CityElement.CityType.Building));
-        typeMapping.put(SAPNodeTypes.Table, List.of(CityElement.CityType.District, CityElement.CityType.Building));
+        typeMapping.put(SAPNodeTypes.Tablebuilding, List.of(CityElement.CityType.Building));
         typeMapping.put(SAPNodeTypes.View, List.of(CityElement.CityType.Building));
         typeMapping.put(SAPNodeTypes.Struct, List.of(CityElement.CityType.Building));
         typeMapping.put(SAPNodeTypes.Domain, List.of(CityElement.CityType.Building));
         typeMapping.put(SAPNodeTypes.Dataelement, List.of(CityElement.CityType.Building));
         typeMapping.put(SAPNodeTypes.DDIC, List.of(CityElement.CityType.District));
+        typeMapping.put(SAPNodeTypes.Table, List.of(CityElement.CityType.District));
 
         for (Map.Entry<SAPNodeTypes, List<CityElement.CityType>> entry : typeMapping.entrySet()) {
             for (CityElement.CityType cityType : entry.getValue()) {
@@ -77,7 +78,7 @@ public class MetropolisCreator {
         for (CityElement element : cityElements) {
             Node sourceNode = element.getSourceNode();
 
-            if (element.getSourceNodeType() == SAPNodeTypes.Report || element.getSourceNodeType() == SAPNodeTypes.Table) {
+            if (element.getSourceNodeType() == SAPNodeTypes.Report) {
                 if (element.getType() == CityElement.CityType.Building) {
                     continue;
                 }
@@ -96,7 +97,7 @@ public class MetropolisCreator {
                 }
 
                 if (childElement.getType() == CityElement.CityType.Building
-                        && childElement.getSourceNodeType() == SAPNodeTypes.Report || childElement.getSourceNodeType() == SAPNodeTypes.Table) {
+                        && childElement.getSourceNodeType() == SAPNodeTypes.Report) {
                     continue;
                 }
 

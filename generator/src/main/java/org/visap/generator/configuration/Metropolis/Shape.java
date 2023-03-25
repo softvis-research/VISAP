@@ -32,13 +32,13 @@ public interface Shape extends Config {
     @DefaultValue("Cylinder")
     CityElement.CityShape tableBuilding();
 
-    @DefaultValue("Box")
+    @DefaultValue("Cone")
     CityElement.CityShape viewBuilding();
 
-    @DefaultValue("Cone")
+    @DefaultValue("Cylinder")
     CityElement.CityShape structBuilding();
 
-    @DefaultValue("Sphere")
+    @DefaultValue("Box")
     CityElement.CityShape dataelementBuilding();
 
     @DefaultValue("Sphere")
