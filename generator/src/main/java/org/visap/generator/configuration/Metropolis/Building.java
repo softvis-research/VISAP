@@ -1,8 +1,13 @@
 package org.visap.generator.configuration.Metropolis;
 
 import org.aeonbits.owner.Config;
+import org.aeonbits.owner.Config.LoadPolicy;
 
-@Config.Sources({ "file:${user.dir}/properties/metropolis/Building.properties" })
+@LoadPolicy(Config.LoadType.MERGE)
+@Config.Sources({
+    "file:${user.dir}/user-properties/Building.properties",
+    "file:${user.dir}/properties/Building.properties",
+})
 public interface Building extends Config {
     @DefaultValue("2")
     double defaultHeight();

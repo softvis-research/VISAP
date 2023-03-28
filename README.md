@@ -1,7 +1,9 @@
 # VISAP
+
 This project aims to be a revamp of [Getaviz](https://github.com/softvis-research/Getaviz). In particular, it aims to reduce bloat in its source code while merging a lot of the features of Getaviz that were previously built separately through the efforts of many individual contributors.
 
 ## Current State
+
 The project is currently in a pre-development phase. Porting of functionality from Getaviz is still ongoing, and while we have a rough idea of where we want to go, many important design decisions are yet to be made.
 
 ## Installation
@@ -14,11 +16,16 @@ The generator project is built using Maven. Open the project in your IDE of choi
 
 ### Initializing the Graph Database
 
-VISAP uses a local Neo4J graph database to generate its model. Download a current version of Neo4J, then set up a new local project there. Setting a password is required, make sure it matches with the password in the ``generator/src/java/properties/setup.properties`` file, the default value is ``123``.
+VISAP uses a local Neo4j graph database to generate its model. Download a current version of Neo4j, then set up a new local project there.
 
 Make the following changes to the configuration of that database (… > Settings):
 - Comment out ``dbms.directories.import=import`` by prepending #
 - De-comment ``dbms.security.allow_csv_import_from_file_urls=true`` by removing the leading #
+
+In addition, for the sake of simplicity, let's also disable authentication for now:
+- De-comment ``dbms.security.auth_enabled=false`` by removing the leading #
+
+If you want to re-enable authentication later, check out the section on [Configuration](#configuration).
 
 Then, start the database. The authorization being disabled may cause warnings on start-up, which can be dismissed.
 
@@ -29,19 +36,18 @@ Then, start the database. The authorization being disabled may cause warnings on
 - Execute the file ``generator/src/main/java/org.visap.generator/steps/LoaderStep.java``. This will place the initial data in the local graph database. Any previously contained data is overwritten!
 - Execute the file ``generator/src/main/java/org.visap.generator/steps/AFrameExporterStep.java``. This will run all additional model-generating steps. Depending on the model size, this process can take a few minutes to finish.
 
-The resulting model files (model.html and metaData.json) are placed in the output/ folder. This folder also includes an example sub-directory.
+The resulting model files (model.html and metaData.json) are placed in the ui/model/yourOutput folder by default. This folder also includes an example sub-directory.
 
 To change your input location, you can change the ``inputCSVFilePath`` property inside the ``generator/properties/Setup.properties`` file. Similarly, to change your output location, you can change the ``mapPath`` property inside the ``generator/properties/Output.properties`` file.
 
 ### Displaying a Model in the Browser
 
-After following the instructions in section [Generating a Model](#generating-a-model), two files will have been generated for you: model.html and metaData.json.
+After following the instructions in section [Generating a Model](#generating-a-model), two files will have been generated for you: model.html and metaData.json. By default, these will be placed inside ``ui/model/yourOutput/``, but you can specify a different location in your configuration.
 
-To display the model in the browser, first navigate to the folder ``ui/model/``. Create a subfolder with a name of your liking, for example ``myFirstModel``. Copy both the model.html file and the metaData.json file from the ``generator/output/`` directory into this subfolder.
-
-Next, you will need a local server. Based on your operating system, we recommend different practices. If these don't work for you, further information about setting up a local server can be found [here](https://aframe.io/docs/0.5.0/introduction/installation.html#local-development).
+Next, you will need a local server. Based on your operating system, we recommend different practices. If these don't work for you, further information about setting up a local server can be found [here](https://aframe.io/docs/1.4.0/introduction/installation.html#use-a-local-server).
 
 ### On Windows
+
 Install [XAMPP](https://www.apachefriends.org/download.html).
 
 ![xampp.png](images/xampp.png)
@@ -63,9 +69,9 @@ inside the UI folder.
 ### Final Steps
 
 Whichever approach for setting up a local server you used, if things went well, you should now be able to view the visualization in the browser.
-Enter the URL ``{localhost}/index.html?setup={setupPath}&model={folderName}``, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the subfolder inside the ``model/`` folder. Instead of the folder you created yourself, you can also use ``example``. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is ``minimal``.
+Enter the URL ``{localhost}/index.html?setup={setupPath}&model={folderName}``, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder that holds the model files (which is going to be yourOutput if you made no changes to the configuration). You can also use ``example`` as the folderName to use an example model. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is ``minimal``.
 
-When using NPM live-server, our complete URL might be http://127.0.0.1:8080/index.html?setup=minimal&model=Example. When using XAMPP, it might be http://localhost/index.html?setup=minimal&model=Example instead.
+When using NPM live-server, our complete URL might be http://127.0.0.1:8080/?setup=minimal&model=Example. When using XAMPP, it might be http://localhost/index.html?setup=minimal&model=Example instead.
 
 The visualization will look similar to this:
 
@@ -80,9 +86,21 @@ Refresh the page with Ctrl-F5 to request an uncached version of the page.
 Alternatively, disable caching in your browser entirely. In Chrome, open the Developer Tools with F12, select the Network tab, then select the checkbox "Disable Cache". In Firefox, enter ``about:config`` in the address bar, search for ``browser.cache.disk.enable`` and set it to ``false``.
 
 ## Documentation
-The development team actively uses and maintains a [Miro board](https://miro.com/app/board/uXjVOGFnA-M=/) for project coordination and documentation. Access requests will generally be accepted. Most of the information on the Miro board is currently German.
+The development team actively uses and maintains a [Miro board](https://miro.com/app/board/uXjVOGFnA-M=/) for project coordination and documentation. Access requests will generally be accepted. Most of the information on the Miro board is currently written in German.
 
 If you need help or have any suggestions, we appreciate your interest in the project, and hope you will file an issue or message the contributors directly.
+
+## Configuration
+
+Configuration files are essential for building projects with different settings, and they can be managed project-wide or locally.
+
+To manage configurations project-wide, you can make changes to the ``generator/properties`` file. These changes will not be ignored by Git. However, if you want to make local changes to your configuration, you can create a new subfolder in the ``generator`` folder called ``user-properties``, and set your configurations there similarly to how you would in ``generator/properties``. All changes made in this folder will be ignored by Git and will overwrite existing configurations.
+
+For example, if you want to specify a password for authentication to Neo4j, you can do so by creating a file ``generator/user-properties/Setup.properties``. In here, write:
+```properties
+password=123
+```
+to set your password to 123. Also remember to enable authentication for your Neo4j database again, if you disabled it before.
 
 ## Coding Standards
 

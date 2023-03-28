@@ -1,8 +1,13 @@
 package org.visap.generator.configuration;
 
 import org.aeonbits.owner.Config;
+import org.aeonbits.owner.Config.LoadPolicy;
 
-@Config.Sources("file:${user.dir}/properties/Setup.properties")
+@LoadPolicy(Config.LoadType.MERGE)
+@Config.Sources({
+    "file:${user.dir}/user-properties/Setup.properties",
+    "file:${user.dir}/properties/Setup.properties",
+})
 public interface Setup extends Config {
     @DefaultValue("bolt://localhost:7687")
     String boltAddress();
@@ -13,7 +18,7 @@ public interface Setup extends Config {
     @DefaultValue("123")
     String password();
 
-    @DefaultValue("input/Example/")
+    @DefaultValue("input/example/")
     String inputCSVFilePath();
 
     @Config.DefaultValue("true")

@@ -11,13 +11,16 @@ target/
 # iml files
 *.iml
 
+# user-specific properties
+user-properties/
+
 # CSV file input
 /input/*
-!/input/Example/
+!/input/example/
 
 # Model output
 /output/*
-!/output/Example/
+!/output/example/
 # This file currently needs to be re-committed whenever the git cache has been cleared
 # !/output/YourOutput/
 
