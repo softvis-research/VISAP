@@ -16,7 +16,8 @@ user-properties/
 
 # CSV file input
 /input/*
-!/input/*example/
+!/input/example/
+!/input/*Example/
 
 # Model output
 /output/*
