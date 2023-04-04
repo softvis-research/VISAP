@@ -33,7 +33,7 @@ public class MetropolisAFrameUI implements OutputFormat {
                 "\n" +
                 "\t\t\t <a-sky src=\"#sky\" radius=\"7000\"></a-sky>" +
                 "\n" +
-                "\t\t\t <a-plane src=\"#ground\" height=\"5000\" width=\"5000\" rotation=\"-90 0 0\" position=\"0 0 0\" repeat=\"30 30\"></a-plane>"
+                "\t\t\t <a-plane src=\"#ground\" height=\"5000\" width=\"5000\" rotation=\"-90 0 0\" position=\"0 0 0\" repeat=\"500 500\"></a-plane>"
                 +
                 "\n";
 
