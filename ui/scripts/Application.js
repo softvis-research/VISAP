@@ -164,27 +164,27 @@ controllers.application = (function () {
 		// areas
 		if (configPart.area !== undefined) {
 			const area = configPart.area;
-			const splitterName = `${configName}_${area.name}`;
-			const splitterId = `#${splitterName}`;
-			const splitterOrientation = area.orientation ?? "vertical";
-			const splitterResizable = area.resizable ?? true;
-
-			const splitterObject = createSplitter(splitterName);
-			parent.appendChild(splitterObject.splitter);
+			const splitterId = `${configName}_${area.name}`;
 
 			const firstPart = area.first;
 			const secondPart = area.second;
 			const firstPanel = createPanel(firstPart);
 			const secondPanel = createPanel(secondPart);
 
-			$(splitterId).jqxSplitter({ theme: "metro", width: "100%", height: "100%", resizable: splitterResizable, orientation: splitterOrientation, panels: [firstPanel, secondPanel] });
-
-			$(splitterId).on("resize", () => { canvasManipulator.resizeScene() });
+			const splitterOptions = {
+				theme: "metro",
+				width: "100%",
+				height: "100%",
+				resizable: area.resizable ?? true,
+				orientation: area.orientation ?? "vertical",
+				panels: [firstPanel, secondPanel]
+			};
+			const splitterDivs = createSplitter(parent, splitterId, splitterOptions);
 
 			// recursively parse layout of the children
-			parseUIConfig(configName, firstPart, splitterObject.firstPanel);
+			parseUIConfig(configName, firstPart, splitterDivs.firstPanel);
 			if (secondPart !== undefined) {
-				parseUIConfig(configName, secondPart, splitterObject.secondPanel);
+				parseUIConfig(configName, secondPart, splitterDivs.secondPanel);
 			}
 		}
 
@@ -258,15 +258,27 @@ controllers.application = (function () {
 		return panel;
 	}
 
-	function createSplitter(id) {
-		const splitter = createDiv(id);
-		const firstPanel = createDivAsChildOf(splitter, `${id}firstPanel`);
-		const secondPanel = createDivAsChildOf(splitter, `${id}secondPanel`);
+	function createSplitter(parent, id, options) {
+		const firstPanelId = id + "FirstPanel";
+		const secondPanelId = id + "SecondPanel";
+
+		$(parent).append(`<div id="${id}">
+			<div id="${firstPanelId}"></div>
+			<div id="${secondPanelId}"></div>
+		</div>`);
+
+		const splitterRoot = $('#' + id);
+		splitterRoot.igSplitter(options);
+
+		const firstPanel = splitterRoot.find('#' + firstPanelId);
+		const secondPanel = splitterRoot.find('#' + secondPanelId);
+
+		splitterRoot.on("resize", () => { canvasManipulator.resizeScene() });
 
 		return {
-			splitter: splitter,
-			firstPanel: firstPanel,
-			secondPanel: secondPanel
+			splitter: splitterRoot[0],
+			firstPanel: firstPanel[0],
+			secondPanel: secondPanel[0]
 		};
 	}
 
