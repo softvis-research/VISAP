@@ -18,4 +18,5 @@ public class Config {
 
     public static Output output = ConfigFactory.create(Output.class);
     public static Assets assets = ConfigFactory.create(Assets.class);
+    public static Features features = ConfigFactory.create(Features.class);
 }
