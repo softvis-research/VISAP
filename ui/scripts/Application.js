@@ -45,9 +45,8 @@ controllers.application = (function () {
 	let controllerDivs = new Map();
 	let uiConfig = null;
 
-	let bodyElement;
+	// reference to model top element
 	let canvasElement;
-
 
 	// initialize application
 
@@ -75,10 +74,7 @@ controllers.application = (function () {
 	}
 
 	function createUiLayout() {
-		bodyElement = document.body;
-		canvasElement = document.getElementById("canvas");
-
-		const uiDiv = createDivAsChildOf(bodyElement, "ui");
+		const uiDiv = createDivAsChildOf(document.body, "ui");
 		uiConfig.uiDiv = uiDiv;
 
 		try {
@@ -156,7 +152,10 @@ controllers.application = (function () {
 				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultModeLPath));
 				else return response.text();
 			}).then(modelHtml => {
-				$("#canvas").append(modelHtml);
+				// load model into a separate, temporary document until UI initialization
+				const domParser = new DOMParser();
+				const canvasDocument = domParser.parseFromString(modelHtml, 'text/html');
+				canvasElement = canvasDocument.querySelector('#' + canvasId);
 		});
 	}
 
@@ -210,9 +209,9 @@ controllers.application = (function () {
 
 		// canvas
 		if (configPart.canvas !== undefined) {
-			const canvasParentElement = canvasElement.parentElement;
-			canvasParentElement.removeChild(canvasElement);
-			parent.appendChild(canvasElement.cloneNode(true));
+			// transfer canvas HTML from loaded document to actual DOM
+			const canvasDiv = createDivAsChildOf(parent, 'canvas');
+			canvasDiv.append(canvasElement);
 		}
 
 		// controller divs
@@ -221,6 +220,10 @@ controllers.application = (function () {
 				addControllerDiv(controller, parent);
 			});
 		}
+	}
+
+	function getCanvas() {
+		return canvasElement;
 	}
 
 
@@ -365,6 +368,7 @@ controllers.application = (function () {
 		createModalPopup: createModalPopup,
 		createDiv: createDiv,
 		createDivAsChildOf: createDivAsChildOf,
+		getCanvas: getCanvas,
 
 		startLoadingSetup: startLoadingSetup,
 		startLoadingMetadata: startLoadingMetadata,

@@ -92,7 +92,7 @@ controllers.actionController = (function () {
 
 
 	function initialize() {
-		const canvas = document.getElementById(canvasId);
+		const canvas = application.getCanvas();
 
 		AFRAME.registerComponent('mouselistener', {
 			init: function () {

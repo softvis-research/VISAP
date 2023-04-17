@@ -22,9 +22,11 @@
 		area: {
 			name: "top",
 			orientation: "horizontal",
-			first: { },
+			first: {
+				size: "25%",
+			 },
 			second: {
-				size: "100%",
+				size: "75%",
 				collapsible: false,
 				name: "canvas",
 				canvas: { },
