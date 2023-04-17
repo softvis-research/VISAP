@@ -276,7 +276,7 @@ controllers.application = (function () {
 		const firstPanel = splitterRoot.find('#' + firstPanelId);
 		const secondPanel = splitterRoot.find('#' + secondPanelId);
 
-		splitterRoot.on("resize", () => { canvasManipulator.resizeScene() });
+		splitterRoot.on("igsplitterresizeended", () => { canvasManipulator.resizeScene() });
 
 		return {
 			splitter: splitterRoot[0],
