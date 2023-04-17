@@ -1,5 +1,5 @@
-var createRelationConnectionHelper = function(controllerConfig) {
-    return (function(controllerConfig) {
+const createRelationConnectionHelper = function (controllerConfig) {
+    return (function (controllerConfig) {
 
         const connectorSize = 0.05;
 
@@ -97,7 +97,7 @@ var createRelationConnectionHelper = function(controllerConfig) {
         }
 
         function createConnector(entity, relatedEntity, relationId) {
-            const {sourcePosition, targetPosition} = evaluatePositions(entity, relatedEntity);
+            const { sourcePosition, targetPosition } = evaluatePositions(entity, relatedEntity);
             if (!sourcePosition || !targetPosition) {
                 return null;
             }
@@ -137,6 +137,7 @@ var createRelationConnectionHelper = function(controllerConfig) {
                 connectorElements.push(sourceEndpoint);
                 connectorElements.push(targetEndpoint);
             }
+
             return connectorElements;
         }
 
