@@ -1,46 +1,44 @@
 const setup = {
 	controllers: [
 		{
-			name: 	"defaultLogger",
+			name: "defaultLogger",
 
-			logActionConsole	: false,
-			logEventConsole		: false
+			logActionConsole: false,
+			logEventConsole: false
 		},
 		{
-			name: 	"canvasHoverController",
+			name: "canvasHoverController",
 		},
-        {
-            name: "relationController",
-            sourceStartAtBorder: false,
-            targetEndAtBorder: false,
-            showInnerRelations: true,      
+		{
+			name: "relationController",
+			sourceStartAtBorder: false,
+			targetEndAtBorder: false,
+			showInnerRelations: true,
 
-            connectorColor: { r: 0, g: 0, b: 1 },
-        },
+			connectorColor: { r: 0, g: 0, b: 1 },
+		},
 	],
 
 	ui: {
 		name: "UI0",
 
 		navigation: {
-			//examine, walk, fly, helicopter, lookAt, turntable, game
 			type: "examine",
-			//speed: 10
 		},
 		area: {
 			name: "top",
 			orientation: "horizontal",
-			first: { },
+			first: {},
 			second: {
 				size: "100%",
 				collapsible: false,
 				name: "canvas",
-				canvas: { },
+				canvas: {},
 
 				controllers: [
 					{ name: "defaultLogger" },
 					{ name: "canvasHoverController" },
-                    { name: "relationController" },
+					{ name: "relationController" },
 				],
 			}
 		}
