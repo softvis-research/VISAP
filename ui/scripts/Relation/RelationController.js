@@ -49,8 +49,8 @@ controllers.relationController = function () {
 		relationConnectionHelper = createRelationConnectionHelper(controllerConfig);
 		curvedRelationConnectionHelper = createCurvedRelationConnectionHelper(controllerConfig);
 
-		events.hovered.on.subscribe(onRelationsChanged);
-		events.hovered.off.subscribe(onEntityDeselected);
+		events.selected.on.subscribe(onRelationsChanged);
+		events.selected.off.subscribe(onEntityDeselected);
 
 		//pop-up to choose between the different connectors 
 		chooseRelation();

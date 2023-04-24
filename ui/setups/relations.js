@@ -10,6 +10,9 @@ const setup = {
 			name: "canvasHoverController",
 		},
 		{
+			name: "canvasSelectController",
+		},
+		{
 			name: "relationController",
 			sourceStartAtBorder: false,
 			targetEndAtBorder: false,
@@ -38,6 +41,7 @@ const setup = {
 				controllers: [
 					{ name: "defaultLogger" },
 					{ name: "canvasHoverController" },
+					{ name: "canvasSelectController" },
 					{ name: "relationController" },
 				],
 			}
