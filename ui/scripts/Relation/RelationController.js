@@ -18,7 +18,7 @@ controllers.relationController = function () {
 	//true for curved Relations, false for straight Relations
 	var curved = new Boolean();
 
-	//config parameters
+	// config parameters
 	const controllerConfig = {
 		showConnector: true,
 		showHighlight: true,
@@ -38,7 +38,7 @@ controllers.relationController = function () {
 		connectorColor: { r: 0, g: 0, b: 1 },
 		endpointColor: { r: 0, g: 0, b: 0 },
 
-		//highlight configs
+		// highlight configs
 		highlightColor: "black",
 	}
 
@@ -52,11 +52,11 @@ controllers.relationController = function () {
 		events.selected.on.subscribe(onRelationsChanged);
 		events.selected.off.subscribe(onEntityDeselected);
 
-		//pop-up to choose between the different connectors 
+		// pop-up to choose between the different connectors 
 		chooseRelation();
 	}
 
-	//creates alert-box to choose between the different connectors, displayed text should be changed...
+	// creates alert-box to choose between the different connectors, displayed text should be changed...
 	function chooseRelation() {
 		var txt;
 		if (confirm("Möchten Sie das neue Feature \"Curved Relations\" nutzen?\nBei Cancel/Abbrechen werden die geraden Relations genutzt")) {
@@ -97,7 +97,7 @@ controllers.relationController = function () {
 			unhighlightAllRelatedEntities();
 		}
 
-		//remove relation entities
+		// remove relation entities
 		relations.forEach(function (relation) {
 			model.removeEntity(relation.id);
 		});
@@ -429,7 +429,7 @@ controllers.relationController = function () {
 		})
 	}
 
-	//new function for Curved Relations, similar to the one above
+	// new function for Curved Relations, similar to the one above
 	function createCurvedRelatedConnections(newRelations) {
 
 		newRelations.forEach(function (relation) {
