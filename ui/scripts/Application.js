@@ -187,26 +187,6 @@ controllers.application = (function () {
 			}
 		}
 
-		// expanders
-		if (configPart.expanders !== undefined) {
-			configPart.expanders.forEach((expander) => {
-				const expanderName = `${configName}_${expander.name}`;
-				const expanderId = `#${expanderName}`;
-				const expanderTitle = expander.title;
-				const expanderObject = createExpander(expanderName, expanderTitle);
-
-				parent.appendChild(expanderObject.expander);
-
-				$(expanderId).jqxExpander({ theme: "metro", width: "100%", height: "100%" });
-
-				// recursively parse layout of the children
-				const expanderContent = createDiv();
-				parseUIConfig(configName, expander, expanderContent);
-
-				$(expanderId).jqxExpander('setContent', expanderContent);
-			});
-		}
-
 		// canvas
 		if (configPart.canvas !== undefined) {
 			// transfer canvas HTML from loaded document to actual DOM
@@ -282,19 +262,6 @@ controllers.application = (function () {
 			splitter: splitterRoot[0],
 			firstPanel: firstPanel[0],
 			secondPanel: secondPanel[0]
-		};
-	}
-
-	function createExpander(id, title) {
-		const expander = createDiv(id);
-		const expanderHead = createDivAsChildOf(expander);
-		expanderHead.innerHTML = title;
-		const expanderContent = createDivAsChildOf(expander);
-
-		return {
-			expander: expander,
-			head: expanderHead,
-			content: expanderContent
 		};
 	}
 
