@@ -150,6 +150,10 @@ td {
 	z-index: 100;
 }
 
+.controllerDiv {
+	display: flex;
+}
+
 /* Neo4j spinner */
 #load-spinner-bg {
 	display: flex;
