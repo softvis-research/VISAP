@@ -69,7 +69,7 @@ controllers.application = (function () {
 		setup.controllers.forEach((controllerSetup) => {
 			const controllerObject = controllers[controllerSetup.name];
 			initializeController(controllerObject, controllerSetup);
-			activateController(controllerObject);
+			activateController(controllerObject, controllerSetup);
 		});
 	}
 
@@ -215,8 +215,8 @@ controllers.application = (function () {
 		}
 	}
 
-	function activateController(controllerObject) {
-		const controllerDiv = controllerDivs.get(controllerObject.name);
+	function activateController(controllerObject, controllerSetup) {
+		const controllerDiv = controllerDivs.get(controllerSetup.name);
 		if (typeof controllerObject.activate === 'function') {
 			controllerObject.activate(controllerDiv);
 		}
@@ -225,7 +225,8 @@ controllers.application = (function () {
 	function addControllerDiv(controller, parent) {
 		const controllerName = controller.name;
 		if (!controllerDivs.has(controllerName)) {
-			const controllerDiv = createDivAsChildOf(parent);
+			const controllerDiv = createDivAsChildOf(parent, controllerName + "Div");
+			controllerDiv.classList.add("controllerDiv");
 			controllerDivs.set(controllerName, controllerDiv);
 		}
 	}
