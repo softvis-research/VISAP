@@ -32,7 +32,7 @@ async function initializeApplication() {
 	application.initialize();
 
 	if (setup.loadPopUp) {
-		$("#RootLoadPopUp").jqxWindow("close");
+		$("#RootLoadPopUp").igDialog("close");
 	}
 }
 
@@ -116,7 +116,7 @@ controllers.application = (function () {
 				if (!setup) {
 					throw new Error("No setup definition found!");
 				} else if (setup.loadPopUp) {
-					application.createModalPopup("Load Visualization", "Visualization is loading...", "RootLoadPopUp");
+					application.createModalPopup("Loading Visualization", "Visualization is loading...", "RootLoadPopUp");
 				}
 		});
 	}
@@ -269,20 +269,17 @@ controllers.application = (function () {
 
 	function createModalPopup(title, text, popupId) {
 		const popupWindow = createDiv(popupId);
-		const popupTitle = createDivAsChildOf(popupWindow);
-		popupTitle.innerHTML = title;
-		const popupContent = createDivAsChildOf(popupWindow);
-		const popupText = createDivAsChildOf(popupContent);
-		popupText.innerHTML = text;
-
+		popupWindow.innerHTML = text;
 		document.body.appendChild(popupWindow);
-		$("#" + popupId).jqxWindow({
-			theme: "metro",
-			width: 200,
+
+		$("#" + popupId).igDialog({
+			width: 300,
 			height: 200,
-			isModal: true,
-			autoOpen: true,
-			resizable: false
+			headerText: title,
+			modal: true,
+			state: "open",
+			resizable: true,
+			draggable: true
 		});
 	}
 
