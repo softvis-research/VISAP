@@ -123,6 +123,10 @@ controllers.canvasSelectController = (function () {
     function handleOnClick(eventObject) {
         const alreadySelected = eventObject.entity === selectedEntities[0];
 
+        if (eventObject.entity.type == "text" || eventObject.entity.type == "Relation") {
+            return;
+        }
+
         // always deselect the previously selected entities
         if (selectedEntities.length != 0) {
             const unselectEvent = {
@@ -154,10 +158,6 @@ controllers.canvasSelectController = (function () {
     function onEntitySelected(applicationEvent) {
         const selectedEntity = applicationEvent.entities[0];
         selectedEntities = applicationEvent.entities;
-
-        if (selectedEntity.type == "text") {
-            return;
-        }
 
         // highlight multiselected entities with specific color
         canvasManipulator.changeColorOfEntities(selectedEntities.slice(1), controllerConfig.multiselectColor, { name: "canvasSelectController" });
