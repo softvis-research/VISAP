@@ -1,4 +1,4 @@
-﻿const setup = {
+const setup = {
 	controllers: [
 		{
 			name: 	"defaultLogger",
@@ -9,6 +9,9 @@
 		{
 			name: 	"canvasHoverController",
 		},
+		{
+			name:	"helloWorldController"
+		}
 	],
 
 	ui: {
@@ -22,10 +25,27 @@
 		area: {
 			name: "top",
 			orientation: "horizontal",
-			first: { },
+			first: {
+				size: "25%",
+				collapsible: true,
+				area: {
+					name: "header",
+					orientation: "vertical",
+					first: {
+						size: "20%",
+						collapsible: false,
+					},
+					second: {
+						size: "80%",
+						controllers: [
+							{ name: "helloWorldController" }
+						]
+					}
+				}
+			 },
 			second: {
-				size: "100%",
-				collapsible: false,
+				size: "75%",
+				collapsible: true,
 				name: "canvas",
 				canvas: { },
 
