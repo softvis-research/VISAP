@@ -163,7 +163,6 @@ controllers.application = (function () {
 		// areas
 		if (configPart.area !== undefined) {
 			const area = configPart.area;
-			const splitterId = `${configName}_${area.name}`;
 
 			const firstPart = area.first;
 			const secondPart = area.second;
@@ -178,13 +177,16 @@ controllers.application = (function () {
 				orientation: area.orientation ?? "vertical",
 				panels: [firstPanel, secondPanel]
 			};
-			const splitterDivs = createSplitter(parent, splitterId, splitterOptions);
+			const splitterDivs = createSplitter(parent, splitterOptions);
 
 			// recursively parse layout of the children
 			parseUIConfig(configName, firstPart, splitterDivs.firstPanel);
 			if (secondPart !== undefined) {
 				parseUIConfig(configName, secondPart, splitterDivs.secondPanel);
 			}
+
+			// force a layout recalculation, as calculated sizes may be off due to depth-first creation of nested splitters
+			$(splitterDivs.splitter).igSplitter("refreshLayout");
 		}
 
 		// canvas
@@ -242,29 +244,21 @@ controllers.application = (function () {
 		return panel;
 	}
 
-	function createSplitter(parent, id, options) {
-		const firstPanelId = id + "FirstPanel";
-		const secondPanelId = id + "SecondPanel";
+	function createSplitter(splitterDiv, options) {
+		const firstPanel = createDivAsChildOf(splitterDiv);
+		const secondPanel = createDivAsChildOf(splitterDiv);
 
-		$(parent).append(`<div id="${id}">
-			<div id="${firstPanelId}"></div>
-			<div id="${secondPanelId}"></div>
-		</div>`);
+		const splitter = $(splitterDiv);
+		splitter.igSplitter(options);
 
-		const splitterRoot = $('#' + id);
-		splitterRoot.igSplitter(options);
-
-		const firstPanel = splitterRoot.find('#' + firstPanelId);
-		const secondPanel = splitterRoot.find('#' + secondPanelId);
-
-		splitterRoot.on("igsplitterresizeended", canvasManipulator.resizeScene);
-		splitterRoot.on("igsplittercollapsed", canvasManipulator.resizeScene);
-		splitterRoot.on("igsplitterexpanded", canvasManipulator.resizeScene);
+		splitter.on("igsplitterresizeended", canvasManipulator.resizeScene);
+		splitter.on("igsplittercollapsed", canvasManipulator.resizeScene);
+		splitter.on("igsplitterexpanded", canvasManipulator.resizeScene);
 
 		return {
-			splitter: splitterRoot[0],
-			firstPanel: firstPanel[0],
-			secondPanel: secondPanel[0]
+			splitter: splitterDiv,
+			firstPanel: firstPanel,
+			secondPanel: secondPanel
 		};
 	}
 
