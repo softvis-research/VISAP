@@ -17,6 +17,7 @@ const setup = {
 			sourceStartAtBorder: false,
 			targetEndAtBorder: false,
 			showInnerRelations: true,
+			curvedConnectors: true,
 
 			connectorColor: { r: 0, g: 0, b: 1 },
 		},

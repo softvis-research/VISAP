@@ -1,5 +1,4 @@
 controllers.relationController = function () {
-
 	// list of entities whose relations to others are being displayed (not including intermediate steps of recursive relations)
 	let sourceEntities = new Array();
 	// for every source entity (and intermediate of recursive relations), the list of entities it is related to
@@ -37,6 +36,7 @@ controllers.relationController = function () {
 		createEndpoints: false,
 		connectorColor: { r: 0, g: 0, b: 1 },
 		endpointColor: { r: 0, g: 0, b: 0 },
+		curvedConnectors: false,
 
 		// highlight configs
 		highlightColor: "black",
@@ -44,29 +44,14 @@ controllers.relationController = function () {
 
 
 	function initialize(setupConfig) {
-
 		application.transferConfigParams(setupConfig, controllerConfig);
 		relationConnectionHelper = createRelationConnectionHelper(controllerConfig);
 		curvedRelationConnectionHelper = createCurvedRelationConnectionHelper(controllerConfig);
 
+		curved = controllerConfig.curvedConnectors;
+
 		events.selected.on.subscribe(onRelationsChanged);
 		events.selected.off.subscribe(onEntityDeselected);
-
-		// pop-up to choose between the different connectors 
-		chooseRelation();
-	}
-
-	// creates alert-box to choose between the different connectors, displayed text should be changed...
-	function chooseRelation() {
-		var txt;
-		if (confirm("Möchten Sie das neue Feature \"Curved Relations\" nutzen?\nBei Cancel/Abbrechen werden die geraden Relations genutzt")) {
-			txt = "Sie haben 'Curved Relation Connectors' gewählt";
-			curved = true;
-		} else {
-			txt = "Sie haben die gewohnten Relation Connectors gewählt";
-			curved = false;
-		}
-		window.alert(txt)
 	}
 
 	async function activate() {
@@ -89,7 +74,6 @@ controllers.relationController = function () {
 	}
 
 	function reset() {
-
 		if (controllerConfig.showConnector) {
 			removeAllConnectors();
 		}
