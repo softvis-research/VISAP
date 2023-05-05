@@ -15,7 +15,7 @@ controllers.relationController = function () {
 	let curvedRelationConnectionHelper;
 
 	//true for curved Relations, false for straight Relations
-	var curved = new Boolean();
+	let curved = new Boolean();
 
 	// config parameters
 	const controllerConfig = {
