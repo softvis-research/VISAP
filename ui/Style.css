@@ -76,20 +76,6 @@ a {
 	margin: -5px -20px -5px -5px;
 }
 
-.jqx-expander-content
-{
-	font-family: 'Open Sans', sans-serif !important;
-}
-
-.jqx-expander-header-content {
-	color: white;
-}
-
-.jqx-widget-metro {
-	font-family: 'Open Sans', sans-serif;
-	color: #767676;
-}
-
 #ui{
 	font-family: 'Open Sans', sans-serif;
 	margin: 0px;
@@ -140,6 +126,14 @@ td {
 	width: 50%;
 	padding: 400px;
 	text-align: center;
+}
+
+/* push splitter collapse buttons to the front to make them easier to click */
+.ui-igsplitter-collapse-button-horizontal-right,
+.ui-igsplitter-collapse-button-horizontal-left,
+.ui-igsplitter-collapse-button-vertical-right,
+.ui-igsplitter-collapse-button-vertical-left {
+	z-index: 100;
 }
 
 /* Neo4j spinner */

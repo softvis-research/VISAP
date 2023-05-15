@@ -92,7 +92,7 @@ controllers.actionController = (function () {
 
 
 	function initialize() {
-		const canvas = document.getElementById(canvasId);
+		const canvas = application.getCanvas();
 
 		AFRAME.registerComponent('mouselistener', {
 			init: function () {
@@ -150,9 +150,7 @@ controllers.actionController = (function () {
 					cursorX = eventObject.layerX;
 					cursorY = eventObject.layerY;
 
-					if (!actions.mouse.move.bubbles) {
-						eventObject.stopPropagation();
-					}
+					// don't stop propagation so splitter drag events still work
 				});
 				this.el.addEventListener("dblclick", function (eventObject) {
 					eventObject.component = hoveredEntity;
