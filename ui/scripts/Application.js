@@ -173,7 +173,6 @@ controllers.application = (function () {
 				theme: "metro",
 				width: "100%",
 				height: "100%",
-				resizable: area.resizable ?? true,
 				orientation: area.orientation ?? "vertical",
 				panels: [firstPanel, secondPanel]
 			};
@@ -239,7 +238,8 @@ controllers.application = (function () {
 		const panel = {
 			size: areaPart.size,
 			min: areaPart.min,
-			collapsible: areaPart.collapsible
+			collapsible: areaPart.collapsible ?? false,
+			resizable: areaPart.resizable ?? true
 		};
 		return panel;
 	}
