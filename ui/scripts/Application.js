@@ -32,7 +32,7 @@ async function initializeApplication() {
 	application.initialize();
 
 	if (setup.loadPopUp) {
-		$("#RootLoadPopUp").jqxWindow("close");
+		$("#RootLoadPopUp").igDialog("close");
 	}
 }
 
@@ -45,9 +45,8 @@ controllers.application = (function () {
 	let controllerDivs = new Map();
 	let uiConfig = null;
 
-	let bodyElement;
+	// reference to model top element
 	let canvasElement;
-
 
 	// initialize application
 
@@ -70,15 +69,12 @@ controllers.application = (function () {
 		setup.controllers.forEach((controllerSetup) => {
 			const controllerObject = controllers[controllerSetup.name];
 			initializeController(controllerObject, controllerSetup);
-			activateController(controllerObject);
+			activateController(controllerObject, controllerSetup);
 		});
 	}
 
 	function createUiLayout() {
-		bodyElement = document.body;
-		canvasElement = document.getElementById("canvas");
-
-		const uiDiv = createDivAsChildOf(bodyElement, "ui");
+		const uiDiv = createDivAsChildOf(document.body, "ui");
 		uiConfig.uiDiv = uiDiv;
 
 		try {
@@ -120,7 +116,7 @@ controllers.application = (function () {
 				if (!setup) {
 					throw new Error("No setup definition found!");
 				} else if (setup.loadPopUp) {
-					application.createModalPopup("Load Visualization", "Visualization is loading...", "RootLoadPopUp");
+					application.createModalPopup("Loading Visualization", "Visualization is loading...", "RootLoadPopUp");
 				}
 		});
 	}
@@ -156,7 +152,10 @@ controllers.application = (function () {
 				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultModeLPath));
 				else return response.text();
 			}).then(modelHtml => {
-				$("#canvas").append(modelHtml);
+				// load model into a separate, temporary document until UI initialization
+				const domParser = new DOMParser();
+				const canvasDocument = domParser.parseFromString(modelHtml, 'text/html');
+				canvasElement = canvasDocument.querySelector('#' + canvasId);
 		});
 	}
 
@@ -164,55 +163,36 @@ controllers.application = (function () {
 		// areas
 		if (configPart.area !== undefined) {
 			const area = configPart.area;
-			const splitterName = `${configName}_${area.name}`;
-			const splitterId = `#${splitterName}`;
-			const splitterOrientation = area.orientation ?? "vertical";
-			const splitterResizable = area.resizable ?? true;
-
-			const splitterObject = createSplitter(splitterName);
-			parent.appendChild(splitterObject.splitter);
 
 			const firstPart = area.first;
 			const secondPart = area.second;
 			const firstPanel = createPanel(firstPart);
 			const secondPanel = createPanel(secondPart);
 
-			$(splitterId).jqxSplitter({ theme: "metro", width: "100%", height: "100%", resizable: splitterResizable, orientation: splitterOrientation, panels: [firstPanel, secondPanel] });
-
-			$(splitterId).on("resize", () => { canvasManipulator.resizeScene() });
+			const splitterOptions = {
+				theme: "metro",
+				width: "100%",
+				height: "100%",
+				orientation: area.orientation ?? "vertical",
+				panels: [firstPanel, secondPanel]
+			};
+			const splitterDivs = createSplitter(parent, splitterOptions);
 
 			// recursively parse layout of the children
-			parseUIConfig(configName, firstPart, splitterObject.firstPanel);
+			parseUIConfig(configName, firstPart, splitterDivs.firstPanel);
 			if (secondPart !== undefined) {
-				parseUIConfig(configName, secondPart, splitterObject.secondPanel);
+				parseUIConfig(configName, secondPart, splitterDivs.secondPanel);
 			}
-		}
 
-		// expanders
-		if (configPart.expanders !== undefined) {
-			configPart.expanders.forEach((expander) => {
-				const expanderName = `${configName}_${expander.name}`;
-				const expanderId = `#${expanderName}`;
-				const expanderTitle = expander.title;
-				const expanderObject = createExpander(expanderName, expanderTitle);
-
-				parent.appendChild(expanderObject.expander);
-
-				$(expanderId).jqxExpander({ theme: "metro", width: "100%", height: "100%" });
-
-				// recursively parse layout of the children
-				const expanderContent = createDiv();
-				parseUIConfig(configName, expander, expanderContent);
-
-				$(expanderId).jqxExpander('setContent', expanderContent);
-			});
+			// force a layout recalculation, as calculated sizes may be off due to depth-first creation of nested splitters
+			$(splitterDivs.splitter).igSplitter("refreshLayout");
 		}
 
 		// canvas
 		if (configPart.canvas !== undefined) {
-			const canvasParentElement = canvasElement.parentElement;
-			canvasParentElement.removeChild(canvasElement);
-			parent.appendChild(canvasElement.cloneNode(true));
+			// transfer canvas HTML from loaded document to actual DOM
+			const canvasDiv = createDivAsChildOf(parent, 'canvas');
+			canvasDiv.append(canvasElement);
 		}
 
 		// controller divs
@@ -221,6 +201,10 @@ controllers.application = (function () {
 				addControllerDiv(controller, parent);
 			});
 		}
+	}
+
+	function getCanvas() {
+		return canvasElement;
 	}
 
 
@@ -232,8 +216,8 @@ controllers.application = (function () {
 		}
 	}
 
-	function activateController(controllerObject) {
-		const controllerDiv = controllerDivs.get(controllerObject.name);
+	function activateController(controllerObject, controllerSetup) {
+		const controllerDiv = controllerDivs.get(controllerSetup.name);
 		if (typeof controllerObject.activate === 'function') {
 			controllerObject.activate(controllerDiv);
 		}
@@ -242,7 +226,8 @@ controllers.application = (function () {
 	function addControllerDiv(controller, parent) {
 		const controllerName = controller.name;
 		if (!controllerDivs.has(controllerName)) {
-			const controllerDiv = createDivAsChildOf(parent);
+			const controllerDiv = createDivAsChildOf(parent, controllerName + "Div");
+			controllerDiv.classList.add("controllerDiv");
 			controllerDivs.set(controllerName, controllerDiv);
 		}
 	}
@@ -253,52 +238,43 @@ controllers.application = (function () {
 		const panel = {
 			size: areaPart.size,
 			min: areaPart.min,
-			collapsible: areaPart.collapsible
+			collapsible: areaPart.collapsible ?? false,
+			resizable: areaPart.resizable ?? true
 		};
 		return panel;
 	}
 
-	function createSplitter(id) {
-		const splitter = createDiv(id);
-		const firstPanel = createDivAsChildOf(splitter, `${id}firstPanel`);
-		const secondPanel = createDivAsChildOf(splitter, `${id}secondPanel`);
+	function createSplitter(splitterDiv, options) {
+		const firstPanel = createDivAsChildOf(splitterDiv);
+		const secondPanel = createDivAsChildOf(splitterDiv);
+
+		const splitter = $(splitterDiv);
+		splitter.igSplitter(options);
+
+		splitter.on("igsplitterresizeended", canvasManipulator.resizeScene);
+		splitter.on("igsplittercollapsed", canvasManipulator.resizeScene);
+		splitter.on("igsplitterexpanded", canvasManipulator.resizeScene);
 
 		return {
-			splitter: splitter,
+			splitter: splitterDiv,
 			firstPanel: firstPanel,
 			secondPanel: secondPanel
 		};
 	}
 
-	function createExpander(id, title) {
-		const expander = createDiv(id);
-		const expanderHead = createDivAsChildOf(expander);
-		expanderHead.innerHTML = title;
-		const expanderContent = createDivAsChildOf(expander);
-
-		return {
-			expander: expander,
-			head: expanderHead,
-			content: expanderContent
-		};
-	}
-
 	function createModalPopup(title, text, popupId) {
 		const popupWindow = createDiv(popupId);
-		const popupTitle = createDivAsChildOf(popupWindow);
-		popupTitle.innerHTML = title;
-		const popupContent = createDivAsChildOf(popupWindow);
-		const popupText = createDivAsChildOf(popupContent);
-		popupText.innerHTML = text;
-
+		popupWindow.innerHTML = text;
 		document.body.appendChild(popupWindow);
-		$("#" + popupId).jqxWindow({
-			theme: "metro",
-			width: 200,
+
+		$("#" + popupId).igDialog({
+			width: 300,
 			height: 200,
-			isModal: true,
-			autoOpen: true,
-			resizable: false
+			headerText: title,
+			modal: true,
+			state: "open",
+			resizable: true,
+			draggable: true
 		});
 	}
 
@@ -353,6 +329,7 @@ controllers.application = (function () {
 		createModalPopup: createModalPopup,
 		createDiv: createDiv,
 		createDivAsChildOf: createDivAsChildOf,
+		getCanvas: getCanvas,
 
 		startLoadingSetup: startLoadingSetup,
 		startLoadingMetadata: startLoadingMetadata,

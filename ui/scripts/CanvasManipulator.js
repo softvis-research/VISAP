@@ -21,7 +21,7 @@ controllers.canvasManipulator = (function () {
 
 
 	function initialize() {
-		scene = document.querySelector("a-scene");
+		scene = application.getCanvas();
 
 		//this is a workaround for a bug of a-frame
 		//if the window size is changed from/to max size,
@@ -313,7 +313,7 @@ controllers.canvasManipulator = (function () {
 	}
 
 	function showEntities(entities, controller) {
-		const sceneEl = document.querySelector('a-scene');
+		const sceneEl = application.getCanvas();
 
 		entities.forEach(function (entity) {
 			if (!hiddenEntitiesMap.has(entity.id)) {
