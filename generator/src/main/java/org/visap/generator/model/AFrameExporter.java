@@ -223,7 +223,9 @@ public class AFrameExporter {
         builder.append(">");
 
         builder.append("\n");
-
+        if (Config.features.outline()) {
+            builder.append(drawOutline(element));
+        }
         builder.append("</" + getShapeExport(element.getShape()) + ">");
         builder.append("\n");
         return builder.toString();
@@ -252,4 +254,45 @@ public class AFrameExporter {
         }
     }
 
+    private String drawOutline(CityElement element) {
+        if (element.getType() != CityElement.CityType.Building || element.getShape() != CityElement.CityShape.Box) {
+            return "";
+        }
+        String id = element.getHash();
+        StringBuilder builder = new StringBuilder();
+
+        double x = element.getWidth() / 2;
+        double y = element.getHeight() / 2;
+        double z = element.getLength() / 2;
+
+        String point1 = "" + x + " " + y + " " + z;
+        String point2 = "" + x + " " + y + " " + -z;
+        String point3 = "" + x + " " + -y + " " + z;
+        String point4 = "" + x + " " + -y + " " + -z;
+        String point5 = "" + -x + " " + y + " " + z;
+        String point6 = "" + -x + " " + y + " " + -z;
+        String point7 = "" + -x + " " + -y + " " + z;
+        String point8 = "" + -x + " " + -y + " " + -z;
+
+        // Every entity requires an id so that it can be recognized as an entity by the handleOnMouseEnter function in Events.js
+        // We use the id of the building corresponding to the outline so that the hover controller can color the building and provide the correct tooltip
+        builder.append("<a-entity id=\"" + id + "\"\n");
+
+        builder.append("\tline__" + id + "1=\"start: " + point1 + "; end: " + point2 + "; color: black\"\n");
+        builder.append("\tline__" + id + "2=\"start: " + point1 + "; end: " + point3 + "; color: black\"\n");
+        builder.append("\tline__" + id + "3=\"start: " + point2 + "; end: " + point4 + "; color: black\"\n");
+        builder.append("\tline__" + id + "4=\"start: " + point3 + "; end: " + point4 + "; color: black\"\n");
+
+        builder.append("\tline__" + id + "5=\"start: " + point1 + "; end: " + point5 + "; color: black\"\n");
+        builder.append("\tline__" + id + "6=\"start: " + point2 + "; end: " + point6 + "; color: black\"\n");
+        builder.append("\tline__" + id + "7=\"start: " + point3 + "; end: " + point7 + "; color: black\"\n");
+        builder.append("\tline__" + id + "8=\"start: " + point4 + "; end: " + point8 + "; color: black\"\n");
+
+        builder.append("\tline__" + id + "9=\"start: " + point5 + "; end: " + point6 + "; color: black\"\n");
+        builder.append("\tline__" + id + "10=\"start: " + point5 + "; end: " + point7 + "; color: black\"\n");
+        builder.append("\tline__" + id + "11=\"start: " + point6 + "; end: " + point8 + "; color: black\"\n");
+        builder.append("\tline__" + id + "12=\"start: " + point7 + "; end: " + point8 + "; color: black\"\n");
+        builder.append("shadow></a-entity>\n");
+        return builder.toString();
+    }
 }
