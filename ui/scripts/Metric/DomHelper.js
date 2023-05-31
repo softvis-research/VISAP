@@ -65,18 +65,18 @@ class DomHelper {
         this.rootDiv.appendChild(viewControllerHeaderDiv);
 
 
-        $(cssIDs.viewDropDown).jqxDropDownList({
-            source: this.controllerConfig.views.map(a => a.name),
+        $(cssIDs.viewDropDown).igCombo({
+            dataSource: this.controllerConfig.views.map(a => a.name),
             placeHolder: "Select View",
             width: widgetSize.dropDownWidth, height: widgetSize.headerDropDownHeight,
             dropDownVerticalAlignment: "top",
             autoDropDownHeight: true,
             autoItemsHeight: true
         });
-        $(cssIDs.downloadViewConfigButton).jqxButton({ theme: "metro", width: widgetSize.buttonWidth });
-        $(cssIDs.executeButton).jqxButton({ theme: "metro", width: widgetSize.buttonWidth });
-        $(cssIDs.resetButton).jqxButton({ theme: "metro", width: widgetSize.buttonWidth });
-        $(cssIDs.addLayerButton).jqxButton({ theme: "metro", width: widgetSize.buttonWidth });
+        $(cssIDs.downloadViewConfigButton).igButton({ theme: "metro", width: widgetSize.buttonWidth });
+        $(cssIDs.executeButton).igButton({ theme: "metro", width: widgetSize.buttonWidth });
+        $(cssIDs.resetButton).igButton({ theme: "metro", width: widgetSize.buttonWidth });
+        $(cssIDs.addLayerButton).igButton({ theme: "metro", width: widgetSize.buttonWidth });
     }
 
     buildUiLayer(layerID) {
@@ -138,8 +138,8 @@ class DomHelper {
 
         this.rootDiv.appendChild(metricDiv);
 
-        $(cssIDs.metricDropDown + layerID).jqxDropDownList({
-            source: this.controllerConfig.metrics,
+        $(cssIDs.metricDropDown + layerID).igCombo({
+            dataSource: this.controllerConfig.metrics,
             placeHolder: "Select Metric",
             width: widgetSize.dropDownWidth, height: widgetSize.dropDownHeight,
             dropDownVerticalAlignment: "top",
@@ -147,17 +147,17 @@ class DomHelper {
             autoItemsHeight: true
         });
         $(cssIDs.metricDropDown + layerID).on("change", () => { this.metricDropDownSelected(layerID) });
-        $(cssIDs.metricFromInput + layerID).jqxInput({ placeHolder: "Value", width: widgetSize.inputWidthMetric, height: widgetSize.inputHeight, minLength: 1 });
-        $(cssIDs.metricFromDateInput + layerID).jqxDateTimeInput({
+        $(cssIDs.metricFromInput + layerID).igNumericEditor({ placeHolder: "Value", width: widgetSize.inputWidthMetric, height: widgetSize.inputHeight, minLength: 1 });
+        $(cssIDs.metricFromDateInput + layerID).igDatePicker({
             placeHolder: "YYYY-MM-DD",
             formatString: "yyyy-MM-dd",
             value: null,
             dropDownVerticalAlignment: "top",
             width: widgetSize.inputWidthMetric
         });
-        $(cssIDs.metricToInput + layerID).jqxInput({ placeHolder: "Value", width: widgetSize.inputWidthMetric, height: widgetSize.inputHeight, minLength: 1 });
+        $(cssIDs.metricToInput + layerID).igNumericEditor({ placeHolder: "Value", width: widgetSize.inputWidthMetric, height: widgetSize.inputHeight, minLength: 1 });
 
-        $(cssIDs.metricToDateInput + layerID).jqxDateTimeInput({
+        $(cssIDs.metricToDateInput + layerID).igDatePicker({
             placeHolder: "YYYY-MM-DD",
             formatString: "yyyy-MM-dd",
             value: null,
@@ -287,8 +287,8 @@ class DomHelper {
 
         this.rootDiv.appendChild(mappingDiv);
 
-        $(cssIDs.mappingDropDown + layerID).jqxDropDownList({
-            source: this.controllerConfig.mappings,
+        $(cssIDs.mappingDropDown + layerID).igCombo({
+            dataSource: this.controllerConfig.mappings,
             placeHolder: "Select Mapping",
             width: widgetSize.dropDownWidth, height: widgetSize.dropDownHeight,
             dropDownVerticalAlignment: "top",
@@ -297,12 +297,16 @@ class DomHelper {
         });
         $(cssIDs.mappingDropDown + layerID).on("change", () => { this.mappingDropDownSelected(layerID) });
 
-        $(cssIDs.mappingFromInput + layerID).jqxInput({ placeHolder: "Value", width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
+        $(cssIDs.mappingFromInput + layerID).igNumericEditor({
+            value: -10.0,
+            minValue: -12.4,
+            maxValue: 12.4
+        });
 
-        $(cssIDs.mappingToInput + layerID).jqxInput({ placeHolder: "Value", width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
+        $(cssIDs.mappingToInput + layerID).igNumericEditor({ placeHolder: "Value", width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
 
-        $(cssIDs.mappingColorDropDown + layerID).jqxDropDownList({
-            source: colors,
+        $(cssIDs.mappingColorDropDown + layerID).igCombo({
+            dataSource: colors,
             placeHolder: "Select Color",
             width: widgetSize.dropDownWidth, height: widgetSize.dropDownHeight,
             dropDownVerticalAlignment: "top",
@@ -310,8 +314,8 @@ class DomHelper {
             autoItemsHeight: true
         });
 
-        $(cssIDs.mappingStartColorDropDown + layerID).jqxDropDownList({
-            source: colors,
+        $(cssIDs.mappingStartColorDropDown + layerID).igCombo({
+            dataSource: colors,
             placeHolder: "Select Start Color",
             width: widgetSize.dropDownWidth, height: widgetSize.dropDownHeight,
             dropDownVerticalAlignment: "top",
@@ -319,8 +323,8 @@ class DomHelper {
             autoItemsHeight: true
         });
 
-        $(cssIDs.mappingEndColorDropDown + layerID).jqxDropDownList({
-            source: colors,
+        $(cssIDs.mappingEndColorDropDown + layerID).igCombo({
+            dataSource: colors,
             placeHolder: "Select End Color",
             width: widgetSize.dropDownWidth, height: widgetSize.dropDownHeight,
             dropDownVerticalAlignment: "top",
@@ -328,16 +332,16 @@ class DomHelper {
             autoItemsHeight: true
         });
 
-        $(cssIDs.mappingTransparencyInput + layerID).jqxNumberInput({
+        $(cssIDs.mappingTransparencyInput + layerID).igNumericEditor({
             width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight,
             min: 0, max: 1,
             inputMode: "simple",
             spinButtons: true
         });
 
-        $(cssIDs.mappingPeriodInput + layerID).jqxInput({ width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
+        $(cssIDs.mappingPeriodInput + layerID).igNumericEditor({ width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
 
-        $(cssIDs.mappingScaleInput + layerID).jqxInput({ width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
+        $(cssIDs.mappingScaleInput + layerID).igNumericEditor({ width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
     }
 
     mappingDropDownSelected(layerID) {
@@ -378,7 +382,7 @@ class DomHelper {
         deleteButtonDiv.classList.add(domClasses.deleteButton, domClasses.layer + layerID);
         this.rootDiv.appendChild(deleteButtonDiv);
 
-        $(cssIDs.deleteButton + layerID).jqxButton({
+        $(cssIDs.deleteButton + layerID).igButton({
             theme: "metro",
             height: widgetSize.deleteButtonHeight,
             width: widgetSize.deleteButtonWidth,
@@ -394,8 +398,8 @@ class DomHelper {
         switch (layer.metric.variant) {
             case metrics.dateOfCreation:
             case metrics.dateOfLastChange:
-                $(cssIDs.metricFromDateInput + layer.id).jqxDateTimeInput('setDate', new Date(layer.metric.from));
-                $(cssIDs.metricToDateInput + layer.id).jqxDateTimeInput('setDate', new Date(layer.metric.to));
+                $(cssIDs.metricFromDateInput + layer.id).igDatePicker('setDate', new Date(layer.metric.from));
+                $(cssIDs.metricToDateInput + layer.id).igDatePicker('setDate', new Date(layer.metric.to));
                 break;
             default:
                 $(cssIDs.metricFromInput + layer.id).val(layer.metric.from);
@@ -444,17 +448,15 @@ class DomHelper {
     }
 
     resetLayerUI(layerID) {
-        $(cssIDs.metricDropDown + layerID).jqxDropDownList("clearSelection");
-        $(cssIDs.mappingDropDown + layerID).jqxDropDownList("clearSelection");
+        $(cssIDs.metricDropDown + layerID).igCombo("clearInput");
+        $(cssIDs.mappingDropDown + layerID).igCombo("clearInput");
 
-        $(cssClasses.metricParameter + layerID).jqxInput("clear");
-        $(cssClasses.metricParameter + layerID).jqxDateTimeInput("clear");
+        $(cssClasses.metricParameter + layerID).igNumericEditor("destroy");
+        $(cssClasses.metricParameter + layerID).igDatePicker("destroy");
 
-        $(cssClasses.mappingParameter + layerID).jqxInput("clear");
-        $(cssClasses.mappingParameter + layerID).jqxNumberInput("clear");
-        $(cssClasses.mappingParameter + layerID).jqxDropDownList("clearSelection");
+        $(cssClasses.mappingParameter + layerID).igCombo("clearInput");
 
-        $(cssIDs.mappingColorDropDown + layerID).jqxDropDownList("clearSelection");
+        $(cssIDs.mappingColorDropDown + layerID).igCombo("clearInput");
 
         $(cssClasses.metricParameter + layerID).hide();
         $(cssClasses.mappingParameter + layerID).hide();

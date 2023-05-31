@@ -186,7 +186,6 @@ controllers.metricController = (function () {
         domHelper.buildUiLayer(layerCounter);
 
         if (layerCounter > 1) {
-            $(cssIDs.deleteButton + (layerCounter - 1)).jqxButton({ disabled: true });
         }
     }
 
@@ -262,7 +261,7 @@ controllers.metricController = (function () {
     }
 
     function resetButtonClicked() {
-        $(cssIDs.viewDropDown).jqxDropDownList("clearSelection");
+        $(cssIDs.viewDropDown).igCombo("clearInput");
 
         reset();
 
