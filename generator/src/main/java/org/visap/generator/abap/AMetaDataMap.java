@@ -2,16 +2,14 @@ package org.visap.generator.abap;
 
 import org.visap.generator.abap.enums.SAPNodeProperties;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 public class AMetaDataMap {
     private static final Map<String, String> metaDataProperties;
     private static final List<String> nodesWithReferencesRelationByType;
     private static final List<String> nodesWithInheritRelationByType;
     private static final List<String> nodesWithMigrationRelationByType;
+    private static final List<String> nodesWithUsesRelationByType;
 
     static {
         // Change property names for metaData-output
@@ -35,6 +33,14 @@ public class AMetaDataMap {
                 "REPS",
                 "FORM",
                 "FUGR");
+
+        // Elements, for which we want to show USES relation
+        nodesWithUsesRelationByType = Arrays.asList(
+                "TABB",
+                "VIEW",
+                "STRU",
+                "DOMA",
+                "DATA");
 
         // Elements, for which we want to show INHERIT relation
         nodesWithInheritRelationByType = Arrays.asList(
@@ -64,6 +70,10 @@ public class AMetaDataMap {
 
     public static List<String> getNodesWithReferencesRelationByType() {
         return nodesWithReferencesRelationByType;
+    }
+
+    public static List<String> getNodesWithUsesRelationByType(){
+        return nodesWithUsesRelationByType;
     }
 
     public static List<String> getNodesWithInheritRelationByType() {
