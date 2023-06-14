@@ -116,6 +116,29 @@ controllers.model = (function () {
 					entity.dependsOn = element.dependsOn;
 					entity.filename = element.filename;
 					break;
+				case "View":
+					entity.use = splitByCommaIfNotEmpty(element.use);
+					entity.used = splitByCommaIfNotEmpty(element.used);
+					entity.numberOfFields = element.number_of_fields;
+					break;
+				case "Struct":
+					entity.use = splitByCommaIfNotEmpty(element.use);
+					entity.used = splitByCommaIfNotEmpty(element.used);
+					entity.numberOfFields = element.number_of_fields;
+					break;
+				case "Domain":
+					entity.use = splitByCommaIfNotEmpty(element.use);
+					entity.used = splitByCommaIfNotEmpty(element.used);
+					break;
+				case "Dataelement":
+					entity.use = splitByCommaIfNotEmpty(element.use);
+					entity.used = splitByCommaIfNotEmpty(element.used);
+					break;
+				case "Tablebuildung":
+					entity.use = splitByCommaIfNotEmpty(element.use);
+					entity.used = splitByCommaIfNotEmpty(element.used);
+					entity.numberOfFields = element.number_of_fields;
+					break;
 
 				default:
 					break;
@@ -245,6 +268,26 @@ controllers.model = (function () {
 					replaceIdsWithReferences(entity, 'accessedBy');
 					break;
 
+				case "View":
+					replaceIdsWithReferences(entity, 'use');
+					replaceIdsWithReferences(entity, 'used');
+					break;
+				case "Struct":
+					replaceIdsWithReferences(entity, 'use');
+					replaceIdsWithReferences(entity, 'used');
+					break;
+				case "Domain":
+					replaceIdsWithReferences(entity, 'use');
+					replaceIdsWithReferences(entity, 'used');
+					break;
+				case "Dataelement":
+					replaceIdsWithReferences(entity, 'use');
+					replaceIdsWithReferences(entity, 'used');
+					break;
+				case "Tablebuilding":
+					replaceIdsWithReferences(entity, 'use');
+					replaceIdsWithReferences(entity, 'used');
+					break;
 				default:
 					break;
 			}
