@@ -375,17 +375,19 @@ class DomHelper {
 	}
 
 	buildDeleteButton(layerID) {
-		const deleteButtonDiv = document.createElement("button");
-		deleteButtonDiv.id = domIDs.deleteButton + layerID;
-		deleteButtonDiv.classList.add(domClasses.deleteButton, domClasses.layer + layerID);
-		this.rootDiv.appendChild(deleteButtonDiv);
+		const deleteButton = document.createElement("button");
+		deleteButton.id = domIDs.deleteButton + layerID;
+		deleteButton.classList.add(domClasses.deleteButton, domClasses.layer + layerID);
+		this.rootDiv.appendChild(deleteButton);
 
 		$(cssIDs.deleteButton + layerID).igButton({
 			theme: "metro",
 			height: widgetSize.deleteButtonHeight,
 			width: widgetSize.deleteButtonWidth,
 			disabled: false,
-			imgSrc: "./scripts/Metric/close.png",
+			icons: {
+				primary: "ui-icon-close",
+			}
 		});
 
 		$(cssIDs.deleteButton + layerID).click((event) => metricController.removeLayer(event));
