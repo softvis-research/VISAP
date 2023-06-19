@@ -142,7 +142,7 @@ class DomHelper {
 			width: widgetSize.dropDownWidth, height: widgetSize.dropDownHeight,
 			dropDownVerticalAlignment: "top",
 			autoDropDownHeight: true,
-			autoItemsHeight: true
+			autoItemsHeight: true,
 		});
 		$(cssIDs.metricDropDown + layerID).on("change", () => { this.metricDropDownSelected(layerID) });
 		$(cssIDs.metricFromInput + layerID).igNumericEditor({ placeHolder: "Value", width: widgetSize.inputWidthMetric, height: widgetSize.inputHeight, minLength: 1 });
@@ -151,7 +151,7 @@ class DomHelper {
 			formatString: "yyyy-MM-dd",
 			value: null,
 			dropDownVerticalAlignment: "top",
-			width: widgetSize.inputWidthMetric
+			width: widgetSize.inputWidthMetric,
 		});
 		$(cssIDs.metricToInput + layerID).igNumericEditor({ placeHolder: "Value", width: widgetSize.inputWidthMetric, height: widgetSize.inputHeight, minLength: 1 });
 
@@ -160,8 +160,11 @@ class DomHelper {
 			formatString: "yyyy-MM-dd",
 			value: null,
 			dropDownVerticalAlignment: "top",
-			width: widgetSize.inputWidthMetric
+			width: widgetSize.inputWidthMetric,
 		});
+
+		$(cssIDs.metricFromDateInput + layerID).igDatePicker("hide");
+		$(cssIDs.metricToDateInput + layerID).igDatePicker("hide");
 	}
 
 	metricDropDownSelected(layerID) {
@@ -296,9 +299,10 @@ class DomHelper {
 		$(cssIDs.mappingDropDown + layerID).on("change", () => { this.mappingDropDownSelected(layerID) });
 
 		$(cssIDs.mappingFromInput + layerID).igNumericEditor({
-			value: -10.0,
-			minValue: -12.4,
-			maxValue: 12.4
+			placeHolder: "Value",
+			width: widgetSize.inputWidthMapping,
+			height: widgetSize.inputHeight,
+			minLength: 1,
 		});
 
 		$(cssIDs.mappingToInput + layerID).igNumericEditor({ placeHolder: "Value", width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
@@ -338,8 +342,14 @@ class DomHelper {
 		});
 
 		$(cssIDs.mappingPeriodInput + layerID).igNumericEditor({ width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
-
 		$(cssIDs.mappingScaleInput + layerID).igNumericEditor({ width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
+
+		debugger;
+		$(cssIDs.mappingFromInput + layerID).igNumericEditor("hide");
+		$(cssIDs.mappingToInput + layerID).igNumericEditor("hide");
+		$(cssIDs.mappingScaleInput + layerID).igNumericEditor("hide");
+		$(cssIDs.mappingPeriodInput + layerID).igNumericEditor("hide");
+		$(cssIDs.mappingTransparencyInput + layerID).igNumericEditor("hide");
 	}
 
 	mappingDropDownSelected(layerID) {
