@@ -34,7 +34,7 @@ class DomHelper {
 
 		const executeButtonDiv = document.createElement("div");
 		executeButtonDiv.id = domIDs.executeButton;
-		executeButtonDiv.innerHTML = '<i class="fa-solid fa-play"></i>';
+		executeButtonDiv.textContent = "Execute";
 		viewControllerHeaderDiv.appendChild(executeButtonDiv);
 
 
