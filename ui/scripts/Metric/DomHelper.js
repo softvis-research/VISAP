@@ -32,28 +32,28 @@ class DomHelper {
 		viewControllerHeaderDiv.appendChild(headerTextNode);
 
 
-		const executeButtonDiv = document.createElement("div");
-		executeButtonDiv.id = domIDs.executeButton;
-		executeButtonDiv.textContent = "Execute";
-		viewControllerHeaderDiv.appendChild(executeButtonDiv);
+		const executeButton = document.createElement("button");
+		executeButton.id = domIDs.executeButton;
+		executeButton.textContent = "Execute";
+		viewControllerHeaderDiv.appendChild(executeButton);
 
 
-		const resetButtonDiv = document.createElement("div");
-		resetButtonDiv.id = domIDs.resetButton;
-		resetButtonDiv.textContent = "Reset";
-		viewControllerHeaderDiv.appendChild(resetButtonDiv);
+		const resetButton = document.createElement("button");
+		resetButton.id = domIDs.resetButton;
+		resetButton.textContent = "Reset";
+		viewControllerHeaderDiv.appendChild(resetButton);
 
 
-		const addLayerButtonDiv = document.createElement("div");
-		addLayerButtonDiv.id = domIDs.addLayerButton;
-		addLayerButtonDiv.textContent = "Add Metric-Layer";
-		viewControllerHeaderDiv.appendChild(addLayerButtonDiv);
+		const addLayerButton = document.createElement("button");
+		addLayerButton.id = domIDs.addLayerButton;
+		addLayerButton.textContent = "Add Metric-Layer";
+		viewControllerHeaderDiv.appendChild(addLayerButton);
 
 
-		const downloadViewConfigButtonDiv = document.createElement("button");
-		downloadViewConfigButtonDiv.id = domIDs.downloadViewConfigButton;
-		downloadViewConfigButtonDiv.textContent = "Download View Config";
-		viewControllerHeaderDiv.appendChild(downloadViewConfigButtonDiv);
+		const downloadViewConfigButton = document.createElement("button");
+		downloadViewConfigButton.id = domIDs.downloadViewConfigButton;
+		downloadViewConfigButton.textContent = "Download View Config";
+		viewControllerHeaderDiv.appendChild(downloadViewConfigButton);
 
 
 		const viewDropDownDiv = document.createElement("div");
