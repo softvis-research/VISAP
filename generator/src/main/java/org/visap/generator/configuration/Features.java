@@ -5,9 +5,12 @@ import org.aeonbits.owner.Config.LoadPolicy;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    "file:${user.dir}/properties/Features.properties",
+        "file:${user.dir}/properties/Features.properties",
 })
 public interface Features extends Config {
     @DefaultValue("false")
     Boolean outline();
+
+    @DefaultValue("false")
+    Boolean inputUsesCSV();
 }

@@ -21,13 +21,13 @@ public class LoaderStep {
         boolean isSilentMode = Config.setup.silentMode();
         String pathToNodesCsv = "";
         String pathToReferenceCsv = "";
-        String pathToUsesCsv= "";
+        String pathToUsesCsv = "";
 
         Scanner userInput = new Scanner(System.in);
 
         // Get files for nodes and relations
         List<Path> files = CSVInput.getInputCSVFiles();
-        for(Path p : files) {
+        for (Path p : files) {
             if (p.toString().endsWith("_Nodes.csv")) {
                 pathToNodesCsv = p.toString();
             } else if (p.toString().endsWith("_Reference.csv")) {
@@ -37,8 +37,18 @@ public class LoaderStep {
             }
         }
 
-        if (pathToNodesCsv.isEmpty() || pathToReferenceCsv.isEmpty() || pathToUsesCsv.isEmpty()) {
-            System.out.println("Some input file wasn't found");
+        if (pathToNodesCsv.isEmpty()) {
+            System.out.println("Nodes.csv file wasn't found");
+            System.exit(0);
+        }
+
+        if (pathToReferenceCsv.isEmpty()) {
+            System.out.println("Reference.csv file wasn't found");
+            System.exit(0);
+        }
+
+        if (Config.features.inputUsesCSV() && pathToUsesCsv.isEmpty()) {
+            System.out.println("Uses.csv file wasn't found");
             System.exit(0);
         }
 
@@ -85,24 +95,26 @@ public class LoaderStep {
         );
 
         // 4. Upload Uses
-        System.out.println("Path to Uses CSV: " + pathToUsesCsv);
-        if (!isSilentMode) {
-            System.out.print("Creating 'USES' relationships. Press any key to continue...");
-            userInput.nextLine();
+        if (Config.features.inputUsesCSV()) {
+            System.out.println("Path to Uses CSV: " + pathToUsesCsv);
+            if (!isSilentMode) {
+                System.out.print("Creating 'USES' relationships. Press any key to continue...");
+                userInput.nextLine();
+            }
+            pathToUsesCsv = pathToUsesCsv.replace("\\", "/");
+            pathToUsesCsv = pathToUsesCsv.replace(" ", "%20");
+            connector.executeWrite(
+                    "LOAD CSV WITH HEADERS FROM \"file:///" + pathToUsesCsv + "\"\n" +
+                            "AS row FIELDTERMINATOR ';'\n" +
+                            "MATCH (a:Elements {element_id: row.use_id}), (b:Elements {element_id: row.usedby_id})\n" +
+                            "CREATE (a)-[r:" + SAPRelationLabels.USES + "]->(b)"
+
+            );
+
+            userInput.close();
+            connector.close();
+            System.out.println("Loader step was completed");
         }
-        pathToUsesCsv = pathToUsesCsv.replace("\\", "/");
-        pathToUsesCsv = pathToUsesCsv.replace(" ", "%20");
-        connector.executeWrite(
-                "LOAD CSV WITH HEADERS FROM \"file:///" + pathToUsesCsv + "\"\n" +
-                        "AS row FIELDTERMINATOR ';'\n" +
-                        "MATCH (a:Elements {element_id: row.use_id}), (b:Elements {element_id: row.usedby_id})\n" +
-                        "CREATE (a)-[r:" + SAPRelationLabels.USES + "]->(b)"
-
-        );
-
-        userInput.close();
-        connector.close();
-        System.out.println("Loader step was completed");
     }
 
     private static class CSVInput {
