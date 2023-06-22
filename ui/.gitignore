@@ -1,4 +1,5 @@
 model/*
 !model/example/
 node_modules/
-setups/local/
+setups/local/*
+!setups/local/README.md

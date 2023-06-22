@@ -1,0 +1,1 @@
+The setups in this folder are ignored by Git. Hence, local test setups should be placed here.
