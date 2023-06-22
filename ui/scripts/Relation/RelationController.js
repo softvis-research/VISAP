@@ -361,6 +361,26 @@ controllers.relationController = function () {
 			case "Reference":
 				relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.rcData || []);
 				break;
+			case "View":
+				relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.use || []);
+				relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.usedby || []);
+				break;
+			case "Struct":
+					relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.use || []);
+					relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.usedby || []);
+				break;
+			case "Domain":
+					relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.use || []);
+					relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.usedby || []);
+				break;
+			case "Dataelement":
+					relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.use || []);
+					relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.usedby || []);
+				break;
+			case "Tablebuilding":
+				relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.use || []);
+				relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.usedby || []);
+				break;
 		}
 
 		return relatedEntitiesOfSourceEntity;
