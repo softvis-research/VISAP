@@ -1,4 +1,4 @@
 model/*
 !model/example/
 node_modules/
-setups/user-setups/
+setups/local/
