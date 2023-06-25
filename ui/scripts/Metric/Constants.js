@@ -1,179 +1,179 @@
 const domIDs = {
-    viewControllerHeader: "viewControllerHeader",
-    metricDiv: "metricDiv",
-    mappingDiv: "mappingDiv",
-    
-    downloadViewConfigButton: "downloadViewConfigButton",
-    executeButton: "executeButton",
-    resetButton: "resetButton",
-    addLayerButton: "addLayerButton",
+	viewControllerHeader: "viewControllerHeader",
+	metricDiv: "metricDiv",
+	mappingDiv: "mappingDiv",
 
-    headerTextNode: "headerTextNode",
-    metricTextNode: "metricTextNode",
-    mappingTextNode: "mappingTextNode",
+	downloadViewConfigButton: "downloadViewConfigButton",
+	executeButton: "executeButton",
+	resetButton: "resetButton",
+	addLayerButton: "addLayerButton",
 
-    viewDropDown: "viewDropDown",
-    
-    metricDropDown: "metricDropDown",
-    mappingDropDown: "mappingDropDown",
+	headerTextNode: "headerTextNode",
+	metricTextNode: "metricTextNode",
+	mappingTextNode: "mappingTextNode",
 
-    mappingColorDropDown: "mappingColorDropDown",
-    mappingStartColorDropDown: "mappingStartColorDropDown",
-    mappingEndColorDropDown: "mappingEndColorDropDown",
+	viewDropDown: "viewDropDown",
 
-    metricFromInput: "metricFromInput",
-    metricToInput: "metricToInput",
-    metricFromDateInput: "metricFromDateInput",
-    metricToDateInput: "metricToDateInput",
+	metricDropDown: "metricDropDown",
+	mappingDropDown: "mappingDropDown",
 
-    metricFromText: "metricFromText",
-    metricToText: "metricToText",
+	mappingColorDropDown: "mappingColorDropDown",
+	mappingStartColorDropDown: "mappingStartColorDropDown",
+	mappingEndColorDropDown: "mappingEndColorDropDown",
 
-    mappingFromText: "mappingFromText",
-    mappingToText: "mappingToText",
+	metricFromInput: "metricFromInput",
+	metricToInput: "metricToInput",
+	metricFromDateInput: "metricFromDateInput",
+	metricToDateInput: "metricToDateInput",
 
-    mappingFromInput: "mappingFromInput",
-    mappingToInput: "mappingToInput",
+	metricFromText: "metricFromText",
+	metricToText: "metricToText",
 
-    mappingTransparencyInput: "mappingTransparencyInput",
-    mappingPeriodInput: "mappingPeriodInput",
-    mappingScaleInput: "mappingScaleInput",
+	mappingFromText: "mappingFromText",
+	mappingToText: "mappingToText",
 
-    mappingPeriodText: "mappingPeriodText",
-    mappingScaleText: "mappingScaleText",
+	mappingFromInput: "mappingFromInput",
+	mappingToInput: "mappingToInput",
 
-    deleteButton: "deleteButton"
+	mappingTransparencyInput: "mappingTransparencyInput",
+	mappingPeriodInput: "mappingPeriodInput",
+	mappingScaleInput: "mappingScaleInput",
+
+	mappingPeriodText: "mappingPeriodText",
+	mappingScaleText: "mappingScaleText",
+
+	deleteButton: "deleteButton"
 };
 
 const cssIDs = {
-    downloadViewConfigButton: "#" + domIDs.downloadViewConfigButton,
-    executeButton: "#" + domIDs.executeButton,
-    resetButton: "#" + domIDs.resetButton,
-    addLayerButton: "#" + domIDs.addLayerButton,
+	downloadViewConfigButton: "#" + domIDs.downloadViewConfigButton,
+	executeButton: "#" + domIDs.executeButton,
+	resetButton: "#" + domIDs.resetButton,
+	addLayerButton: "#" + domIDs.addLayerButton,
 
-    metricTextNode: "#" + domIDs.metricTextNode,
-    mappingTextNode: "#" + domIDs.mappingTextNode,
+	metricTextNode: "#" + domIDs.metricTextNode,
+	mappingTextNode: "#" + domIDs.mappingTextNode,
 
-    viewDropDown: "#" + domIDs.viewDropDown,
-    
-    metricDropDown: "#" + domIDs.metricDropDown,
-    mappingDropDown: "#" + domIDs.mappingDropDown,
+	viewDropDown: "#" + domIDs.viewDropDown,
 
-    mappingColorDropDown: "#" + domIDs.mappingColorDropDown,
-    mappingStartColorDropDown: "#" + domIDs.mappingStartColorDropDown,
-    mappingEndColorDropDown: "#" + domIDs.mappingEndColorDropDown,
+	metricDropDown: "#" + domIDs.metricDropDown,
+	mappingDropDown: "#" + domIDs.mappingDropDown,
 
-    metricFromInput: "#" + domIDs.metricFromInput,
-    metricToInput: "#" + domIDs.metricToInput,
-    metricFromDateInput: "#" + domIDs.metricFromDateInput,
-    metricToDateInput: "#" + domIDs.metricToDateInput,
+	mappingColorDropDown: "#" + domIDs.mappingColorDropDown,
+	mappingStartColorDropDown: "#" + domIDs.mappingStartColorDropDown,
+	mappingEndColorDropDown: "#" + domIDs.mappingEndColorDropDown,
 
-    metricFromText: "#" + domIDs.metricFromText,
-    metricToText: "#" + domIDs.metricToText,
+	metricFromInput: "#" + domIDs.metricFromInput,
+	metricToInput: "#" + domIDs.metricToInput,
+	metricFromDateInput: "#" + domIDs.metricFromDateInput,
+	metricToDateInput: "#" + domIDs.metricToDateInput,
 
-    mappingFromText: "#" + domIDs.mappingFromText,
-    mappingToText: "#" + domIDs.mappingToText,
+	metricFromText: "#" + domIDs.metricFromText,
+	metricToText: "#" + domIDs.metricToText,
 
-    mappingFromInput: "#" + domIDs.mappingFromInput,
-    mappingToInput: "#" + domIDs.mappingToInput,
+	mappingFromText: "#" + domIDs.mappingFromText,
+	mappingToText: "#" + domIDs.mappingToText,
 
-    mappingTransparencyInput: "#" + domIDs.mappingTransparencyInput,
-    mappingPeriodInput: "#" + domIDs.mappingPeriodInput,
-    mappingScaleInput: "#" + domIDs.mappingScaleInput,
+	mappingFromInput: "#" + domIDs.mappingFromInput,
+	mappingToInput: "#" + domIDs.mappingToInput,
 
-    mappingPeriodText: "#" + domIDs.mappingPeriodText,
-    mappingScaleText: "#" + domIDs.mappingScaleText,
+	mappingTransparencyInput: "#" + domIDs.mappingTransparencyInput,
+	mappingPeriodInput: "#" + domIDs.mappingPeriodInput,
+	mappingScaleInput: "#" + domIDs.mappingScaleInput,
 
-    deleteButton: "#" + domIDs.deleteButton
+	mappingPeriodText: "#" + domIDs.mappingPeriodText,
+	mappingScaleText: "#" + domIDs.mappingScaleText,
+
+	deleteButton: "#" + domIDs.deleteButton
 };
 
 const domClasses = {
-    metricDiv: "metricDiv",
-    mappingDiv: "mappingDiv",
-    
-    metricTextNode: "metricTextNode",
-    mappingTextNode: "mappingTextNode",
+	metricDiv: "metricDiv",
+	mappingDiv: "mappingDiv",
 
-    layer: "layer",
+	metricTextNode: "metricTextNode",
+	mappingTextNode: "mappingTextNode",
 
-    metricParameter: "metricParameter",
-    mappingParameter: "mappingParameter",
+	layer: "layer",
 
-    viewDropDown: "viewDropDown",
-    
-    metricDropDown: "metricDropDown",
-    mappingDropDown: "mappingDropDown",
+	metricParameter: "metricParameter",
+	mappingParameter: "mappingParameter",
 
-    deleteButton: "deleteButton",
+	viewDropDown: "viewDropDown",
 
-    textLabel: "textLabel"
+	metricDropDown: "metricDropDown",
+	mappingDropDown: "mappingDropDown",
+
+	deleteButton: "deleteButton",
+
+	textLabel: "textLabel"
 }
 
 const cssClasses = {
-    metricTextNode: "." + domClasses.metricTextNode,
-    mappingTextNode: "." + domClasses.mappingTextNode,
+	metricTextNode: "." + domClasses.metricTextNode,
+	mappingTextNode: "." + domClasses.mappingTextNode,
 
-    layer: "." + domClasses.layer,
-    
-    metricParameter: "." + domClasses.metricParameter,
-    mappingParameter: "." + domClasses.mappingParameter,
+	layer: "." + domClasses.layer,
 
-    viewDropDown: "." + domClasses.viewDropDown,
+	metricParameter: "." + domClasses.metricParameter,
+	mappingParameter: "." + domClasses.mappingParameter,
 
-    metricDropDown: "." + domClasses.metricDropDown,
-    mappingDropDown: "." + domClasses.mappingDropDown,
+	viewDropDown: "." + domClasses.viewDropDown,
 
-    deleteButton: "." + domClasses.deleteButton
+	metricDropDown: "." + domClasses.metricDropDown,
+	mappingDropDown: "." + domClasses.mappingDropDown,
+
+	deleteButton: "." + domClasses.deleteButton
 }
 
 const metrics = {
-    numberOfStatements: "numberOfStatements",
-    amountOfResults: "amountOfResults",
-    amountOfNamspa: "amountOfNamspa",
-    amountOfChnhis: "amountOfChnhis",
-    amountOfCodlen: "amountOfCodlen",
-    amountOfCommam: "amountOfCommam",
-    amountOfDynsta: "amountOfDynsta",
-    amountOfEnhmod: "amountOfEnhmod",
-    amountOfFormty: "amountOfFormty",
-    amountOfNomac: "amountOfNomac",
-    amountOfObjnam: "amountOfObjnam",
-    amountOfPraefi: "amountOfPraefi",
-    amountOfSlin: "amountOfSlin",
-    amountOfSql: "amountOfSql",
-    amountOfTodo: "amountOfTodo",
-    dateOfCreation: "dateOfCreation",
-    dateOfLastChange: "dateOfLastChange"
+	numberOfStatements: "numberOfStatements",
+	amountOfResults: "amountOfResults",
+	amountOfNamspa: "amountOfNamspa",
+	amountOfChnhis: "amountOfChnhis",
+	amountOfCodlen: "amountOfCodlen",
+	amountOfCommam: "amountOfCommam",
+	amountOfDynsta: "amountOfDynsta",
+	amountOfEnhmod: "amountOfEnhmod",
+	amountOfFormty: "amountOfFormty",
+	amountOfNomac: "amountOfNomac",
+	amountOfObjnam: "amountOfObjnam",
+	amountOfPraefi: "amountOfPraefi",
+	amountOfSlin: "amountOfSlin",
+	amountOfSql: "amountOfSql",
+	amountOfTodo: "amountOfTodo",
+	dateOfCreation: "dateOfCreation",
+	dateOfLastChange: "dateOfLastChange"
 };
 
 const mappings = {
-    color: "Color",
-    colorGradient: "Color Gradient",
-    transparency: "Transparency",
-    pulsation: "Pulsation",
-    flashing: "Flashing",
-    rotation: "Rotation"
+	color: "Color",
+	colorGradient: "Color Gradient",
+	transparency: "Transparency",
+	pulsation: "Pulsation",
+	flashing: "Flashing",
+	rotation: "Rotation"
 };
 
 const colors = [
-    "red",
-    "blue",
-    "green",
-    "black",
-    "yellow",
-    "orange"
+	"red",
+	"blue",
+	"green",
+	"black",
+	"yellow",
+	"orange"
 ];
 
 const widgetSize = {
-    buttonHeight: 25,
-    headerDropDownHeight: 27,
-    dropDownHeight: 25,
-    inputHeight: 25,
-    deleteButtonHeight: 27,
+	buttonHeight: 25,
+	headerDropDownHeight: 27,
+	dropDownHeight: 25,
+	inputHeight: 25,
+	deleteButtonHeight: 27,
 
-    dropDownWidth: 150,
-    buttonWidth: 125,
-    inputWidthMapping: 73,
-    inputWidthMetric: 100,
-    deleteButtonWidth: "3.6%",
+	dropDownWidth: 150,
+	buttonWidth: 125,
+	inputWidthMapping: 73,
+	inputWidthMetric: 100,
+	deleteButtonWidth: "3.6%",
 }
