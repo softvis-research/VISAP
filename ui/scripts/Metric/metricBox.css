@@ -5,6 +5,7 @@
 	background-color: #1faeff;
 	width: 100%;
 	padding: 2px;
+	box-sizing: border-box;
 }
 
 .metricDiv {
