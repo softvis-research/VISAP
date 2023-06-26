@@ -45,47 +45,9 @@ const domIDs = {
 	deleteButton: "deleteButton"
 };
 
-const cssIDs = {
-	downloadViewConfigButton: "#" + domIDs.downloadViewConfigButton,
-	executeButton: "#" + domIDs.executeButton,
-	resetButton: "#" + domIDs.resetButton,
-	addLayerButton: "#" + domIDs.addLayerButton,
-
-	metricTextNode: "#" + domIDs.metricTextNode,
-	mappingTextNode: "#" + domIDs.mappingTextNode,
-
-	viewDropDown: "#" + domIDs.viewDropDown,
-
-	metricSelectionDropDown: "#" + domIDs.metricSelectionDropDown,
-	mappingDropDown: "#" + domIDs.mappingDropDown,
-
-	mappingColorDropDown: "#" + domIDs.mappingColorDropDown,
-	mappingStartColorDropDown: "#" + domIDs.mappingStartColorDropDown,
-	mappingEndColorDropDown: "#" + domIDs.mappingEndColorDropDown,
-
-	metricFromInput: "#" + domIDs.metricFromInput,
-	metricToInput: "#" + domIDs.metricToInput,
-	metricFromDateInput: "#" + domIDs.metricFromDateInput,
-	metricToDateInput: "#" + domIDs.metricToDateInput,
-
-	metricFromText: "#" + domIDs.metricFromText,
-	metricToText: "#" + domIDs.metricToText,
-
-	mappingFromText: "#" + domIDs.mappingFromText,
-	mappingToText: "#" + domIDs.mappingToText,
-
-	mappingFromInput: "#" + domIDs.mappingFromInput,
-	mappingToInput: "#" + domIDs.mappingToInput,
-
-	mappingTransparencyInput: "#" + domIDs.mappingTransparencyInput,
-	mappingPeriodInput: "#" + domIDs.mappingPeriodInput,
-	mappingScaleInput: "#" + domIDs.mappingScaleInput,
-
-	mappingPeriodText: "#" + domIDs.mappingPeriodText,
-	mappingScaleText: "#" + domIDs.mappingScaleText,
-
-	deleteButton: "#" + domIDs.deleteButton
-};
+const cssIDs = Object.fromEntries(
+	Object.entries(domIDs).map(([key, value]) => [key, '#' + value])
+);
 
 const domClasses = {
 	metricDiv: "metricDiv",
@@ -110,24 +72,9 @@ const domClasses = {
 	textLabel: "textLabel"
 }
 
-const cssClasses = {
-	metricTextNode: "." + domClasses.metricTextNode,
-	mappingTextNode: "." + domClasses.mappingTextNode,
-
-	layer: "." + domClasses.layer,
-
-	metricNumParameter: "." + domClasses.metricNumParameter,
-	metricDatearameter: "." + domClasses.metricDateParameter,
-	mappingParameter: "." + domClasses.mappingParameter,
-
-	viewDropDown: "." + domClasses.viewDropDown,
-
-	metricsDropDown: "." + domClasses.metricsDropDown,
-	metricSelectionDropDown: "." + domClasses.metricSelectionDropDown,
-	mappingDropDown: "." + domClasses.mappingDropDown,
-
-	deleteButton: "." + domClasses.deleteButton
-}
+const cssClasses = Object.fromEntries(
+	Object.entries(domClasses).map(([key, value]) => [key, '.' + value])
+);
 
 const metrics = {
 	numberOfStatements: "numberOfStatements",
