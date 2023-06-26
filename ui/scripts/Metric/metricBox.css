@@ -69,12 +69,13 @@
 	float: left;
 }
 
-.metricDropDown {
+.metricSelectionDropDown {
 	float: left;
 	font-size: 12px;
 }
 
-.metricParameter {
+.metricNumParameter,
+.metricDateParameter {
 	float: left;
 	font-size: 12px;
 	text-align: right;

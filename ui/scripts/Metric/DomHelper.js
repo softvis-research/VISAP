@@ -58,7 +58,7 @@ class DomHelper {
 
 		const viewDropDownDiv = document.createElement("div");
 		viewDropDownDiv.id = domIDs.viewDropDown;
-		viewDropDownDiv.classList.add(domClasses.viewDropDown);
+		viewDropDownDiv.classList.add(domClasses.metricsDropDown, domClasses.viewDropDown);
 		viewControllerHeaderDiv.appendChild(viewDropDownDiv);
 
 		this.rootDiv.appendChild(viewControllerHeaderDiv);
@@ -95,48 +95,48 @@ class DomHelper {
 		metricTextNode.textContent = "Metric";
 		metricDiv.appendChild(metricTextNode);
 
-		const metricDropDownDiv = document.createElement("div");
-		metricDropDownDiv.id = domIDs.metricDropDown + layerID;
-		metricDropDownDiv.classList.add(domClasses.metricDropDown, domClasses.layer + layerID);
-		metricDiv.appendChild(metricDropDownDiv);
+		const metricSelectionDropDownDiv = document.createElement("div");
+		metricSelectionDropDownDiv.id = domIDs.metricSelectionDropDown + layerID;
+		metricSelectionDropDownDiv.classList.add(domClasses.metricsDropDown, domClasses.metricSelectionDropDown, domClasses.layer + layerID);
+		metricDiv.appendChild(metricSelectionDropDownDiv);
 
 		const metricFromTextNode = document.createElement("label");
 		metricFromTextNode.id = domIDs.metricFromText + layerID;
-		metricFromTextNode.classList.add(domClasses.metricParameter, domClasses.metricParameter + layerID, domClasses.layer + layerID, domClasses.textLabel);
+		metricFromTextNode.classList.add(domClasses.metricTextNode, domClasses.layer + layerID, domClasses.textLabel);
 		metricFromTextNode.textContent = "From";
 		metricDiv.appendChild(metricFromTextNode);
 
 		const metricFromInput = document.createElement("input");
 		metricFromInput.type = "number";
 		metricFromInput.id = domIDs.metricFromInput + layerID;
-		metricFromInput.classList.add(domClasses.metricParameter, domClasses.metricParameter + layerID, domClasses.layer + layerID);
+		metricFromInput.classList.add(domClasses.metricNumParameter, domClasses.metricNumParameter + layerID, domClasses.layer + layerID);
 		metricDiv.appendChild(metricFromInput);
 
 		const metricFromDateInput = document.createElement("div");
 		metricFromDateInput.id = domIDs.metricFromDateInput + layerID;
-		metricFromDateInput.classList.add(domClasses.metricParameter, domClasses.metricParameter + layerID, domClasses.layer + layerID);
+		metricFromDateInput.classList.add(domClasses.metricDateParameter, domClasses.metricDateParameter + layerID, domClasses.layer + layerID);
 		metricDiv.appendChild(metricFromDateInput);
 
 		const metricToTextNode = document.createElement("label");
 		metricToTextNode.id = domIDs.metricToText + layerID;
-		metricToTextNode.classList.add(domClasses.metricParameter, domClasses.metricParameter + layerID, domClasses.layer + layerID, domClasses.textLabel);
+		metricToTextNode.classList.add(domClasses.metricTextNode, domClasses.layer + layerID, domClasses.textLabel);
 		metricToTextNode.textContent = "To";
 		metricDiv.appendChild(metricToTextNode);
 
 		const metricToInput = document.createElement("input");
 		metricToInput.type = "number";
 		metricToInput.id = domIDs.metricToInput + layerID;
-		metricToInput.classList.add(domClasses.metricParameter, domClasses.metricParameter + layerID, domClasses.layer + layerID);
+		metricToInput.classList.add(domClasses.metricNumParameter, domClasses.metricNumParameter + layerID, domClasses.layer + layerID);
 		metricDiv.appendChild(metricToInput);
 
 		const metricToDateInput = document.createElement("div");
 		metricToDateInput.id = domIDs.metricToDateInput + layerID;
-		metricToDateInput.classList.add(domClasses.metricParameter, domClasses.metricParameter + layerID, domClasses.layer + layerID);
+		metricToDateInput.classList.add(domClasses.metricDateParameter, domClasses.metricDateParameter + layerID, domClasses.layer + layerID);
 		metricDiv.appendChild(metricToDateInput);
 
 		this.rootDiv.appendChild(metricDiv);
 
-		$(cssIDs.metricDropDown + layerID).igCombo({
+		$(cssIDs.metricSelectionDropDown + layerID).igCombo({
 			dataSource: this.controllerConfig.metrics,
 			placeHolder: "Select Metric",
 			width: widgetSize.dropDownWidth, height: widgetSize.dropDownHeight,
@@ -144,7 +144,7 @@ class DomHelper {
 			autoDropDownHeight: true,
 			autoItemsHeight: true,
 		});
-		$(cssIDs.metricDropDown + layerID).on("change", () => { this.metricDropDownSelected(layerID) });
+		$(cssIDs.metricSelectionDropDown + layerID).on("change", () => { this.metricSelectionDropDownSelected(layerID) });
 		$(cssIDs.metricFromInput + layerID).igNumericEditor({ placeHolder: "Value", width: widgetSize.inputWidthMetric, height: widgetSize.inputHeight, minLength: 1 });
 		$(cssIDs.metricFromDateInput + layerID).igDatePicker({
 			placeHolder: "YYYY-MM-DD",
@@ -167,11 +167,11 @@ class DomHelper {
 		$(cssIDs.metricToDateInput + layerID).igDatePicker("hide");
 	}
 
-	metricDropDownSelected(layerID) {
+	metricSelectionDropDownSelected(layerID) {
 		$(cssIDs.metricFromText + layerID).show();
 		$(cssIDs.metricToText + layerID).show();
 
-		switch ($(cssIDs.metricDropDown + layerID).val()) {
+		switch ($(cssIDs.metricSelectionDropDown + layerID).val()) {
 			case metrics.numberOfStatements:
 			case metrics.amountOfResults:
 			case metrics.amountOfNamspa:
@@ -215,7 +215,7 @@ class DomHelper {
 
 		const mappingDropDownDiv = document.createElement("div");
 		mappingDropDownDiv.id = domIDs.mappingDropDown + layerID;
-		mappingDropDownDiv.classList.add(domClasses.mappingDropDown, domClasses.layer + layerID);
+		mappingDropDownDiv.classList.add(domClasses.metricsDropDown, domClasses.mappingDropDown, domClasses.layer + layerID);
 		mappingDiv.appendChild(mappingDropDownDiv);
 
 		const mappingFromTextNode = document.createElement("label");
@@ -244,17 +244,17 @@ class DomHelper {
 
 		const mappingColorDropDownDiv = document.createElement("div");
 		mappingColorDropDownDiv.id = domIDs.mappingColorDropDown + layerID;
-		mappingColorDropDownDiv.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
+		mappingColorDropDownDiv.classList.add(domClasses.metricsDropDown, domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
 		mappingDiv.appendChild(mappingColorDropDownDiv);
 
 		const mappingStartColorDropDownDiv = document.createElement("div");
 		mappingStartColorDropDownDiv.id = domIDs.mappingStartColorDropDown + layerID;
-		mappingStartColorDropDownDiv.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
+		mappingStartColorDropDownDiv.classList.add(domClasses.metricsDropDown, domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
 		mappingDiv.appendChild(mappingStartColorDropDownDiv);
 
 		const mappingEndColorDropDownDiv = document.createElement("div");
 		mappingEndColorDropDownDiv.id = domIDs.mappingEndColorDropDown + layerID;
-		mappingEndColorDropDownDiv.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
+		mappingEndColorDropDownDiv.classList.add(domClasses.metricsDropDown, domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
 		mappingDiv.appendChild(mappingEndColorDropDownDiv);
 
 		const transparencyInputDiv = document.createElement("div");
@@ -404,7 +404,7 @@ class DomHelper {
 	}
 
 	setLayerUI(layer) {
-		$(cssIDs.metricDropDown + layer.id).val(layer.metric.variant);
+		$(cssIDs.metricSelectionDropDown + layer.id).val(layer.metric.variant);
 
 		switch (layer.metric.variant) {
 			case metrics.dateOfCreation:
@@ -418,7 +418,7 @@ class DomHelper {
 				break;
 		}
 
-		this.metricDropDownSelected(layer.id);
+		this.metricSelectionDropDownSelected(layer.id);
 		$(cssIDs.mappingDropDown + layer.id).val(layer.mapping.variant);
 
 		switch (layer.mapping.variant) {
@@ -459,15 +459,10 @@ class DomHelper {
 	}
 
 	resetLayerUI(layerID) {
-		$(cssIDs.metricDropDown + layerID).igCombo("clearInput");
-		$(cssIDs.mappingDropDown + layerID).igCombo("clearInput");
+		$(cssClasses.layer + layerID).find(cssClasses.metricsDropDown).igCombo("clearInput");
 
-		$(cssClasses.metricParameter + layerID).igNumericEditor("destroy");
-		$(cssClasses.metricParameter + layerID).igDatePicker("destroy");
-
-		$(cssClasses.mappingParameter + layerID).igCombo("clearInput");
-
-		$(cssIDs.mappingColorDropDown + layerID).igCombo("clearInput");
+		$(cssClasses.metricNumParameter + layerID).igNumericEditor("destroy");
+		$(cssClasses.metricDateParameter + layerID).igDatePicker("destroy");
 
 		$(cssClasses.metricParameter + layerID).hide();
 		$(cssClasses.mappingParameter + layerID).hide();

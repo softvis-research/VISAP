@@ -14,7 +14,7 @@ const domIDs = {
 
 	viewDropDown: "viewDropDown",
 
-	metricDropDown: "metricDropDown",
+	metricSelectionDropDown: "metricSelectionDropDown",
 	mappingDropDown: "mappingDropDown",
 
 	mappingColorDropDown: "mappingColorDropDown",
@@ -56,7 +56,7 @@ const cssIDs = {
 
 	viewDropDown: "#" + domIDs.viewDropDown,
 
-	metricDropDown: "#" + domIDs.metricDropDown,
+	metricSelectionDropDown: "#" + domIDs.metricSelectionDropDown,
 	mappingDropDown: "#" + domIDs.mappingDropDown,
 
 	mappingColorDropDown: "#" + domIDs.mappingColorDropDown,
@@ -96,12 +96,13 @@ const domClasses = {
 
 	layer: "layer",
 
-	metricParameter: "metricParameter",
+	metricNumParameter: "metricNumParameter",
+	metricDateParameter: "metricDateParameter",
 	mappingParameter: "mappingParameter",
 
 	viewDropDown: "viewDropDown",
-
-	metricDropDown: "metricDropDown",
+	metricsDropDown: "metricsDropDown",
+	metricSelectionDropDown: "metricSelectionDropDown",
 	mappingDropDown: "mappingDropDown",
 
 	deleteButton: "deleteButton",
@@ -115,12 +116,14 @@ const cssClasses = {
 
 	layer: "." + domClasses.layer,
 
-	metricParameter: "." + domClasses.metricParameter,
+	metricNumParameter: "." + domClasses.metricNumParameter,
+	metricDatearameter: "." + domClasses.metricDateParameter,
 	mappingParameter: "." + domClasses.mappingParameter,
 
 	viewDropDown: "." + domClasses.viewDropDown,
 
-	metricDropDown: "." + domClasses.metricDropDown,
+	metricsDropDown: "." + domClasses.metricsDropDown,
+	metricSelectionDropDown: "." + domClasses.metricSelectionDropDown,
 	mappingDropDown: "." + domClasses.mappingDropDown,
 
 	deleteButton: "." + domClasses.deleteButton
