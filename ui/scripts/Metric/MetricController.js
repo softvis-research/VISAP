@@ -28,7 +28,7 @@ controllers.metricController = (function () {
 			mappings.flashing,
 			mappings.rotation,
 		],
-		views: [ 
+		views: [
 			{
 				name: "View 1",
 				viewMappings: [
@@ -136,7 +136,7 @@ controllers.metricController = (function () {
 
 		setTimeout(executeMapping, 10);
 
-		if (typeof(viewConfig) === 'undefined') {
+		if (typeof (viewConfig) === 'undefined') {
 			return;
 		}
 
@@ -186,9 +186,9 @@ controllers.metricController = (function () {
 		domHelper.buildUiLayer(layerCounter);
 
 		if (layerCounter > 1) {
-            $(cssIDs.deleteButton + (layerCounter - 1)).prop("disabled", true);
+			$(cssIDs.deleteButton + (layerCounter - 1)).prop("disabled", true);
 			$(cssIDs.deleteButton + (layerCounter - 1)).addClass("ui-state-disabled");
-        }
+		}
 	}
 
 	function removeLayer(event) {
@@ -201,13 +201,14 @@ controllers.metricController = (function () {
 
 		if (layerCounter > 0) {
 			$(cssIDs.deleteButton + layerCounter).igButton({
-				disabled: false });
+				disabled: false
+			});
 		}
 	}
 
 	function downloadViewConfig(event) {
 		const viewName = prompt("Please enter View name", "View");
-		
+
 		if (viewName === null) {
 			return;
 		}
