@@ -11,58 +11,22 @@ class DomHelper {
 			"yellow",
 			"orange"
 		];
-
 	}
 
 	buildUiHead() {
-		let cssLink = document.createElement("link");
-		cssLink.type = "text/css";
-		cssLink.rel = "stylesheet";
-		cssLink.href = "scripts/Metric/metricBox.css";
-		document.getElementsByTagName("head")[0].appendChild(cssLink);
+		application.loadCSS("scripts/Metric/metricBox.css");
 
+		const uiHeadHtml =
+			`<div id="${domIDs.viewControllerHeader}">
+				<label id="${domIDs.headerTextNode}">Metric View</label>
+				<button id="${domIDs.executeButton}">Execute</button>
+				<button id="${domIDs.resetButton}">Reset</button>
+				<button id="${domIDs.addLayerButton}">Add Metric Layer</button>
+				<button id="${domIDs.downloadViewConfigButton}">Download View Config</button>
+				<div id="${domIDs.viewDropDown}" class="${domClasses.metricsDropDown} ${domClasses.viewDropDown}"></div>
+			</div>`;
 
-		const viewControllerHeaderDiv = document.createElement("div");
-		viewControllerHeaderDiv.id = domIDs.viewControllerHeader;
-
-
-		const headerTextNode = document.createElement("label");
-		headerTextNode.id = domIDs.headerTextNode;
-		headerTextNode.textContent = "Metric View";
-		viewControllerHeaderDiv.appendChild(headerTextNode);
-
-
-		const executeButton = document.createElement("button");
-		executeButton.id = domIDs.executeButton;
-		executeButton.textContent = "Execute";
-		viewControllerHeaderDiv.appendChild(executeButton);
-
-
-		const resetButton = document.createElement("button");
-		resetButton.id = domIDs.resetButton;
-		resetButton.textContent = "Reset";
-		viewControllerHeaderDiv.appendChild(resetButton);
-
-
-		const addLayerButton = document.createElement("button");
-		addLayerButton.id = domIDs.addLayerButton;
-		addLayerButton.textContent = "Add Metric-Layer";
-		viewControllerHeaderDiv.appendChild(addLayerButton);
-
-
-		const downloadViewConfigButton = document.createElement("button");
-		downloadViewConfigButton.id = domIDs.downloadViewConfigButton;
-		downloadViewConfigButton.textContent = "Download View Config";
-		viewControllerHeaderDiv.appendChild(downloadViewConfigButton);
-
-
-		const viewDropDownDiv = document.createElement("div");
-		viewDropDownDiv.id = domIDs.viewDropDown;
-		viewDropDownDiv.classList.add(domClasses.metricsDropDown, domClasses.viewDropDown);
-		viewControllerHeaderDiv.appendChild(viewDropDownDiv);
-
-		this.rootDiv.appendChild(viewControllerHeaderDiv);
-
+		$(this.rootDiv).append(uiHeadHtml);
 
 		$(cssIDs.viewDropDown).igCombo({
 			dataSource: this.controllerConfig.views.map(a => a.name),
@@ -85,56 +49,28 @@ class DomHelper {
 	}
 
 	buildMetricArea(layerID) {
-		const metricDiv = document.createElement("div");
-		metricDiv.id = domIDs.metricDiv + layerID;
-		metricDiv.classList.add(domClasses.metricDiv, domClasses.layer + layerID);
+		const layerClass = domClasses.layer + layerID;
+		const metricHtml =
+			`<div id="${domIDs.metricDiv + layerID}" class="${domClasses.metricDiv} ${layerClass}">
+				<label id="${domIDs.metricTextNode + layerID}" class="${domClasses.metricTextNode} ${layerClass} ${domClasses.textLabel}">
+					Metric
+				</label>
+				<div id="${domIDs.metricSelectionDropDown + layerID}" class="${domClasses.metricsDropDown} ${layerClass} ${domClasses.metricSelectionDropDown}"></div>
 
-		const metricTextNode = document.createElement("label");
-		metricTextNode.id = domIDs.metricTextNode + layerID;
-		metricTextNode.classList.add(domClasses.metricTextNode, domClasses.layer + layerID, domClasses.textLabel);
-		metricTextNode.textContent = "Metric";
-		metricDiv.appendChild(metricTextNode);
+				<label id="${domIDs.metricFromText + layerID}" class="${domClasses.metricTextNode} ${layerClass} ${domClasses.textLabel}">
+					From
+				</label>
+				<input type="number" id="${domIDs.metricFromInput + layerID}" class="${domClasses.metricNumParameter} ${layerClass} ${domClasses.metricNumParameter + layerID}" />
+				<div id="${domIDs.metricFromDateInput + layerID}" class="${domClasses.metricDateParameter} ${layerClass} ${domClasses.metricDateParameter + layerID}"></div>
 
-		const metricSelectionDropDownDiv = document.createElement("div");
-		metricSelectionDropDownDiv.id = domIDs.metricSelectionDropDown + layerID;
-		metricSelectionDropDownDiv.classList.add(domClasses.metricsDropDown, domClasses.metricSelectionDropDown, domClasses.layer + layerID);
-		metricDiv.appendChild(metricSelectionDropDownDiv);
+				<label id="${domIDs.metricToText + layerID}" class="${domClasses.metricTextNode} ${layerClass} ${domClasses.textLabel}">
+					To
+				</label>
+				<input type="number" id="${domIDs.metricToInput + layerID}" class="${domClasses.metricNumParameter} ${layerClass} ${domClasses.metricNumParameter + layerID}"/>
+				<div id="${domIDs.metricToDateInput + layerID}" class="${domClasses.metricDateParameter} ${layerClass} ${domClasses.metricDateParameter + layerID}"></div>
+			</div>`;
 
-		const metricFromTextNode = document.createElement("label");
-		metricFromTextNode.id = domIDs.metricFromText + layerID;
-		metricFromTextNode.classList.add(domClasses.metricTextNode, domClasses.layer + layerID, domClasses.textLabel);
-		metricFromTextNode.textContent = "From";
-		metricDiv.appendChild(metricFromTextNode);
-
-		const metricFromInput = document.createElement("input");
-		metricFromInput.type = "number";
-		metricFromInput.id = domIDs.metricFromInput + layerID;
-		metricFromInput.classList.add(domClasses.metricNumParameter, domClasses.metricNumParameter + layerID, domClasses.layer + layerID);
-		metricDiv.appendChild(metricFromInput);
-
-		const metricFromDateInput = document.createElement("div");
-		metricFromDateInput.id = domIDs.metricFromDateInput + layerID;
-		metricFromDateInput.classList.add(domClasses.metricDateParameter, domClasses.metricDateParameter + layerID, domClasses.layer + layerID);
-		metricDiv.appendChild(metricFromDateInput);
-
-		const metricToTextNode = document.createElement("label");
-		metricToTextNode.id = domIDs.metricToText + layerID;
-		metricToTextNode.classList.add(domClasses.metricTextNode, domClasses.layer + layerID, domClasses.textLabel);
-		metricToTextNode.textContent = "To";
-		metricDiv.appendChild(metricToTextNode);
-
-		const metricToInput = document.createElement("input");
-		metricToInput.type = "number";
-		metricToInput.id = domIDs.metricToInput + layerID;
-		metricToInput.classList.add(domClasses.metricNumParameter, domClasses.metricNumParameter + layerID, domClasses.layer + layerID);
-		metricDiv.appendChild(metricToInput);
-
-		const metricToDateInput = document.createElement("div");
-		metricToDateInput.id = domIDs.metricToDateInput + layerID;
-		metricToDateInput.classList.add(domClasses.metricDateParameter, domClasses.metricDateParameter + layerID, domClasses.layer + layerID);
-		metricDiv.appendChild(metricToDateInput);
-
-		this.rootDiv.appendChild(metricDiv);
+		$(this.rootDiv).append(metricHtml);
 
 		$(cssIDs.metricSelectionDropDown + layerID).igCombo({
 			dataSource: this.controllerConfig.metrics,
@@ -204,86 +140,42 @@ class DomHelper {
 	}
 
 	buildMappingArea(layerID) {
-		const mappingDiv = document.createElement("div");
-		mappingDiv.id = domIDs.mappingDiv + layerID;
-		mappingDiv.classList.add(domClasses.mappingDiv, domClasses.layer + layerID);
+		const layerClass = domClasses.layer + layerID;
+		const mappingParamClass = `${domClasses.mappingParameter} ${domClasses.mappingParameter + layerID}`;
+		const mappingHtml =
+			`<div id="${domIDs.mappingDiv + layerID}" class="${domClasses.mappingDiv} ${layerClass}">
+				<label id="${domIDs.mappingTextNode + layerID}" class="${domClasses.mappingTextNode} ${layerClass} ${domClasses.textLabel}">
+					Mapping
+				</label>
+				<div id="${domIDs.mappingDropDown + layerID}" class="${domClasses.metricsDropDown} ${layerClass} ${domClasses.mappingDropDown}"></div>
 
-		const mappingTextNode = document.createElement("label");
-		mappingTextNode.id = domIDs.mappingTextNode + layerID;
-		mappingTextNode.classList.add(domClasses.mappingTextNode, domClasses.layer + layerID, domClasses.textLabel);
-		mappingTextNode.textContent = "Mapping";
-		mappingDiv.appendChild(mappingTextNode);
+				<label id="${domIDs.mappingFromText + layerID}" class="${mappingParamClass} ${layerClass} ${domClasses.textLabel}">
+					Mapping - From
+				</label>
+				<div id="${domIDs.mappingFromInput + layerID}" class="${mappingParamClass} ${layerClass}"></div>
 
-		const mappingDropDownDiv = document.createElement("div");
-		mappingDropDownDiv.id = domIDs.mappingDropDown + layerID;
-		mappingDropDownDiv.classList.add(domClasses.metricsDropDown, domClasses.mappingDropDown, domClasses.layer + layerID);
-		mappingDiv.appendChild(mappingDropDownDiv);
+				<label id="${domIDs.mappingToText + layerID}" class="${domClasses.metricTextNode} ${layerClass} ${domClasses.textLabel}">
+					Mapping - To
+				</label>
+				<div id="${domIDs.mappingToInput + layerID}" class="${mappingParamClass} ${layerClass}"></div>
 
-		const mappingFromTextNode = document.createElement("label");
-		mappingFromTextNode.id = domIDs.mappingFromText + layerID;
-		mappingFromTextNode.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID, domClasses.textLabel);
-		mappingFromTextNode.textContent = "Mapping - From";
-		mappingDiv.appendChild(mappingFromTextNode);
+				<div id="${domIDs.mappingColorDropDown + layerID}" class="${domClasses.metricsDropDown} ${mappingParamClass} ${layerClass}"></div>
+				<div id="${domIDs.mappingStartColorDropDown + layerID}" class="${domClasses.metricsDropDown} ${mappingParamClass} ${layerClass}"></div>
+				<div id="${domIDs.mappingEndColorDropDown + layerID}" class="${domClasses.metricsDropDown} ${mappingParamClass} ${layerClass}"></div>
+				<div id="${domIDs.mappingTransparencyInput + layerID}" class="${mappingParamClass} ${layerClass}"></div>
 
-		const mappingFromInput = document.createElement("div");
-		mappingFromInput.id = domIDs.mappingFromInput + layerID;
-		mappingFromInput.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
-		mappingDiv.appendChild(mappingFromInput);
+				<label id="${domIDs.mappingPeriodText + layerID}" class="${mappingParamClass} ${layerClass} ${domClasses.textLabel}">
+					Period in ms
+				</label>
+				<div id="${domIDs.mappingPeriodInput + layerID}" class="${mappingParamClass} ${layerClass}"></div>
 
-		const mappingToTextNode = document.createElement("label");
-		mappingToTextNode.id = domIDs.mappingToText + layerID;
-		mappingToTextNode.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID, domClasses.textLabel);
-		mappingToTextNode.textContent = "Mapping - To";
-		mappingDiv.appendChild(mappingToTextNode);
+				<label id="${domIDs.mappingScaleText + layerID}" class="${mappingParamClass} ${layerClass} ${domClasses.textLabel}">
+					Scale
+				</label>
+				<div id="${domIDs.mappingScaleInput + layerID}" class="${mappingParamClass} ${layerClass}"></div>
+			</div>`;
 
-		const mappingToInput = document.createElement("div");
-		mappingToInput.id = domIDs.mappingToInput + layerID;
-		mappingToInput.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
-		mappingDiv.appendChild(mappingToInput);
-
-		const mappingColorDropDownDiv = document.createElement("div");
-		mappingColorDropDownDiv.id = domIDs.mappingColorDropDown + layerID;
-		mappingColorDropDownDiv.classList.add(domClasses.metricsDropDown, domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
-		mappingDiv.appendChild(mappingColorDropDownDiv);
-
-		const mappingStartColorDropDownDiv = document.createElement("div");
-		mappingStartColorDropDownDiv.id = domIDs.mappingStartColorDropDown + layerID;
-		mappingStartColorDropDownDiv.classList.add(domClasses.metricsDropDown, domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
-		mappingDiv.appendChild(mappingStartColorDropDownDiv);
-
-		const mappingEndColorDropDownDiv = document.createElement("div");
-		mappingEndColorDropDownDiv.id = domIDs.mappingEndColorDropDown + layerID;
-		mappingEndColorDropDownDiv.classList.add(domClasses.metricsDropDown, domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
-		mappingDiv.appendChild(mappingEndColorDropDownDiv);
-
-		const transparencyInputDiv = document.createElement("div");
-		transparencyInputDiv.id = domIDs.mappingTransparencyInput + layerID;
-		transparencyInputDiv.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
-		mappingDiv.appendChild(transparencyInputDiv);
-
-		const mappingPeriodTextNode = document.createElement("label");
-		mappingPeriodTextNode.id = domIDs.mappingPeriodText + layerID;
-		mappingPeriodTextNode.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID, domClasses.textLabel);
-		mappingPeriodTextNode.textContent = "Period in ms";
-		mappingDiv.appendChild(mappingPeriodTextNode);
-
-		const mappingPeriodInput = document.createElement("div");
-		mappingPeriodInput.id = domIDs.mappingPeriodInput + layerID;
-		mappingPeriodInput.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
-		mappingDiv.appendChild(mappingPeriodInput);
-
-		const mappingScaleTextNode = document.createElement("label");
-		mappingScaleTextNode.id = domIDs.mappingScaleText + layerID;
-		mappingScaleTextNode.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID, domClasses.textLabel);
-		mappingScaleTextNode.textContent = "Scale";
-		mappingDiv.appendChild(mappingScaleTextNode);
-
-		const mappingScaleInput = document.createElement("div");
-		mappingScaleInput.id = domIDs.mappingScaleInput + layerID;
-		mappingScaleInput.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
-		mappingDiv.appendChild(mappingScaleInput);
-
-		this.rootDiv.appendChild(mappingDiv);
+		$(this.rootDiv).append(mappingHtml);
 
 		$(cssIDs.mappingDropDown + layerID).igCombo({
 			dataSource: this.controllerConfig.mappings,
@@ -423,26 +315,21 @@ class DomHelper {
 			case mappings.color:
 				$(cssIDs.mappingColorDropDown + layer.id).igCombo("value", layer.mapping.color);
 				break;
-
 			case mappings.colorGradient:
 				$(cssIDs.mappingStartColorDropDown + layer.id).igCombo("value", layer.mapping.startColor);
 				$(cssIDs.mappingEndColorDropDown + layer.id).igCombo("value", layer.mapping.endColor);
 				break;
-
 			case mappings.transparency:
 				$(cssIDs.mappingTransparencyInput + layer.id).igNumericEditor("value", layer.mapping.transparency);
 				break;
-
 			case mappings.pulsation:
 				$(cssIDs.mappingPeriodInput + layer.id).igNumericEditor("value", layer.mapping.period);
 				$(cssIDs.mappingScaleInput + layer.id).igNumericEditor("value", layer.mapping.scale);
 				break;
-
 			case mappings.flashing:
 				$(cssIDs.mappingPeriodInput + layer.id).igNumericEditor("value", layer.mapping.period);
 				$(cssIDs.mappingColorDropDown + layer.id).igCombo("value", layer.mapping.color);
 				break;
-
 			case mappings.rotation:
 				$(cssIDs.mappingPeriodInput + layer.id).igNumericEditor("value", layer.mapping.period);
 				break;
