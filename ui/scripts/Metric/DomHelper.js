@@ -144,7 +144,8 @@ class DomHelper {
 			autoDropDownHeight: true,
 			autoItemsHeight: true,
 		});
-		$(cssIDs.metricSelectionDropDown + layerID).on("change", () => { this.metricSelectionDropDownSelected(layerID) });
+		$(document).delegate(cssIDs.metricSelectionDropDown + layerID, "igcomboselectionchanged", (evt, ui) => { this.metricSelectionDropDownSelected(layerID) });
+
 		$(cssIDs.metricFromInput + layerID).igNumericEditor({ placeHolder: "Value", width: widgetSize.inputWidthMetric, height: widgetSize.inputHeight, minLength: 1 });
 		$(cssIDs.metricFromDateInput + layerID).igDatePicker({
 			placeHolder: "YYYY-MM-DD",
@@ -171,7 +172,7 @@ class DomHelper {
 		$(cssIDs.metricFromText + layerID).show();
 		$(cssIDs.metricToText + layerID).show();
 
-		switch ($(cssIDs.metricSelectionDropDown + layerID).val()) {
+		switch ($(cssIDs.metricSelectionDropDown + layerID).igCombo("value")) {
 			case metrics.numberOfStatements:
 			case metrics.amountOfResults:
 			case metrics.amountOfNamspa:
@@ -187,17 +188,17 @@ class DomHelper {
 			case metrics.amountOfSlin:
 			case metrics.amountOfSql:
 			case metrics.amountOfTodo:
-				$(cssIDs.metricFromDateInput + layerID).hide();
-				$(cssIDs.metricToDateInput + layerID).hide();
-				$(cssIDs.metricFromInput + layerID).show();
-				$(cssIDs.metricToInput + layerID).show();
+				$(cssIDs.metricFromDateInput + layerID).igDatePicker("hide");
+				$(cssIDs.metricToDateInput + layerID).igDatePicker("hide");
+				$(cssIDs.metricFromInput + layerID).igNumericEditor("show");
+				$(cssIDs.metricToInput + layerID).igNumericEditor("show");
 				break;
 			case metrics.dateOfCreation:
 			case metrics.dateOfLastChange:
-				$(cssIDs.metricFromInput + layerID).hide();
-				$(cssIDs.metricToInput + layerID).hide();
-				$(cssIDs.metricFromDateInput + layerID).show();
-				$(cssIDs.metricToDateInput + layerID).show();
+				$(cssIDs.metricFromInput + layerID).igNumericEditor("hide");
+				$(cssIDs.metricToInput + layerID).igNumericEditor("hide");
+				$(cssIDs.metricFromDateInput + layerID).igDatePicker("show");
+				$(cssIDs.metricToDateInput + layerID).igDatePicker("show");
 				break;
 		}
 	}
@@ -296,7 +297,8 @@ class DomHelper {
 			autoDropDownHeight: true,
 			autoItemsHeight: true
 		});
-		$(cssIDs.mappingDropDown + layerID).on("change", () => { this.mappingDropDownSelected(layerID) });
+
+		$(document).delegate(cssIDs.mappingDropDown + layerID, "igcomboselectionchanged", (evt, ui) => { this.mappingDropDownSelected(layerID) });
 
 		$(cssIDs.mappingFromInput + layerID).igNumericEditor({
 			placeHolder: "Value",
@@ -344,18 +346,18 @@ class DomHelper {
 		$(cssIDs.mappingPeriodInput + layerID).igNumericEditor({ width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
 		$(cssIDs.mappingScaleInput + layerID).igNumericEditor({ width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
 
-		debugger;
 		$(cssIDs.mappingFromInput + layerID).igNumericEditor("hide");
 		$(cssIDs.mappingToInput + layerID).igNumericEditor("hide");
 		$(cssIDs.mappingScaleInput + layerID).igNumericEditor("hide");
 		$(cssIDs.mappingPeriodInput + layerID).igNumericEditor("hide");
 		$(cssIDs.mappingTransparencyInput + layerID).igNumericEditor("hide");
+		$(cssClasses.mappingParameter + layerID).hide();
 	}
 
 	mappingDropDownSelected(layerID) {
 		$(cssClasses.mappingParameter + layerID).hide();
 
-		switch ($(cssIDs.mappingDropDown + layerID).val()) {
+		switch ($(cssIDs.mappingDropDown + layerID).igCombo("value")) {
 			case mappings.color:
 				$(cssIDs.mappingColorDropDown + layerID).show();
 				break;

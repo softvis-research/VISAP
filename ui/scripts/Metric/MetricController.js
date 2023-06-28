@@ -124,7 +124,7 @@ controllers.metricController = (function () {
 		$(cssIDs.resetButton).click(resetButtonClicked);
 		$(cssIDs.addLayerButton).click(addLayer);
 		$(cssIDs.downloadViewConfigButton).click(downloadViewConfig);
-		$(cssIDs.viewDropDown).on('change', changeView);
+		$(document).delegate(cssIDs.viewDropDown, 'igcomboselectionchanged', changeView);
 	}
 
 	function executeButtonClicked(event) {
@@ -147,7 +147,7 @@ controllers.metricController = (function () {
 
 	function changeView(event) {
 		controllerConfig.views.forEach(function (view) {
-			if (view.name == $(cssIDs.viewDropDown).val()) {
+			if (view.name == $(cssIDs.viewDropDown).igCombo("value")) {
 				viewConfig = view;
 			}
 		});
