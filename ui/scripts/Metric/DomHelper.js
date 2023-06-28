@@ -11,6 +11,30 @@ class DomHelper {
 			"yellow",
 			"orange"
 		];
+		this.defaultIgButtonSettings = {
+			theme: "metro",
+			width: widgetSize.buttonWidth
+		}
+		this.defaultIgComboSettings = {
+			width: widgetSize.dropDownWidth,
+			height: widgetSize.headerDropDownHeight,
+			dropDownVerticalAlignment: "top",
+			autoDropDownHeight: true,
+			autoItemsHeight: true
+		};
+		this.defaultIgDatePickerSettings = {
+			placeHolder: "YYYY-MM-DD",
+			formatString: "yyyy-MM-dd",
+			value: null,
+			dropDownVerticalAlignment: "top",
+			width: widgetSize.inputWidthMetric
+		};
+		this.defaultIgNumInputSettings = {
+			placeHolder: "Value",
+			width: widgetSize.inputWidthMetric,
+			height: widgetSize.inputHeight,
+			minLength: 1
+		};
 	}
 
 	buildUiHead() {
@@ -29,17 +53,14 @@ class DomHelper {
 		$(this.rootDiv).append(uiHeadHtml);
 
 		$(cssIDs.viewDropDown).igCombo({
+			...this.defaultIgComboSettings,
 			dataSource: this.controllerConfig.views.map(a => a.name),
 			placeHolder: "Select View",
-			width: widgetSize.dropDownWidth, height: widgetSize.headerDropDownHeight,
-			dropDownVerticalAlignment: "top",
-			autoDropDownHeight: true,
-			autoItemsHeight: true
 		});
-		$(cssIDs.downloadViewConfigButton).igButton({ theme: "metro", width: widgetSize.buttonWidth });
-		$(cssIDs.executeButton).igButton({ theme: "metro", width: widgetSize.buttonWidth });
-		$(cssIDs.resetButton).igButton({ theme: "metro", width: widgetSize.buttonWidth });
-		$(cssIDs.addLayerButton).igButton({ theme: "metro", width: widgetSize.buttonWidth });
+		$(cssIDs.downloadViewConfigButton).igButton({ ...this.defaultIgButtonSettings });
+		$(cssIDs.executeButton).igButton({ ...this.defaultIgButtonSettings });
+		$(cssIDs.resetButton).igButton({ ...this.defaultIgButtonSettings });
+		$(cssIDs.addLayerButton).igButton({ ...this.defaultIgButtonSettings });
 	}
 
 	buildUiLayer(layerID) {
@@ -73,32 +94,16 @@ class DomHelper {
 		$(this.rootDiv).append(metricHtml);
 
 		$(cssIDs.metricSelectionDropDown + layerID).igCombo({
+			...this.defaultIgComboSettings,
 			dataSource: this.controllerConfig.metrics,
-			placeHolder: "Select Metric",
-			width: widgetSize.dropDownWidth, height: widgetSize.dropDownHeight,
-			dropDownVerticalAlignment: "top",
-			autoDropDownHeight: true,
-			autoItemsHeight: true,
+			placeHolder: "Select Metric"
 		});
 		$(document).delegate(cssIDs.metricSelectionDropDown + layerID, "igcomboselectionchanged", (evt, ui) => { this.metricSelectionDropDownSelected(layerID) });
 
-		$(cssIDs.metricFromInput + layerID).igNumericEditor({ placeHolder: "Value", width: widgetSize.inputWidthMetric, height: widgetSize.inputHeight, minLength: 1 });
-		$(cssIDs.metricFromDateInput + layerID).igDatePicker({
-			placeHolder: "YYYY-MM-DD",
-			formatString: "yyyy-MM-dd",
-			value: null,
-			dropDownVerticalAlignment: "top",
-			width: widgetSize.inputWidthMetric,
-		});
-		$(cssIDs.metricToInput + layerID).igNumericEditor({ placeHolder: "Value", width: widgetSize.inputWidthMetric, height: widgetSize.inputHeight, minLength: 1 });
-
-		$(cssIDs.metricToDateInput + layerID).igDatePicker({
-			placeHolder: "YYYY-MM-DD",
-			formatString: "yyyy-MM-dd",
-			value: null,
-			dropDownVerticalAlignment: "top",
-			width: widgetSize.inputWidthMetric,
-		});
+		$(cssIDs.metricFromInput + layerID).igNumericEditor({ ...this.defaultIgNumInputSettings });
+		$(cssIDs.metricFromDateInput + layerID).igDatePicker({ ...this.defaultIgDatePickerSettings });
+		$(cssIDs.metricToInput + layerID).igNumericEditor({ ...this.defaultIgNumInputSettings });
+		$(cssIDs.metricToDateInput + layerID).igDatePicker({ ...this.defaultIgDatePickerSettings });
 
 		$(cssIDs.metricFromDateInput + layerID).igDatePicker("hide");
 		$(cssIDs.metricToDateInput + layerID).igDatePicker("hide");
@@ -178,52 +183,31 @@ class DomHelper {
 		$(this.rootDiv).append(mappingHtml);
 
 		$(cssIDs.mappingDropDown + layerID).igCombo({
+			...this.defaultIgComboSettings,
 			dataSource: this.controllerConfig.mappings,
-			placeHolder: "Select Mapping",
-			width: widgetSize.dropDownWidth, height: widgetSize.dropDownHeight,
-			dropDownVerticalAlignment: "top",
-			autoDropDownHeight: true,
-			autoItemsHeight: true
+			placeHolder: "Select Mapping"
 		});
 
 		$(document).delegate(cssIDs.mappingDropDown + layerID, "igcomboselectionchanged", (evt, ui) => { this.mappingDropDownSelected(layerID) });
 
-		$(cssIDs.mappingFromInput + layerID).igNumericEditor({
-			placeHolder: "Value",
-			width: widgetSize.inputWidthMapping,
-			height: widgetSize.inputHeight,
-			minLength: 1,
-		});
-
-		$(cssIDs.mappingToInput + layerID).igNumericEditor({ placeHolder: "Value", width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
+		$(cssIDs.mappingFromInput + layerID).igNumericEditor({ ...this.defaultIgNumInputSettings });
+		$(cssIDs.mappingToInput + layerID).igNumericEditor({ ...this.defaultIgNumInputSettings });
 
 		$(cssIDs.mappingColorDropDown + layerID).igCombo({
+			...this.defaultIgComboSettings,
 			dataSource: colors,
-			placeHolder: "Select Color",
-			width: widgetSize.dropDownWidth, height: widgetSize.dropDownHeight,
-			dropDownVerticalAlignment: "top",
-			autoDropDownHeight: true,
-			autoItemsHeight: true
+			placeHolder: "Select Color"
 		});
-
 		$(cssIDs.mappingStartColorDropDown + layerID).igCombo({
+			...this.defaultIgComboSettings,
 			dataSource: colors,
-			placeHolder: "Select Start Color",
-			width: widgetSize.dropDownWidth, height: widgetSize.dropDownHeight,
-			dropDownVerticalAlignment: "top",
-			autoDropDownHeight: true,
-			autoItemsHeight: true
+			placeHolder: "Select Start Color"
 		});
-
 		$(cssIDs.mappingEndColorDropDown + layerID).igCombo({
+			...this.defaultIgComboSettings,
 			dataSource: colors,
-			placeHolder: "Select End Color",
-			width: widgetSize.dropDownWidth, height: widgetSize.dropDownHeight,
-			dropDownVerticalAlignment: "top",
-			autoDropDownHeight: true,
-			autoItemsHeight: true
+			placeHolder: "Select End Color"
 		});
-
 		$(cssIDs.mappingTransparencyInput + layerID).igNumericEditor({
 			width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight,
 			min: 0, max: 1,
@@ -231,8 +215,8 @@ class DomHelper {
 			spinButtons: true
 		});
 
-		$(cssIDs.mappingPeriodInput + layerID).igNumericEditor({ width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
-		$(cssIDs.mappingScaleInput + layerID).igNumericEditor({ width: widgetSize.inputWidthMapping, height: widgetSize.inputHeight, minLength: 1 });
+		$(cssIDs.mappingPeriodInput + layerID).igNumericEditor({ ...this.defaultIgNumInputSettings });
+		$(cssIDs.mappingScaleInput + layerID).igNumericEditor({ ...this.defaultIgNumInputSettings });
 
 		$(cssIDs.mappingFromInput + layerID).igNumericEditor("hide");
 		$(cssIDs.mappingToInput + layerID).igNumericEditor("hide");
