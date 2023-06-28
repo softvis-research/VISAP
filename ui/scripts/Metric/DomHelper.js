@@ -225,8 +225,7 @@ class DomHelper {
 		mappingFromTextNode.textContent = "Mapping - From";
 		mappingDiv.appendChild(mappingFromTextNode);
 
-		const mappingFromInput = document.createElement("input");
-		mappingFromInput.type = "text";
+		const mappingFromInput = document.createElement("div");
 		mappingFromInput.id = domIDs.mappingFromInput + layerID;
 		mappingFromInput.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
 		mappingDiv.appendChild(mappingFromInput);
@@ -237,8 +236,7 @@ class DomHelper {
 		mappingToTextNode.textContent = "Mapping - To";
 		mappingDiv.appendChild(mappingToTextNode);
 
-		const mappingToInput = document.createElement("input");
-		mappingToInput.type = "text";
+		const mappingToInput = document.createElement("div");
 		mappingToInput.id = domIDs.mappingToInput + layerID;
 		mappingToInput.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
 		mappingDiv.appendChild(mappingToInput);
@@ -269,8 +267,7 @@ class DomHelper {
 		mappingPeriodTextNode.textContent = "Period in ms";
 		mappingDiv.appendChild(mappingPeriodTextNode);
 
-		const mappingPeriodInput = document.createElement("input");
-		mappingPeriodInput.type = "number";
+		const mappingPeriodInput = document.createElement("div");
 		mappingPeriodInput.id = domIDs.mappingPeriodInput + layerID;
 		mappingPeriodInput.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
 		mappingDiv.appendChild(mappingPeriodInput);
@@ -281,8 +278,7 @@ class DomHelper {
 		mappingScaleTextNode.textContent = "Scale";
 		mappingDiv.appendChild(mappingScaleTextNode);
 
-		const mappingScaleInput = document.createElement("input");
-		mappingScaleInput.type = "number";
+		const mappingScaleInput = document.createElement("div");
 		mappingScaleInput.id = domIDs.mappingScaleInput + layerID;
 		mappingScaleInput.classList.add(domClasses.mappingParameter, domClasses.mappingParameter + layerID, domClasses.layer + layerID);
 		mappingDiv.appendChild(mappingScaleInput);
