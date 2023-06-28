@@ -184,6 +184,11 @@ controllers.metricController = (function () {
 		layers.push(newLayer);
 
 		domHelper.buildUiLayer(layerCounter);
+
+		if (layerCounter > 1) {
+            $(cssIDs.deleteButton + (layerCounter - 1)).prop("disabled", true);
+			$(cssIDs.deleteButton + (layerCounter - 1)).addClass("ui-state-disabled");
+        }
 	}
 
 	function removeLayer(event) {
