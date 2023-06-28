@@ -184,9 +184,6 @@ controllers.metricController = (function () {
 		layers.push(newLayer);
 
 		domHelper.buildUiLayer(layerCounter);
-
-		if (layerCounter > 1) {
-		}
 	}
 
 	function removeLayer(event) {

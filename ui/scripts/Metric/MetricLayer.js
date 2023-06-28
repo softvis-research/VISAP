@@ -24,48 +24,48 @@ class MetricLayer {
 	}
 
 	readUIData() {
-		this.metric.variant = ($(cssIDs.metricDropDown + this.id).val() == "" ? metricController.metricDefault.variant : $(cssIDs.metricDropDown + this.id).val());
+		this.metric.variant = ($(cssIDs.metricSelectionDropDown + this.id).igCombo("value") == "" ? metricController.metricDefault.variant : $(cssIDs.metricSelectionDropDown + this.id).igCombo("value"));
 
 		switch (this.metric.variant) {
 			case metrics.dateOfCreation:
 			case metrics.dateOfLastChange:
-				this.metric.from = $(cssIDs.metricFromDateInput + this.id).val() === "" ? (new Date(0)).getTime() : (new Date($(cssIDs.metricFromDateInput + this.id).val())).getTime();
-				this.metric.to = $(cssIDs.metricToDateInput + this.id).val() === "" ? (new Date()).getTime() : (new Date($(cssIDs.metricToDateInput + this.id).val())).getTime();
+				this.metric.from = $(cssIDs.metricFromDateInput + this.id).igDatePicker("value") === "" ? (new Date(0)).getTime() : (new Date($(cssIDs.metricFromDateInput + this.id).igDatePicker("value"))).getTime();
+				this.metric.to = $(cssIDs.metricToDateInput + this.id).igDatePicker("value") === "" ? (new Date()).getTime() : (new Date($(cssIDs.metricToDateInput + this.id).igDatePicker("value"))).getTime();
 				break;
 			default:
-				this.metric.from = $(cssIDs.metricFromInput + this.id).val() === "" ? Number.NEGATIVE_INFINITY : Number($(cssIDs.metricFromInput + this.id).val());
-				this.metric.to = $(cssIDs.metricToInput + this.id).val() === "" ? Number.POSITIVE_INFINITY : Number($(cssIDs.metricToInput + this.id).val());
+				this.metric.from = $(cssIDs.metricFromInput + this.id).igNumericEditor("value") === "" ? Number.NEGATIVE_INFINITY : Number($(cssIDs.metricFromInput + this.id).igNumericEditor("value"));
+				this.metric.to = $(cssIDs.metricToInput + this.id).igNumericEditor("value") === "" ? Number.POSITIVE_INFINITY : Number($(cssIDs.metricToInput + this.id).igNumericEditor("value"));
 				break;
 		}
 
-		this.mapping.variant = ($(cssIDs.mappingDropDown + this.id).val() == "" ? metricController.mappingDefault.variant : $(cssIDs.mappingDropDown + this.id).val());
+		this.mapping.variant = ($(cssIDs.mappingDropDown + this.id).igCombo("value") == "" ? metricController.mappingDefault.variant : $(cssIDs.mappingDropDown + this.id).igCombo("value"));
 
 		switch (this.mapping.variant) {
 			case mappings.color:
-				this.mapping.color = ($(cssIDs.mappingColorDropDown + this.id).val() == "" ? metricController.mappingDefault.color : $(cssIDs.mappingColorDropDown + this.id).val());
+				this.mapping.color = ($(cssIDs.mappingColorDropDown + this.id).igCombo("value") == "" ? metricController.mappingDefault.color : $(cssIDs.mappingColorDropDown + this.id).igCombo("value"));
 				break;
 
 			case mappings.colorGradient:
-				this.mapping.startColor = ($(cssIDs.mappingStartColorDropDown + this.id).val() == "" ? metricController.mappingDefault.startColor : $(cssIDs.mappingStartColorDropDown + this.id).val());
-				this.mapping.endColor = ($(cssIDs.mappingEndColorDropDown + this.id).val() == "" ? metricController.mappingDefault.endColor : $(cssIDs.mappingEndColorDropDown + this.id).val());
+				this.mapping.startColor = ($(cssIDs.mappingStartColorDropDown + this.id).igCombo("value") == "" ? metricController.mappingDefault.startColor : $(cssIDs.mappingStartColorDropDown + this.id).igCombo("value"));
+				this.mapping.endColor = ($(cssIDs.mappingEndColorDropDown + this.id).igCombo("value") == "" ? metricController.mappingDefault.endColor : $(cssIDs.mappingEndColorDropDown + this.id).igCombo("value"));
 				break;
 
 			case mappings.transparency:
-				this.mapping.transparency = ($(cssIDs.mappingTransparencyInput + this.id).val() == "" ? metricController.mappingDefault.transparency : $(cssIDs.mappingTransparencyInput + this.id).val());
+				this.mapping.transparency = ($(cssIDs.mappingTransparencyInput + this.id).igNumericEditor("value") == "" ? metricController.mappingDefault.transparency : $(cssIDs.mappingTransparencyInput + this.id).igNumericEditor("value"));
 				break;
 
 			case mappings.pulsation:
-				this.mapping.period = ($(cssIDs.mappingPeriodInput + this.id).val() == "" ? metricController.mappingDefault.period : $(cssIDs.mappingPeriodInput + this.id).val());
-				this.mapping.scale = ($(cssIDs.mappingScaleInput + this.id).val() == "" ? metricController.mappingDefault.scale : $(cssIDs.mappingScaleInput + this.id).val());
+				this.mapping.period = ($(cssIDs.mappingPeriodInput + this.id).igNumericEditor("value") == "" ? metricController.mappingDefault.period : $(cssIDs.mappingPeriodInput + this.id).igNumericEditor("value"));
+				this.mapping.scale = ($(cssIDs.mappingScaleInput + this.id).igNumericEditor("value") == "" ? metricController.mappingDefault.scale : $(cssIDs.mappingScaleInput + this.id).igNumericEditor("value"));
 				break;
 
 			case mappings.flashing:
-				this.mapping.period = ($(cssIDs.mappingPeriodInput + this.id).val() == "" ? metricController.mappingDefault.period : $(cssIDs.mappingPeriodInput + this.id).val());
-				this.mapping.color = ($(cssIDs.mappingColorDropDown + this.id).val() == "" ? metricController.mappingDefault.color : $(cssIDs.mappingColorDropDown + this.id).val());
+				this.mapping.period = ($(cssIDs.mappingPeriodInput + this.id).igNumericEditor("value") == "" ? metricController.mappingDefault.period : $(cssIDs.mappingPeriodInput + this.id).igNumericEditor("value"));
+				this.mapping.color = ($(cssIDs.mappingColorDropDown + this.id).igCombo("value") == "" ? metricController.mappingDefault.color : $(cssIDs.mappingColorDropDown + this.id).igCombo("value"));
 				break;
 
 			case mappings.rotation:
-				this.mapping.period = ($(cssIDs.mappingPeriodInput + this.id).val() == "" ? metricController.mappingDefault.period : $(cssIDs.mappingPeriodInput + this.id).val());
+				this.mapping.period = ($(cssIDs.mappingPeriodInput + this.id).igNumericEditor("value") == "" ? metricController.mappingDefault.period : $(cssIDs.mappingPeriodInput + this.id).igNumericEditor("value"));
 				break;
 		}
 	}
