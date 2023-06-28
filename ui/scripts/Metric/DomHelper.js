@@ -411,8 +411,8 @@ class DomHelper {
 		switch (layer.metric.variant) {
 			case metrics.dateOfCreation:
 			case metrics.dateOfLastChange:
-				$(cssIDs.metricFromDateInput + layer.id).igDatePicker('setDate', new Date(layer.metric.from));
-				$(cssIDs.metricToDateInput + layer.id).igDatePicker('setDate', new Date(layer.metric.to));
+				$(cssIDs.metricFromDateInput + layer.id).igDatePicker('selectDate', new Date(layer.metric.from));
+				$(cssIDs.metricToDateInput + layer.id).igDatePicker('selectDate', new Date(layer.metric.to));
 				break;
 			default:
 				$(cssIDs.metricFromInput + layer.id).val(layer.metric.from);
