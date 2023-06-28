@@ -406,7 +406,7 @@ class DomHelper {
 	}
 
 	setLayerUI(layer) {
-		$(cssIDs.metricSelectionDropDown + layer.id).val(layer.metric.variant);
+		$(cssIDs.metricSelectionDropDown + layer.id).igCombo("value", layer.metric.variant);
 
 		switch (layer.metric.variant) {
 			case metrics.dateOfCreation:
@@ -415,40 +415,40 @@ class DomHelper {
 				$(cssIDs.metricToDateInput + layer.id).igDatePicker('selectDate', new Date(layer.metric.to));
 				break;
 			default:
-				$(cssIDs.metricFromInput + layer.id).val(layer.metric.from);
-				$(cssIDs.metricToInput + layer.id).val(layer.metric.to);
+				$(cssIDs.metricFromInput + layer.id).igNumericEditor("value", layer.metric.from);
+				$(cssIDs.metricToInput + layer.id).igNumericEditor("value", layer.metric.to);
 				break;
 		}
 
 		this.metricSelectionDropDownSelected(layer.id);
-		$(cssIDs.mappingDropDown + layer.id).val(layer.mapping.variant);
+		$(cssIDs.mappingDropDown + layer.id).igCombo("value", layer.mapping.variant);
 
 		switch (layer.mapping.variant) {
 			case mappings.color:
-				$(cssIDs.mappingColorDropDown + layer.id).val(layer.mapping.color);
+				$(cssIDs.mappingColorDropDown + layer.id).igCombo("value", layer.mapping.color);
 				break;
 
 			case mappings.colorGradient:
-				$(cssIDs.mappingStartColorDropDown + layer.id).val(layer.mapping.startColor);
-				$(cssIDs.mappingEndColorDropDown + layer.id).val(layer.mapping.endColor);
+				$(cssIDs.mappingStartColorDropDown + layer.id).igCombo("value", layer.mapping.startColor);
+				$(cssIDs.mappingEndColorDropDown + layer.id).igCombo("value", layer.mapping.endColor);
 				break;
 
 			case mappings.transparency:
-				$(cssIDs.mappingTransparencyInput + layer.id).val(layer.mapping.transparency);
+				$(cssIDs.mappingTransparencyInput + layer.id).igNumericEditor("value", layer.mapping.transparency);
 				break;
 
 			case mappings.pulsation:
-				$(cssIDs.mappingPeriodInput + layer.id).val(layer.mapping.period);
-				$(cssIDs.mappingScaleInput + layer.id).val(layer.mapping.scale);
+				$(cssIDs.mappingPeriodInput + layer.id).igNumericEditor("value", layer.mapping.period);
+				$(cssIDs.mappingScaleInput + layer.id).igNumericEditor("value", layer.mapping.scale);
 				break;
 
 			case mappings.flashing:
-				$(cssIDs.mappingPeriodInput + layer.id).val(layer.mapping.period);
-				$(cssIDs.mappingColorDropDown + layer.id).val(layer.mapping.color);
+				$(cssIDs.mappingPeriodInput + layer.id).igNumericEditor("value", layer.mapping.period);
+				$(cssIDs.mappingColorDropDown + layer.id).igCombo("value", layer.mapping.color);
 				break;
 
 			case mappings.rotation:
-				$(cssIDs.mappingPeriodInput + layer.id).val(layer.mapping.period);
+				$(cssIDs.mappingPeriodInput + layer.id).igNumericEditor("value", layer.mapping.period);
 				break;
 		}
 
