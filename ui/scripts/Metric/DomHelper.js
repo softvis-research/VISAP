@@ -13,24 +13,26 @@ class DomHelper {
 		];
 		this.defaultIgButtonSettings = {
 			theme: "metro",
-			width: widgetSize.buttonWidth
+			width: widgetSize.buttonWidth,
+			height: widgetSize.buttonHeight
 		}
 		this.defaultIgComboSettings = {
 			width: widgetSize.dropDownWidth,
-			height: widgetSize.headerDropDownHeight,
+			height: widgetSize.dropDownHeight,
 			dropDownVerticalAlignment: "top",
 			autoDropDownHeight: true,
 			autoItemsHeight: true
 		};
+
 		this.defaultIgDatePickerSettings = {
-			placeHolder: "YYYY-MM-DD",
 			formatString: "yyyy-MM-dd",
 			value: null,
 			dropDownVerticalAlignment: "top",
-			width: widgetSize.inputWidthMetric
+			width: widgetSize.inputDateWidth,
+			height: widgetSize.inputHeight
 		};
 		this.defaultIgNumInputSettings = {
-			placeHolder: "Value",
+			placeHolder: "0",
 			width: widgetSize.inputWidthMetric,
 			height: widgetSize.inputHeight,
 			minLength: 1
@@ -54,8 +56,8 @@ class DomHelper {
 
 		$(cssIDs.viewDropDown).igCombo({
 			...this.defaultIgComboSettings,
+			height: widgetSize.headerDropDownHeight,
 			dataSource: this.controllerConfig.views.map(a => a.name),
-			placeHolder: "Select View",
 		});
 		$(cssIDs.downloadViewConfigButton).igButton({ ...this.defaultIgButtonSettings });
 		$(cssIDs.executeButton).igButton({ ...this.defaultIgButtonSettings });

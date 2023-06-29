@@ -77,23 +77,23 @@ const cssClasses = Object.fromEntries(
 );
 
 const metrics = {
-	numberOfStatements: "numberOfStatements",
-	amountOfResults: "amountOfResults",
-	amountOfNamspa: "amountOfNamspa",
-	amountOfChnhis: "amountOfChnhis",
-	amountOfCodlen: "amountOfCodlen",
-	amountOfCommam: "amountOfCommam",
-	amountOfDynsta: "amountOfDynsta",
-	amountOfEnhmod: "amountOfEnhmod",
-	amountOfFormty: "amountOfFormty",
-	amountOfNomac: "amountOfNomac",
-	amountOfObjnam: "amountOfObjnam",
-	amountOfPraefi: "amountOfPraefi",
-	amountOfSlin: "amountOfSlin",
-	amountOfSql: "amountOfSql",
-	amountOfTodo: "amountOfTodo",
-	dateOfCreation: "dateOfCreation",
-	dateOfLastChange: "dateOfLastChange"
+	numberOfStatements: "Number of Statements",
+	amountOfResults: "Results",
+	amountOfNamspa: "Namespaces",
+	amountOfChnhis: "Changes",
+	amountOfCodlen: "Code Length",
+	amountOfCommam: "Comments",
+	amountOfDynsta: "Dynamic Statements",
+	amountOfEnhmod: "Enhancements",
+	amountOfFormty: "Form Types",
+	amountOfNomac: "Macro Expansions",
+	amountOfObjnam: "Object Names",
+	amountOfPraefi: "Prefixes",
+	amountOfSlin: "SLIN",
+	amountOfSql: "SQL",
+	amountOfTodo: "TODO",
+	dateOfCreation: "Date of Creation",
+	dateOfLastChange: "Date of Last Change"
 };
 
 const mappings = {
@@ -115,15 +115,17 @@ const colors = [
 ];
 
 const widgetSize = {
-	buttonHeight: 25,
-	headerDropDownHeight: 27,
+	buttonHeight: 45,
+	headerDropDownHeight: 45,
 	dropDownHeight: 25,
 	inputHeight: 25,
-	deleteButtonHeight: 27,
-
-	dropDownWidth: 150,
+	
+	dropDownWidth: 180,
 	buttonWidth: 125,
 	inputWidthMapping: 73,
 	inputWidthMetric: 100,
+	
+	inputDateWidth: 140,
+	deleteButtonHeight: 27,
 	deleteButtonWidth: "3.6%",
 }
