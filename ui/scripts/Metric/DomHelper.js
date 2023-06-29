@@ -280,7 +280,7 @@ class DomHelper {
 	}
 
 	setLayerUI(layer) {
-		$(cssIDs.metricSelectionDropDown + layer.id).igCombo("value", layer.metric.variant);
+		$(cssIDs.metricSelectionDropDown + layer.id).igCombo("value", metrics[layer.metric.variant]);
 
 		switch (layer.metric.variant) {
 			case metrics.dateOfCreation:
