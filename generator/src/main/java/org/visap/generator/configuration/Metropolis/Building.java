@@ -5,7 +5,7 @@ import org.aeonbits.owner.Config.LoadPolicy;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    "file:${user.dir}/user-properties/Building.properties",
+    "file:${user.dir}/properties/local/Building.properties",
     "file:${user.dir}/properties/Building.properties",
 })
 public interface Building extends Config {

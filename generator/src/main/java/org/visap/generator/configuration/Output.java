@@ -6,7 +6,7 @@ import org.aeonbits.owner.Config.LoadPolicy;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    "file:${user.dir}/user-properties/Output.properties",
+    "file:${user.dir}/properties/local/Output.properties",
     "file:${user.dir}/properties/Output.properties",
 })
 public interface Output extends Config {

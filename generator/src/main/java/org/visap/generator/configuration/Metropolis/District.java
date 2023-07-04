@@ -9,7 +9,7 @@ import org.aeonbits.owner.Config.LoadPolicy;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    "file:${user.dir}/user-properties/District.properties",
+    "file:${user.dir}/properties/local/District.properties",
     "file:${user.dir}/properties/District.properties",
 })
 public interface District extends Config {

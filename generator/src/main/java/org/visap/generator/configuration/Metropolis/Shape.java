@@ -7,7 +7,7 @@ import org.aeonbits.owner.Config.LoadPolicy;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    "file:${user.dir}/user-properties/Shape.properties",
+    "file:${user.dir}/properties/local/Shape.properties",
     "file:${user.dir}/properties/Shape.properties",
 })
 public interface Shape extends Config {

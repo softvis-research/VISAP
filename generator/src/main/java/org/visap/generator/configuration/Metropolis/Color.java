@@ -5,7 +5,7 @@ import org.aeonbits.owner.Config.LoadPolicy;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    "file:${user.dir}/user-properties/Color.properties",
+    "file:${user.dir}/properties/local/Color.properties",
     "file:${user.dir}/properties/Color.properties",
 })
 public interface Color extends Config {
