@@ -12,7 +12,8 @@ target/
 *.iml
 
 # user-specific properties
-user-properties/
+properties/local/*
+!properties/local/README.md
 
 # CSV file input
 /input/*
