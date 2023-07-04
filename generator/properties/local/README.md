@@ -1,0 +1,1 @@
+You can use this folder for local properties that should be ignored by Git. Properties defined here will override the properties of the parent folder.
