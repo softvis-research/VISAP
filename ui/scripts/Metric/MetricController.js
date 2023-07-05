@@ -34,7 +34,7 @@ controllers.metricController = (function () {
 				viewMappings: [
 					{
 						metric: { "variant": "amountOfChnhis", "from": 1, "to": 2 },
-						mapping: { "variant": "Pulsation", "color": "", "startColor": "", "endColor": "", "transparency": 0, "period": "1000", "scale": "2" }
+						mapping: { "variant": "Pulsation", "color": "", "startColor": "", "endColor": "", "transparency": 0, "period": 1000, "scale": 2 }
 					},
 					{
 						metric: { "variant": "amountOfNamspa", "from": 1, "to": 2 },
@@ -42,7 +42,7 @@ controllers.metricController = (function () {
 					},
 					{
 						metric: { "variant": "amountOfCommam", "from": 1, "to": 2 },
-						mapping: { "variant": "Flashing", "color": "orange", "startColor": "", "endColor": "", "transparency": 0, "period": "1000", "scale": 0 }
+						mapping: { "variant": "Flashing", "color": "orange", "startColor": "", "endColor": "", "transparency": 0, "period": 1000, "scale": 0 }
 					},
 				]
 			},
@@ -55,11 +55,11 @@ controllers.metricController = (function () {
 					},
 					{
 						metric: { "variant": "amountOfNomac", "from": 1, "to": 30 },
-						mapping: { "variant": "Flashing", "color": "red", "startColor": "", "endColor": "", "transparency": 0, "period": "1000", "scale": 0 }
+						mapping: { "variant": "Flashing", "color": "red", "startColor": "", "endColor": "", "transparency": 0, "period": 1000, "scale": 0 }
 					},
 					{
 						metric: { "variant": "amountOfDynsta", "from": 1, "to": 5 },
-						mapping: { "variant": "Pulsation", "color": "", "startColor": "", "endColor": "", "transparency": 0, "period": "1000", "scale": "3" }
+						mapping: { "variant": "Pulsation", "color": "", "startColor": "", "endColor": "", "transparency": 0, "period": 1000, "scale": 3 }
 					},
 					{
 						metric: { "variant": "amountOfDynsta", "from": 1, "to": 5 },
@@ -76,11 +76,11 @@ controllers.metricController = (function () {
 					},
 					{
 						metric: { "variant": "amountOfTodo", "from": 1, "to": 5 },
-						mapping: { "variant": "Flashing", "color": "red", "startColor": "", "endColor": "", "transparency": 0, "period": "500", "scale": 0 }
+						mapping: { "variant": "Flashing", "color": "red", "startColor": "", "endColor": "", "transparency": 0, "period": 500, "scale": 0 }
 					},
 					{
 						metric: { "variant": "amountOfSlin", "from": 1, "to": 5 },
-						mapping: { "variant": "Pulsation", "color": "", "startColor": "", "endColor": "", "transparency": 0, "period": "1000", "scale": "3" }
+						mapping: { "variant": "Pulsation", "color": "", "startColor": "", "endColor": "", "transparency": 0, "period": 1000, "scale": 3 }
 					},
 				]
 			},
