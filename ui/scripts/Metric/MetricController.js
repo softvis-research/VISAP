@@ -133,15 +133,11 @@ controllers.metricController = (function () {
 			layer.readUIData();
 		}
 
-		executeMapping();
-
-		if (typeof (viewConfig) === 'undefined') {
-			return;
-		}
-
-		if (!viewEqualToMetricMappings(viewConfig, layers)) {
+		if (viewConfig && !viewEqualToMetricMappings(viewConfig, layers)) {
 			$(cssIDs.viewDropDown).igCombo('clearInput', true);
 		}
+
+		executeMappingOnRender();
 	}
 
 	function changeView() {
@@ -163,7 +159,7 @@ controllers.metricController = (function () {
 			domHelper.setLayerUI(layer);
 		}
 
-		executeMapping();
+		executeMappingOnRender();
 	}
 
 	function executeMapping() {
@@ -171,6 +167,13 @@ controllers.metricController = (function () {
 			layer.getMatchingEntities();
 			layer.doMapping();
 		}
+	}
+
+	// Some AFrame properties are not flushed to the DOM until the next render (e.g. transparency by way of the material property)
+	// so wait until the next tick after the reset to re-modify transparency, otherwise the reset will not work
+	async function executeMappingOnRender() {
+		await canvasManipulator.waitForRenderOfElement(application.getCanvas());
+		executeMapping();
 	}
 
 	function addLayer(metricMapping) {
