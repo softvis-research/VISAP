@@ -3,14 +3,6 @@ class DomHelper {
 	constructor(rootDiv, controllerConfig) {
 		this.rootDiv = rootDiv;
 		this.controllerConfig = controllerConfig;
-		this.colors = [
-			"red",
-			"blue",
-			"green",
-			"black",
-			"yellow",
-			"orange"
-		];
 		this.defaultIgButtonSettings = {
 			theme: "metro",
 			width: widgetSize.buttonWidth,
