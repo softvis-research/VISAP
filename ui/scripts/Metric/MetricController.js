@@ -120,21 +120,20 @@ controllers.metricController = (function () {
 
 		addLayer();
 
-		$(cssIDs.executeButton).click(executeButtonClicked);
-		$(cssIDs.resetButton).click(resetButtonClicked);
-		$(cssIDs.addLayerButton).click(addLayer);
-		$(cssIDs.downloadViewConfigButton).click(downloadViewConfig);
-		$(document).delegate(cssIDs.viewDropDown, 'igcomboselectionchanged', changeView);
+		$(cssIDs.executeButton).click(() => executeButtonClicked());
+		$(cssIDs.resetButton).click(() => resetButtonClicked());
+		$(cssIDs.addLayerButton).click(() => addLayer());
+		$(cssIDs.downloadViewConfigButton).click(() => downloadViewConfig());
+		$(document).delegate(cssIDs.viewDropDown, 'igcomboselectionchanged', () => changeView());
 	}
 
-	function executeButtonClicked(event) {
-		for (let layer of layers) {
+	function executeButtonClicked() {
+		for (const layer of layers) {
 			layer.reset();
-
 			layer.readUIData();
 		}
 
-		setTimeout(executeMapping, 10);
+		executeMapping();
 
 		if (typeof (viewConfig) === 'undefined') {
 			return;
@@ -145,35 +144,36 @@ controllers.metricController = (function () {
 		}
 	}
 
-	function changeView(event) {
-		controllerConfig.views.forEach(function (view) {
-			if (view.name == $(cssIDs.viewDropDown).igCombo("value")) {
-				viewConfig = view;
-			}
-		});
+	function changeView() {
+		const selectedView = $(cssIDs.viewDropDown).igCombo("value");
+		const newViewConfig = controllerConfig.views.find(view => view.name === selectedView);
+		if (!newViewConfig) {
+			events.log.error.publish({ text: `MetricContrller - view ${selectedView} not found` });
+		} else {
+			viewConfig = newViewConfig;
+		}
 
 		reset();
 
 		viewConfig.viewMappings.forEach(function (metricMapping) {
-			addLayer('', metricMapping);
-		})
+			addLayer(metricMapping);
+		});
 
-		for (let layer of layers) {
+		for (const layer of layers) {
 			domHelper.setLayerUI(layer);
 		}
 
-		setTimeout(executeMapping, 10);
+		executeMapping();
 	}
 
 	function executeMapping() {
-		for (let layer of layers) {
+		for (const layer of layers) {
 			layer.getMatchingEntities();
-
 			layer.doMapping();
 		}
 	}
 
-	function addLayer(event, metricMapping) {
+	function addLayer(metricMapping) {
 		const newLayer = new MetricLayer(++layerCounter);
 
 		if (metricMapping !== undefined) {
@@ -192,7 +192,7 @@ controllers.metricController = (function () {
 	}
 
 	function removeLayer(event) {
-		if (event !== undefined && $("#" + event.currentTarget.id).prop("disabled")) {
+		if (event !== undefined && event.currentTarget.disabled) {
 			return;
 		}
 
@@ -206,7 +206,7 @@ controllers.metricController = (function () {
 		}
 	}
 
-	function downloadViewConfig(event) {
+	function downloadViewConfig() {
 		const viewName = prompt("Please enter View name", "View");
 
 		if (viewName === null) {
@@ -215,7 +215,7 @@ controllers.metricController = (function () {
 
 		let text = '{\n\tname: "' + viewName + '",\n\tviewMappings: [';
 
-		for (let layer of layers) {
+		for (const layer of layers) {
 			layer.readUIData();
 			text += '\n\t\t{\n\t\t\tmetric: ' + JSON.stringify(layer.metric) + ',\n\t\t\tmapping: ' + JSON.stringify(layer.mapping) + '\n\t\t},';
 		}
@@ -240,13 +240,10 @@ controllers.metricController = (function () {
 			return false;
 		}
 
-		for (let layer of layers) {
-			if (isEqual(view.viewMappings[layers.indexOf(layer)].metric, layer.metric) && isEqual(view.viewMappings[layers.indexOf(layer)].mapping, layer.mapping)) {
-				return true;
-			} else {
-				return false;
-			}
-		}
+		return layers.every((layer, index) =>
+			isEqual(view.viewMappings[index].metric, layer.metric) &&
+			isEqual(view.viewMappings[index].mapping, layer.mapping)
+		);
 	}
 
 	function isEqual(obj1, obj2) {
@@ -287,5 +284,4 @@ controllers.metricController = (function () {
 		metricDefault: metricDefault,
 		mappingDefault: mappingDefault,
 	}
-
 })();

@@ -84,15 +84,16 @@ class MetricLayer {
 
 	getMatchingEntities() {
 		model.getAllEntities().forEach((entity) => {
-			if (entity[this.metric.variant] === undefined) {
+			const metricProperty = entity[this.metric.variant];
+			if (metricProperty === undefined) {
 				return;
 			}
 
-			if (this.metric.from <= entity[this.metric.variant]	&& entity[this.metric.variant] <= this.metric.to) {
+			if (this.metric.from <= metricProperty && metricProperty <= this.metric.to) {
 				this.entities.push(entity);
-				this.entityMetricMap.set(entity.id, entity[this.metric.variant])
+				this.entityMetricMap.set(entity.id, metricProperty)
 			}
-		})
+		});
 	}
 
 	doMapping() {
