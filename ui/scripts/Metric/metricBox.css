@@ -14,42 +14,43 @@
 	width: 48%;
 	height: 33%;
 	border: 1px solid lightgray;
+	display:flex;
+	align-items: center;
+	font-size: 12px;
 }
 
 .mappingDiv {
 	overflow: hidden;
 	height: 33%;
 	border: 1px solid lightgray;
+	display:flex;
+	align-items: center;
+	font-size: 12px;
 }
 
 #downloadViewConfigButton {
 	float: right;
-	font-size: 12px;
 	margin-left: 5px;
 }
 
 #executeButton {
 	float: right;
-	font-size: 12px;
 	margin-left: 5px;
 	margin-right: 10px;
 }
 
 #resetButton {
 	float: right;
-	font-size: 12px;
 	margin-left: 5px;
 }
 
 #addLayerButton {
 	float: right;
-	font-size: 12px;
 	margin-left: 5px;
 }
 
 #headerTextNode {
 	float: left;
-	font-size: 12px;
 	color: white;
 	padding: 3px 0;
 	margin-left: 5px;
@@ -62,37 +63,14 @@
 
 .viewDropDown {
 	float: right;
-	font-size: 12px;
-}
-
-.metricTextNode {
-	float: left;
-}
-
-.metricSelectionDropDown {
-	float: left;
-	font-size: 12px;
 }
 
 .metricNumParameter,
 .metricDateParameter {
-	float: left;
-	font-size: 12px;
 	text-align: right;
 }
 
-.mappingTextNode {
-	float: left;
-}
-
-.mappingDropDown {
-	float: left;
-	font-size: 12px;
-}
-
 .mappingParameter {
-	float: left;
-	font-size: 12px;
 	text-align: right;
 }
 
