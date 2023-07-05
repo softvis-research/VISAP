@@ -35,8 +35,8 @@ class MetricLayer {
 	}
 
 	getNumericInput(genericCssId, defaultValue) {
-		const selectedValueStr = $(genericCssId + this.id).igNumericEditor("value");
-		return selectedValueStr ? Number(selectedValueStr) : defaultValue;
+		const selectedValue = $(genericCssId + this.id).igNumericEditor("value");
+		return selectedValue !== "" ? Number(selectedValue) : defaultValue;
 	}
 
 	readUIData() {
