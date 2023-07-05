@@ -40,9 +40,10 @@ class MetricLayer {
 	}
 
 	readUIData() {
-		this.metric.variant = this.getComboInput(cssIDs.metricSelectionDropDown, metricController.metricDefault.variant);
+		const selectedVariantString = this.getComboInput(cssIDs.metricSelectionDropDown, metricController.metricDefault.variant);
+		this.metric.variant = Object.keys(metrics).find(key => metrics[key] === selectedVariantString);
 
-		switch (this.metric.variant) {
+		switch (selectedVariantString) {
 			case metrics.dateOfCreation:
 			case metrics.dateOfLastChange:
 				this.metric.from = this.getDateInput(cssIDs.metricFromDateInput, new Date(0));
