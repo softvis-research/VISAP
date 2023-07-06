@@ -25,7 +25,12 @@ class MetricLayer {
 
 	getComboInput(genericCssId, defaultValue) {
 		const selectedValue = $(genericCssId + this.id).igCombo("value");
-		return selectedValue || defaultValue;
+		if (Array.isArray(selectedValue) && selectedValue.length === 0) {
+			// Ignite combo boxes return "nothing selected" as empty arrays
+			return defaultValue;
+		} else {
+			return selectedValue;
+		}
 	}
 
 	getDateInput(genericCssId, defaultDate) {
