@@ -2,6 +2,7 @@ package org.visap.generator.metaphors.metropolis.layouts;
 
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.configuration.Config;
+import org.visap.generator.helper.NumericChecker;
 import org.visap.generator.repository.CityElement;
 
 public class BuildingLayout {
@@ -26,11 +27,23 @@ public class BuildingLayout {
         building.setWidth(Config.Visualization.Metropolis.building.defaultWidth());
         building.setLength(Config.Visualization.Metropolis.building.defaultLength());
 
-        String nos = building.getSourceNodeProperty(SAPNodeProperties.number_of_statements);
-        if ((nos == "null") || Double.valueOf(nos) == 0) {
+        Double nos = 0.0;
+        Double nof = 0.0;
+
+        if (NumericChecker.isNumeric(building.getSourceNodeProperty(SAPNodeProperties.number_of_statements))) {
+            nos = Double.valueOf(building.getSourceNodeProperty(SAPNodeProperties.number_of_statements));
+        }
+        if (NumericChecker.isNumeric(building.getSourceNodeProperty(SAPNodeProperties.number_of_fields))) {
+            nof = Double.valueOf(building.getSourceNodeProperty(SAPNodeProperties.number_of_fields));
+        }
+
+        if (nos < 0.0 || nof < 0.0) {
+            System.out.println("Negative number of statements or fields is not allowed");
+            System.exit(1);
+        } else if (nos == 0.0 && nof == 0.0) {
             building.setHeight(Config.Visualization.Metropolis.building.defaultHeight());
         } else {
-            building.setHeight(getScaledHeight(Double.valueOf(nos)));
+            building.setHeight(getScaledHeight(nos + nof));
         }
     }
 

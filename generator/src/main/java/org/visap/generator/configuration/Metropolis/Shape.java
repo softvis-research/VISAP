@@ -11,6 +11,7 @@ import org.aeonbits.owner.Config.LoadPolicy;
     "file:${user.dir}/properties/Shape.properties",
 })
 public interface Shape extends Config {
+
     @DefaultValue("Cylinder")
     CityElement.CityShape attributeBuilding();
 
@@ -30,4 +31,21 @@ public interface Shape extends Config {
     CityElement.CityShape functionModuleBuilding();
 
     CityElement.CityShape defaultBuildingValue();
+
+
+    // Test
+    @DefaultValue("Cylinder")
+    CityElement.CityShape tableBuilding();
+
+    @DefaultValue("Cone")
+    CityElement.CityShape viewBuilding();
+
+    @DefaultValue("Cylinder")
+    CityElement.CityShape structBuilding();
+
+    @DefaultValue("Box")
+    CityElement.CityShape dataelementBuilding();
+
+    @DefaultValue("Sphere")
+    CityElement.CityShape domainBuilding();
 }

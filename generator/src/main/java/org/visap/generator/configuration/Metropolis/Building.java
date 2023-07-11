@@ -41,4 +41,11 @@ public interface Building extends Config {
 
     @DefaultValue("0.1")
     double defaultBuildingLength();
+
+    @DefaultValue("1.5")
+    double defaultDDICLength();
+
+    @DefaultValue("1.5")
+    double defaultDDICWidth();
+
 }

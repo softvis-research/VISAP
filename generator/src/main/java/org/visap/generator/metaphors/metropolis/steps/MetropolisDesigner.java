@@ -112,6 +112,12 @@ public class MetropolisDesigner {
             case FunctionGroup:
                 district.setColor(Config.Visualization.Metropolis.color.functionGroupDistrict());
                 break;
+            case Table:
+                district.setColor(Config.Visualization.Metropolis.color.tableDistrict());
+                break;
+            case DDIC:
+                district.setColor(Config.Visualization.Metropolis.color.ddicDistrict());
+                break;
             default:
                 district.setColor(Config.Visualization.Metropolis.color.defaultDistrictValue());
                 log.error(district.getSubType().name() + " is not a valid type for \"district\"");
@@ -166,6 +172,36 @@ public class MetropolisDesigner {
                     building.setShape(Config.Visualization.Metropolis.shape.functionModuleBuilding());
                     building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
                     building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
+                    break;
+                case Tablebuilding:
+                    building.setColor(Config.Visualization.Metropolis.color.tableBuilding());
+                    building.setShape(Config.Visualization.Metropolis.shape.tableBuilding());
+                    building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
+                    building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
+                    break;
+                case Struct:
+                    building.setColor(Config.Visualization.Metropolis.color.structBuilding());
+                    building.setShape(Config.Visualization.Metropolis.shape.structBuilding());
+                    building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
+                    building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
+                    break;
+                case View:
+                    building.setColor(Config.Visualization.Metropolis.color.viewBuilding());
+                    building.setShape(Config.Visualization.Metropolis.shape.viewBuilding());
+                    building.setWidth(building.getWidth() - Config.Visualization.Metropolis.building.adjustWidth());
+                    building.setLength(building.getLength() - Config.Visualization.Metropolis.building.adjustLength());
+                    break;
+                case Dataelement:
+                    building.setColor(Config.Visualization.Metropolis.color.dataelementBuilding());
+                    building.setShape(Config.Visualization.Metropolis.shape.dataelementBuilding());
+                    building.setWidth(Config.Visualization.Metropolis.building.defaultDDICWidth());
+                    building.setLength(Config.Visualization.Metropolis.building.defaultDDICLength());
+                    break;
+                case Domain:
+                    building.setColor(Config.Visualization.Metropolis.color.domainBuilding());
+                    building.setShape(Config.Visualization.Metropolis.shape.domainBuilding());
+                    building.setWidth(Config.Visualization.Metropolis.building.defaultDDICWidth());
+                    building.setLength(Config.Visualization.Metropolis.building.defaultDDICLength());
                     break;
                 default:
                     building.setColor(Config.Visualization.Metropolis.color.defaultBuildingValue());

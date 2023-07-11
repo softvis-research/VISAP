@@ -56,4 +56,23 @@ public interface Color extends Config {
 
      @DefaultValue("#FFFFFF")
      String defaultBuildingValue();
+
+
+     // Test
+     @DefaultValue("#229954")
+     String ddicDistrict();
+     @DefaultValue("#1A5276")
+     String tableDistrict();
+     @DefaultValue("#FCFAFA")
+     String tableBuilding();
+     @DefaultValue("#8AB8E6")
+     String viewBuilding();
+     @DefaultValue("#0E573B")
+     String domainBuilding();
+     @DefaultValue("#FCFAFA")
+     String structBuilding();
+     @DefaultValue("#1E8449")
+     String dataelementBuilding();
+
+
 }

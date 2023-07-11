@@ -32,6 +32,7 @@ public class AFrameExporterStep {
         nodeRepository.loadNodesByRelation(SAPRelationLabels.TYPEOF, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.REFERENCES, true);
+        nodeRepository.loadNodesByRelation(SAPRelationLabels.USES, true);
         
         cityRepository = new CityRepository();
 

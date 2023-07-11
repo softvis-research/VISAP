@@ -11,4 +11,7 @@ import org.aeonbits.owner.Config.LoadPolicy;
 public interface Features extends Config {
     @DefaultValue("false")
     Boolean outline();
+
+    @DefaultValue("false")
+    Boolean inputUsesCSV();
 }

@@ -166,6 +166,10 @@ public class MetaDataExporter {
             builder.append("\"subClassOf\": \"" + getRelations(node, SAPRelationLabels.INHERIT, true) + "\",\n");
             builder.append("\"superClassOf\": \"" + getRelations(node, SAPRelationLabels.INHERIT, false) + "\",\n");
         }
+        if (AMetaDataMap.getNodesWithUsesRelationByType().contains(nodeType)) {
+            builder.append("\"use\": \"" + getRelations(node, SAPRelationLabels.USES, true) + "\",\n");
+            builder.append("\"usedby\": \"" + getRelations(node, SAPRelationLabels.USES, false) + "\",\n");
+        }
 
         return builder.toString();
     }
