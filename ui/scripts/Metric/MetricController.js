@@ -144,7 +144,7 @@ controllers.metricController = (function () {
 		const selectedView = $(cssIDs.viewDropDown).igCombo("value");
 		const newViewConfig = controllerConfig.views.find(view => view.name === selectedView);
 		if (!newViewConfig) {
-			events.log.error.publish({ text: `MetricContrller - view ${selectedView} not found` });
+			events.log.error.publish({ text: `MetricController - view ${selectedView} not found` });
 		} else {
 			viewConfig = newViewConfig;
 		}
