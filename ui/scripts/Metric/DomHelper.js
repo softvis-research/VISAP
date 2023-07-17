@@ -274,11 +274,11 @@ class DomHelper {
 	setLayerUI(layer) {
 		$(cssIDs.metricSelectionDropDown + layer.id).igCombo("value", metrics[layer.metric.variant]);
 
-		switch (layer.metric.variant) {
+		switch (metrics[layer.metric.variant]) {
 			case metrics.dateOfCreation:
 			case metrics.dateOfLastChange:
-				$(cssIDs.metricFromDateInput + layer.id).igDatePicker('selectDate', new Date(layer.metric.from));
-				$(cssIDs.metricToDateInput + layer.id).igDatePicker('selectDate', new Date(layer.metric.to));
+				$(cssIDs.metricFromDateInput + layer.id).igDatePicker("value", new Date(layer.metric.from));
+				$(cssIDs.metricToDateInput + layer.id).igDatePicker("value", new Date(layer.metric.to));
 				break;
 			default:
 				$(cssIDs.metricFromInput + layer.id).igNumericEditor("value", layer.metric.from);
