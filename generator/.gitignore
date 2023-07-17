@@ -23,8 +23,6 @@ properties/local/*
 # Model output
 /output/*
 !/output/example/
-# This file currently needs to be re-committed whenever the git cache has been cleared
-# !/output/YourOutput/
 
 # Compiled class file
 *.class
