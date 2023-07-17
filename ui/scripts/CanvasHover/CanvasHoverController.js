@@ -4,7 +4,6 @@ controllers.canvasHoverController = (function () {
 	const controllerConfig = {
 		hoverColor: "darkred",
 		showQualifiedName: false,
-		showVersion: false,
 	};
 
 
@@ -43,9 +42,6 @@ controllers.canvasHoverController = (function () {
 		createParagraphAsChildOf(tooltipDivElement, "tooltipName");
 		if (controllerConfig.showQualifiedName) {
 			createParagraphAsChildOf(tooltipDivElement, "tooltipQualifiedName");
-		}
-		if (controllerConfig.showVersion) {
-			createParagraphAsChildOf(tooltipDivElement, "tooltipVersion");
 		}
 		canvas.appendChild(tooltipDivElement);
 	}
@@ -109,9 +105,6 @@ controllers.canvasHoverController = (function () {
 
 		if (controllerConfig.showQualifiedName) {
 			$("#tooltipQualifiedName").text(entity.qualifiedName);
-		}
-		if (controllerConfig.showVersion) {
-			$("#tooltipVersion").text("Version: " + entity.version);
 		}
 
 		const tooltip = $("#tooltip");
