@@ -1,7 +1,5 @@
 package org.visap.generator.abap.enums;
 
-import org.visap.generator.metaphors.metropolis.steps.MetropolisCreator;
-
 public enum SAPNodeTypes{
     Namespace,
 
