@@ -1,12 +1,13 @@
-package org.visap.generator.configuration;
+package org.visap.generator.configuration.interfaces;
 
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;
+import org.visap.generator.configuration.Sources;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    "file:${user.dir}/properties/local/Features.properties",
-    "file:${user.dir}/properties/Features.properties",
+    Sources.SETUP_LOCAL_PATH + "Features.properties",
+    Sources.SETUP_PATH + "Features.properties",
 })
 public interface Features extends Config {
     @DefaultValue("false")

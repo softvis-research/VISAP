@@ -1,5 +1,6 @@
-package org.visap.generator.configuration.Metropolis;
+package org.visap.generator.configuration.interfaces.Metropolis;
 
+import org.visap.generator.configuration.Sources;
 import org.visap.generator.repository.CityElement;
 
 import org.aeonbits.owner.Config;
@@ -7,8 +8,8 @@ import org.aeonbits.owner.Config.LoadPolicy;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    "file:${user.dir}/properties/local/Shape.properties",
-    "file:${user.dir}/properties/Shape.properties",
+    Sources.SETUP_LOCAL_PATH + "Shape.properties",
+    Sources.SETUP_PATH + "Shape.properties",
 })
 public interface Shape extends Config {
 

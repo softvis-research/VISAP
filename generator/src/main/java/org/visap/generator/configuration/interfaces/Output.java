@@ -1,13 +1,14 @@
-package org.visap.generator.configuration;
+package org.visap.generator.configuration.interfaces;
 
+import org.visap.generator.configuration.Sources;
 import org.visap.generator.model.MetaDataOutput;
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    "file:${user.dir}/properties/local/Output.properties",
-    "file:${user.dir}/properties/Output.properties",
+    Sources.SETUP_LOCAL_PATH + "Output.properties",
+    Sources.SETUP_PATH + "Output.properties",
 })
 public interface Output extends Config {
     @DefaultValue("BOTH")

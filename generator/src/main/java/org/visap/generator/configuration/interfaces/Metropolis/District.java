@@ -1,5 +1,6 @@
-package org.visap.generator.configuration.Metropolis;
+package org.visap.generator.configuration.interfaces.Metropolis;
 
+import org.visap.generator.configuration.Sources;
 import org.visap.generator.metaphors.metropolis.layouts.enums.LayoutType;
 import org.visap.generator.metaphors.metropolis.layouts.enums.LayoutVersion;
 import org.visap.generator.repository.CityElement;
@@ -9,8 +10,8 @@ import org.aeonbits.owner.Config.LoadPolicy;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    "file:${user.dir}/properties/local/District.properties",
-    "file:${user.dir}/properties/District.properties",
+    Sources.SETUP_LOCAL_PATH + "District.properties",
+    Sources.SETUP_PATH + "District.properties",
 })
 public interface District extends Config {
     @DefaultValue("3.0")

@@ -1,12 +1,13 @@
-package org.visap.generator.configuration;
+package org.visap.generator.configuration.interfaces;
 
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;
+import org.visap.generator.configuration.Sources;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    "file:${user.dir}/properties/local/Assets.properties",
-    "file:${user.dir}/properties/Assets.properties",
+    Sources.SETUP_LOCAL_PATH + "Assets.properties",
+    Sources.SETUP_PATH + "Assets.properties",
 })
 public interface Assets extends Config {
     @DefaultValue("assets/sky_pano.jpg")

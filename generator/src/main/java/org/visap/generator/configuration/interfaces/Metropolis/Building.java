@@ -1,12 +1,13 @@
-package org.visap.generator.configuration.Metropolis;
+package org.visap.generator.configuration.interfaces.Metropolis;
 
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;
+import org.visap.generator.configuration.Sources;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    "file:${user.dir}/properties/local/Building.properties",
-    "file:${user.dir}/properties/Building.properties",
+    Sources.SETUP_LOCAL_PATH + "Building.properties",
+    Sources.SETUP_PATH + "Building.properties",
 })
 public interface Building extends Config {
     @DefaultValue("2")
