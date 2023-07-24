@@ -7,8 +7,8 @@ import org.aeonbits.owner.Config.LoadPolicy;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    Sources.SETUP_LOCAL_PATH + "Output.properties",
-    Sources.SETUP_PATH + "Output.properties",
+    Sources.CONFIG_LOCAL_PATH + "Output.properties",
+    Sources.CONFIG_PATH + "Output.properties",
 })
 public interface Output extends Config {
     @DefaultValue("BOTH")

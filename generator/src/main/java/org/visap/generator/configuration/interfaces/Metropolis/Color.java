@@ -6,8 +6,8 @@ import org.visap.generator.configuration.Sources;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    Sources.SETUP_LOCAL_PATH + "Color.properties",
-    Sources.SETUP_PATH + "Color.properties",
+    Sources.CONFIG_LOCAL_PATH + "Color.properties",
+    Sources.CONFIG_PATH + "Color.properties",
 })
 public interface Color extends Config {
      @DefaultValue("#FF8C00")

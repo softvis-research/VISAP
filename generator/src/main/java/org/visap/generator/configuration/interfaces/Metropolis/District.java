@@ -10,8 +10,8 @@ import org.aeonbits.owner.Config.LoadPolicy;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    Sources.SETUP_LOCAL_PATH + "District.properties",
-    Sources.SETUP_PATH + "District.properties",
+    Sources.CONFIG_LOCAL_PATH + "District.properties",
+    Sources.CONFIG_PATH + "District.properties",
 })
 public interface District extends Config {
     @DefaultValue("3.0")

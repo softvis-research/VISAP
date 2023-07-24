@@ -6,8 +6,8 @@ import org.visap.generator.configuration.Sources;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    Sources.SETUP_LOCAL_PATH + "Features.properties",
-    Sources.SETUP_PATH + "Features.properties",
+    Sources.CONFIG_LOCAL_PATH + "Features.properties",
+    Sources.CONFIG_PATH + "Features.properties",
 })
 public interface Features extends Config {
     @DefaultValue("false")

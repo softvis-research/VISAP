@@ -6,8 +6,8 @@ import org.visap.generator.configuration.Sources;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    Sources.SETUP_LOCAL_PATH + "Setup.properties",
-    Sources.SETUP_PATH + "Setup.properties",
+    Sources.CONFIG_LOCAL_PATH + "Setup.properties",
+    Sources.CONFIG_PATH + "Setup.properties",
 })
 public interface Setup extends Config {
     @DefaultValue("bolt://localhost:7687")
