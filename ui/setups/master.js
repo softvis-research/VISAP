@@ -13,6 +13,9 @@ const setup = {
 			name: "metricController",
 		},
 		{
+			name: "canvasSelectController",
+		},
+		{
 			name: "relationController",
 			sourceStartAtBorder: false,
 			targetEndAtBorder: false,
