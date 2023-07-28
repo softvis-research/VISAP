@@ -25,10 +25,7 @@ const setup = {
 
 	ui: {
 		name: "UI0",
-
-		navigation: {
-			type: "examine",
-		},
+		
 		area: {
 			name: "top",
 			orientation: "horizontal",
