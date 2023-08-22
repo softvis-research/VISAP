@@ -35,9 +35,8 @@ public class DistrictCircularLayout {
     }
 
     private void setSizeOfDistrict(CityRectangle coveringCityRectangle) {
-
-        district.setWidth(coveringCityRectangle.getWidth());
-        district.setLength(coveringCityRectangle.getLength());
+        district.setWidth(coveringCityRectangle.getWidth() + 2 * Config.Visualization.Metropolis.district.horizontalDistrictMargin());
+        district.setLength(coveringCityRectangle.getLength() + 2 * Config.Visualization.Metropolis.district.horizontalDistrictMargin());
         district.setHeight(Config.Visualization.Metropolis.district.districtHeight());
     }
 
@@ -277,9 +276,16 @@ public class DistrictCircularLayout {
             double width = element.getWidth();
             double length = element.getLength();
 
-            CityRectangle rectangle = new CityRectangle(0, 0,
-                    width + Config.Visualization.Metropolis.district.horizontalBuildingGap(),
-                    length + Config.Visualization.Metropolis.district.horizontalBuildingGap(), 1);
+            CityRectangle rectangle;
+
+            if (element.getType().equals(CityElement.CityType.District) || element.getType().equals(CityElement.CityType.Reference)) {
+                rectangle = new CityRectangle(0, 0, width + Config.Visualization.Metropolis.district.horizontalDistrictGap(),
+                        length + Config.Visualization.Metropolis.district.horizontalDistrictGap(), 1);
+            } else {
+                rectangle = new CityRectangle(0, 0, width + Config.Visualization.Metropolis.district.horizontalBuildingGap(),
+                        length + Config.Visualization.Metropolis.district.horizontalBuildingGap(), 1);
+            }
+
             rectangles.add(rectangle);
             rectangleElementsMap.put(rectangle, element);
         }
@@ -290,8 +296,14 @@ public class DistrictCircularLayout {
         double sum_width = 0;
         double sum_length = 0;
         for (CityElement element : elements) {
-            sum_width += element.getWidth() + Config.Visualization.Metropolis.district.horizontalBuildingGap();
-            sum_length += element.getLength() + Config.Visualization.Metropolis.district.horizontalBuildingGap();
+
+            if (element.getType().equals(CityElement.CityType.District) || element.getType().equals(CityElement.CityType.Reference)) {
+                sum_width += element.getWidth() + Config.Visualization.Metropolis.district.horizontalDistrictGap();
+                sum_length += element.getLength() + Config.Visualization.Metropolis.district.horizontalDistrictGap();
+            } else {
+                sum_width += element.getWidth() + Config.Visualization.Metropolis.district.horizontalBuildingGap();
+                sum_length += element.getLength() + Config.Visualization.Metropolis.district.horizontalBuildingGap();
+            }
         }
         return new CityRectangle(0, 0, sum_width, sum_length, 1);
     }

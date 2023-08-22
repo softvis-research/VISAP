@@ -48,4 +48,7 @@ public interface Shape extends Config {
 
     @DefaultValue("Sphere")
     CityElement.CityShape domainBuilding();
+
+    @DefaultValue("Box")
+    CityElement.CityShape road();
 }

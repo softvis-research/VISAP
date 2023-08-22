@@ -73,6 +73,7 @@ public interface Color extends Config {
      String structBuilding();
      @DefaultValue("#1E8449")
      String dataelementBuilding();
-
+     @DefaultValue("#000000")
+     String road();
 
 }

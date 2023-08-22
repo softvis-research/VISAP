@@ -13,5 +13,8 @@ public interface Features extends Config {
     Boolean outline();
 
     @DefaultValue("false")
+    Boolean roads();
+
+    @DefaultValue("false")
     Boolean inputUsesCSV();
 }

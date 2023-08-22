@@ -66,13 +66,13 @@ public class DistrictLightMapLayout {
         for (CityElement element : elements) {
 
             double centerX = element.getXPosition();
-            double newXPosition = centerX + parentX
-                    + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
+            double newXPosition = centerX + parentX;
+//                    + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
             element.setXPosition(newXPosition);
 
             double centerZ = element.getZPosition();
-            double newZPosition = centerZ + parentZ
-                    + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
+            double newZPosition = centerZ + parentZ;
+//                    + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
             element.setZPosition(newZPosition);
 
             Collection<CityElement> subElements = element.getSubElements();
@@ -151,13 +151,19 @@ public class DistrictLightMapLayout {
         List<CityRectangle> rectangles = new ArrayList<>();
 
         for (CityElement element : elements) {
-
             double width = element.getWidth();
             double length = element.getLength();
 
-            CityRectangle rectangle = new CityRectangle(0, 0,
-                    width + Config.Visualization.Metropolis.district.horizontalBuildingGap(),
-                    length + Config.Visualization.Metropolis.district.horizontalBuildingGap(), 1);
+            CityRectangle rectangle;
+
+            if (element.getType().equals(CityElement.CityType.District) || element.getType().equals(CityElement.CityType.Reference)) {
+                rectangle = new CityRectangle(0, 0, width + Config.Visualization.Metropolis.district.horizontalDistrictGap(),
+                        length + Config.Visualization.Metropolis.district.horizontalDistrictGap(), 1);
+            } else {
+                rectangle = new CityRectangle(0, 0, width + Config.Visualization.Metropolis.district.horizontalBuildingGap(),
+                        length + Config.Visualization.Metropolis.district.horizontalBuildingGap(), 1);
+            }
+
             rectangles.add(rectangle);
             rectangleElementsMap.put(rectangle, element);
         }

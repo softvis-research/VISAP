@@ -4,13 +4,10 @@ import org.visap.generator.configuration.Config;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.visap.generator.abap.enums.SAPRelationLabels;
+import org.visap.generator.metaphors.metropolis.steps.*;
 import org.visap.generator.repository.CityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
 import org.visap.generator.database.DatabaseConnector;
-import org.visap.generator.metaphors.metropolis.steps.MetaDataExporter;
-import org.visap.generator.metaphors.metropolis.steps.MetropolisCreator;
-import org.visap.generator.metaphors.metropolis.steps.MetropolisDesigner;
-import org.visap.generator.metaphors.metropolis.steps.MetropolisLayouter;
 import org.visap.generator.model.AFrameExporter;
 import org.visap.generator.model.MetaDataOutput;
 
@@ -50,6 +47,15 @@ public class AFrameExporterStep {
         }
         MetropolisLayouter layouter = new MetropolisLayouter(cityRepository, nodeRepository);
         layouter.layoutRepository();
+
+        if (Config.features.roads()) {
+            if (!isSilentMode) {
+                System.out.print("RoadNetworkLayouter step to be processed. Press any key to continue...");
+                userInput.nextLine();
+            }
+            MetropolisRoadNetworkLayouter roadNetworkLayouter = new MetropolisRoadNetworkLayouter(cityRepository, nodeRepository);
+            roadNetworkLayouter.createRoadNetworks();
+        }
 
         if (!isSilentMode) {
             System.out.print("\nDesigner step to be processed. Press any key to continue...");

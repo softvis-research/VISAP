@@ -3,6 +3,7 @@ package org.visap.generator.repository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.visap.generator.abap.enums.SAPNodeProperties;
+import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.database.DatabaseConnector;
 import org.neo4j.driver.Value;
@@ -127,6 +128,25 @@ public class CityRepository {
         }
 
         return elementsBySourceProperty;
+    }
+
+    public Collection<CityElement> getNamespaceDistrictsOfOriginSet() {
+        List<CityElement> namespaceDistrictsOfOriginSet = new ArrayList<>();
+        Collection<CityElement> namespaceDistricts = getElementsByTypeAndSourceProperty(CityElement.CityType.District, SAPNodeProperties.type_name, SAPNodeTypes.Namespace.toString());
+
+        for (CityElement namespaceDistrict : namespaceDistricts) {
+            String creator = namespaceDistrict.getSourceNodeProperty(SAPNodeProperties.creator);
+            int iteration = Integer.parseInt(namespaceDistrict.getSourceNodeProperty(SAPNodeProperties.iteration));
+
+            // iteration == 0 && creator <> SAP => origin set (to be analyzed custom code)
+            // iteration > 0 					=> further referenced custom code
+            // creator == SAP 					=> coding of SAP standard
+            if (iteration == 0 && !creator.equals("SAP")) {
+                namespaceDistrictsOfOriginSet.add(namespaceDistrict);
+            }
+        }
+
+        return namespaceDistrictsOfOriginSet;
     }
 
     // Schreiben der ACityElemente in die Neo4j-Datenbank

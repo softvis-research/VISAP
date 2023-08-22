@@ -51,6 +51,9 @@ public class MetaDataExporter {
     public void setMetaDataPropToCityElements() {
         Collection<CityElement> cityElements = cityRepository.getAllElements();
         for (final CityElement element : cityElements) {
+            if (element.getSourceNode() == null)
+                continue;
+            
             String metaData = toMetaData(element);
             element.setMetaData("{" + metaData + "}");
         }
