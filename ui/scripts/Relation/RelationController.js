@@ -40,6 +40,21 @@ controllers.relationController = function () {
 
 		// highlight configs
 		highlightColor: "black",
+
+		relationsByEntityType: {
+			"Attribute": ["accessedBy"],
+			"Method": ["accesses"],
+			"Function": ["accesses"],
+			"FunctionModule": ["calls"],
+			"Report": ["calls"],
+			"FormRoutine": ["calls"],
+			"Reference": ["rcData"],
+			"View": ["use", "usedBy"],
+			"Struct": ["use", "usedBy"],
+			"Domain": ["use", "usedBy"],
+			"Dataelement": ["use", "usedBy"],
+			"Tablebuilding": ["use", "usedBy"],
+		},
 	}
 
 
@@ -245,7 +260,7 @@ controllers.relationController = function () {
 
 			if (controllerConfig.showConnector) {
 				if (curved) {
-					//new curved connectors are displayed 
+					//new curved connectors are displayed
 					createCurvedRelatedConnections(relations);
 				} else {
 					//normal straight connectors are displayed
@@ -336,51 +351,13 @@ controllers.relationController = function () {
 	function getRelatedEntitiesOfSourceEntity(sourceEntity, entityType) {
 		let relatedEntitiesOfSourceEntity = [];
 
-		switch (entityType) {
-			case "Class":
-			case "Interface":
-				//relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.superTypes);
-				//relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.subTypes);
-				break;
-			case "ParameterizableClass":
-				relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.superTypes || []);
-				//relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.subTypes);
-				break;
-			case "Attribute":
-				relatedEntitiesOfSourceEntity = sourceEntity.accessedBy || [];
-				break;
-			case "Method":
-			case "Function":
-				relatedEntitiesOfSourceEntity = sourceEntity.accesses || [];
-			case "FunctionModule":
-			case "Report":
-			case "FormRoutine":
-				relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.calls || []);
-				//relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.calledBy);
-				break;
-			case "Reference":
-				relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.rcData || []);
-				break;
-			case "View":
-				relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.use || []);
-				relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.usedby || []);
-				break;
-			case "Struct":
-					relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.use || []);
-					relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.usedby || []);
-				break;
-			case "Domain":
-					relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.use || []);
-					relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.usedby || []);
-				break;
-			case "Dataelement":
-					relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.use || []);
-					relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.usedby || []);
-				break;
-			case "Tablebuilding":
-				relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.use || []);
-				relatedEntitiesOfSourceEntity = relatedEntitiesOfSourceEntity.concat(sourceEntity.usedby || []);
-				break;
+		const relationsForThisType = controllerConfig.relationsByEntityType[entityType];
+		if (relationsForThisType) {
+			for (const relation of relationsForThisType) {
+				if (sourceEntity[relation]) {
+					relatedEntitiesOfSourceEntity.push(...sourceEntity[relation]);
+				}
+			}
 		}
 
 		return relatedEntitiesOfSourceEntity;
