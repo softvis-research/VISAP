@@ -69,9 +69,8 @@ controllers.relationController = function () {
 		events.selected.off.subscribe(onEntityDeselected);
 	}
 
-	async function activate() {
+	function activate() {
 		activated = true;
-		await unhideRelatedEntities();
 
 		if (relatedEntitiesMap.size != 0) {
 			if (controllerConfig.showConnector) {
@@ -107,19 +106,6 @@ controllers.relationController = function () {
 		relations = new Array();
 	}
 
-	function foreachEntityInRelationTree(relationMap, rootEntity, operationFunction, alreadyVisitedSet) {
-		operationFunction(rootEntity);
-		if (relationMap.has(rootEntity)) {
-			for (const relatedEntity of relationMap.get(rootEntity)) {
-				// guard against cycles (and therefore infinite recursion) in the relation tree
-				if (!alreadyVisitedSet.has(relatedEntity)) {
-					alreadyVisitedSet.add(relatedEntity);
-					foreachEntityInRelationTree(relationMap, relatedEntity, operationFunction, alreadyVisitedSet);
-				}
-			}
-		}
-	}
-
 	function onEntityDeselected(applicationEvent) {
 		const deselectedEntities = new Set(applicationEvent.entities);
 		// all source entities were deselected
@@ -130,102 +116,6 @@ controllers.relationController = function () {
 		// there is currently no way to deselect only a subset without filtering it
 	}
 
-	function onEntityFiltered(applicationEvent) {
-		const entities = applicationEvent.entities;
-
-		if (entities.every(entity => !relatedEntitiesSet.has(entity) && !sourceEntities.includes(entity))) {
-			return;
-		}
-
-		const filteredEntities = new Set(entities);
-		// all source entities were filtered
-		if (sourceEntities.every(entity => filteredEntities.has(entity))) {
-			reset();
-			return;
-		}
-
-		// we need to remove relations to filtered entities from the map before doing the recursive passes over the tree
-		// otherwise the second pass will invalidate the first pass if a filtered element is the relation target of a source element
-		for (const [source, targets] of relatedEntitiesMap) {
-			if (targets.length) {
-				relatedEntitiesMap.set(source, targets.filter(entity => !filteredEntities.has(entity)));
-			}
-		}
-
-		const relatedEntitiesToRemove = new Set();
-		for (const entity of filteredEntities) {
-			foreachEntityInRelationTree(relatedEntitiesMap, entity, (entity) => relatedEntitiesToRemove.add(entity), new Set());
-		}
-		// there can be multiple relation paths to the same element - keep anything that still has a valid path to it
-		const remainingSourceEntities = sourceEntities.filter(entity => !filteredEntities.has(entity));
-		for (const entity of remainingSourceEntities) {
-			foreachEntityInRelationTree(relatedEntitiesMap, entity, (entity) => relatedEntitiesToRemove.delete(entity), new Set());
-		}
-
-		sourceEntities = remainingSourceEntities;
-
-		removeRelationsToAndFrom(relatedEntitiesToRemove);
-
-		// clean up entities that are no longer targeted, but remain sources (and thus couldn't have their outgoing relations removed)
-		const remainingRelationTargets = new Set(relations.map(relation => relation.target));
-		const previouslyRelatedSourceEntities =
-			sourceEntities.filter(entity => relatedEntitiesSet.has(entity) && !remainingRelationTargets.has(entity));
-		for (const entity of previouslyRelatedSourceEntities) {
-			relatedEntitiesSet.delete(entity);
-		}
-		canvasManipulator.unhighlightEntities(previouslyRelatedSourceEntities, { name: "relationController" });
-	}
-
-	async function onEntityUnfiltered(applicationEvent) {
-		// do not needlessly trigger on unfiltering caused by relations
-		if (sourceEntities.length && applicationEvent.sender !== relationController) {
-			const newRelations = await loadAllRelationsTo(applicationEvent.entities);
-			if (!activated) return;
-
-			await canvasManipulator.waitForRenderOfElement(applicationEvent.entities[0]);
-
-			if (controllerConfig.showHighlight) {
-				const newRelatedEntities = new Set(newRelations.map(entity => entity.target));
-				highlightRelatedEntities(newRelatedEntities);
-			}
-			if (controllerConfig.showConnector) {
-				createRelatedConnections(newRelations);
-			}
-		}
-	}
-
-	// remove all relations involving these entities from the internal relation state
-	// this does not remove these entities from the target lists of relatedEntitiesMap, that already happens earlier in onEntityFiltered
-	function removeRelationsToAndFrom(entitySet) {
-		for (const relatedEntity of entitySet) {
-			relatedEntitiesSet.delete(relatedEntity);
-			relatedEntitiesMap.delete(relatedEntity);
-		}
-
-		const remainingRelations = [];
-		const connectorsToDelete = new Set();
-		for (const relation of relations) {
-			if (entitySet.has(relation.target) || entitySet.has(relation.source)) {
-				model.removeEntity(relation.id);
-				connectorsToDelete.add(relation.id);
-			} else {
-				remainingRelations.push(relation);
-			}
-		}
-		relations = remainingRelations;
-
-		const remainingConnectors = [];
-		for (const connector of connectors) {
-			if (connectorsToDelete.has(connector.getAttribute("id"))) {
-				canvasManipulator.removeElement(connector);
-			} else {
-				remainingConnectors.push(connector);
-			}
-		}
-		connectors = remainingConnectors;
-
-		canvasManipulator.unhighlightEntities([...entitySet], { name: "relationController" });
-	}
 
 	async function onRelationsChanged(applicationEvent) {
 
@@ -255,8 +145,6 @@ controllers.relationController = function () {
 			if (controllerConfig.showHighlight) {
 				highlightRelatedEntities(relatedEntitiesSet);
 			}
-
-			await unhideRelatedEntities();
 
 			if (controllerConfig.showConnector) {
 				if (curved) {
@@ -490,31 +378,6 @@ controllers.relationController = function () {
 
 		return false;
 	}
-
-	async function unhideRelatedEntities() {
-		const elementsToUnhide = new Set();
-		for (const relatedEntity of relatedEntitiesSet) {
-			if (relatedEntity.filtered) {
-				elementsToUnhide.add(relatedEntity);
-				const hiddenParents = relatedEntity.allParents.filter(entity => entity.filtered);
-				for (const parent of hiddenParents) {
-					elementsToUnhide.add(parent);
-				}
-			}
-		}
-		if (elementsToUnhide.size) {
-			const elementsAsArray = [...elementsToUnhide];
-			events.filtered.off.publish({
-				sender: relationController,
-				entities: elementsAsArray
-			});
-
-			// re-inserting the elements is synchronous, but they will only be rendered on the next A-Frame tick
-			// which entity we wait for here doesn't really matter, it comes down to awaiting the next possible render step
-			await canvasManipulator.waitForRenderOfElement(elementsAsArray[0]);
-		}
-	}
-
 
 	return {
 		initialize: initialize,
