@@ -220,7 +220,7 @@ controllers.relationController = function () {
 		return relatedEntitiesOfSourceEntity;
 	}
 
-	async function loadAllRecursiveRelationsOf(oldSourceEntities) {
+	function loadAllRecursiveRelationsOf(oldSourceEntities) {
 		for (const oldSourceEntity of oldSourceEntities) {
 			const relatedEntities = relatedEntitiesMap.get(oldSourceEntity);
 
@@ -228,7 +228,7 @@ controllers.relationController = function () {
 				return;
 			}
 
-			newSourceEntities = relatedEntities.filter(relatedEntity => (!relatedEntitiesMap.has(relatedEntity)));
+			const newSourceEntities = relatedEntities.filter(relatedEntity => (!relatedEntitiesMap.has(relatedEntity)));
 
 			if (newSourceEntities.length == 0) {
 				return;
