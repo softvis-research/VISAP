@@ -25,7 +25,7 @@ const setup = {
 
 	ui: {
 		name: "UI0",
-		
+
 		area: {
 			name: "top",
 			orientation: "horizontal",

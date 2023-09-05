@@ -12,10 +12,6 @@ controllers.relationController = function () {
 	let activated = false;
 
 	let relationConnectionHelper;
-	let curvedRelationConnectionHelper;
-
-	//true for curved Relations, false for straight Relations
-	let curved = new Boolean();
 
 	// config parameters
 	const controllerConfig = {
@@ -60,10 +56,12 @@ controllers.relationController = function () {
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
-		relationConnectionHelper = createRelationConnectionHelper(controllerConfig);
-		curvedRelationConnectionHelper = createCurvedRelationConnectionHelper(controllerConfig);
 
-		curved = controllerConfig.curvedConnectors;
+		if (controllerConfig.curvedConnectors) {
+			relationConnectionHelper = createCurvedRelationConnectionHelper(controllerConfig);
+		} else {
+			relationConnectionHelper = createRelationConnectionHelper(controllerConfig);
+		}
 
 		events.selected.on.subscribe(onRelationsChanged);
 		events.selected.off.subscribe(onEntityDeselected);
@@ -116,9 +114,7 @@ controllers.relationController = function () {
 		// there is currently no way to deselect only a subset without filtering it
 	}
 
-
 	function onRelationsChanged(applicationEvent) {
-
 		events.log.info.publish({ text: "connector - onRelationsChanged" });
 
 		if (controllerConfig.useMultiSelect) {
@@ -147,13 +143,7 @@ controllers.relationController = function () {
 			}
 
 			if (controllerConfig.showConnector) {
-				if (curved) {
-					//new curved connectors are displayed
-					createCurvedRelatedConnections(relations);
-				} else {
-					//normal straight connectors are displayed
-					createRelatedConnections(relations);
-				}
+				createRelatedConnections(relations);
 			}
 		}
 	}
@@ -277,32 +267,7 @@ controllers.relationController = function () {
 		})
 	}
 
-	// new function for Curved Relations, similar to the one above
-	function createCurvedRelatedConnections(newRelations) {
-
-		newRelations.forEach(function (relation) {
-			const sourceEntity = relation.source;
-			const relatedEntity = relation.target;
-
-			//create scene element, new helper class
-			const curvedConnectorElements = curvedRelationConnectionHelper.createConnector(sourceEntity, relatedEntity, relation.id);
-
-			//source or target not rendered -> no connector
-			if (!curvedConnectorElements) {
-				events.log.error.publish({ text: "connector - createRelatedConnections - source or target not rendered" });
-				return;
-			}
-
-			events.log.info.publish({ text: "connector - createRelatedConnections - create connector" });
-
-			curvedConnectorElements.forEach(function (element) {
-				connectors.push(element);
-			});
-		})
-	}
-
 	function removeAllConnectors() {
-
 		events.log.info.publish({ text: "connector - removeAllConnectors" });
 
 		if (connectors.length == 0) {
@@ -340,18 +305,14 @@ controllers.relationController = function () {
 		canvasManipulator.unhighlightEntities(visibleEntities, { name: "relationController" });
 	}
 
-
 	function isTargetChildOfSourceParent(target, source) {
-
 		let targetParent = target.belongsTo;
 		const sourceParent = source.belongsTo;
 
 		while (targetParent !== undefined) {
-
 			if (targetParent == sourceParent) {
 				return true;
 			}
-
 			targetParent = targetParent.belongsTo;
 		}
 
@@ -364,6 +325,4 @@ controllers.relationController = function () {
 		activate: activate,
 		deactivate: deactivate
 	};
-
-
 }();
