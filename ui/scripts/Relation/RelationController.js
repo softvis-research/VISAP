@@ -117,7 +117,7 @@ controllers.relationController = function () {
 	}
 
 
-	async function onRelationsChanged(applicationEvent) {
+	function onRelationsChanged(applicationEvent) {
 
 		events.log.info.publish({ text: "connector - onRelationsChanged" });
 
@@ -129,10 +129,10 @@ controllers.relationController = function () {
 
 		events.log.info.publish({ text: "connector - onRelationsChanged - selected Entity - " + applicationEvent.entities[0] });
 
-		await loadAllRelationsOf(sourceEntities);
+		loadAllRelationsOf(sourceEntities);
 
 		if (controllerConfig.showRecursiveRelations) {
-			await loadAllRecursiveRelationsOf(sourceEntities);
+			loadAllRecursiveRelationsOf(sourceEntities);
 		}
 
 		events.log.info.publish({ text: "connector - onRelationsChanged - related Entities - " + relatedEntitiesMap.size });
@@ -159,18 +159,8 @@ controllers.relationController = function () {
 	}
 
 	// given a list of entities, return a map depicting all relations originating from them
-	async function getRelatedEntities(sourceEntitiesArray) {
+	function getRelatedEntities(sourceEntitiesArray) {
 		const relatedEntities = new Map();
-		let entitiesToLoad = [];
-		for (const sourceEntity of sourceEntitiesArray) {
-			const unloadedRelatedEntities = getRelatedEntitiesOfSourceEntity(sourceEntity.unloadedRelationships, sourceEntity.type);
-			if (unloadedRelatedEntities.length) {
-				entitiesToLoad = entitiesToLoad.concat(unloadedRelatedEntities);
-			}
-		}
-		if (entitiesToLoad.length) {
-			await neo4jModelLoadController.loadTreesContainingAnyOf(entitiesToLoad);
-		}
 		for (const sourceEntity of sourceEntitiesArray) {
 			relatedEntities.set(sourceEntity, getRelatedEntitiesOfSourceEntity(sourceEntity, sourceEntity.type));
 		}
@@ -220,19 +210,8 @@ controllers.relationController = function () {
 		return newRelations;
 	}
 
-	async function loadAllRelationsOf(sourceEntitiesArray) {
-		const newRelatedEntities = await getRelatedEntities(sourceEntitiesArray);
-		return loadRelations(newRelatedEntities);
-	}
-
-	async function loadAllRelationsTo(targetEntitiesArray) {
-		// there is no guarantee that all relations have a matching inverse
-		// so we'll have to re-find all relations and filter them down to the ones pointing at the targets
-		const newRelatedEntities = await getRelatedEntities(sourceEntities);
-		const targetEntitiesSet = new Set(targetEntitiesArray);
-		for (const [source, targets] of newRelatedEntities) {
-			newRelatedEntities.set(source, targets.filter(target => targetEntitiesSet.has(target)));
-		}
+	function loadAllRelationsOf(sourceEntitiesArray) {
+		const newRelatedEntities = getRelatedEntities(sourceEntitiesArray);
 		return loadRelations(newRelatedEntities);
 	}
 
@@ -265,8 +244,8 @@ controllers.relationController = function () {
 				return;
 			}
 
-			await loadAllRelationsOf(newSourceEntities);
-			await loadAllRecursiveRelationsOf(newSourceEntities);
+			loadAllRelationsOf(newSourceEntities);
+			loadAllRecursiveRelationsOf(newSourceEntities);
 		}
 	}
 
