@@ -38,13 +38,11 @@ controllers.relationController = function () {
 		highlightColor: "black",
 
 		relationsByEntityType: {
-			"Attribute": ["accessedBy"],
-			"Method": ["accesses"],
-			"Function": ["accesses"],
+			"Method": ["calls"],
+			"Function": ["calls"],
 			"FunctionModule": ["calls"],
 			"Report": ["calls"],
 			"FormRoutine": ["calls"],
-			"Reference": ["rcData"],
 			"View": ["use", "usedBy"],
 			"Struct": ["use", "usedBy"],
 			"Domain": ["use", "usedBy"],
