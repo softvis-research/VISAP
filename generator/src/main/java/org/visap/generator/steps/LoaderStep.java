@@ -177,7 +177,6 @@ public class LoaderStep {
         }
 
         // change/remove attribute names of all nodes
-
     }
 
     private static class CSVInput {
