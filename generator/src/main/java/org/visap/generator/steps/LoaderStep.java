@@ -181,7 +181,7 @@ public class LoaderStep {
         connector.executeWrite(
                 "MATCH(n:Elements)\n" +
                         "WHERE n.SUB_OBJ_NAME IS NULL AND n.SUB_OBJ_TYPE IS NULL\n"+
-                        "SET n.obj_name = n.MAIN_OBJ_NAME, n.type = n.MAIN_OBJ_TYPE"
+                        "SET n.object_name = n.MAIN_OBJ_NAME, n.type = n.MAIN_OBJ_TYPE"
         );
 
         //2. sub elements
