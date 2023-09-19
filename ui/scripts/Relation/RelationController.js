@@ -1,7 +1,12 @@
 controllers.relationController = function () {
+	// for clarity and consistency in handling relation array tuples
+	// outgoing meaning a relation from this to something else, incoming meaning a relation from somewhere else to this
+	const outgoing = 0;
+	const incoming = 1;
+
 	// list of entities whose relations to others are being displayed (not including intermediate steps of recursive relations)
 	let sourceEntities = new Array();
-	// for every source entity (and intermediate of recursive relations), the list of entities it is related to
+	// for every source entity (and intermediate of recursive relations), the a tuple of lists with entities it is related to (separated by direction)
 	let relatedEntitiesMap = new Map();
 	// set of all entities that are related to sourceEntities overall, not including the source entities themselves
 	let relatedEntitiesSet = new Set();
@@ -31,23 +36,29 @@ controllers.relationController = function () {
 		targetEndAtBorder: false,
 		createEndpoints: false,
 		connectorColor: { r: 0, g: 0, b: 1 },
+		reverseConnectorColor: { r: 1, g: 0, b: 0},
 		endpointColor: { r: 0, g: 0, b: 0 },
 		curvedConnectors: false,
 
 		// highlight configs
 		highlightColor: "black",
 
+		// which fields to use for creating outgoing (first element) and incoming relations (second element)
+		relationClasses: {
+			calls: ["calls", "calledBy"],
+			uses: ["use", "usedBy"]
+		},
 		relationsByEntityType: {
-			"Method": ["calls"],
-			"Function": ["calls"],
-			"FunctionModule": ["calls"],
-			"Report": ["calls"],
-			"FormRoutine": ["calls"],
-			"View": ["use", "usedBy"],
-			"Struct": ["use", "usedBy"],
-			"Domain": ["use", "usedBy"],
-			"Dataelement": ["use", "usedBy"],
-			"Tablebuilding": ["use", "usedBy"],
+			"Method": "calls",
+			"Function": "calls",
+			"FunctionModule": "calls",
+			"Report": "calls",
+			"FormRoutine": "calls",
+			"View": "uses",
+			"Struct": "uses",
+			"Domain": "uses",
+			"Dataelement": "uses",
+			"Tablebuilding": "uses"
 		},
 	}
 
@@ -158,11 +169,11 @@ controllers.relationController = function () {
 	// add these new relations to the internal relation state - duplicates will be filtered
 	function loadRelations(newRelationMap) {
 		const newRelations = [];
-		for (const [sourceEntity, allRelatedEntitiesOfSourceEntity] of newRelationMap) {
+		for (const [sourceEntity, [relatedEntitiesOutgoing, relatedEntitiesIncoming]] of newRelationMap) {
 			const oldRelatedEntities = relatedEntitiesMap.get(sourceEntity);
 			const relatedEntitiesOfSourceEntity = new Set(oldRelatedEntities);
 
-			for (const relatedEntity of allRelatedEntitiesOfSourceEntity) {
+			for (const relatedEntity of relatedEntitiesOutgoing) {
 				if (relatedEntitiesOfSourceEntity.has(relatedEntity)) {
 					events.log.info.publish({ text: "connector - onRelationsChanged - multiple relation" });
 					break;
@@ -204,14 +215,18 @@ controllers.relationController = function () {
 	}
 
 	function getRelatedEntitiesOfSourceEntity(sourceEntity, entityType) {
-		let relatedEntitiesOfSourceEntity = [];
+		let relatedEntitiesOfSourceEntity = [[], []];
 
-		const relationsForThisType = controllerConfig.relationsByEntityType[entityType];
-		if (relationsForThisType) {
-			for (const relation of relationsForThisType) {
-				if (sourceEntity[relation]) {
-					relatedEntitiesOfSourceEntity.push(...sourceEntity[relation]);
-				}
+		const relationsConfig = controllerConfig.relationsByEntityType[entityType];
+		const relationsProperties = typeof relationsConfig === 'string' ?
+			controllerConfig.relationClasses[relationsConfig] : relationsConfig;
+		if (!Array.isArray(relationsProperties)) return relatedEntitiesOfSourceEntity;
+
+		for (const mode of [outgoing, incoming]) {
+			const relationProperty = relationsProperties[mode];
+			if (relationProperty && typeof relationProperty === 'string' && sourceEntity[relationProperty]) {
+				const relatedEntities = sourceEntity[relationProperty];
+				relatedEntitiesOfSourceEntity[mode].push(...relatedEntities);
 			}
 		}
 
