@@ -201,7 +201,7 @@ public class LoaderStep {
         //add type_name attribute
         connector.executeWrite(
                 "MATCH(n:Elements)\n" +
-                        "SET n.type_name = CASE n.type\n" +
+                        "SET n.iteration = '0', n.type_name = CASE n.type\n" +
                         "                    WHEN 'DEVC' THEN 'Namespace'\n" +
                         "                    WHEN 'CLAS' THEN 'Class'\n" +
                         "                    WHEN 'PROG' THEN 'Report'\n" +
