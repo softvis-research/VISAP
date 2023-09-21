@@ -219,6 +219,13 @@ public class LoaderStep {
                         "                    ELSE n.type\n" +
                         "                    END"
         );
+
+        //add local_class attribute
+        connector.executeWrite(
+                "MATCH (n {SUB_OBJ_TYPE: 'CLAS'})\n" +
+                           "WHERE n.SUB_SUB_OBJ_NAME IS NULL\n" +
+                           "SET n.local_class = 'true'"
+        );
     }
 
     private static class CSVInput {
