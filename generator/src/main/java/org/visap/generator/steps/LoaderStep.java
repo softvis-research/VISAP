@@ -222,8 +222,8 @@ public class LoaderStep {
 
         //add local_class attribute
         connector.executeWrite(
-                "MATCH (n {SUB_OBJ_TYPE: 'CLAS'})\n" +
-                           "WHERE n.SUB_SUB_OBJ_NAME IS NULL\n" +
+                "MATCH (n:Elements)\n" +
+                           "WHERE ( n.SUB_OBJ_TYPE = 'CLAS' OR n.SUB_OBJ_TYPE = 'INTF' ) AND n.SUB_SUB_OBJ_NAME IS NULL\n" +
                            "SET n.local_class = 'true'"
         );
     }
