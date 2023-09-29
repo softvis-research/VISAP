@@ -181,7 +181,10 @@ public class LoaderStep {
         connector.executeWrite(
                 "MATCH(n:Elements)\n" +
                         "WHERE n.SUB_OBJ_NAME IS NULL AND n.SUB_OBJ_TYPE IS NULL\n"+
-                        "SET n.object_name = n.MAIN_OBJ_NAME, n.type = n.MAIN_OBJ_TYPE"
+                        "SET n.object_name = n.MAIN_OBJ_NAME, n.type = CASE n.MAIN_OBJ_TYPE\n" +
+                                                                        "WHEN 'PROG' THEN 'REPS'\n" +
+                                                                        "ELSE n.MAIN_OBJ_TYPE\n" +
+                                                                        "END"
         );
 
         //2. sub elements
@@ -204,7 +207,7 @@ public class LoaderStep {
                         "SET n.iteration = '0', n.type_name = CASE n.type\n" +
                         "                    WHEN 'DEVC' THEN 'Namespace'\n" +
                         "                    WHEN 'CLAS' THEN 'Class'\n" +
-                        "                    WHEN 'PROG' THEN 'Report'\n" +
+                        "                    WHEN 'REPS' THEN 'Report'\n" +
                         "                    WHEN 'INTF' THEN 'Interface'\n" +
                         "                    WHEN 'FUGR' THEN 'FunctionGroup'\n" +
                         "                    WHEN 'METH' THEN 'Method'\n" +
