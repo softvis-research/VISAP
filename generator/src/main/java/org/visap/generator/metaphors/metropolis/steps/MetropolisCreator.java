@@ -128,10 +128,10 @@ public class MetropolisCreator {
                 CityElement.CityType.Building, SAPNodeProperties.type_name, buildingElementTypeName);
 
         for (CityElement buildingElement : BuildingElements) {
-            String districtTypename = element.getSourceNodeProperty(SAPNodeProperties.element_id);
-            String buildingTypeName = buildingElement.getSourceNodeProperty(SAPNodeProperties.element_id);
+            String districtId = element.getSourceNodeID().toString();
+            String buildingId = buildingElement.getSourceNodeID().toString();
 
-            if (buildingTypeName.equals(districtTypename)) {
+            if (buildingId.equals(districtId)) {
                 element.addSubElement(buildingElement);
                 buildingElement.setParentElement(element);
             }
