@@ -98,7 +98,7 @@ const createCurvedRelationConnectionHelper = function (controllerConfig) {
 			return mergedObject;
 		}
 
-		function createConnector(entity, relatedEntity, relationId) {
+		function createConnector(entity, relatedEntity, relationId, options) {
 			const { sourcePosition, targetPosition, centralPosition } = evaluatePositions(entity, relatedEntity);
 			if (!sourcePosition || !targetPosition) {
 				return null;
@@ -119,7 +119,8 @@ const createCurvedRelationConnectionHelper = function (controllerConfig) {
 			// create connector
 			const connector = document.createElement("a-ring");
 			setConnectorMeshProperties(connector, direction);
-			setCommonConnectorHTMLProperties(connector, controllerConfig.connectorColor);
+			const connectorColor = options?.reversed ?  controllerConfig.reverseConnectorColor : controllerConfig.connectorColor;
+			setCommonConnectorHTMLProperties(connector, connectorColor);
 
 			connector.setAttribute("position", centralPosition);
 			connector.setAttribute("radius-inner", distance);

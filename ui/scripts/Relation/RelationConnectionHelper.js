@@ -96,7 +96,7 @@ const createRelationConnectionHelper = function (controllerConfig) {
 			return mergedObject;
 		}
 
-		function createConnector(entity, relatedEntity, relationId) {
+		function createConnector(entity, relatedEntity, relationId, options) {
 			const { sourcePosition, targetPosition } = evaluatePositions(entity, relatedEntity);
 			if (!sourcePosition || !targetPosition) {
 				return null;
@@ -110,7 +110,8 @@ const createRelationConnectionHelper = function (controllerConfig) {
 			const connector = document.createElement("a-cylinder");
 			const halfwayPoint = combineObjectProperties(sourcePosition, delta, (left, right) => left + right / 2);
 			setConnectorMeshProperties(connector, halfwayPoint, direction, connectorSize, distance);
-			setCommonConnectorHTMLProperties(connector, controllerConfig.connectorColor);
+			const connectorColor = options?.reversed ?  controllerConfig.reverseConnectorColor : controllerConfig.connectorColor;
+			setCommonConnectorHTMLProperties(connector, connectorColor);
 			connector.setAttribute("radius", 5);
 			connector.setAttribute("id", relationId);
 

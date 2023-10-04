@@ -170,10 +170,15 @@ controllers.relationController = function () {
 	function loadRelations(newRelationMap) {
 		const newRelations = [];
 		for (const [sourceEntity, [relatedEntitiesOutgoing, relatedEntitiesIncoming]] of newRelationMap) {
+			// merge into one array for easier traversal
+			const newRelatedEntities = Array.prototype.concat(
+				relatedEntitiesOutgoing.map(entity => [entity, outgoing]),
+				relatedEntitiesIncoming.map(entity => [entity, incoming])
+			);
 			const oldRelatedEntities = relatedEntitiesMap.get(sourceEntity);
 			const relatedEntitiesOfSourceEntity = new Set(oldRelatedEntities);
 
-			for (const relatedEntity of relatedEntitiesOutgoing) {
+			for (const [relatedEntity, mode] of newRelatedEntities) {
 				if (relatedEntitiesOfSourceEntity.has(relatedEntity)) {
 					events.log.info.publish({ text: "connector - onRelationsChanged - multiple relation" });
 					break;
@@ -185,16 +190,21 @@ controllers.relationController = function () {
 					}
 				}
 
+				// source of e.g. "usedBy" relation is rendered as target and the other way round
+				const renderSourceEntity = mode === outgoing ? sourceEntity : relatedEntity;
+				const renderTargetEntity = mode === outgoing ? relatedEntity : sourceEntity;
+				const relationIdConnector = mode === outgoing ? "--2--" : "--by--";
 				const relation = model.createEntity(
 					"Relation",
-					sourceEntity.id + "--2--" + relatedEntity.id,
-					sourceEntity.name + " - " + relatedEntity.name,
-					sourceEntity.name + " - " + relatedEntity.name,
+					renderSourceEntity.id + relationIdConnector + renderTargetEntity.id,
+					renderSourceEntity.name + " - " + renderTargetEntity.name,
+					renderSourceEntity.name + " - " + renderTargetEntity.name,
 					sourceEntity
 				);
 
-				relation.source = sourceEntity;
-				relation.target = relatedEntity;
+				relation.source = renderSourceEntity;
+				relation.target = renderTargetEntity;
+				relation.mode = mode;
 
 				relations.push(relation);
 				newRelations.push(relation);
@@ -262,9 +272,11 @@ controllers.relationController = function () {
 		newRelations.forEach(function (relation) {
 			const sourceEntity = relation.source;
 			const relatedEntity = relation.target;
-
+			const options = {
+				reversed: relation.mode === incoming
+			};
 			//create scene element
-			const connectorElements = relationConnectionHelper.createConnector(sourceEntity, relatedEntity, relation.id);
+			const connectorElements = relationConnectionHelper.createConnector(sourceEntity, relatedEntity, relation.id, options);
 
 			//source or target not rendered -> no connector
 			if (!connectorElements) {
