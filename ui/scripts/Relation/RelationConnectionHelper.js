@@ -24,11 +24,8 @@ const createRelationConnectionHelper = function (controllerConfig) {
 
 		function evaluatePositions(entity, relatedEntity) {
 			let sourcePosition = canvasManipulator.getCenterOfEntity(entity);
-			if (sourcePosition === null) {
-				return {};
-			}
 			let targetPosition = canvasManipulator.getCenterOfEntity(relatedEntity);
-			if (targetPosition === null) {
+			if (sourcePosition === null || targetPosition === null) {
 				return {};
 			}
 

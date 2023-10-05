@@ -165,6 +165,22 @@ controllers.relationController = function () {
 		return relatedEntities;
 	}
 
+	function createRelation(sourceEntity, relatedEntity, direction) {
+		const relationIdConnector = direction === outgoing ? "--2--" : "--fr--";
+		const relation = model.createEntity(
+			"Relation",
+			sourceEntity.id + relationIdConnector + relatedEntity.id,
+			sourceEntity.name + " - " + relatedEntity.name,
+			sourceEntity.name + " - " + relatedEntity.name,
+			sourceEntity
+		);
+		relation.source = sourceEntity;
+		relation.target = relatedEntity;
+		relation.direction = direction;
+
+		return relation;
+	}
+
 	// add these new relations to the internal relation state - duplicates will be filtered
 	function loadRelations(newRelationMap, relationDirection) {
 		const filterOutgoing = relationDirection === incoming;
@@ -183,31 +199,19 @@ controllers.relationController = function () {
 			for (const [relatedEntity, direction] of newRelatedEntities) {
 				if (relatedEntitiesOfSourceEntity.has(relatedEntity)) {
 					events.log.info.publish({ text: "connector - onRelationsChanged - multiple relation" });
-					break;
+					continue;
 				}
 				if (!controllerConfig.showInnerRelations) {
 					if (isTargetChildOfSourceParent(relatedEntity, sourceEntity)) {
 						events.log.info.publish({ text: "connector - onRelationsChanged - inner relation" });
-						break;
+						continue;
 					}
 				}
 
-				const relationIdConnector = direction === outgoing ? "--2--" : "--fr--";
-				const relation = model.createEntity(
-					"Relation",
-					sourceEntity.id + relationIdConnector + relatedEntity.id,
-					sourceEntity.name + " - " + relatedEntity.name,
-					sourceEntity.name + " - " + relatedEntity.name,
-					sourceEntity
-				);
-
-				relation.source = sourceEntity;
-				relation.target = relatedEntity;
-				relation.direction = direction;
+				const relation = createRelation(sourceEntity, relatedEntity, direction);
 
 				relations.push(relation);
 				newRelations.push(relation);
-
 				relatedEntitiesOfSourceEntity.add(relatedEntity);
 				relatedEntitiesSet.add(relatedEntity);
 			}

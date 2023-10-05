@@ -20,11 +20,8 @@ const createCurvedRelationConnectionHelper = function (controllerConfig) {
 
 		function evaluatePositions(entity, relatedEntity) {
 			let sourcePosition = canvasManipulator.getCenterOfEntity(entity);
-			if (sourcePosition === null) {
-				return {};
-			}
 			let targetPosition = canvasManipulator.getCenterOfEntity(relatedEntity);
-			if (targetPosition === null) {
+			if (sourcePosition === null || targetPosition === null) {
 				return {};
 			}
 
@@ -70,7 +67,7 @@ const createCurvedRelationConnectionHelper = function (controllerConfig) {
 				targetPosition.y = sourcePosition.y;
 			}
 
-			//new 'centralPosition' ist the center of the Ring elements
+			// new 'centralPosition' ist the center of the Ring elements
 			let centralPosition = sourcePosition;
 			centralPosition.x = ((sourcePosition.x + targetPosition.x) / 2);
 			centralPosition.z = ((sourcePosition.z + targetPosition.z) / 2);
