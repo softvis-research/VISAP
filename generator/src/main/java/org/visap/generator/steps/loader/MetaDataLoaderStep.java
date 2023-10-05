@@ -15,7 +15,7 @@ public class MetaDataLoaderStep {
     private static final String FolderName = "MetaData";
     private static final String FileSuffix = "Meta.csv";
 
-    public static void main() {
+    public static void main(String[] args) {
 
         boolean isSilentMode = Config.setup.silentMode();
         Scanner userInput = new Scanner(System.in);

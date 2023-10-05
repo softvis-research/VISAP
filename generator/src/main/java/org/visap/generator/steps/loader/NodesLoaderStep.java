@@ -15,7 +15,7 @@ public class NodesLoaderStep {
     private static final String FolderName = "Nodes";
     private static final String FileSuffix = "Nodes.csv";
 
-    public static void main() {
+    public static void main(String[] args) {
 
         boolean isSilentMode = Config.setup.silentMode();
         Scanner userInput = new Scanner(System.in);

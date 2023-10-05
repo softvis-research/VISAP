@@ -16,7 +16,7 @@ public class ReferencesLoaderStep {
     private static final String FolderName = "References";
     private static final String FileSuffix = "Reference.csv";
 
-    public static void main() {
+    public static void main(String[] args) {
 
         boolean isSilentMode = Config.setup.silentMode();
         Scanner userInput = new Scanner(System.in);
