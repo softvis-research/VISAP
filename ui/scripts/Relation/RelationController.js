@@ -134,10 +134,9 @@ controllers.relationController = function () {
 
 		events.log.info.publish({ text: "connector - onRelationsChanged - selected Entity - " + applicationEvent.entities[0] });
 
-		loadAllRelationsOf(sourceEntities);
-
+		const newRelations = loadAllRelationsOf(sourceEntities);
 		if (controllerConfig.showRecursiveRelations) {
-			loadAllRecursiveRelationsOf(sourceEntities);
+			loadAllRecursiveRelationsOf(newRelations);
 		}
 
 		events.log.info.publish({ text: "connector - onRelationsChanged - related Entities - " + relatedEntitiesMap.size });
@@ -167,18 +166,21 @@ controllers.relationController = function () {
 	}
 
 	// add these new relations to the internal relation state - duplicates will be filtered
-	function loadRelations(newRelationMap) {
+	function loadRelations(newRelationMap, relationDirection) {
+		const filterOutgoing = relationDirection === incoming;
+		const filterIncoming = relationDirection === outgoing;
+
 		const newRelations = [];
 		for (const [sourceEntity, [relatedEntitiesOutgoing, relatedEntitiesIncoming]] of newRelationMap) {
 			// merge into one array for easier traversal
 			const newRelatedEntities = Array.prototype.concat(
-				relatedEntitiesOutgoing.map(entity => [entity, outgoing]),
-				relatedEntitiesIncoming.map(entity => [entity, incoming])
+				filterOutgoing ? [] : relatedEntitiesOutgoing.map(entity => [entity, outgoing]),
+				filterIncoming ? [] : relatedEntitiesIncoming.map(entity => [entity, incoming])
 			);
 			const oldRelatedEntities = relatedEntitiesMap.get(sourceEntity);
 			const relatedEntitiesOfSourceEntity = new Set(oldRelatedEntities);
 
-			for (const [relatedEntity, mode] of newRelatedEntities) {
+			for (const [relatedEntity, direction] of newRelatedEntities) {
 				if (relatedEntitiesOfSourceEntity.has(relatedEntity)) {
 					events.log.info.publish({ text: "connector - onRelationsChanged - multiple relation" });
 					break;
@@ -190,21 +192,18 @@ controllers.relationController = function () {
 					}
 				}
 
-				// source of e.g. "usedBy" relation is rendered as target and the other way round
-				const renderSourceEntity = mode === outgoing ? sourceEntity : relatedEntity;
-				const renderTargetEntity = mode === outgoing ? relatedEntity : sourceEntity;
-				const relationIdConnector = mode === outgoing ? "--2--" : "--by--";
+				const relationIdConnector = direction === outgoing ? "--2--" : "--fr--";
 				const relation = model.createEntity(
 					"Relation",
-					renderSourceEntity.id + relationIdConnector + renderTargetEntity.id,
-					renderSourceEntity.name + " - " + renderTargetEntity.name,
-					renderSourceEntity.name + " - " + renderTargetEntity.name,
+					sourceEntity.id + relationIdConnector + relatedEntity.id,
+					sourceEntity.name + " - " + relatedEntity.name,
+					sourceEntity.name + " - " + relatedEntity.name,
 					sourceEntity
 				);
 
-				relation.source = renderSourceEntity;
-				relation.target = renderTargetEntity;
-				relation.mode = mode;
+				relation.source = sourceEntity;
+				relation.target = relatedEntity;
+				relation.direction = direction;
 
 				relations.push(relation);
 				newRelations.push(relation);
@@ -219,9 +218,9 @@ controllers.relationController = function () {
 		return newRelations;
 	}
 
-	function loadAllRelationsOf(sourceEntitiesArray) {
+	function loadAllRelationsOf(sourceEntitiesArray, direction) {
 		const newRelatedEntities = getRelatedEntities(sourceEntitiesArray);
-		return loadRelations(newRelatedEntities);
+		return loadRelations(newRelatedEntities, direction);
 	}
 
 	function getRelatedEntitiesOfSourceEntity(sourceEntity, entityType) {
@@ -232,33 +231,33 @@ controllers.relationController = function () {
 			controllerConfig.relationClasses[relationsConfig] : relationsConfig;
 		if (!Array.isArray(relationsProperties)) return relatedEntitiesOfSourceEntity;
 
-		for (const mode of [outgoing, incoming]) {
-			const relationProperty = relationsProperties[mode];
+		for (const direction of [outgoing, incoming]) {
+			const relationProperty = relationsProperties[direction];
 			if (relationProperty && typeof relationProperty === 'string' && sourceEntity[relationProperty]) {
 				const relatedEntities = sourceEntity[relationProperty];
-				relatedEntitiesOfSourceEntity[mode].push(...relatedEntities);
+				relatedEntitiesOfSourceEntity[direction].push(...relatedEntities);
 			}
 		}
 
 		return relatedEntitiesOfSourceEntity;
 	}
 
-	function loadAllRecursiveRelationsOf(oldSourceEntities) {
-		for (const oldSourceEntity of oldSourceEntities) {
-			const relatedEntities = relatedEntitiesMap.get(oldSourceEntity);
-
-			if (relatedEntities.length == 0) {
-				return;
-			}
-
-			const newSourceEntities = relatedEntities.filter(relatedEntity => (!relatedEntitiesMap.has(relatedEntity)));
-
-			if (newSourceEntities.length == 0) {
-				return;
-			}
-
-			loadAllRelationsOf(newSourceEntities);
-			loadAllRecursiveRelationsOf(newSourceEntities);
+	function loadAllRecursiveRelationsOf(previouslyAddedRelations) {
+		// filter out relations which point at previously reached entities
+		const nonCyclicRelations = previouslyAddedRelations.filter(relation => !(relatedEntitiesMap.has(relation.target)));
+		// map out which entities those relations point to, separated by direction
+		const newRelatedEntitiesByDirection = nonCyclicRelations.reduce((acc, relation) => {
+			acc[relation.direction].push(relation.target);
+			return acc;
+		}, [[], []]);
+		// load relations separately for each set, filtered to match the same direction
+		const newRelations = Array.prototype.concat(
+			loadAllRelationsOf(newRelatedEntitiesByDirection[outgoing], outgoing),
+			loadAllRelationsOf(newRelatedEntitiesByDirection[incoming], incoming)
+		);
+		// recursively move through descendants
+		if (newRelations.length > 0) {
+			loadAllRecursiveRelationsOf(newRelations);
 		}
 	}
 
@@ -273,7 +272,7 @@ controllers.relationController = function () {
 			const sourceEntity = relation.source;
 			const relatedEntity = relation.target;
 			const options = {
-				reversed: relation.mode === incoming
+				reversed: relation.direction === incoming
 			};
 			//create scene element
 			const connectorElements = relationConnectionHelper.createConnector(sourceEntity, relatedEntity, relation.id, options);
