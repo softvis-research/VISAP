@@ -54,8 +54,6 @@ public class NoesLoaderStep {
                         "WHERE row.MainObjektname <> row.Objektname AND row.Meldungscode = 'K_NOES'\n" +
                         "OPTIONAL MATCH (s:Elements {object_name : row.MainObjektname, PACKAGE : row.Paket})\n" +
                         "WHERE row.MainObjektname = row.Objektname AND row.Meldungscode = 'K_NOES'\n"+
-                        "OPTIONAL MATCH (ss:Elements {MAIN_OBJ_NAME : row.MAIN_OBJ_NAME, MAIN_OBJ_TYPE : row.MAIN_OBJ_TYPE, SUB_OBJ_NAME: row.SUB_OBJ_NAME, SUB_OBJ_TYPE: row.SUB_OBJ_TYPE, SUB_SUB_OBJ_NAME: row.SUB_SUB_OBJ_NAME, SUB_SUB_OBJ_TYPE: row.SUB_SUB_OBJ_TYPE})\n" +
-                        "WHERE row.SUB_SUB_OBJ_NAME IS NOT NULL AND row.SUB_OBJ_NAME IS NOT NULL\n"+
                         "SET n.number_of_statements = row.Noes\n" +
                         "SET s.number_of_statements = row.Noes"
         );
