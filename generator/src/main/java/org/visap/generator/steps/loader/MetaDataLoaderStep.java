@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class MetaDataLoaderStep {
 
-    private static DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
+    private static final DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
     private static final Log log = LogFactory.getLog(ReferencesLoaderStep.class);
     private static final String FolderName = "MetaData";
     private static final String FileSuffix = "Meta.csv";
@@ -46,7 +46,6 @@ public class MetaDataLoaderStep {
         createLocalClassAttribute();
 
         userInput.close();
-        connector.close();
         log.info("MetaDataLoader step was completed");
     }
 

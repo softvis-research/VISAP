@@ -5,5 +5,6 @@ public class LoaderManager {
         NodesLoaderStep.main(args);
         ReferencesLoaderStep.main(args);
         MetaDataLoaderStep.main(args);
+        NoesLoaderStep.main(args);
     }
 }
