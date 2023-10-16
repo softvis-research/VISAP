@@ -1,8 +1,8 @@
 package org.visap.generator.configuration;
 
-import org.visap.generator.model.MetaDataOutput;
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;
+import org.visap.generator.export.core.MetaDataOutput;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({

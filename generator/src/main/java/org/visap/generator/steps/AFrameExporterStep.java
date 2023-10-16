@@ -8,8 +8,8 @@ import org.visap.generator.metaphors.metropolis.steps.*;
 import org.visap.generator.repository.CityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
 import org.visap.generator.database.DatabaseConnector;
-import org.visap.generator.model.AFrameExporter;
-import org.visap.generator.model.MetaDataOutput;
+import org.visap.generator.export.core.AFrameExporter;
+import org.visap.generator.export.core.MetaDataOutput;
 
 import java.util.Scanner;
 
@@ -81,8 +81,7 @@ public class AFrameExporterStep {
             metaDataExporter.setMetaDataPropToCityElements();
         }
 
-        // Create A-Frame
-        // Create metaData.json
+        // Create A-Frame model
         if (!isSilentMode) {
             System.out.println("Writing A-Frame. Press any key to continue...");
             userInput.nextLine();
@@ -102,8 +101,9 @@ public class AFrameExporterStep {
             connector.executeWrite("MATCH (n:ACityRep) DETACH DELETE n;");
             cityRepository.writeRepositoryToNeo4j();
         }
-
+        
         System.out.println("\nA-Frame Exporter step was completed");
+        System.out.println("Model files were written to " + Config.output.mapPath());
         userInput.close();
         connector.close();
     }

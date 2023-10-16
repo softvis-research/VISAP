@@ -33,7 +33,7 @@ public class MetropolisRoadNetworkLayouter {
 
         CityElement virtualRootDistrict = createVirtualRootDistrict();
         DistrictRoadNetwork rootRoadNetwork = new DistrictRoadNetwork(virtualRootDistrict, new HashMap<>(), referenceMapper);
-        List<CityElement> mainRoads = rootRoadNetwork.calculate2();
+        List<CityElement> mainRoads = rootRoadNetwork.calculate();
 
         for (CityElement mainRoad : mainRoads) {
             repository.addElement(mainRoad);
@@ -42,7 +42,7 @@ public class MetropolisRoadNetworkLayouter {
 
         for (CityElement namespaceDistrict : repository.getNamespaceDistrictsOfOriginSet()) {
             DistrictRoadNetwork roadNetwork = new DistrictRoadNetwork(namespaceDistrict, rootRoadNetwork.getSubElementConnectors(namespaceDistrict), referenceMapper);
-            List<CityElement> roads = roadNetwork.calculate2();
+            List<CityElement> roads = roadNetwork.calculate();
 
             for (CityElement road : roads) {
                 repository.addElement(road);

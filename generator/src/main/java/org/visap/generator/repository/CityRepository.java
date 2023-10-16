@@ -157,7 +157,9 @@ public class CityRepository {
 
         AtomicInteger cityBuildingCounter = new AtomicInteger(0);
         AtomicInteger cityDistrictCounter = new AtomicInteger(0);
-
+        AtomicInteger cityRoadCounter = new AtomicInteger(0);
+        AtomicInteger cityReferenceCounter = new AtomicInteger(0);
+    
         elementsByHash.forEach((id, element) -> {
             Long aCityNodeID = connector
                     .addNode("CREATE ( n:Elements:ACityRep { " + getACityProperties(element) + "})", "n").id();
@@ -171,11 +173,19 @@ public class CityRepository {
                 case District:
                     cityDistrictCounter.getAndAdd(1);
                     break;
+                case Road:
+                    cityRoadCounter.getAndAdd(1);
+                    break;
+                case Reference:
+                    cityReferenceCounter.getAndAdd(1);
+                    break;
             }
         });
 
         log.info(cityBuildingCounter + " new Buildings added to Neo4j");
         log.info(cityDistrictCounter + " new Districts added to Neo4j");
+        log.info(cityRoadCounter + " new Roads added to Neo4j");
+        log.info(cityReferenceCounter + "new References added to Neo4j");
 
         AtomicInteger sourceRelationCounter = new AtomicInteger(0);
         AtomicInteger childRelationCounter = new AtomicInteger(0);

@@ -54,8 +54,8 @@ public class DistrictRoadNetwork {
         return subElementConnectors.get(subElement);
     }
 
+
     public List<CityElement> calculate() {
-
         initializeRoadGraph();
 
         if (Config.Visualization.Metropolis.roadNetwork.completeRoadNetwork()) {
@@ -64,136 +64,6 @@ public class DistrictRoadNetwork {
 
         RoadNodeBuilder nodeBuilder = new RoadNodeBuilder();
 
-        // TODO
-        // erstmal nur Workaround
-        List<List<RoadNode>> paths = new ArrayList<>();
-
-        for (CityElement subelement : subElements) {
-
-            if (subelement.getType() != CityType.District) {
-                continue;
-            }
-
-            List<RoadNode> slipRoadNodesSource = nodeBuilder.calculateSlipRoadNodes(subelement);
-            Collection<CityElement> referencedElements = referenceMapper.getAggregatedRelatedACityElements(subelement, referenceMapper.mapToAggregationLevel(subelement), false);
-
-            for (CityElement referencedElement : referencedElements) {
-                if (referencedElement == null || subelement == referencedElement) {
-                    continue;
-                }
-
-                if (!checkIfElementBelongsToOriginSet(referencedElement)) {
-                    continue;
-                }
-
-                List<RoadNode> slipRoadNodesTarget;
-
-                if (subElements.contains(referencedElement)) {
-                    // von den Distrikten die Auffahrtspunkte bestimmen
-                    slipRoadNodesTarget = nodeBuilder.calculateSlipRoadNodes(referencedElement);
-                } else {
-                    slipRoadNodesTarget = new ArrayList<RoadNode>();
-                    slipRoadNodesTarget.add(mainElementConnectors.get(referencedElement.getParentElement()));
-                }
-
-                // TODO
-                // erstmal nur Workaround
-                double shortestPathLength = Double.MAX_VALUE;
-                List<RoadNode> shortestPathAbsolut = null;
-
-                // kürzesten Pfad aller (4 * 4 =) 16 Kombinationen berechnen
-                // Aufruf von dijkstra
-                for (RoadNode slipRoadNodeSource : slipRoadNodesSource) {
-                    for (RoadNode slipRoadNodeTarget : slipRoadNodesTarget) {
-                        List<List<RoadNode>> shortestPath = getAllShortestPaths(slipRoadNodeSource, slipRoadNodeTarget);
-
-                        double pathLength = roadGraph.calculatePathLength(shortestPath.get(0));
-                        if (pathLength < shortestPathLength) {
-                            shortestPathAbsolut = shortestPath.get(0);
-                            shortestPathLength = pathLength;
-                        }
-                    }
-                }
-
-                // passenden Pfad bestimmen und merken
-                // erstmal: kürzesten Pfad wählen
-                if (shortestPathAbsolut != null) {
-
-                    // Auffahrt auf containingSourceDistrict
-                    shortestPathAbsolut.add(0, nodeBuilder.calculateDistrictSlipRoadNode(subelement, shortestPathAbsolut.get(0)));
-
-                    if (subElements.contains(referencedElement)) {
-                        // Auffahrt auf containingTargetDistrict
-                        shortestPathAbsolut.add(nodeBuilder.calculateDistrictSlipRoadNode(referencedElement, shortestPathAbsolut.get(shortestPathAbsolut.size() - 1)));
-
-                        subElementConnectors.get(subelement).put(referencedElement, nodeBuilder.calculateDistrictMarginRoadNode(subelement, shortestPathAbsolut.get(0)));
-                        subElementConnectors.get(referencedElement).put(subelement, nodeBuilder.calculateDistrictMarginRoadNode(referencedElement, shortestPathAbsolut.get(shortestPathAbsolut.size() - 1)));
-                    } else {
-                        shortestPathAbsolut.add(nodeBuilder.calculateDistrictSlipRoadNode(district, shortestPathAbsolut.get(shortestPathAbsolut.size() - 1)));
-                    }
-                    paths.add(shortestPathAbsolut);
-                }
-            }
-
-            Collection<CityElement> reverseReferencedElements = referenceMapper.getAggregatedRelatedACityElements(subelement, referenceMapper.mapToAggregationLevel(subelement), true);
-
-            // Wir müssen jetzt nur Beziehungen berücksichtigen, die von "draußen" kommen
-            // Die anderen haben wir ja schon behandelt
-            for (CityElement referencedElement : reverseReferencedElements) {
-                if (referencedElement == null || subelement == referencedElement || subElements.contains(referencedElement)) {
-                    continue;
-                }
-
-                if (!checkIfElementBelongsToOriginSet(referencedElement)) {
-                    continue;
-                }
-
-                // TODO
-                // erstmal nur Workaround
-                double shortestPathLength = Double.MAX_VALUE;
-                List<RoadNode> shortestPathAbsolut = null;
-
-                // kürzesten Pfad aller (4 * 4 =) 16 Kombinationen berechnen
-                // Aufruf von Dijkstra
-                for (RoadNode slipRoadNodeSource : slipRoadNodesSource) {
-                    List<List<RoadNode>> shortestPath = getAllShortestPaths(slipRoadNodeSource, mainElementConnectors.get(referencedElement.getParentElement()));
-
-                    double pathLength = roadGraph.calculatePathLength(shortestPath.get(0));
-                    if (pathLength < shortestPathLength) {
-                        shortestPathAbsolut = shortestPath.get(0);
-                        shortestPathLength = pathLength;
-                    }
-                }
-
-                // passenden Pfad bestimmen und merken
-                // erstmal: kürzesten Pfad wählen
-                if (shortestPathAbsolut != null) {
-
-                    // Auffahrt auf containingSourceDistrict
-                    shortestPathAbsolut.add(0, nodeBuilder.calculateDistrictSlipRoadNode(subelement, shortestPathAbsolut.get(0)));
-                    shortestPathAbsolut.add(nodeBuilder.calculateDistrictSlipRoadNode(district, shortestPathAbsolut.get(shortestPathAbsolut.size() - 1)));
-                    paths.add(shortestPathAbsolut);
-                }
-            }
-
-        }
-
-//		return extractRoads(paths);
-        return null;
-    }
-
-    public List<CityElement> calculate2() {
-
-        initializeRoadGraph();
-
-        if (Config.Visualization.Metropolis.roadNetwork.completeRoadNetwork()) {
-            return extractRoads(roadGraph.getGraph());
-        }
-
-        RoadNodeBuilder nodeBuilder = new RoadNodeBuilder();
-
-        // TODO
-        // erstmal nur Workaround
         List<Road> roads = new ArrayList<Road>();
 
         for (CityElement subelement : subElements) {
@@ -224,8 +94,6 @@ public class DistrictRoadNetwork {
                     slipRoadNodesTarget.add(mainElementConnectors.get(referencedElement.getParentElement()));
                 }
 
-                // TODO
-                // erstmal nur Workaround
                 double shortestPathLength = Double.MAX_VALUE;
                 List<RoadNode> shortestPathAbsolut = null;
 
@@ -276,8 +144,6 @@ public class DistrictRoadNetwork {
                     continue;
                 }
 
-                // TODO
-                // erstmal nur Workaround
                 double shortestPathLength = Double.MAX_VALUE;
                 List<RoadNode> shortestPathAbsolut = null;
 
@@ -304,7 +170,7 @@ public class DistrictRoadNetwork {
                     roads.add(new Road(referencedElement.getParentElement(), subelement, shortestPathAbsolut));
                 }
             }
-
+            
         }
 
         return extractRoads(roads);
@@ -449,27 +315,6 @@ public class DistrictRoadNetwork {
         return roads;
     }
 
-//	private List<ACityElement> extractRoads(List<List<RoadNode>> paths) {
-//		Map<RoadNode, ArrayList<RoadNode>> adjacencyList = new HashMap<RoadNode, ArrayList<RoadNode>>();
-//
-//		for (List<RoadNode> path : paths) {
-//			for (int i = 0; i < path.size() - 1; i++) {
-//				RoadNode node = path.get(i);
-//				RoadNode successor = path.get(i + 1);
-//
-//				adjacencyList.putIfAbsent(node, new ArrayList<RoadNode>());
-//				adjacencyList.putIfAbsent(successor, new ArrayList<RoadNode>());
-//
-//				if (!adjacencyList.get(node).contains(successor)) {
-//					adjacencyList.get(node).add(successor);
-//					adjacencyList.get(successor).add(node);
-//				}
-//			}
-//		}
-//
-//		return extractRoads(adjacencyList);
-//	}
-
     private List<CityElement> extractRoads(List<Road> roads) {
         List<CityElement> roadElementsUnfiltered = new ArrayList<CityElement>();
         List<CityElement> roadElements = new ArrayList<CityElement>();
@@ -559,7 +404,7 @@ public class DistrictRoadNetwork {
                 String creator = parentElement.getSourceNodeProperty(SAPNodeProperties.creator);
                 int iteration = Integer.parseInt(parentElement.getSourceNodeProperty(SAPNodeProperties.iteration));
 
-                // iteration == 0 && creator <> SAP => origin set (to be analyzed custom code)
+                // iteration == 0 && creator != SAP => origin set (to be analyzed custom code)
                 // iteration > 0 					=> further referenced custom code
                 // creator == SAP 					=> coding of SAP standard
                 if (iteration == 0 && !creator.equals("SAP")) {
@@ -570,11 +415,6 @@ public class DistrictRoadNetwork {
             }
             parentElement = parentElement.getParentElement();
         }
-    }
-
-    private List<RoadNode> getShortestPath(RoadNode startNode, RoadNode destinationNode) {
-        RoadGraphDijkstraAlgorithm dijkstra = new RoadGraphDijkstraAlgorithm(roadGraph.getGraph());
-        return dijkstra.calculateShortestPath(startNode, destinationNode);
     }
 
     private List<List<RoadNode>> getAllShortestPaths(RoadNode startNode, RoadNode destinationNode) {
