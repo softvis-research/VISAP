@@ -1,4 +1,4 @@
-package org.visap.generator.helper;
+package org.visap.generator.helpers;
 
 public class NumericChecker {
     // Check if attribute is Numeric

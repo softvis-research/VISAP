@@ -6,7 +6,6 @@ import java.util.List;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.visap.generator.repository.CityElement;
-import org.visap.generator.repository.CityElement.CitySubType;
 
 public class RoadNodeBuilder {
 
@@ -132,14 +131,11 @@ public class RoadNodeBuilder {
 
     public RoadNode calculateDistrictSlipRoadNode(CityElement district, RoadNode slipNode) {
         double x, y;
-        CitySubType roadType;
         double roadWidth;
 
         if (district.getSourceNodeType() == SAPNodeTypes.Namespace) {
-            roadType = CitySubType.Freeway;
             roadWidth = Config.Visualization.Metropolis.roadNetwork.roadWidthFreeway();
         } else {
-            roadType = CitySubType.Street;
             roadWidth = Config.Visualization.Metropolis.roadNetwork.roadWidthStreet();
         }
 

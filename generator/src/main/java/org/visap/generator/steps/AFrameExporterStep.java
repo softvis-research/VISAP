@@ -10,7 +10,7 @@ import org.visap.generator.repository.SourceNodeRepository;
 import org.visap.generator.database.DatabaseConnector;
 import org.visap.generator.export.core.AFrameExporter;
 import org.visap.generator.export.core.MetaDataOutput;
-
+import org.visap.generator.export.features.roads.RoadExporter;
 import java.util.Scanner;
 
 public class AFrameExporterStep {
@@ -55,6 +55,9 @@ public class AFrameExporterStep {
             }
             MetropolisRoadNetworkLayouter roadNetworkLayouter = new MetropolisRoadNetworkLayouter(cityRepository, nodeRepository);
             roadNetworkLayouter.createRoadNetworks();
+
+            RoadExporter roadExporter = new RoadExporter(roadNetworkLayouter.getMainRoads(), roadNetworkLayouter.getSubRoads());
+            roadExporter.exportRoads();
         }
 
         if (!isSilentMode) {
@@ -101,7 +104,7 @@ public class AFrameExporterStep {
             connector.executeWrite("MATCH (n:ACityRep) DETACH DELETE n;");
             cityRepository.writeRepositoryToNeo4j();
         }
-        
+
         System.out.println("\nA-Frame Exporter step was completed");
         System.out.println("Model files were written to " + Config.output.mapPath());
         userInput.close();
