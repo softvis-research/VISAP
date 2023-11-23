@@ -16,15 +16,15 @@ import java.util.stream.Stream;
 
 public class CsvFilesInputFilter {
 
-    private String FolderName;
-    private String FileSuffix;
+    private String folderName;
+    private String fileSuffix;
     private String fileExtension = ".csv";
     private static final Log log = LogFactory.getLog(CsvFilesInputFilter.class);
     private static String path = Config.setup.inputCSVFilePath();
 
     public CsvFilesInputFilter(String FolderName, String FileSuffix){
-        this.FolderName = FolderName.toLowerCase();
-        this.FileSuffix = FileSuffix.toLowerCase();
+        this.folderName = FolderName.toLowerCase();
+        this.fileSuffix = FileSuffix.toLowerCase();
     }
 
     public List<Path> getFiles(){
@@ -35,7 +35,7 @@ public class CsvFilesInputFilter {
         if (files.isEmpty()){
             files = getFileFromRootWithSuffix(helper);
             if (files.size() > 1){
-                log.warn("more than one file detected\nput all files of type "+FileSuffix+" in a folder named "+ "\""+FolderName+"\"");
+                log.warn("more than one file detected\nput all files of type "+ fileSuffix +" in a folder named "+ "\""+ folderName +"\"");
                 System.exit(0);
             }
         }
@@ -48,7 +48,7 @@ public class CsvFilesInputFilter {
         try {
             files = Files.walk(Paths.get(AbsolutePath), 1)
                     .filter(Files::isDirectory)
-                    .filter(p -> p.getFileName().toString().equalsIgnoreCase(FolderName))
+                    .filter(p -> p.getFileName().toString().equalsIgnoreCase(folderName))
                     .filter(p -> !isEmptyFolder(p))
                     .collect(Collectors.toList());
         } catch (IOException e) {
@@ -76,7 +76,7 @@ public class CsvFilesInputFilter {
         try {
             files = Files.walk(Paths.get(AbsolutePath), 1)
                     .filter(Files::isRegularFile)
-                    .filter(p -> p.getFileName().toString().toLowerCase().endsWith(FileSuffix))
+                    .filter(p -> p.getFileName().toString().toLowerCase().endsWith(fileSuffix))
                     .collect(Collectors.toList());
         } catch (IOException e) {
             e.printStackTrace();

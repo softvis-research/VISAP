@@ -13,15 +13,15 @@ public class ReferencesLoaderStep {
 
     private static final DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
     private static final Log log = LogFactory.getLog(ReferencesLoaderStep.class);
-    private static final String FolderName = "References";
-    private static final String FileSuffix = "Reference.csv";
+    private static final String folderName = "References";
+    private static final String fileSuffix = "Reference.csv";
 
     public static void main(String[] args) {
 
         boolean isSilentMode = Config.setup.silentMode();
         Scanner userInput = new Scanner(System.in);
 
-        List<Path> files = new CsvFilesInputFilter(FolderName, FileSuffix).getFiles();
+        List<Path> files = new CsvFilesInputFilter(folderName, fileSuffix).getFiles();
         if (files.isEmpty()){
             log.info("Reference CSV file wasn't found");
             System.exit(0);
@@ -45,7 +45,7 @@ public class ReferencesLoaderStep {
         pathToReferenceCsv = p.toString().replace("\\", "/");
         pathToReferenceCsv = pathToReferenceCsv.replace(" ", "%20");
 
-        connector.executeWrite(
+        connector.executeWrite( //bessere bezeichner md-> , Query in strings splitten..
                 "LOAD CSV WITH HEADERS FROM \"file:///" + pathToReferenceCsv + "\"\n" +
                         "AS row FIELDTERMINATOR ';' WITH row WHERE row.MAIN_OBJ_NAME_SRC IS NOT NULL\n" +
 

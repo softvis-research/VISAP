@@ -12,15 +12,15 @@ import java.util.Scanner;
 public class NodesLoaderStep {
     private static final DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
     private static final Log log = LogFactory.getLog(NodesLoaderStep.class);
-    private static final String FolderName = "Nodes";
-    private static final String FileSuffix = "Nodes.csv";
+    private static final String folderName = "Nodes";
+    private static final String fileSuffix = "Nodes.csv";
 
     public static void main(String[] args) {
 
         boolean isSilentMode = Config.setup.silentMode();
         Scanner userInput = new Scanner(System.in);
 
-        List<Path> files = new CsvFilesInputFilter(FolderName, FileSuffix).getFiles();
+        List<Path> files = new CsvFilesInputFilter(folderName, fileSuffix).getFiles();
         if (files.isEmpty()){
             log.info("Nodes CSV file wasn't found");
             System.exit(0);

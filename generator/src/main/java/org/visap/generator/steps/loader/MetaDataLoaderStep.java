@@ -12,15 +12,15 @@ public class MetaDataLoaderStep {
 
     private static final DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
     private static final Log log = LogFactory.getLog(ReferencesLoaderStep.class);
-    private static final String FolderName = "MetaData";
-    private static final String FileSuffix = "Meta.csv";
+    private static final String folderName = "MetaData";
+    private static final String fileSuffix = "Meta.csv";
 
     public static void main(String[] args) {
 
         boolean isSilentMode = Config.setup.silentMode();
         Scanner userInput = new Scanner(System.in);
 
-        List<Path> files = new CsvFilesInputFilter(FolderName, FileSuffix).getFiles();
+        List<Path> files = new CsvFilesInputFilter(folderName, fileSuffix).getFiles();
         if (files.isEmpty()){
             log.info("Meta CSV file wasn't found");
             System.exit(0);
@@ -49,7 +49,7 @@ public class MetaDataLoaderStep {
         log.info("MetaDataLoader step was completed");
     }
 
-    private static void createLocalClassAttribute() {
+    private static void createLocalClassAttribute() { //in LoaderStep ...
         connector.executeWrite(
                 "MATCH (n:Elements)\n" +
                         "WHERE ( n.SUB_OBJ_TYPE = 'CLAS' OR n.SUB_OBJ_TYPE = 'INTF' ) AND n.SUB_SUB_OBJ_NAME IS NULL\n" +
