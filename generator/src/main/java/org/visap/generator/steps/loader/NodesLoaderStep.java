@@ -39,6 +39,15 @@ public class NodesLoaderStep {
             createNodes(p);
         }
 
+        // add attributes to all nodes
+        createNameAndTypeAttributes();
+
+        //add type_name attribute
+        addTypeNameAttributes();
+
+        //add local_class attribute
+        createLocalClassAttribute();
+
         // 2. Apply contains relations
         if (!isSilentMode) {
             log.info("Creating 'CONTAINS' relationships. Press any key to continue...");
@@ -80,6 +89,63 @@ public class NodesLoaderStep {
                         "AS row FIELDTERMINATOR ';' WITH row WHERE row.MAIN_OBJ_NAME IS NOT NULL\n" +
                         "CREATE (n:Elements)\n" +
                         "SET n = row");
+    }
+
+    private static void createLocalClassAttribute() { //in LoaderStep ...
+        connector.executeWrite(
+                "MATCH (n:Elements)\n" +
+                        "WHERE ( n.SUB_OBJ_TYPE = 'CLAS' OR n.SUB_OBJ_TYPE = 'INTF' ) AND n.SUB_SUB_OBJ_NAME IS NULL\n" +
+                        "SET n.local_class = 'true'"
+        );
+    }
+
+    private static void addTypeNameAttributes() {
+        connector.executeWrite(
+                "MATCH(n:Elements)\n" +
+                        "SET n.iteration = '0', n.type_name = CASE n.type\n" +
+                        "                    WHEN 'DEVC' THEN 'Namespace'\n" +
+                        "                    WHEN 'CLAS' THEN 'Class'\n" +
+                        "                    WHEN 'REPS' THEN 'Report'\n" +
+                        "                    WHEN 'INTF' THEN 'Interface'\n" +
+                        "                    WHEN 'FUGR' THEN 'FunctionGroup'\n" +
+                        "                    WHEN 'METH' THEN 'Method'\n" +
+                        "                    WHEN 'ATTR' THEN 'Attribute'\n" +
+                        "                    WHEN 'FUNC' THEN 'FunctionModule'\n" +
+                        "                    WHEN 'FORM' THEN 'FormRoutine'\n" +
+                        "                    WHEN 'VIEW' THEN 'View'\n" +
+                        "                    WHEN 'TABL' THEN 'Table'\n" +
+                        "                    WHEN 'STRU' THEN 'Struct'\n" +
+                        "                    WHEN 'DOMA' THEN 'Domain'\n" +
+                        "                    WHEN 'DTEL' THEN 'Dataelement'    \n" +
+                        "                    ELSE n.type\n" +
+                        "                    END"
+        );
+    }
+
+    private static void createNameAndTypeAttributes() {
+        //1. main elements
+        connector.executeWrite(
+                "MATCH(n:Elements)\n" +
+                        "WHERE n.SUB_OBJ_NAME IS NULL AND n.SUB_OBJ_TYPE IS NULL\n"+
+                        "SET n.object_name = n.MAIN_OBJ_NAME, n.type = CASE n.MAIN_OBJ_TYPE\n" +
+                        "WHEN 'PROG' THEN 'REPS'\n" +
+                        "ELSE n.MAIN_OBJ_TYPE\n" +
+                        "END"
+        );
+
+        //2. sub elements
+        connector.executeWrite(
+                "MATCH(s:Elements)\n" +
+                        "WHERE s.SUB_OBJ_NAME IS NOT NULL AND s.SUB_SUB_OBJ_NAME IS NULL\n" +
+                        "SET s.object_name = s.SUB_OBJ_NAME , s.type = s.SUB_OBJ_TYPE"
+        );
+
+        //3. sub sub elements
+        connector.executeWrite(
+                "MATCH (ss)\n" +
+                        "WHERE ss.SUB_SUB_OBJ_NAME IS NOT NULL AND ss.SUB_SUB_OBJ_TYPE IS NOT NULL \n" +
+                        "SET ss.object_name = ss.SUB_SUB_OBJ_NAME , ss.type = ss.SUB_SUB_OBJ_TYPE\n"
+        );
     }
 }
 
