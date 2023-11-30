@@ -121,7 +121,9 @@ public class MetropolisRoadNetworkLayouter {
         for (Road road : roads) {
             int amountOfRelations = this.referenceMapper.getAmountOfRelationsToACityElement(road.getStartElement(), road.getDestinationElement(), false);
             for (int i = 0; i < road.getPath().size() - 1; i++) {
-                roadElementsUnfiltered.add(createRoadACityElement(road.getPath().get(i), road.getPath().get(i + 1), district, amountOfRelations));
+                CityElement roadSection = createRoadSectionACityElement(road.getPath().get(i), road.getPath().get(i + 1), district, amountOfRelations);
+                roadElementsUnfiltered.add(roadSection);
+                road.addRoadSectionId(roadSection.getHash());
             }
         }
 
@@ -154,29 +156,29 @@ public class MetropolisRoadNetworkLayouter {
         return roadElements;
     }
 
-    private CityElement createRoadACityElement(RoadNode start, RoadNode end, CityElement district, int amountOfRelations) {
-        CityElement road = new CityElement(CityType.Road);
+    private CityElement createRoadSectionACityElement(RoadNode start, RoadNode end, CityElement district, int amountOfRelations) {
+        CityElement roadSection = new CityElement(CityType.Road);
         double roadWidth;
 
         if (amountOfRelations < 5) {
-            road.setSubType(CitySubType.Lane);
+            roadSection.setSubType(CitySubType.Lane);
             roadWidth = Config.Visualization.Metropolis.roadNetwork.roadWidthLane();
         } else if (amountOfRelations < 10) {
-            road.setSubType(CitySubType.Street);
+            roadSection.setSubType(CitySubType.Street);
             roadWidth = Config.Visualization.Metropolis.roadNetwork.roadWidthStreet();
         } else {
-            road.setSubType(CitySubType.Freeway);
+            roadSection.setSubType(CitySubType.Freeway);
             roadWidth = Config.Visualization.Metropolis.roadNetwork.roadWidthFreeway();
         }
 
-        road.setXPosition((start.getX() + end.getX()) / 2.0);
-        road.setYPosition(district.getYPosition() + districtHeight / 2.0 + roadHeight / 2.0);
-        road.setZPosition((start.getY() + end.getY()) / 2.0);
+        roadSection.setXPosition((start.getX() + end.getX()) / 2.0);
+        roadSection.setYPosition(district.getYPosition() + districtHeight / 2.0 + roadHeight / 2.0);
+        roadSection.setZPosition((start.getY() + end.getY()) / 2.0);
 
-        road.setWidth(Math.abs(start.getX() - end.getX()) + roadWidth);
-        road.setLength(Math.abs(start.getY() - end.getY()) + roadWidth);
-        road.setHeight(roadHeight);
+        roadSection.setWidth(Math.abs(start.getX() - end.getX()) + roadWidth);
+        roadSection.setLength(Math.abs(start.getY() - end.getY()) + roadWidth);
+        roadSection.setHeight(roadHeight);
 
-        return road;
+        return roadSection;
     }
 }

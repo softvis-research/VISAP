@@ -2,20 +2,19 @@ package org.visap.generator.export.features.roads;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.visap.generator.metaphors.metropolis.layouts.road.network.RoadNode;
 
 public class RoadJson {
     private static final AtomicInteger idGenerator = new AtomicInteger(1000);
     private String id;
     private String startElement;
     private String destinationElement;
-    private List<RoadNode> path;
+    private List<String> roadSections;
 
-    RoadJson(String startElement, String destinationElement, List<RoadNode> path) {
+    RoadJson(String startElement, String destinationElement, List<String> roadSectionIds) {
         this.id = "road_" + idGenerator.getAndIncrement();
         this.startElement = startElement;
         this.destinationElement = destinationElement;
-        this.path = path;
+        this.roadSections = roadSectionIds;
     }
 
     public String getId() {
@@ -30,7 +29,7 @@ public class RoadJson {
         return this.destinationElement;
     }
 
-    public List<RoadNode> getPath() {
-        return this.path;
+    public List<String> getRoadSections() {
+        return this.roadSections;
     }
 }

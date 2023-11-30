@@ -30,7 +30,7 @@ public class RoadExporter {
     public void exportRoads() {
         List<RoadJson> roadJsons = new ArrayList<RoadJson>();
         for (Road road : this.roads) {
-            roadJsons.add(new RoadJson(road.getStartElement().getHash(), road.getDestinationElement().getHash(), road.getPath()));
+            roadJsons.add(new RoadJson(road.getStartElement().getHash(), road.getDestinationElement().getHash(), road.getRoadSectionIds()));
         }
 
         ObjectMapper objectMapper = new ObjectMapper();

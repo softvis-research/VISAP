@@ -6,16 +6,17 @@ import java.util.List;
 import org.visap.generator.repository.CityElement;
 
 public class Road {
-
     private CityElement startElement;
     private CityElement destinationElement;
     private List<RoadNode> path;
+    private List<String> roadSectionIds;
 
     public Road(CityElement startElement, CityElement destinationElement) {
         this.startElement = startElement;
         this.destinationElement = destinationElement;
 
         this.path = new ArrayList<RoadNode>();
+        this.roadSectionIds = new ArrayList<String>();
     }
 
     public Road(CityElement startElement, CityElement destinationElement, List<RoadNode> path) {
@@ -23,6 +24,7 @@ public class Road {
         this.destinationElement = destinationElement;
 
         this.path = path;
+        this.roadSectionIds = new ArrayList<String>();
     }
 
     public void addRoadNodeToPath(RoadNode roadNode) {
@@ -31,6 +33,14 @@ public class Road {
 
     public void addRoadNodesToPath(List<RoadNode> roadNodes) {
         this.path.addAll(roadNodes);
+    }
+
+    public void addRoadSectionId(String roadSectionId) {
+        this.roadSectionIds.add(roadSectionId);
+    }
+
+    public void addRoadSectionIds(List<String> roadSectionIds) {
+        this.roadSectionIds.addAll(roadSectionIds);
     }
 
     public CityElement getStartElement() {
@@ -43,6 +53,10 @@ public class Road {
 
     public List<RoadNode> getPath() {
         return this.path;
+    }
+
+    public List<String> getRoadSectionIds() {
+        return this.roadSectionIds;
     }
 
     public double calculateLength() {

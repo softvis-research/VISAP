@@ -89,7 +89,7 @@ public class CityElement {
         subElements = new ArrayList<>();
 
         UUID uuid = UUID.randomUUID();
-        hash = "ID_" + uuid.toString();
+        this.hash = "ID_" + uuid.toString();
     }
 
     public Long getSourceNodeID() {
@@ -277,7 +277,7 @@ public class CityElement {
     }
 
     public String getHash() {
-        return hash;
+        return this.hash;
     }
 
     public CityType getType() {
