@@ -1,12 +1,13 @@
-package org.visap.generator.configuration;
+package org.visap.generator.configuration.interfaces;
 
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;
+import org.visap.generator.configuration.Sources;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    "file:${user.dir}/properties/local/Setup.properties",
-    "file:${user.dir}/properties/Setup.properties",
+    Sources.CONFIG_LOCAL_PATH + "Setup.properties",
+    Sources.CONFIG_PATH + "Setup.properties",
 })
 public interface Setup extends Config {
     @DefaultValue("bolt://localhost:7687")

@@ -38,7 +38,7 @@ Then, start the database. The authorization being disabled may cause warnings on
 
 The resulting model files (model.html and metaData.json) are placed in the ui/model/yourOutput folder by default. This folder also includes an example sub-directory.
 
-To change your input location, you can change the ``inputCSVFilePath`` property inside the ``generator/properties/Setup.properties`` file. Similarly, to change your output location, you can change the ``mapPath`` property inside the ``generator/properties/Output.properties`` file.
+To change your input location, you can change the ``inputCSVFilePath`` property inside the ``generator/properties/local/Setup.properties`` file. Similarly, to change your output location, you can change the ``mapPath`` property inside the ``generator/properties/local/Output.properties`` file. See [Configuration](#configuration) for further details on how the configuration works.
 
 ### Displaying a Model in the Browser
 
@@ -94,13 +94,15 @@ If you need help or have any suggestions, we appreciate your interest in the pro
 
 Configuration files are essential for building projects with different settings, and they can be managed project-wide or locally.
 
-To manage configurations project-wide, you can make changes to the ``generator/properties`` file. These changes will not be ignored by Git. However, if you want to make local changes to your configuration, you can create a new subfolder in the ``generator`` folder called ``user-properties``, and set your configurations there similarly to how you would in ``generator/properties``. All changes made in this folder will be ignored by Git and will overwrite existing configurations.
+Local settings can be modified under ``generator/properties/local/`` while project-wide settings can be managed under ``generator/properties/master/`` by default. These defaults can be changed under ``generator/src/main/java/org/visap/generator/configuration/Sources.java``.
 
-For example, if you want to specify a password for authentication to Neo4j, you can do so by creating a file ``generator/user-properties/Setup.properties``. In here, write:
+For example, if you want to specify a password for authentication to Neo4j, you can do so by creating a file named ``generator/local/Setup.properties``. In here, write:
 ```properties
 password=123
 ```
-to set your password to 123. Also remember to enable authentication for your Neo4j database again, if you disabled it before.
+to set your password to 123. Remember to enable authentication for your Neo4j database again, if you disabled it before.
+
+To create new configuration options, you can either add to existing Configuration interfaces in ``generator/src/main/java/org/visap/generator/configuration/interfaces`` or create your own. When creating a new interface, make sure to include it in the ``generator/src/main/java/org/visap/generator/configuration/Config.java`` file, which defines the API for interacting with the project configuration values.
 
 ## Coding Standards
 

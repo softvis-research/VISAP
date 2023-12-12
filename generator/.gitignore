@@ -17,6 +17,7 @@ properties/local/*
 
 # CSV file input
 /input/*
+!/input/master/
 !/input/example/
 !/input/*Example/
 

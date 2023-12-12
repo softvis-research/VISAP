@@ -10,6 +10,9 @@ const setup = {
 			name: "canvasHoverController",
 		},
 		{
+			name: "metricController",
+		},
+		{
 			name: "canvasSelectController",
 		},
 		{
@@ -29,9 +32,8 @@ const setup = {
 		area: {
 			name: "top",
 			orientation: "horizontal",
-			first: {},
-			second: {
-				size: "100%",
+			first: {
+				size: "80%",
 				collapsible: false,
 				name: "canvas",
 				canvas: {},
@@ -41,6 +43,16 @@ const setup = {
 					{ name: "canvasHoverController" },
 					{ name: "canvasSelectController" },
 					{ name: "relationController" },
+				],
+			},
+			second: {
+				size: "20%",
+				collapsible: false,
+				name: "metrics",
+				metrics: {},
+
+				controllers: [
+					{ name: "metricController" },
 				],
 			}
 		}

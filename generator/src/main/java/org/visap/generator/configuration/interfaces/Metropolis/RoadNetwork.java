@@ -1,4 +1,4 @@
-package org.visap.generator.configuration.Metropolis;
+package org.visap.generator.configuration.interfaces.Metropolis;
 
 import org.aeonbits.owner.Config;
 

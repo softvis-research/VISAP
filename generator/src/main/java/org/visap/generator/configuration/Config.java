@@ -1,7 +1,11 @@
 package org.visap.generator.configuration;
 
 import org.aeonbits.owner.ConfigFactory;
-import org.visap.generator.configuration.Metropolis.*;
+import org.visap.generator.configuration.interfaces.Assets;
+import org.visap.generator.configuration.interfaces.Features;
+import org.visap.generator.configuration.interfaces.Output;
+import org.visap.generator.configuration.interfaces.Setup;
+import org.visap.generator.configuration.interfaces.Metropolis.*;
 
 public class Config {
     public static Setup setup = ConfigFactory.create(Setup.class);
