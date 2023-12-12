@@ -43,6 +43,11 @@ public class Road {
         this.roadSectionIds.addAll(roadSectionIds);
     }
 
+    public void substituteRoadSectionId(String oldRoadSectionId, String newRoadSectionId) {
+        int index = this.roadSectionIds.indexOf(oldRoadSectionId);
+        this.roadSectionIds.set(index, newRoadSectionId);
+    }
+
     public CityElement getStartElement() {
         return this.startElement;
     }

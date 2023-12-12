@@ -144,12 +144,19 @@ public class MetropolisRoadNetworkLayouter {
         });
 
         for (int i = 0; i < roadElementsUnfiltered.size() - 1; i++) {
-            if (i == roadElementsUnfiltered.size() - 2) {
-                roadElements.add(roadElementsUnfiltered.get(i + 1));
-            }
-
             if (roadElementsUnfiltered.get(i).getXPosition() != roadElementsUnfiltered.get(i + 1).getXPosition() || roadElementsUnfiltered.get(i).getZPosition() != roadElementsUnfiltered.get(i + 1).getZPosition()) {
                 roadElements.add(roadElementsUnfiltered.get(i));
+            } else {
+                // This is a duplicate of the next road section. Find the road it belongs to and substitute the ID of the road section it will be filtered in favor of.
+                for (Road road : roads) {
+                    if (road.getRoadSectionIds().contains(roadElementsUnfiltered.get(i).getHash())) {
+                        road.substituteRoadSectionId(roadElementsUnfiltered.get(i).getHash(), roadElementsUnfiltered.get(i + 1).getHash());
+                    }
+                }
+            }
+
+            if (i == roadElementsUnfiltered.size() - 2) {
+                roadElements.add(roadElementsUnfiltered.get(i + 1));
             }
         }
 
