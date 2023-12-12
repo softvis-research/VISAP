@@ -192,6 +192,10 @@ public class CityReferenceMapper implements ICityRelationMapper {
     }
 
     private CityElement getAggregatedObject(CityElement element, RelationAggregationLevel aggregationLevel) {
+        if (element == null) {
+            return null;
+        }
+        
         if (this.mapToAggregationLevel(element) == aggregationLevel) {
             return element;
         }
