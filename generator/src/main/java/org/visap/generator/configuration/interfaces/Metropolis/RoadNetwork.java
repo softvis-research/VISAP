@@ -1,11 +1,12 @@
 package org.visap.generator.configuration.interfaces.Metropolis;
 
+import org.visap.generator.configuration.Sources;
 import org.aeonbits.owner.Config;
 
 @Config.LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-        "file:${user.dir}/properties/local/RoadNetwork.properties",
-        "file:${user.dir}/properties/RoadNetwork.properties",
+    Sources.CONFIG_LOCAL_PATH + "metropolis/RoadNetwork.properties",
+    Sources.CONFIG_PATH + "metropolis/RoadNetwork.properties",
 })
 public interface RoadNetwork extends Config {
 
