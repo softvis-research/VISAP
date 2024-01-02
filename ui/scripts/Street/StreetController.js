@@ -1,0 +1,3 @@
+controllers.streetController = function () {
+// TODO
+}();
