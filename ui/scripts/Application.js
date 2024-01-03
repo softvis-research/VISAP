@@ -88,9 +88,10 @@ controllers.application = (function () {
 	function getResourcePaths() {
 		// parse URL arguments
 		const searchParams = new URLSearchParams(window.location.search);
-		const modelName = searchParams.get('model') || defaultModelName;
-		const modelDir = searchParams.get('srcDir') || defaultModelDir;
-		const setupName = searchParams.get('setup') || defaultSetupName;
+		// lowercase the first letter of each param to dodge auto-capitals in URI by browsers
+		const modelName = searchParams.get('model').charAt(0).toLowerCase() + str.slice(1) || defaultModelName;
+		const modelDir = searchParams.get('srcDir').charAt(0).toLowerCase() + str.slice(1) || defaultModelDir;
+		const setupName = searchParams.get('setup').charAt(0).toLowerCase() + str.slice(1) || defaultSetupName;
 
 		return {
 			modelPath: `${modelDir}/${modelName}/model.html`,
