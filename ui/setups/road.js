@@ -14,12 +14,11 @@ const setup = {
 		},
 		{
 			name: "roadController",
-			sourceStartAtBorder: false,
-			targetEndAtBorder: false,
-			showInnerRelations: true,
-			curvedConnectors: true,
-
-			connectorColor: { r: 0, g: 0, b: 1 },
+			guideMode: "coloredRoads"
+			roadColorCalls: { r: 0, g: 0, b: 1 },
+			roadColorIsCalled: { r: 1, g: 0, b: 1 },
+			roadColorBidirectional: { r: 1, g: 0, b: 1 },
+			roadColorAmbiguous: { r: 0, g: 0, b: 0 },
 		},
 	],
 
