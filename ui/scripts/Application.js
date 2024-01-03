@@ -15,6 +15,7 @@ async function initializeApplication() {
 	// parsing the setup happens later, since it requires controllers to be running
 	const setupLoaded = application.startLoadingSetup(paths.setupPath, paths.defaultSetupPath);
 	const metadataLoaded = application.startLoadingMetadata(paths.metadataPath, paths.defaultMetadataPath);
+	const streetsLoaded = application.startLoadingStreets(paths.streetsPath, paths.defaultStreetsPath);
 	const modelLoaded = application.startLoadingModel(paths.modelPath, paths.defaultModeLPath);
 
 	try {
@@ -88,18 +89,19 @@ controllers.application = (function () {
 	function getResourcePaths() {
 		// parse URL arguments
 		const searchParams = new URLSearchParams(window.location.search);
-		// lowercase the first letter of each param to dodge auto-capitals in URI by browsers
-		const modelName = searchParams.get('model').charAt(0).toLowerCase() + str.slice(1) || defaultModelName;
-		const modelDir = searchParams.get('srcDir').charAt(0).toLowerCase() + str.slice(1) || defaultModelDir;
-		const setupName = searchParams.get('setup').charAt(0).toLowerCase() + str.slice(1) || defaultSetupName;
+		const modelName = searchParams.get('model') || defaultModelName
+        const modelDir = searchParams.get('srcDir') || defaultModelDir
+        const setupName = searchParams.get('setup') || defaultSetupName
 
 		return {
 			modelPath: `${modelDir}/${modelName}/model.html`,
 			metadataPath: `${modelDir}/${modelName}/metaData.json`,
+			streetsPath: `${modelDir}/${modelName}/roads.json`, // LD: TODO: Change roads.json to streets.json
 			setupPath: `setups/${setupName}.js`,
 
-			defaultModeLPath: `${defaultModelDir}/${defaultModelName}/model.html`,
+			defaultModeLPath: `${defaultModelDir}/${defaultModelName}/model.html`, // LD: TODO: Fix typo (ModelL)
 			defaultMetadataPath: `${defaultModelDir}/${defaultModelName}/metaData.json`,
+			defaultStreetsPath: `${defaultModelDir}/${defaultModelName}/roads.json`,
 			defaultSetupPath: `setups/${defaultSetupName}.js`,
 		};
 	}
@@ -139,6 +141,24 @@ controllers.application = (function () {
 				model.createEntititesFromMetadata(metadataJson);
 		});
 	}
+
+	async function startLoadingStreets(streetsPath, defaultStreetsPath) {
+    		return fetch(encodeURI(streetsPath))
+    			.then((response) => {
+    				if (!response.ok) throw new Error(response);
+    				return response;
+    			}).catch(response => {
+    				const errorMessage = "Failed to load streets: " + mapResponseToErrorMessage(response, streetsPath) + "\n" + "Loading default streets instead.";
+    				alert(errorMessage);
+    				return fetch(encodeURI(defaultStreetsPath));
+    			}).then(response => {
+    				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultStreetsPath));
+    				else return response.json();
+    			}).then(streetsJson => {
+    				model.initialize();
+    				model.createEntitiesFromStreets(streetsJson);
+    		});
+    	}
 
 	async function startLoadingModel(modelPath, defaultModeLPath) {
 		return fetch(encodeURI(modelPath))
@@ -334,6 +354,7 @@ controllers.application = (function () {
 
 		startLoadingSetup: startLoadingSetup,
 		startLoadingMetadata: startLoadingMetadata,
+		startLoadingStreets: startLoadingStreets,
 		startLoadingModel: startLoadingModel
 	};
 })();
