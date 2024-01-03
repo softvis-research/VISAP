@@ -1,3 +1,4 @@
 controllers.streetController = function () {
-// TODO
+	return {
+	};
 }();
