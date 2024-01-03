@@ -1,4 +1,0 @@
-controllers.streetController = function () {
-	return {
-	};
-}();

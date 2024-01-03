@@ -13,7 +13,7 @@ const setup = {
 			name: "canvasSelectController",
 		},
 		{
-			name: "streetController",
+			name: "roadController",
 			sourceStartAtBorder: false,
 			targetEndAtBorder: false,
 			showInnerRelations: true,
@@ -40,7 +40,7 @@ const setup = {
 					{ name: "defaultLogger" },
 					{ name: "canvasHoverController" },
 					{ name: "canvasSelectController" },
-					{ name: "streetController" },
+					{ name: "roadController" },
 				],
 			}
 		}

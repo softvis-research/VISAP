@@ -15,7 +15,7 @@ async function initializeApplication() {
 	// parsing the setup happens later, since it requires controllers to be running
 	const setupLoaded = application.startLoadingSetup(paths.setupPath, paths.defaultSetupPath);
 	const metadataLoaded = application.startLoadingMetadata(paths.metadataPath, paths.defaultMetadataPath);
-	const streetsLoaded = application.startLoadingStreets(paths.streetsPath, paths.defaultStreetsPath);
+	const roadsLoaded = application.startLoadingRoads(paths.roadsPath, paths.defaultRoadsPath);
 	const modelLoaded = application.startLoadingModel(paths.modelPath, paths.defaultModeLPath);
 
 	try {
@@ -96,12 +96,12 @@ controllers.application = (function () {
 		return {
 			modelPath: `${modelDir}/${modelName}/model.html`,
 			metadataPath: `${modelDir}/${modelName}/metaData.json`,
-			streetsPath: `${modelDir}/${modelName}/roads.json`, // LD: TODO: Change roads.json to streets.json
+			roadsPath: `${modelDir}/${modelName}/roads.json`,
 			setupPath: `setups/${setupName}.js`,
 
 			defaultModeLPath: `${defaultModelDir}/${defaultModelName}/model.html`, // LD: TODO: Fix typo (ModelL)
 			defaultMetadataPath: `${defaultModelDir}/${defaultModelName}/metaData.json`,
-			defaultStreetsPath: `${defaultModelDir}/${defaultModelName}/roads.json`,
+			defaultRoadsPath: `${defaultModelDir}/${defaultModelName}/roads.json`,
 			defaultSetupPath: `setups/${defaultSetupName}.js`,
 		};
 	}
@@ -142,21 +142,21 @@ controllers.application = (function () {
 		});
 	}
 
-	async function startLoadingStreets(streetsPath, defaultStreetsPath) {
-    		return fetch(encodeURI(streetsPath))
+	async function startLoadingRoads(roadsPath, defaultRoadsPath) {
+    		return fetch(encodeURI(roadsPath))
     			.then((response) => {
     				if (!response.ok) throw new Error(response);
     				return response;
     			}).catch(response => {
-    				const errorMessage = "Failed to load streets: " + mapResponseToErrorMessage(response, streetsPath) + "\n" + "Loading default streets instead.";
+    				const errorMessage = "Failed to load roads: " + mapResponseToErrorMessage(response, roadsPath) + "\n" + "Loading default roads instead.";
     				alert(errorMessage);
-    				return fetch(encodeURI(defaultStreetsPath));
+    				return fetch(encodeURI(defaultRoadsPath));
     			}).then(response => {
-    				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultStreetsPath));
+    				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultroadsPath));
     				else return response.json();
-    			}).then(streetsJson => {
-    				model.initialize();
-    				model.createEntitiesFromStreets(streetsJson);
+    			}).then(RoadsJson => {
+    				model.initialize(); // LD TODO: Check if we need another model init or if it is sufficient to do it in metaData loading...
+    				model.createEntitiesFromRoads(roadsJson);
     		});
     	}
 
@@ -354,7 +354,7 @@ controllers.application = (function () {
 
 		startLoadingSetup: startLoadingSetup,
 		startLoadingMetadata: startLoadingMetadata,
-		startLoadingStreets: startLoadingStreets,
+		startLoadingRoads: startLoadingRoads,
 		startLoadingModel: startLoadingModel
 	};
 })();
