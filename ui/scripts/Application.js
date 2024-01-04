@@ -15,7 +15,7 @@ async function initializeApplication() {
 	// parsing the setup happens later, since it requires controllers to be running
 	const setupLoaded = application.startLoadingSetup(paths.setupPath, paths.defaultSetupPath);
 	const metadataLoaded = application.startLoadingMetadata(paths.metadataPath, paths.defaultMetadataPath);
-	const roadsLoaded = application.startLoadingRoads(paths.roadsPath, paths.defaultRoadsPath);
+	const roadsDataLoaded = application.startLoadingRoadsData(paths.roadsDataPath, paths.defaultRoadsDataPath); // LD TODO: Inbound
 	const modelLoaded = application.startLoadingModel(paths.modelPath, paths.defaultModeLPath);
 
 	try {
@@ -96,12 +96,12 @@ controllers.application = (function () {
 		return {
 			modelPath: `${modelDir}/${modelName}/model.html`,
 			metadataPath: `${modelDir}/${modelName}/metaData.json`,
-			roadsPath: `${modelDir}/${modelName}/roads.json`,
+			roadsDataPath: `${modelDir}/${modelName}/roads.json`,
 			setupPath: `setups/${setupName}.js`,
 
 			defaultModeLPath: `${defaultModelDir}/${defaultModelName}/model.html`, // LD: TODO: Fix typo (ModelL)
 			defaultMetadataPath: `${defaultModelDir}/${defaultModelName}/metaData.json`,
-			defaultRoadsPath: `${defaultModelDir}/${defaultModelName}/roads.json`,
+			defaultRoadsDataPath: `${defaultModelDir}/${defaultModelName}/roads.json`,
 			defaultSetupPath: `setups/${defaultSetupName}.js`,
 		};
 	}
@@ -142,21 +142,20 @@ controllers.application = (function () {
 		});
 	}
 
-	async function startLoadingRoads(roadsPath, defaultRoadsPath) {
-    		return fetch(encodeURI(roadsPath))
+	async function startLoadingRoadsData(roadsDataPath, defaultRoadsDataPath) {
+    		return fetch(encodeURI(roadsDataPath))
     			.then((response) => {
     				if (!response.ok) throw new Error(response);
     				return response;
     			}).catch(response => {
-    				const errorMessage = "Failed to load roads: " + mapResponseToErrorMessage(response, roadsPath) + "\n" + "Loading default roads instead.";
+    				const errorMessage = "Failed to load roads data: " + mapResponseToErrorMessage(response, roadsDataPath) + "\n" + "Loading default roads instead.";
     				alert(errorMessage);
-    				return fetch(encodeURI(defaultRoadsPath));
+    				return fetch(encodeURI(defaultRoadsDataPath));
     			}).then(response => {
-    				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultroadsPath));
+    				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultRoadsDataPath));
     				else return response.json();
-    			}).then(RoadsJson => {
-    				model.initialize(); // LD TODO: Check if we need another model init or if it is sufficient to do it in metaData loading...
-    				model.createEntitiesFromRoads(roadsJson);
+    			}).then(roadsDataJson => {
+    				model.createRoadEntitiesFromRoadsData(roadsDataJson);
     		});
     	}
 
@@ -354,7 +353,7 @@ controllers.application = (function () {
 
 		startLoadingSetup: startLoadingSetup,
 		startLoadingMetadata: startLoadingMetadata,
-		startLoadingRoads: startLoadingRoads,
+		startLoadingRoadsData: startLoadingRoadsData,
 		startLoadingModel: startLoadingModel
 	};
 })();

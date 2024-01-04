@@ -197,6 +197,13 @@ controllers.model = (function () {
 		return newElements;
 	}
 
+	// LD TODO: Discuss how to name this.
+	function createRoadEntitiesFromRoadsData(roadsDataArray) {
+		// LD TODO: Change data structure namings of roads DTO (into snake case)
+		console.log("Loaded and passed roads Data!")
+	}
+
+
 	function splitByCommaIfNotEmpty(string) {
 		if (string) {
 			return string.split(',').map(element => element.trim());
@@ -449,6 +456,7 @@ controllers.model = (function () {
 		createEntity: createEntity,
 		removeEntity: removeEntity,
 		createEntititesFromMetadata: createEntititesFromMetadata,
+		createRoadEntitiesFromRoadsData: createRoadEntitiesFromRoadsData,
 	};
 
 })();
