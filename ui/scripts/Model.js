@@ -197,10 +197,20 @@ controllers.model = (function () {
 		return newElements;
 	}
 
-	// LD TODO: Discuss how to name this.
 	function createRoadEntitiesFromRoadsData(roadsDataArray) {
-		// LD TODO: Change data structure namings of roads DTO (into snake case)
-		console.log("Loaded and passed roads Data!")
+		console.log("Loaded and passed roads Data!");
+		
+		// LD TODO: handle further modelling and error/case-handling (e.g. empty values, duplicates, ...) here.  
+		const roadEntities = roadsDataArray.map((roadData) => {
+			return {
+				id: roadData.id,
+				startElement: roadData.start_element,
+				destinationElement: roadData.destination_element,
+				roadSections: roadData.road_sections
+			};
+		});
+	
+		return roadEntities;
 	}
 
 
