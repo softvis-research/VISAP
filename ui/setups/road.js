@@ -14,7 +14,7 @@ const setup = {
 		},
 		{
 			name: "roadController",
-			guideMode: "coloredRoads"
+			guideMode: "coloredRoads",
 			roadColorCalls: { r: 0, g: 0, b: 1 },
 			roadColorIsCalled: { r: 1, g: 0, b: 1 },
 			roadColorBidirectional: { r: 1, g: 0, b: 1 },
