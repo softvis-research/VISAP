@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import org.visap.generator.metaphors.metropolis.layouts.road.network.Road;
 import org.visap.generator.configuration.Config;
 
@@ -34,6 +35,8 @@ public class RoadExporter {
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+
         try {
             FileWriter fileWriter = constructFileWriter();
             objectMapper.writeValue(fileWriter, roadJsons);
