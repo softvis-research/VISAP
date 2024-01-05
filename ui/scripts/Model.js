@@ -6,6 +6,9 @@ controllers.model = (function () {
 	let eventEntityMap = new Map();
 	let entitiesByContainedUnloadedProperty = new Map();
 
+	let roadRelationsStartElementDestinationElementMap = new Map();
+	let roadRelationsStartElementRoadSectionsMap = new Map();
+
 	function initialize() {
 		//subscribe for changing status of entities on events
 		states.forEach(function (eventName) {
@@ -197,22 +200,40 @@ controllers.model = (function () {
 		return newElements;
 	}
 
-	function createRoadEntitiesFromRoadsData(roadsDataArray) {
-		console.log("Loaded and passed roads Data!");
-		
-		// LD TODO: handle further modelling and error/case-handling (e.g. empty values, duplicates, ...) here.  
-		const roadEntities = roadsDataArray.map((roadData) => {
-			return {
-				id: roadData.id,
-				startElement: roadData.start_element,
-				destinationElement: roadData.destination_element,
-				roadSections: roadData.road_sections
-			};
-		});
-	
-		return roadEntities;
-	}
+	function createRoadRelationsFromRoadsData(roadsDataArray) {
+		const roadRelations = [];
 
+		roadsDataArray.forEach(function (entry) {
+
+			let roadRelation = createRoadRelation(
+				entry.id,
+				entry.start_element,
+				entry.destination_element,
+				entry.road_sections,
+			);
+
+		// set up startElement -> RoadSections map; duplicates removed
+		if (roadRelationsStartElementRoadSectionsMap.has(roadRelation.startElementId)) {
+			const existingSections = roadRelationsStartElementRoadSectionsMap.get(roadRelation.startElementId);
+			const updatedSections = removeDuplicates([...existingSections, ...roadRelation.roadSectionsIds]);
+			roadRelationsStartElementRoadSectionsMap.set(roadRelation.startElementId, updatedSections);
+		} else {
+			roadRelationsStartElementRoadSectionsMap.set(roadRelation.startElementId, removeDuplicates([...roadRelation.roadSectionsIds]));
+		}
+
+		// set up startElement -> DestinationElement(s) map; duplicates removed
+		if (roadRelationsStartElementDestinationElementMap.has(roadRelation.startElementId)) {
+			const existingDestinations = roadRelationsStartElementDestinationElementMap.get(roadRelation.startElementId);
+			const updatedDestinations = removeDuplicates([...existingDestinations, roadRelation.destinationElementId]);
+			roadRelationsStartElementDestinationElementMap.set(roadRelation.startElementId, updatedDestinations);
+		} else {
+			roadRelationsStartElementDestinationElementMap.set(roadRelation.startElementId, [roadRelation.destinationElementId]);
+		}
+
+			roadRelations.push(roadRelation);
+		});
+		return roadRelations;
+	}
 
 	function splitByCommaIfNotEmpty(string) {
 		if (string) {
@@ -403,6 +424,32 @@ controllers.model = (function () {
 		return entity;
 	}
 
+	function createRoadRelation(roadRelationId, startElementId, destinationElementId, roadSectionsIds) {
+		let roadRelation = {
+			roadRelationId,
+			startElementId,
+			destinationElementId,
+			roadSectionsIds,
+		}
+		return roadRelation;
+	}
+
+	function getAllRoadSectionsForStartElement(startElementId) {
+		if (roadRelationsStartElementRoadSectionsMap.has(startElementId)) {
+			return roadRelationsStartElementRoadSectionsMap.get(startElementId);
+		} else {
+			return [];
+		}
+	}
+
+	function getAllRoadDestinationElementsForStartElement(startElementId) {
+		if (roadRelationsStartElementDestinationElementMap.has(startElementId)) {
+			return roadRelationsStartElementDestinationElementMap.get(startElementId);
+		} else {
+			return [];
+		}
+	}
+
 	function removeEntity(id) {
 		entitiesById.delete(id);
 	}
@@ -466,7 +513,10 @@ controllers.model = (function () {
 		createEntity: createEntity,
 		removeEntity: removeEntity,
 		createEntititesFromMetadata: createEntititesFromMetadata,
-		createRoadEntitiesFromRoadsData: createRoadEntitiesFromRoadsData,
+
+		createRoadRelationsFromRoadsData: createRoadRelationsFromRoadsData,
+		getAllRoadSectionsForStartElement: getAllRoadSectionsForStartElement,
+		getAllRoadDestinationElementsForStartElement: getAllRoadDestinationElementsForStartElement
 	};
 
 })();
