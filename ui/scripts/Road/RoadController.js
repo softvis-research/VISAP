@@ -10,7 +10,7 @@ controllers.roadController = function () {
 		activeRoadOffsetY: 0.1,
 
 		supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"]
-    }
+	}
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
@@ -25,37 +25,31 @@ controllers.roadController = function () {
 		const entityType = applicationEvent.entities[0].type;
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
 			startElement = [applicationEvent.entities[0]]
-			console.log(startElement)
 			const roadSections = model.getAllRoadSectionsForStartElement(startElement[0].id)
-			console.log(roadSections)
 			roadSections.forEach(roadSection => {
-				const dto = [{
-					id: roadSection
-				}]
-				canvasManipulator.highlightEntities(dto, "red", { name: "roadController" });
-				canvasManipulator.alterPositionOfEntities(dto, controllerConfig.activeRoadOffsetY)
+				const roadSectionDTO = [{ id: roadSection }] // create DTO to match required input of canvasManipulator
+				canvasManipulator.highlightEntities(roadSectionDTO, "white", { name: "roadController" });
+				canvasManipulator.alterPositionOfEntities(roadSectionDTO, controllerConfig.activeRoadOffsetY) // Y offset to dodge overlaps
 			});
-			
+
 			canvasManipulator.highlightEntities(startElement, "red", { name: "roadController" });
-		  } else {
-		  }
+		} else {
+			return;
+		}
 	}
 
 	function onEntityDeselected(applicationEvent) {
 		startElementId = [applicationEvent.entities[0]]
 		const roadSections = model.getAllRoadSectionsForStartElement(startElement[0].id)
 		roadSections.forEach(roadSection => {
-			const dto = [{
-				id: roadSection
-			}]
-			canvasManipulator.resetColorOfEntities(dto, { name: "roadController" });
-			canvasManipulator.alterPositionOfEntities(dto, - controllerConfig.activeRoadOffsetY)
+			const roadSectionDTO = [{ id: roadSection }] // create DTO to match required input of canvasManipulator
+			canvasManipulator.resetColorOfEntities(roadSectionDTO, { name: "roadController" });
+			canvasManipulator.alterPositionOfEntities(roadSectionDTO, - controllerConfig.activeRoadOffsetY) // undo Y offset
 
 		});
 		canvasManipulator.resetColorOfEntities(startElementId, { name: "roadController" })
 	}
 
-	// LD TODO: Implement me.
 	return {
 		initialize: initialize,
 	};
