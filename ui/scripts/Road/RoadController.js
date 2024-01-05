@@ -22,15 +22,31 @@ controllers.roadController = function () {
 	function onEntitySelected(applicationEvent) {
 		const entityType = applicationEvent.entities[0].type;
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
-			startElementId = [applicationEvent.entities[0]]
-			console.log(startElementId)
-			canvasManipulator.highlightEntities(startElementId, "green", { name: "roadController" });
+			startElement = [applicationEvent.entities[0]]
+			console.log(startElement)
+			const roadSections = model.getAllRoadSectionsForStartElement(startElement[0].id)
+			console.log(roadSections)
+			roadSections.forEach(roadSection => {
+				const dto = [{
+					id: roadSection
+				}]
+				canvasManipulator.highlightEntities(dto, "red", { name: "roadController" });
+			});
+			
+			canvasManipulator.highlightEntities(startElement, "red", { name: "roadController" });
 		  } else {
 		  }
 	}
 
 	function onEntityDeselected(applicationEvent) {
 		startElementId = [applicationEvent.entities[0]]
+		const roadSections = model.getAllRoadSectionsForStartElement(startElement[0].id)
+		roadSections.forEach(roadSection => {
+			const dto = [{
+				id: roadSection
+			}]
+			canvasManipulator.resetColorOfEntities(dto, { name: "roadController" });
+		});
 		canvasManipulator.resetColorOfEntities(startElementId, { name: "roadController" })
 	}
 
