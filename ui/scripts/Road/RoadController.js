@@ -43,12 +43,18 @@ controllers.roadController = function () {
 		const roadSections = model.getAllRoadSectionsForStartElement(startElement[0].id)
 		roadSections.forEach(roadSection => {
 			const roadSectionDTO = [{ id: roadSection }] // create DTO to match required input of canvasManipulator
-			canvasManipulator.resetColorOfEntities(roadSectionDTO, { name: "roadController" });
+			canvasManipulator.unhighlightEntities(roadSectionDTO, { name: "roadController" });
 			canvasManipulator.alterPositionOfEntities(roadSectionDTO, - controllerConfig.activeRoadOffsetY) // undo Y offset
 
 		});
 		canvasManipulator.resetColorOfEntities(startElementId, { name: "roadController" })
 	}
+
+	// function showRoadGuideForStartElement(startElementId) {
+	// 	const roadSectionsStartElement = model.getAllRoadSectionsForStartElement(startElementId)
+	// 	const destinationElements = model.getAllRoadDestinationElementsForStartElement(startElementId)
+	// 	const roadSectionsDestinationElement = model.
+	// }
 
 	return {
 		initialize: initialize,
