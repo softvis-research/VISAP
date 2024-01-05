@@ -31,6 +31,7 @@ controllers.roadController = function () {
 					id: roadSection
 				}]
 				canvasManipulator.highlightEntities(dto, "red", { name: "roadController" });
+				canvasManipulator.alterPositionOfEntities(dto, 1)
 			});
 			
 			canvasManipulator.highlightEntities(startElement, "red", { name: "roadController" });

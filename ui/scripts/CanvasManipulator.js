@@ -407,6 +407,25 @@ controllers.canvasManipulator = (function () {
 		});
 	}
 
+	function alterPositionOfEntities(entities, deltaY) {
+		entities.forEach(function (entity) {
+			const component = document.getElementById(entity.id);
+			if (!component) {
+				events.log.error.publish({ text: "CanvasManipulator - alterPositionOfEntities - component for entityId not found" });
+				return;
+			}
+	
+			const currentPosition = component.getAttribute("position");
+			const newYPosition = currentPosition.y + deltaY;
+	
+			component.setAttribute("position", {
+				x: currentPosition.x,
+				y: newYPosition,
+				z: currentPosition.z
+			});
+		});
+	}
+
 	return {
 		initialize: initialize,
 		reset: reset,
@@ -438,7 +457,9 @@ controllers.canvasManipulator = (function () {
 		addElementsFromAframeData: addElementsFromAframeData,
 		loadAsHiddenFromAframeData: loadAsHiddenFromAframeData,
 
-		waitForRenderOfElement: waitForRenderOfElement
+		waitForRenderOfElement: waitForRenderOfElement,
+
+		alterPositionOfEntities: alterPositionOfEntities
 	};
 
 })
