@@ -19,6 +19,12 @@ const setup = {
 			roadColorIsCalled: { r: 1, g: 0, b: 1 },
 			roadColorBidirectional: { r: 1, g: 0, b: 1 },
 			roadColorAmbiguous: { r: 0, g: 0, b: 0 },
+
+			triggeredOffsetZ: 0.1,
+
+			supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"]
+
+
 		},
 	],
 

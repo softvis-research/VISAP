@@ -7,6 +7,8 @@ controllers.roadController = function () {
 		roadColorBidirectional: { r: 1, g: 0, b: 1 },
 		roadColorAmbiguous: { r: 0, g: 1, b: 0 },
 
+		activeRoadOffsetY: 0.1,
+
 		supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"]
     }
 
@@ -31,7 +33,7 @@ controllers.roadController = function () {
 					id: roadSection
 				}]
 				canvasManipulator.highlightEntities(dto, "red", { name: "roadController" });
-				canvasManipulator.alterPositionOfEntities(dto, 1)
+				canvasManipulator.alterPositionOfEntities(dto, controllerConfig.activeRoadOffsetY)
 			});
 			
 			canvasManipulator.highlightEntities(startElement, "red", { name: "roadController" });
@@ -47,7 +49,7 @@ controllers.roadController = function () {
 				id: roadSection
 			}]
 			canvasManipulator.resetColorOfEntities(dto, { name: "roadController" });
-			canvasManipulator.alterPositionOfEntities(dto, -1)
+			canvasManipulator.alterPositionOfEntities(dto, - controllerConfig.activeRoadOffsetY)
 
 		});
 		canvasManipulator.resetColorOfEntities(startElementId, { name: "roadController" })
