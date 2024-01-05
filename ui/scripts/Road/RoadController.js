@@ -47,6 +47,8 @@ controllers.roadController = function () {
 				id: roadSection
 			}]
 			canvasManipulator.resetColorOfEntities(dto, { name: "roadController" });
+			canvasManipulator.alterPositionOfEntities(dto, -1)
+
 		});
 		canvasManipulator.resetColorOfEntities(startElementId, { name: "roadController" })
 	}
