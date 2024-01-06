@@ -17,6 +17,7 @@ controllers.roadController = function () {
 
 	}
 
+	let legendDivElement;
 	let emphasizedRoadSectionStates = new Map();
 
 	function initialize(setupConfig) {
@@ -25,7 +26,7 @@ controllers.roadController = function () {
 		// LD TODO: Add logic for guideMode helper initialization here (if we plan to implement multiple modes)
 
 		application.loadCSS("scripts/Road/legend.css");
-        createLegend()
+		createLegend()
 		events.selected.on.subscribe(onEntitySelected);
 		events.selected.off.subscribe(onEntityUnselected);
 	}
@@ -37,6 +38,7 @@ controllers.roadController = function () {
 			canvasManipulator.highlightEntities(startElement, "red", { name: "roadController" });
 			startElementId = startElement[0].id
 			handleRoadEmphasizingForStartElement(startElementId)
+			showLegend() 
 		} else {
 			return;
 		}
@@ -82,23 +84,28 @@ controllers.roadController = function () {
 
 	function resetRoadEmphasizing() {
 		console.log(emphasizedRoadSectionStates)
+		legendDivElement.style.display = 'none';
 		emphasizedRoadSectionStates.forEach((_, roadSection) =>  {
 			canvasManipulator.changeColorOfEntities([{ id: roadSection }], "black", { name: "roadController" });
 			canvasManipulator.alterPositionOfEntities([{ id: roadSection }], - controllerConfig.emphasizedRoadOffsetY)
 		});
 		emphasizedRoadSectionStates.clear();
+		hideLegend()
 	}
 
 	function createLegend() {
         const canvas = document.getElementById("canvas");
 
-        const legendDivElement = application.createDiv("legend");
+        legendDivElement = application.createDiv("legend");
         createLegendItem(legendDivElement, "Calls", controllerConfig.emphasizeColors.calls);
         createLegendItem(legendDivElement, "Is Called", controllerConfig.emphasizeColors.isCalled);
-        createLegendItem(legendDivElement, "Bidirectional", controllerConfig.emphasizeColors.bidirectionalCall);
+        createLegendItem(legendDivElement, "Bidirectional Call", controllerConfig.emphasizeColors.bidirectionalCall);
         createLegendItem(legendDivElement, "Ambiguous", controllerConfig.emphasizeColors.ambiguous);
 
         canvas.appendChild(legendDivElement);
+		const legendElement = document.getElementById("legend");
+        legendElement.style.display = 'none';
+        legendVisible = false;
     }
 
     function createLegendItem(parentElement, text, color) {
@@ -111,6 +118,18 @@ controllers.roadController = function () {
 
         legendItem.appendChild(legendText);
         parentElement.appendChild(legendItem);
+    }
+
+	function showLegend() {
+        const legendElement = document.getElementById("legend");
+        legendElement.style.display = 'block';
+        legendVisible = true;
+    }
+
+    function hideLegend() {
+        const legendElement = document.getElementById("legend");
+        legendElement.style.display = 'none';
+        legendVisible = false;
     }
 
 	return {
