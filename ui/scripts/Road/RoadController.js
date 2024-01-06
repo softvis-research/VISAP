@@ -10,6 +10,8 @@ controllers.roadController = function () {
 		emphasizedRoadOffsetY: 0.05,
 
 		supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"]
+
+
 	}
 
 	let emphasizedRoadSections = new Set();
@@ -61,30 +63,13 @@ controllers.roadController = function () {
 				emphasizedRoadSections.add(roadSection)
 			});
 		})
-
-		// TEST!
-		// TODO: Bring me in shape :o
-		const aaa = []
-
-		const xo = model.getAllRoadDestinationElementsForStartElement(startElementId)
-		console.log("DESTINATIONS: " + xo)
-		xo.forEach(x => {
-			let yo = model.getAllRoadDestinationElementsForStartElement(x)
-			console.log("DESTINATIONS OF DESTINATION " + yo)
-			yo.forEach(y => {
-				if(y === startElementId) {
-					aaa.push(model.getAllRoadSectionsForStartElement(y))
-				}
-			})
-		})
-		console.log(aaa)
-		aaa[0].forEach(a => {
-			canvasManipulator.changeColorOfEntities([{ id: a }], controllerConfig.roadColorBidirectional, { name: "roadController" });
-			if (!emphasizedRoadSections.has(a)) {
-				console.log(a)
-				canvasManipulator.alterPositionOfEntities([{ id: a }], controllerConfig.emphasizedRoadOffsetY) // Y offset to dodge overlaps
+		const bidirectionalRoadSections = model.getAllBidirectionalRoadSectionsForStartElement(startElementId)
+		bidirectionalRoadSections.forEach(roadSection => {
+			canvasManipulator.changeColorOfEntities([{ id: roadSection }], controllerConfig.roadColorBidirectional, { name: "roadController" });
+			if (!emphasizedRoadSections.has(roadSection)) {
+				canvasManipulator.alterPositionOfEntities([{ id: roadSection }], controllerConfig.emphasizedRoadOffsetY) // Y offset to dodge overlaps
 			}				
-			emphasizedRoadSections.add(a)
+			emphasizedRoadSections.add(roadSection)
 		});
 	}
 

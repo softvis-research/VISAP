@@ -460,6 +460,20 @@ controllers.model = (function () {
 		return startElements;
 	}
 
+	function getAllBidirectionalRoadSectionsForStartElement(startElementId) {
+		const roadSections = []
+		const destinationElements = getAllRoadDestinationElementsForStartElement(startElementId)
+		destinationElements.forEach(destinationElement => {
+			let destinationsOfDestinationElements = getAllRoadDestinationElementsForStartElement(destinationElement)
+			destinationsOfDestinationElements.forEach(destinationsOfDestinationElement => {
+				if(destinationsOfDestinationElement === startElementId) {
+					roadSections.push(getAllRoadSectionsForStartElement(destinationsOfDestinationElement))
+				}
+			})
+		})
+		return roadSections.flat();
+	}
+
 	function removeEntity(id) {
 		entitiesById.delete(id);
 	}
@@ -527,7 +541,8 @@ controllers.model = (function () {
 		createRoadRelationsFromRoadsData: createRoadRelationsFromRoadsData,
 		getAllRoadSectionsForStartElement: getAllRoadSectionsForStartElement,
 		getAllRoadDestinationElementsForStartElement: getAllRoadDestinationElementsForStartElement,
-		getAllRoadStartElementsForDestinationElement: getAllRoadStartElementsForDestinationElement
+		getAllRoadStartElementsForDestinationElement: getAllRoadStartElementsForDestinationElement,
+		getAllBidirectionalRoadSectionsForStartElement: getAllBidirectionalRoadSectionsForStartElement,
 	};
 
 })();
