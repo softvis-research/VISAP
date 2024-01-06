@@ -108,7 +108,7 @@ controllers.model = (function () {
 					});
 
 					entity.qualifiedName = entity.qualifiedName.trim();
-					if (entity.qualifiedName.slice(-1) == "." ) {
+					if (entity.qualifiedName.slice(-1) == ".") {
 						entity.qualifiedName = element.qualifiedName;
 					}
 
@@ -212,23 +212,23 @@ controllers.model = (function () {
 				entry.road_sections,
 			);
 
-		// set up startElement -> RoadSections map; duplicates removed
-		if (roadRelationsStartElementRoadSectionsMap.has(roadRelation.startElementId)) {
-			const existingSections = roadRelationsStartElementRoadSectionsMap.get(roadRelation.startElementId);
-			const updatedSections = removeDuplicates([...existingSections, ...roadRelation.roadSectionsIds]);
-			roadRelationsStartElementRoadSectionsMap.set(roadRelation.startElementId, updatedSections);
-		} else {
-			roadRelationsStartElementRoadSectionsMap.set(roadRelation.startElementId, removeDuplicates([...roadRelation.roadSectionsIds]));
-		}
+			// set up StartElement -> RoadSections map; duplicates removed
+			if (roadRelationsStartElementRoadSectionsMap.has(roadRelation.startElementId)) {
+				const existingSections = roadRelationsStartElementRoadSectionsMap.get(roadRelation.startElementId);
+				const updatedSections = removeDuplicates([...existingSections, ...roadRelation.roadSectionsIds]);
+				roadRelationsStartElementRoadSectionsMap.set(roadRelation.startElementId, updatedSections);
+			} else {
+				roadRelationsStartElementRoadSectionsMap.set(roadRelation.startElementId, removeDuplicates([...roadRelation.roadSectionsIds]));
+			}
 
-		// set up startElement -> DestinationElement(s) map; duplicates removed
-		if (roadRelationsStartElementDestinationElementMap.has(roadRelation.startElementId)) {
-			const existingDestinations = roadRelationsStartElementDestinationElementMap.get(roadRelation.startElementId);
-			const updatedDestinations = removeDuplicates([...existingDestinations, roadRelation.destinationElementId]);
-			roadRelationsStartElementDestinationElementMap.set(roadRelation.startElementId, updatedDestinations);
-		} else {
-			roadRelationsStartElementDestinationElementMap.set(roadRelation.startElementId, [roadRelation.destinationElementId]);
-		}
+			// set up StartElement -> DestinationElement(s) map; duplicates removed
+			if (roadRelationsStartElementDestinationElementMap.has(roadRelation.startElementId)) {
+				const existingDestinations = roadRelationsStartElementDestinationElementMap.get(roadRelation.startElementId);
+				const updatedDestinations = removeDuplicates([...existingDestinations, roadRelation.destinationElementId]);
+				roadRelationsStartElementDestinationElementMap.set(roadRelation.startElementId, updatedDestinations);
+			} else {
+				roadRelationsStartElementDestinationElementMap.set(roadRelation.startElementId, [roadRelation.destinationElementId]);
+			}
 
 			roadRelations.push(roadRelation);
 		});
@@ -378,7 +378,7 @@ controllers.model = (function () {
 			const entitiesReferencingThis = entitiesByContainedUnloadedProperty.get(entity.id);
 			if (entitiesReferencingThis) {
 				entitiesReferencingThis.forEach(referenceReminder => {
-					const {entity: refEntity, property: refProperty} = referenceReminder;
+					const { entity: refEntity, property: refProperty } = referenceReminder;
 					// add newly loaded element to property lists it's supposed to be on
 					refEntity[refProperty].push(entity);
 					// remove it from the list of properties that haven't been loaded yet
@@ -450,6 +450,16 @@ controllers.model = (function () {
 		}
 	}
 
+	function getAllRoadStartElementsForDestinationElement(destinationElementId) {
+		const startElements = [];
+		for (const [startElement, destinationElements] of roadRelationsStartElementDestinationElementMap.entries()) {
+			if (destinationElements.includes(destinationElementId)) {
+				startElements.push(startElement);
+			}
+		}
+		return startElements;
+	}
+
 	function removeEntity(id) {
 		entitiesById.delete(id);
 	}
@@ -473,7 +483,7 @@ controllers.model = (function () {
 	function getAllChildrenOfEntity(entity) {
 		let children = [];
 
-		entity.children.forEach(function(child) {
+		entity.children.forEach(function (child) {
 			children.push(child);
 			const grandChildren = getAllChildrenOfEntity(child);
 			children = children.concat(grandChildren);
@@ -516,7 +526,8 @@ controllers.model = (function () {
 
 		createRoadRelationsFromRoadsData: createRoadRelationsFromRoadsData,
 		getAllRoadSectionsForStartElement: getAllRoadSectionsForStartElement,
-		getAllRoadDestinationElementsForStartElement: getAllRoadDestinationElementsForStartElement
+		getAllRoadDestinationElementsForStartElement: getAllRoadDestinationElementsForStartElement,
+		getAllRoadStartElementsForDestinationElement: getAllRoadStartElementsForDestinationElement
 	};
 
 })();

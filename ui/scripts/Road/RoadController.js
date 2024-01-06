@@ -26,6 +26,11 @@ controllers.roadController = function () {
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
 			startElement = [applicationEvent.entities[0]]
 			const roadSections = model.getAllRoadSectionsForStartElement(startElement[0].id)
+
+
+			console.log(model.getAllRoadStartElementsForDestinationElement(startElement[0].id))
+
+
 			roadSections.forEach(roadSection => {
 				const roadSectionDTO = [{ id: roadSection }] // create DTO to match required input of canvasManipulator
 				canvasManipulator.highlightEntities(roadSectionDTO, "white", { name: "roadController" });
