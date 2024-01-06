@@ -15,12 +15,12 @@ const setup = {
 		{
 			name: "roadController",
 			emphasizeMode: "coloredRoads",
-			roadColorCalls: { r: 0, g: 0, b: 1 },
-			roadColorIsCalled: { r: 1, g: 0, b: 1 },
-			roadColorBidirectional: { r: 1, g: 0, b: 1 },
-			roadColorAmbiguous: { r: 0, g: 0, b: 0 },
+			roadColorCalls: "cyan",
+			roadColorIsCalled: "pink",
+			roadColorBidirectional: "red",
+			roadColorAmbiguous: "white",
 
-			emphasizedRoadOffsetY: 0.1,
+			emphasizedRoadOffsetY: 0.05,
 
 			supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"]
 

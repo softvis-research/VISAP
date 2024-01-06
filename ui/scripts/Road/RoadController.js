@@ -2,12 +2,12 @@ controllers.roadController = function () {
 	const controllerConfig = {
 		name: "roadController",
 		emphasizeMode: "coloredRoads",
-		roadColorCalls: { r: 0, g: 0, b: 1 },
-		roadColorIsCalled: { r: 1, g: 0, b: 1 },
-		roadColorBidirectional: { r: 1, g: 0, b: 1 },
-		roadColorAmbiguous: { r: 0, g: 1, b: 0 },
+		roadColorCalls: "cyan",
+		roadColorIsCalled: "pink",
+		roadColorBidirectional: "red",
+		roadColorAmbiguous: "white",
 
-		emphasizedRoadOffsetY: 0.1,
+		emphasizedRoadOffsetY: 0.05,
 
 		supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"]
 	}
@@ -42,19 +42,38 @@ controllers.roadController = function () {
 		startElementId = startElement[0].id
 		const roadSections = model.getAllRoadSectionsForStartElement(startElementId)
 		roadSections.forEach(roadSection => {
-			canvasManipulator.changeColorOfEntities([{ id: roadSection }], "white", { name: "roadController" });
+			canvasManipulator.changeColorOfEntities([{ id: roadSection }], controllerConfig.roadColorCalls, { name: "roadController" });
 			if (!emphasizedRoadSections.has(roadSection)) {
 				canvasManipulator.alterPositionOfEntities([{ id: roadSection }], controllerConfig.emphasizedRoadOffsetY) // Y offset to dodge overlaps
 			}
 			emphasizedRoadSections.add(roadSection)
 		});
 
+		// TEST!
+		const a = []
 
-		const destinationElements = model.getAllRoadStartElementsForDestinationElement(startElementId);
+		const xo = model.getAllRoadDestinationElementsForStartElement(startElementId)
+		console.log(xo)
+		xo.forEach(x => {
+			console.log("x"+x)
+			let yo = model.getAllRoadStartElementsForDestinationElement(x)
+			console.log(yo)
+			yo.forEach(y => {
+				if(y === x) {
+					a.push(y)
+				}
+			})
+		})
+
+		console.log(a)
+
+
+
+		const destinationElements = model.getAllRoadStartElementsForDestinationElement(destinationElemenId = startElementId);
 		destinationElements.forEach(destinationElement => {
 			const roadSections = model.getAllRoadSectionsForStartElement(destinationElement)
 			roadSections.forEach(roadSection => {
-				canvasManipulator.changeColorOfEntities([{ id: roadSection }], "green", { name: "roadController" });
+				canvasManipulator.changeColorOfEntities([{ id: roadSection }], controllerConfig.roadColorIsCalled, { name: "roadController" });
 				if (!emphasizedRoadSections.has(roadSection)) {
 					canvasManipulator.alterPositionOfEntities([{ id: roadSection }], controllerConfig.emphasizedRoadOffsetY) // Y offset to dodge overlaps
 				}				
