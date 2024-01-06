@@ -15,10 +15,12 @@ const setup = {
 		{
 			name: "roadController",
 			emphasizeMode: "coloredRoads",
-			roadColorCalls: "cyan",
-			roadColorIsCalled: "red",
-			roadColorBidirectional: "magenta",
-			roadColorAmbiguous: "white",
+			emphasizeColors: {
+				calls: "turquoise",
+				isCalled: "green",
+				bidirectionalCall: "magenta",
+				ambiguous: "white",
+			},
 
 			emphasizedRoadOffsetY: 0.05,
 

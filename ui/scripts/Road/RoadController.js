@@ -2,10 +2,12 @@ controllers.roadController = function () {
 	const controllerConfig = {
 		name: "roadController",
 		emphasizeMode: "coloredRoads",
-		roadColorCalls: "turquoise",
-		roadColorIsCalled: "",
-		roadColorBidirectional: "magenta",
-		roadColorAmbiguous: "white",
+		emphasizeColors: {
+            calls: "turquoise",
+            isCalled: "green",
+            bidirectionalCall: "magenta",
+            ambiguous: "white",
+        },
 
 		emphasizedRoadOffsetY: 0.05,
 
@@ -21,6 +23,9 @@ controllers.roadController = function () {
 		application.transferConfigParams(setupConfig, controllerConfig);
 
 		// LD TODO: Add logic for guideMode helper initialization here (if we plan to implement multiple modes)
+
+		application.loadCSS("scripts/Road/legend.css");
+        createLegend()
 		events.selected.on.subscribe(onEntitySelected);
 		events.selected.off.subscribe(onEntityUnselected);
 	}
@@ -43,32 +48,25 @@ controllers.roadController = function () {
 	}
 
 	function controlRoadSectionEmphasizingStates(roadSections, roadType) {
-		
-		// Y offset to dodge overlaps
-		const offset = 0.05
-		const step = 0.0001
-		const emphasizedRoadOffsetY = {
-			calls: offset,
-			isCalled: offset + step,
-			bidirectional: offset + 2*step,
-			ambigous: offset + 3*step
-		}
+        
+        // Y offset to dodge overlaps
+        const offset = 0.05
+        const step = 0.0001
+        const emphasizedRoadOffsetY = {
+            calls: offset,
+            isCalled: offset + step,
+            bidirectional: offset + 2*step,
+            ambigous: offset + 3*step
+        }
 
-		const colors = {
-			calls: controllerConfig.roadColorCalls,
-			isCalled: controllerConfig.roadColorIsCalled,
-			bidirectional: controllerConfig.roadColorBidirectional,
-			ambigous: controllerConfig.roadColorAmbiguous,
-		}
-
-		roadSections.forEach(roadSection => {
-			canvasManipulator.changeColorOfEntities([{ id: roadSection }], colors[roadType], { name: "roadController" });
-			if (!emphasizedRoadSectionStates.has(roadSection)) {
-				canvasManipulator.alterPositionOfEntities([{ id: roadSection }], emphasizedRoadOffsetY[roadType]) 
-			}
-			emphasizedRoadSectionStates.set(roadSection, roadType)
-		});
-	}
+        roadSections.forEach(roadSection => {
+            canvasManipulator.changeColorOfEntities([{ id: roadSection }], controllerConfig.emphasizeColors[roadType], { name: "roadController" });
+            if (!emphasizedRoadSectionStates.has(roadSection)) {
+                canvasManipulator.alterPositionOfEntities([{ id: roadSection }], emphasizedRoadOffsetY[roadType]) 
+            }
+            emphasizedRoadSectionStates.set(roadSection, roadType)
+        });
+    }
 
 	function handleRoadEmphasizingForStartElement(startElementId) {
 		let roadSections = model.getAllRoadSectionsForStartElement(startElementId)
@@ -79,7 +77,7 @@ controllers.roadController = function () {
 			controlRoadSectionEmphasizingStates(roadSections, "isCalled")
 		})
 		roadSections = model.getAllBidirectionalRoadSectionsForStartElement(startElementId);
-		controlRoadSectionEmphasizingStates(roadSections, "bidirectional")
+		controlRoadSectionEmphasizingStates(roadSections, "bidirectionalCall")
 	}
 
 	function resetRoadEmphasizing() {
@@ -90,6 +88,30 @@ controllers.roadController = function () {
 		});
 		emphasizedRoadSectionStates.clear();
 	}
+
+	function createLegend() {
+        const canvas = document.getElementById("canvas");
+
+        const legendDivElement = application.createDiv("legend");
+        createLegendItem(legendDivElement, "Calls", controllerConfig.emphasizeColors.calls);
+        createLegendItem(legendDivElement, "Is Called", controllerConfig.emphasizeColors.isCalled);
+        createLegendItem(legendDivElement, "Bidirectional", controllerConfig.emphasizeColors.bidirectionalCall);
+        createLegendItem(legendDivElement, "Ambiguous", controllerConfig.emphasizeColors.ambiguous);
+
+        canvas.appendChild(legendDivElement);
+    }
+
+    function createLegendItem(parentElement, text, color) {
+        const legendItem = document.createElement("DIV");
+        legendItem.classList.add("legend-item");
+        legendItem.style.backgroundColor = color;
+
+        const legendText = document.createElement("SPAN");
+        legendText.textContent = text;
+
+        legendItem.appendChild(legendText);
+        parentElement.appendChild(legendItem);
+    }
 
 	return {
 		initialize: initialize,
