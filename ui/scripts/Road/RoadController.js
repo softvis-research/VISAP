@@ -12,7 +12,7 @@ controllers.roadController = function () {
 		supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"]
 	}
 
-	let emphasizedRoadSections = []
+	let emphasizedRoadSections = new Set();
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
@@ -42,11 +42,11 @@ controllers.roadController = function () {
 		startElementId = startElement[0].id
 		const roadSections = model.getAllRoadSectionsForStartElement(startElementId)
 		roadSections.forEach(roadSection => {
-			canvasManipulator.highlightEntities([{ id: roadSection }], "white", { name: "roadController" });
-			if (!emphasizedRoadSections.includes(roadSection)) {
+			canvasManipulator.changeColorOfEntities([{ id: roadSection }], "white", { name: "roadController" });
+			if (!emphasizedRoadSections.has(roadSection)) {
 				canvasManipulator.alterPositionOfEntities([{ id: roadSection }], controllerConfig.emphasizedRoadOffsetY) // Y offset to dodge overlaps
 			}
-			emphasizedRoadSections.push(roadSection)
+			emphasizedRoadSections.add(roadSection)
 		});
 
 
@@ -54,18 +54,18 @@ controllers.roadController = function () {
 		destinationElements.forEach(destinationElement => {
 			const roadSections = model.getAllRoadSectionsForStartElement(destinationElement)
 			roadSections.forEach(roadSection => {
-				canvasManipulator.highlightEntities([{ id: roadSection }], "green", { name: "roadController" });
-				if (!emphasizedRoadSections.includes(roadSection)) {
+				canvasManipulator.changeColorOfEntities([{ id: roadSection }], "green", { name: "roadController" });
+				if (!emphasizedRoadSections.has(roadSection)) {
 					canvasManipulator.alterPositionOfEntities([{ id: roadSection }], controllerConfig.emphasizedRoadOffsetY) // Y offset to dodge overlaps
 				}				
-				emphasizedRoadSections.push(roadSection)
+				emphasizedRoadSections.add(roadSection)
 			});
 		})
 	}
 
 	function resetRoadEmphasizing() {
 		emphasizedRoadSections.forEach(roadSection =>  {
-			canvasManipulator.unhighlightEntities([{ id: roadSection }], { name: "roadController" });
+			canvasManipulator.changeColorOfEntities([{ id: roadSection }], "black", { name: "roadController" });
 			canvasManipulator.alterPositionOfEntities([{ id: roadSection }], - controllerConfig.emphasizedRoadOffsetY)
 		});
 		emphasizedRoadSections.clear();
