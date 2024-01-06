@@ -20,13 +20,14 @@ controllers.roadController = function () {
 	let legendDivElement;
 	let emphasizedRoadSectionStates = new Map();
 
+	let legendHelper;
+
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
 
-		// LD TODO: Add logic for guideMode helper initialization here (if we plan to implement multiple modes)
+		legendHelper = createLegendHelper(controllerConfig)
 
-		application.loadCSS("scripts/Road/legend.css");
-		createLegend()
+		legendHelper.createLegend()
 		events.selected.on.subscribe(onEntitySelected);
 		events.selected.off.subscribe(onEntityUnselected);
 	}
@@ -38,7 +39,7 @@ controllers.roadController = function () {
 			canvasManipulator.highlightEntities(startElement, "red", { name: "roadController" });
 			startElementId = startElement[0].id
 			handleRoadEmphasizingForStartElement(startElementId)
-			showLegend() 
+			legendHelper.showLegend() 
 		} else {
 			return;
 		}
@@ -96,62 +97,15 @@ controllers.roadController = function () {
 
 	function resetRoadEmphasizing() {
 		console.log(emphasizedRoadSectionStates)
-		legendDivElement.style.display = 'none';
+		// legendDivElement.style.display = 'none';
 		emphasizedRoadSectionStates.forEach((_, roadSection) =>  {
 			canvasManipulator.changeColorOfEntities([{ id: roadSection }], "black", { name: "roadController" });
 			canvasManipulator.alterPositionOfEntities([{ id: roadSection }], - controllerConfig.emphasizedRoadOffsetY)
 		});
 	
 		emphasizedRoadSectionStates.clear();
-		hideLegend()
+		legendHelper.hideLegend()
 	}
-
-	function createLegend() {
-        const canvas = document.getElementById("canvas");
-
-        legendDivElement = application.createDiv("legend");
-        createLegendItem(legendDivElement, "calls", controllerConfig.emphasizeColors.calls);
-        createLegendItem(legendDivElement, "isCalled", controllerConfig.emphasizeColors.isCalled);
-        createLegendItem(legendDivElement, "bidirectionalCall", controllerConfig.emphasizeColors.bidirectionalCall);
-        createLegendItem(legendDivElement, "ambiguous", controllerConfig.emphasizeColors.ambiguous);
-
-        canvas.appendChild(legendDivElement);
-		const legendElement = document.getElementById("legend");
-        legendElement.style.display = 'none';
-        legendVisible = false;
-    }
-
-	function createLegendItem(parentElement, text, color) {
-		const legendItem = document.createElement("DIV");
-		legendItem.classList.add("legend-item");
-	
-		const coloredBox = document.createElement("DIV");
-		coloredBox.classList.add("colored-box");
-		coloredBox.style.backgroundColor = color;
-	
-		const whiteBox = document.createElement("DIV");
-		whiteBox.classList.add("white-box");
-	
-		const legendText = document.createElement("SPAN");
-		legendText.textContent = text;
-	
-		whiteBox.appendChild(legendText);
-		legendItem.appendChild(coloredBox);
-		legendItem.appendChild(whiteBox);
-		parentElement.appendChild(legendItem);
-	}
-
-	function showLegend() {
-        const legendElement = document.getElementById("legend");
-        legendElement.style.display = 'block';
-        legendVisible = true;
-    }
-
-    function hideLegend() {
-        const legendElement = document.getElementById("legend");
-        legendElement.style.display = 'none';
-        legendVisible = false;
-    }
 
 	return {
 		initialize: initialize,
