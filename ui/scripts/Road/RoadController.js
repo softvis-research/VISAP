@@ -97,10 +97,10 @@ controllers.roadController = function () {
         const canvas = document.getElementById("canvas");
 
         legendDivElement = application.createDiv("legend");
-        createLegendItem(legendDivElement, "Calls", controllerConfig.emphasizeColors.calls);
-        createLegendItem(legendDivElement, "Is Called", controllerConfig.emphasizeColors.isCalled);
-        createLegendItem(legendDivElement, "Bidirectional Call", controllerConfig.emphasizeColors.bidirectionalCall);
-        createLegendItem(legendDivElement, "Ambiguous", controllerConfig.emphasizeColors.ambiguous);
+        createLegendItem(legendDivElement, "calls", controllerConfig.emphasizeColors.calls);
+        createLegendItem(legendDivElement, "isCalled", controllerConfig.emphasizeColors.isCalled);
+        createLegendItem(legendDivElement, "bidirectionalCall", controllerConfig.emphasizeColors.bidirectionalCall);
+        createLegendItem(legendDivElement, "ambiguous", controllerConfig.emphasizeColors.ambiguous);
 
         canvas.appendChild(legendDivElement);
 		const legendElement = document.getElementById("legend");
@@ -108,17 +108,25 @@ controllers.roadController = function () {
         legendVisible = false;
     }
 
-    function createLegendItem(parentElement, text, color) {
-        const legendItem = document.createElement("DIV");
-        legendItem.classList.add("legend-item");
-        legendItem.style.backgroundColor = color;
-
-        const legendText = document.createElement("SPAN");
-        legendText.textContent = text;
-
-        legendItem.appendChild(legendText);
-        parentElement.appendChild(legendItem);
-    }
+	function createLegendItem(parentElement, text, color) {
+		const legendItem = document.createElement("DIV");
+		legendItem.classList.add("legend-item");
+	
+		const coloredBox = document.createElement("DIV");
+		coloredBox.classList.add("colored-box");
+		coloredBox.style.backgroundColor = color;
+	
+		const whiteBox = document.createElement("DIV");
+		whiteBox.classList.add("white-box");
+	
+		const legendText = document.createElement("SPAN");
+		legendText.textContent = text;
+	
+		whiteBox.appendChild(legendText);
+		legendItem.appendChild(coloredBox);
+		legendItem.appendChild(whiteBox);
+		parentElement.appendChild(legendItem);
+	}
 
 	function showLegend() {
         const legendElement = document.getElementById("legend");

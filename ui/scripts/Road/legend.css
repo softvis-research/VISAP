@@ -10,19 +10,35 @@
     position: absolute;
     top: 20px;
     right: 20px;
-    border: 2px solid #17a0fa; /* Change the border color as needed */
     padding: 10px;
-    background-color: #fff; /* Change the background color as needed */
-    border-radius: 5px; /* Optional: Add border-radius for rounded corners */
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
 }
 
 .legend-item {
+    font-weight: normal; /* Adjust font weight as needed */
     display: flex;
     align-items: center;
     margin-bottom: 8px;
+    position: relative;
 }
 
-.legend-item span {
-    margin-left: 8px;
-    font-size: 14px;
+.colored-box {
+    width: 10px;
+    height: 13px;
+    margin-right: auto;
+    padding: 5px 10px;
+    border: 2px solid black;
+}
+
+.white-box {
+    font-size: small;
+    font-weight: normal;
+    text-align: left;
+    background-color: black;
+    color: white;
+    padding: 5px 22px;
+    flex: 1;
+    margin-left: auto;
+    border: 2px solid black;
 }
