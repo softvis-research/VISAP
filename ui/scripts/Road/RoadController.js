@@ -2,14 +2,15 @@ controllers.roadController = function () {
 	const controllerConfig = {
 		name: "roadController",
 		emphasizeMode: "coloredRoads",
-		roadColorCalls: "cyan",
-		roadColorIsCalled: "pink",
-		roadColorBidirectional: "red",
+		roadColorCalls: "turquoise",
+		roadColorIsCalled: "",
+		roadColorBidirectional: "magenta",
 		roadColorAmbiguous: "white",
 
 		emphasizedRoadOffsetY: 0.05,
 
-		supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"]
+		supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
+		supportedRelationExpressions: ["calls", "isCalled", "bidirectional", "ambigous"],
 
 
 	}
@@ -28,8 +29,9 @@ controllers.roadController = function () {
 		const entityType = applicationEvent.entities[0].type;
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
 			startElement = [applicationEvent.entities[0]]
-			handleRoadEmphasizingForStartElement(startElement)
 			canvasManipulator.highlightEntities(startElement, "red", { name: "roadController" });
+			startElementId = startElement[0].id
+			handleRoadEmphasizingForStartElement(startElementId)
 		} else {
 			return;
 		}
@@ -40,37 +42,44 @@ controllers.roadController = function () {
 		resetRoadEmphasizing();
 	}
 
-	function handleRoadEmphasizingForStartElement(startElement) {
-		startElementId = startElement[0].id
-		const roadSections = model.getAllRoadSectionsForStartElement(startElementId)
+	function controlRoadSectionEmphasizingStates(roadSections, roadType) {
+		
+		// Y offset to dodge overlaps
+		const offset = 0.05
+		const step = 0.0001
+		const emphasizedRoadOffsetY = {
+			calls: offset,
+			isCalled: offset + step,
+			bidirectional: offset + 2*step,
+			ambigous: offset + 3*step
+		}
+
+		const colors = {
+			calls: controllerConfig.roadColorCalls,
+			isCalled: controllerConfig.roadColorIsCalled,
+			bidirectional: controllerConfig.roadColorBidirectional,
+			ambigous: controllerConfig.roadColorAmbiguous,
+		}
+
 		roadSections.forEach(roadSection => {
-			canvasManipulator.changeColorOfEntities([{ id: roadSection }], controllerConfig.roadColorCalls, { name: "roadController" });
+			canvasManipulator.changeColorOfEntities([{ id: roadSection }], colors[roadType], { name: "roadController" });
 			if (!emphasizedRoadSections.has(roadSection)) {
-				canvasManipulator.alterPositionOfEntities([{ id: roadSection }], controllerConfig.emphasizedRoadOffsetY) // Y offset to dodge overlaps
+				canvasManipulator.alterPositionOfEntities([{ id: roadSection }], emphasizedRoadOffsetY[roadType]) 
 			}
 			emphasizedRoadSections.add(roadSection)
 		});
+	}
 
-
+	function handleRoadEmphasizingForStartElement(startElementId) {
+		let roadSections = model.getAllRoadSectionsForStartElement(startElementId)
+		controlRoadSectionEmphasizingStates(roadSections, "calls");
 		const destinationElements = model.getAllRoadStartElementsForDestinationElement(destinationElemenId = startElementId);
 		destinationElements.forEach(destinationElement => {
-			const roadSections = model.getAllRoadSectionsForStartElement(destinationElement)
-			roadSections.forEach(roadSection => {
-				canvasManipulator.changeColorOfEntities([{ id: roadSection }], controllerConfig.roadColorIsCalled, { name: "roadController" });
-				if (!emphasizedRoadSections.has(roadSection)) {
-					canvasManipulator.alterPositionOfEntities([{ id: roadSection }], controllerConfig.emphasizedRoadOffsetY) // Y offset to dodge overlaps
-				}				
-				emphasizedRoadSections.add(roadSection)
-			});
+			roadSections = model.getAllRoadSectionsForStartElement(destinationElement)
+			controlRoadSectionEmphasizingStates(roadSections, "isCalled")
 		})
-		const bidirectionalRoadSections = model.getAllBidirectionalRoadSectionsForStartElement(startElementId)
-		bidirectionalRoadSections.forEach(roadSection => {
-			canvasManipulator.changeColorOfEntities([{ id: roadSection }], controllerConfig.roadColorBidirectional, { name: "roadController" });
-			if (!emphasizedRoadSections.has(roadSection)) {
-				canvasManipulator.alterPositionOfEntities([{ id: roadSection }], controllerConfig.emphasizedRoadOffsetY) // Y offset to dodge overlaps
-			}				
-			emphasizedRoadSections.add(roadSection)
-		});
+		roadSections = model.getAllBidirectionalRoadSectionsForStartElement(startElementId);
+		controlRoadSectionEmphasizingStates(roadSections, "bidirectional")
 	}
 
 	function resetRoadEmphasizing() {
