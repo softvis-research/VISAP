@@ -1,13 +1,13 @@
 controllers.roadController = function () {
 	const controllerConfig = {
 		name: "roadController",
-		guideMode: "coloredRoads",
+		emphasizeMode: "coloredRoads",
 		roadColorCalls: { r: 0, g: 0, b: 1 },
 		roadColorIsCalled: { r: 1, g: 0, b: 1 },
 		roadColorBidirectional: { r: 1, g: 0, b: 1 },
 		roadColorAmbiguous: { r: 0, g: 1, b: 0 },
 
-		activeRoadOffsetY: 0.1,
+		emphasizedRoadOffsetY: 0.1,
 
 		supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"]
 	}
@@ -18,9 +18,8 @@ controllers.roadController = function () {
 		application.transferConfigParams(setupConfig, controllerConfig);
 
 		// LD TODO: Add logic for guideMode helper initialization here (if we plan to implement multiple modes)
-
 		events.selected.on.subscribe(onEntitySelected);
-		events.selected.off.subscribe(onEntityDeselected);
+		events.selected.off.subscribe(onEntityUnselected);
 	}
 
 	function onEntitySelected(applicationEvent) {
@@ -34,41 +33,42 @@ controllers.roadController = function () {
 		}
 	}
 
-	function onEntityDeselected(applicationEvent) {
-		resetRoadEmphasizing()	
+	function onEntityUnselected(applicationEvent) {
+		canvasManipulator.unhighlightEntities([{ id: applicationEvent.entities[0].id }], { name: "roadController" });
+		resetRoadEmphasizing();
 	}
 
 	function handleRoadEmphasizingForStartElement(startElement) {
 		startElementId = startElement[0].id
 		const roadSections = model.getAllRoadSectionsForStartElement(startElementId)
 		roadSections.forEach(roadSection => {
-			const roadSectionDTO = [{ id: roadSection }] // create DTO to match required input of canvasManipulator
-			canvasManipulator.highlightEntities(roadSectionDTO, "white", { name: "roadController" });
-			canvasManipulator.alterPositionOfEntities(roadSectionDTO, controllerConfig.activeRoadOffsetY) // undo Y offset
+			canvasManipulator.highlightEntities([{ id: roadSection }], "white", { name: "roadController" });
+			if (!emphasizedRoadSections.includes(roadSection)) {
+				canvasManipulator.alterPositionOfEntities([{ id: roadSection }], controllerConfig.emphasizedRoadOffsetY) // Y offset to dodge overlaps
+			}
+			emphasizedRoadSections.push(roadSection)
 		});
 
-		emphasizedRoadSections.push(roadSections)
 
 		const destinationElements = model.getAllRoadStartElementsForDestinationElement(startElementId);
 		destinationElements.forEach(destinationElement => {
 			const roadSections = model.getAllRoadSectionsForStartElement(destinationElement)
 			roadSections.forEach(roadSection => {
-				const roadSectionDTO = [{ id: roadSection }]
-				canvasManipulator.highlightEntities(roadSectionDTO, "green", { name: "roadController" });
-				canvasManipulator.alterPositionOfEntities(roadSectionDTO, controllerConfig.activeRoadOffsetY) // Y offset to dodge overlaps
+				canvasManipulator.highlightEntities([{ id: roadSection }], "green", { name: "roadController" });
+				if (!emphasizedRoadSections.includes(roadSection)) {
+					canvasManipulator.alterPositionOfEntities([{ id: roadSection }], controllerConfig.emphasizedRoadOffsetY) // Y offset to dodge overlaps
+				}				
+				emphasizedRoadSections.push(roadSection)
 			});
-			emphasizedRoadSections.push(roadSections)
 		})
 	}
 
 	function resetRoadEmphasizing() {
-		emphasizedRoadSections = emphasizedRoadSections.flat();
-		emphasizedRoadSections.forEach(emphasizedRoadSection =>  {
-			const roadSectionDTO = [{ id: emphasizedRoadSection }]
-			canvasManipulator.unhighlightEntities(roadSectionDTO, { name: "roadController" });
-			canvasManipulator.alterPositionOfEntities(roadSectionDTO, - controllerConfig.activeRoadOffsetY)
+		emphasizedRoadSections.forEach(roadSection =>  {
+			canvasManipulator.unhighlightEntities([{ id: roadSection }], { name: "roadController" });
+			canvasManipulator.alterPositionOfEntities([{ id: roadSection }], - controllerConfig.emphasizedRoadOffsetY)
 		});
-		emphasizedRoadSections = [];
+		emphasizedRoadSections.clear();
 	}
 
 	return {
