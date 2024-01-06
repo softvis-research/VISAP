@@ -15,7 +15,7 @@ controllers.roadController = function () {
 
 	}
 
-	let emphasizedRoadSections = new Set();
+	let emphasizedRoadSectionStates = new Map();
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
@@ -63,10 +63,10 @@ controllers.roadController = function () {
 
 		roadSections.forEach(roadSection => {
 			canvasManipulator.changeColorOfEntities([{ id: roadSection }], colors[roadType], { name: "roadController" });
-			if (!emphasizedRoadSections.has(roadSection)) {
+			if (!emphasizedRoadSectionStates.has(roadSection)) {
 				canvasManipulator.alterPositionOfEntities([{ id: roadSection }], emphasizedRoadOffsetY[roadType]) 
 			}
-			emphasizedRoadSections.add(roadSection)
+			emphasizedRoadSectionStates.set(roadSection, roadType)
 		});
 	}
 
@@ -83,11 +83,12 @@ controllers.roadController = function () {
 	}
 
 	function resetRoadEmphasizing() {
-		emphasizedRoadSections.forEach(roadSection =>  {
+		console.log(emphasizedRoadSectionStates)
+		emphasizedRoadSectionStates.forEach((_, roadSection) =>  {
 			canvasManipulator.changeColorOfEntities([{ id: roadSection }], "black", { name: "roadController" });
 			canvasManipulator.alterPositionOfEntities([{ id: roadSection }], - controllerConfig.emphasizedRoadOffsetY)
 		});
-		emphasizedRoadSections.clear();
+		emphasizedRoadSectionStates.clear();
 	}
 
 	return {
