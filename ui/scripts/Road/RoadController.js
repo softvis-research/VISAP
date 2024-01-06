@@ -50,25 +50,37 @@ controllers.roadController = function () {
 	}
 
 	function controlRoadSectionEmphasizingStates(roadSections, roadType) {
-        
-        // Y offset to dodge overlaps
-        const offset = 0.05
-        const step = 0.0001
-        const emphasizedRoadOffsetY = {
-            calls: offset,
-            isCalled: offset + step,
-            bidirectional: offset + 2*step,
-            ambigous: offset + 3*step
-        }
+		const offset = 0.05;
+		const step = 0.0001;
+		const emphasizedRoadOffsetY = {
+			calls: offset,
+			isCalled: offset + step,
+			bidirectional: offset + 2 * step,
+			ambiguous: offset + 3 * step
+		}
+	
+		roadSections.forEach(roadSection => {
+			const existingTypes = emphasizedRoadSectionStates.get(roadSection) || [];
+			const newTypes = [...existingTypes, roadType];
+	
+			canvasManipulator.changeColorOfEntities([{ id: roadSection }], controllerConfig.emphasizeColors[roadType], { name: "roadController" });
+	
+			if (!emphasizedRoadSectionStates.has(roadSection)) {
+				canvasManipulator.alterPositionOfEntities([{ id: roadSection }], emphasizedRoadOffsetY[roadType]);
+			}
+			emphasizedRoadSectionStates.set(roadSection, newTypes);
 
-        roadSections.forEach(roadSection => {
-            canvasManipulator.changeColorOfEntities([{ id: roadSection }], controllerConfig.emphasizeColors[roadType], { name: "roadController" });
-            if (!emphasizedRoadSectionStates.has(roadSection)) {
-                canvasManipulator.alterPositionOfEntities([{ id: roadSection }], emphasizedRoadOffsetY[roadType]) 
-            }
-            emphasizedRoadSectionStates.set(roadSection, roadType)
-        });
-    }
+			// LD TODO: FIX
+			const currentStates = emphasizedRoadSectionStates.get(roadSection);
+			if (currentStates.length > 1 && !["calls", "isCalled", "bidirectionalCalls"].every(state => currentStates.includes(state))) {
+				canvasManipulator.changeColorOfEntities([{ id: roadSection }], controllerConfig.emphasizeColors.ambiguous, { name: "roadController" });
+				canvasManipulator.alterPositionOfEntities([{ id: roadSection }], emphasizedRoadOffsetY.ambiguous);
+			}
+
+		});
+	
+		console.log(emphasizedRoadSectionStates);
+	}
 
 	function handleRoadEmphasizingForStartElement(startElementId) {
 		let roadSections = model.getAllRoadSectionsForStartElement(startElementId)
@@ -89,6 +101,7 @@ controllers.roadController = function () {
 			canvasManipulator.changeColorOfEntities([{ id: roadSection }], "black", { name: "roadController" });
 			canvasManipulator.alterPositionOfEntities([{ id: roadSection }], - controllerConfig.emphasizedRoadOffsetY)
 		});
+	
 		emphasizedRoadSectionStates.clear();
 		hideLegend()
 	}
