@@ -2,32 +2,24 @@ controllers.roadController = function () {
 	const controllerConfig = {
 		name: "roadController",
 		emphasizeMode: "coloredRoads",
-		emphasizeColors: {
-            calls: "turquoise",
-            isCalled: "green",
-            bidirectionalCall: "magenta",
-            ambiguous: "white",
+        supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
+		roadSectionStates: {
+            calls: "STATE_calls",
+            isCalled: "STATE__isCalled",
+            bidirectionalCall: "STATE__bidirectionalCall",
+            ambiguous: "STATE__ambiguous"
         },
-
-		emphasizedRoadOffsetY: 0.05,
-
-		supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
-		supportedRelationExpressions: ["calls", "isCalled", "bidirectional", "ambigous"],
-
-
 	}
 
-	let legendDivElement;
-	let emphasizedRoadSectionStates = new Map();
-
-	let legendHelper;
+	let roadSectionRelationsMap = new Map();
+    let roadSectionStatesMap = new Map();
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
 
-		legendHelper = createLegendHelper(controllerConfig)
-
-		legendHelper.createLegend()
+        // LD TODO: Outsource in specific controller
+		// legendHelper = createLegendHelper(controllerConfig)
+		// legendHelper.createLegend()
 		events.selected.on.subscribe(onEntitySelected);
 		events.selected.off.subscribe(onEntityUnselected);
 	}
@@ -36,10 +28,12 @@ controllers.roadController = function () {
 		const entityType = applicationEvent.entities[0].type;
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
 			startElement = [applicationEvent.entities[0]]
+			// LD TODO: Outsource to specific controller
 			canvasManipulator.highlightEntities(startElement, "red", { name: "roadController" });
 			startElementId = startElement[0].id
-			handleRoadEmphasizingForStartElement(startElementId)
-			legendHelper.showLegend() 
+			determineRoadSectionRelations(startElementId)
+			determineRoadSectionStates()
+			console.log(roadSectionStatesMap)
 		} else {
 			return;
 		}
@@ -47,64 +41,76 @@ controllers.roadController = function () {
 
 	function onEntityUnselected(applicationEvent) {
 		canvasManipulator.unhighlightEntities([{ id: applicationEvent.entities[0].id }], { name: "roadController" });
-		resetRoadEmphasizing();
+		resetRoadSectionStates()
 	}
 
-	function controlRoadSectionEmphasizingStates(roadSections, roadType) {
-		const offset = 0.05;
-		const step = 0.0001;
-		const emphasizedRoadOffsetY = {
-			calls: offset,
-			isCalled: offset + step,
-			bidirectional: offset + 2 * step,
-			ambiguous: offset + 3 * step
-		}
-	
-		roadSections.forEach(roadSection => {
-			const existingTypes = emphasizedRoadSectionStates.get(roadSection) || [];
-			const newTypes = [...existingTypes, roadType];
-	
-			canvasManipulator.changeColorOfEntities([{ id: roadSection }], controllerConfig.emphasizeColors[roadType], { name: "roadController" });
-	
-			if (!emphasizedRoadSectionStates.has(roadSection)) {
-				canvasManipulator.alterPositionOfEntities([{ id: roadSection }], emphasizedRoadOffsetY[roadType]);
-			}
-			emphasizedRoadSectionStates.set(roadSection, newTypes);
-
-			// LD TODO: FIX
-			const currentStates = emphasizedRoadSectionStates.get(roadSection);
-			if (currentStates.length > 1 && !["calls", "isCalled", "bidirectionalCalls"].every(state => currentStates.includes(state))) {
-				canvasManipulator.changeColorOfEntities([{ id: roadSection }], controllerConfig.emphasizeColors.ambiguous, { name: "roadController" });
-				canvasManipulator.alterPositionOfEntities([{ id: roadSection }], emphasizedRoadOffsetY.ambiguous);
-			}
-
-		});
-	
-		console.log(emphasizedRoadSectionStates);
+	// determine all relations of a startElement
+	function determineRoadSectionRelations(startElementId) {
+        // 1. get all destinationElements for startElement
+        const destinationElements = model.getAllRoadDestinationElementsForStartElement(startElementId)
+        // 2. determine which destinationElements calls the startElement
+        const isDestinationElements = model.getAllRoadStartElementsForDestinationElement(startElementId);
+		// 3. determine all destinationElements which call the startElement AND the startElement also calls the destinationElement 
+		// => add a "bidirectionalCall" relation to all involved roadSections 
+		const bidirectionalCallElements = destinationElements.filter(id => isDestinationElements.includes(id));
+		addRelationToRoadSection(bidirectionalCallElements, "bidirectionalCall")
+		// 4. determine all destinationElements that get called by the startElement but do not call the startElement
+		// => add a "calls" relation to all involved roadSections 
+		const callsElements = destinationElements.filter(id => !isDestinationElements.includes(id));
+		addRelationToRoadSection(callsElements, "calls")
+		// 5. determine all destinationElements that call the startElement but are not called by the startElement
+		// => add a "isCalled" relation to all involved roadSections
+		const isCalledElements = isDestinationElements.filter(id => !destinationElements.includes(id));
+		addRelationToRoadSection(isCalledElements, "isCalled")
 	}
 
-	function handleRoadEmphasizingForStartElement(startElementId) {
-		let roadSections = model.getAllRoadSectionsForStartElement(startElementId)
-		controlRoadSectionEmphasizingStates(roadSections, "calls");
-		const destinationElements = model.getAllRoadStartElementsForDestinationElement(destinationElemenId = startElementId);
-		destinationElements.forEach(destinationElement => {
-			roadSections = model.getAllRoadSectionsForStartElement(destinationElement)
-			controlRoadSectionEmphasizingStates(roadSections, "isCalled")
+	// helper function to get all roadSections and add relations to a map with their relation
+	function addRelationToRoadSection(elements, relation) {
+		elements.forEach(id => {
+			const roadSections = model.getAllRoadSectionsForStartElement(id);
+			roadSections.forEach(rs => {
+				const existingRelations = roadSectionRelationsMap.get(rs) || [];
+				const newRelations = [...existingRelations, relation];
+				roadSectionRelationsMap.set(rs, newRelations)
+			})
 		})
-		roadSections = model.getAllBidirectionalRoadSectionsForStartElement(startElementId);
-		controlRoadSectionEmphasizingStates(roadSections, "bidirectionalCall")
 	}
 
-	function resetRoadEmphasizing() {
-		console.log(emphasizedRoadSectionStates)
-		// legendDivElement.style.display = 'none';
-		emphasizedRoadSectionStates.forEach((_, roadSection) =>  {
-			canvasManipulator.changeColorOfEntities([{ id: roadSection }], "black", { name: "roadController" });
-			canvasManipulator.alterPositionOfEntities([{ id: roadSection }], - controllerConfig.emphasizedRoadOffsetY)
+	// check all added relations on roadSections and assign a determinable undeterminable (ambiguous)or determinable (calls, isCalled, bidirectionalCall) state 
+	function determineRoadSectionStates() {
+		roadSectionRelationsMap.forEach((relationsArray, roadSection) => {
+		  let state;
+	  
+		  switch (true) {
+			case isArrayContainsOnly(relationsArray, 'calls'):
+			  state = controllerConfig.roadSectionStates.calls;
+			  break;
+			
+			case isArrayContainsOnly(relationsArray, 'isCalled'):
+			  state = controllerConfig.roadSectionStates.isCalled;
+			  break;
+			
+			case isArrayContainsOnly(relationsArray, 'bidirectionalCall'):
+			  state = controllerConfig.roadSectionStates.bidirectionalCall;
+			  break;
+	  
+			default:
+			  state = controllerConfig.roadSectionStates.ambiguous;
+		  }
+	  
+		  roadSectionStatesMap.set(roadSection, state);
 		});
-	
-		emphasizedRoadSectionStates.clear();
-		legendHelper.hideLegend()
+	  }
+	  
+	  // helper function to check if an array contains only a specific value
+	  function isArrayContainsOnly(arr, value) {
+		return arr.every(item => item === value);
+	  }
+	  
+
+	function resetRoadSectionStates() {
+		roadSectionRelationsMap.clear();
+		roadSectionStatesMap.clear();
 	}
 
 	return {
