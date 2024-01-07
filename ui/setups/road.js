@@ -14,19 +14,17 @@ const setup = {
 		},
 		{
 			name: "roadController",
-			emphasizeMode: "coloredRoads",
+			emphasizeMode: "RoadColor",
+			supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"]
+		},
+		{
+			name: "RoadColorHelper",
 			emphasizeColors: {
 				calls: "turquoise",
 				isCalled: "green",
 				bidirectionalCall: "magenta",
 				ambiguous: "white",
 			},
-
-			emphasizedRoadOffsetY: 0.05,
-
-			supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"]
-
-
 		},
 	],
 

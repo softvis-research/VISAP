@@ -3,12 +3,19 @@ controllers.roadController = function () {
 		name: "roadController",
 		emphasizeMode: "coloredRoads",
         supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
-		roadSectionStates: {
-            calls: "STATE_calls",
-            isCalled: "STATE__isCalled",
-            bidirectionalCall: "STATE__bidirectionalCall",
-            ambiguous: "STATE__ambiguous"
-        },
+	}
+
+	const relationTypes = {
+		calls: "REL__calls",
+		isCalled: "REL__isCalled",
+		bidirectionalCall: "REL__bidirectionalCall",
+		ambiguous: "REL__ambiguous"
+	}
+	const roadSectionStates = {
+		calls: "STATE_calls",
+		isCalled: "STATE__isCalled",
+		bidirectionalCall: "STATE__bidirectionalCall",
+		ambiguous: "STATE__ambiguous"
 	}
 
 	let roadSectionRelationsMap = new Map();
@@ -53,15 +60,15 @@ controllers.roadController = function () {
 		// 3. determine all destinationElements which call the startElement AND the startElement also calls the destinationElement 
 		// => add a "bidirectionalCall" relation to all involved roadSections 
 		const bidirectionalCallElements = destinationElements.filter(id => isDestinationElements.includes(id));
-		addRelationToRoadSection(bidirectionalCallElements, "bidirectionalCall")
+		addRelationToRoadSection(bidirectionalCallElements, relationTypes.bidirectionalCall)
 		// 4. determine all destinationElements that get called by the startElement but do not call the startElement
 		// => add a "calls" relation to all involved roadSections 
 		const callsElements = destinationElements.filter(id => !isDestinationElements.includes(id));
-		addRelationToRoadSection(callsElements, "calls")
+		addRelationToRoadSection(callsElements, relationTypes.calls)
 		// 5. determine all destinationElements that call the startElement but are not called by the startElement
 		// => add a "isCalled" relation to all involved roadSections
 		const isCalledElements = isDestinationElements.filter(id => !destinationElements.includes(id));
-		addRelationToRoadSection(isCalledElements, "isCalled")
+		addRelationToRoadSection(isCalledElements, relationTypes.isCalled)
 	}
 
 	// helper function to get all roadSections and add relations to a map with their relation
@@ -82,20 +89,20 @@ controllers.roadController = function () {
 		  let state;
 	  
 		  switch (true) {
-			case isArrayContainsOnly(relationsArray, 'calls'):
-			  state = controllerConfig.roadSectionStates.calls;
+			case isArrayContainsOnly(relationsArray, relationTypes.calls):
+			  state = roadSectionStates.calls;
 			  break;
 			
-			case isArrayContainsOnly(relationsArray, 'isCalled'):
-			  state = controllerConfig.roadSectionStates.isCalled;
+			case isArrayContainsOnly(relationsArray, relationTypes.isCalled):
+			  state = roadSectionStates.isCalled;
 			  break;
 			
-			case isArrayContainsOnly(relationsArray, 'bidirectionalCall'):
-			  state = controllerConfig.roadSectionStates.bidirectionalCall;
+			case isArrayContainsOnly(relationsArray, relationTypes.bidirectionalCall):
+			  state = roadSectionStates.bidirectionalCall;
 			  break;
 	  
 			default:
-			  state = controllerConfig.roadSectionStates.ambiguous;
+			  state = roadSectionStates.ambiguous;
 		  }
 	  
 		  roadSectionStatesMap.set(roadSection, state);
