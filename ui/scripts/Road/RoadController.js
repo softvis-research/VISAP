@@ -11,7 +11,7 @@ controllers.roadController = function () {
 		bidirectionalCall: "REL__bidirectionalCall",
 		ambiguous: "REL__ambiguous"
 	}
-	const roadSectionStates = {
+	const roadSectionStatesDefinition = {
 		calls: "STATE_calls",
 		isCalled: "STATE__isCalled",
 		bidirectionalCall: "STATE__bidirectionalCall",
@@ -27,6 +27,10 @@ controllers.roadController = function () {
         // LD TODO: Outsource in specific controller
 		// legendHelper = createLegendHelper(controllerConfig)
 		// legendHelper.createLegend()
+
+		roadColorHelper = createRoadColorHelper(controllerConfig)
+		roadColorHelper.initialize(setupConfig);
+
 		events.selected.on.subscribe(onEntitySelected);
 		events.selected.off.subscribe(onEntityUnselected);
 	}
@@ -35,12 +39,15 @@ controllers.roadController = function () {
 		const entityType = applicationEvent.entities[0].type;
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
 			startElement = [applicationEvent.entities[0]]
-			// LD TODO: Outsource to specific controller
 			canvasManipulator.highlightEntities(startElement, "red", { name: "roadController" });
+
 			startElementId = startElement[0].id
 			determineRoadSectionRelations(startElementId)
 			determineRoadSectionStates()
 			console.log(roadSectionStatesMap)
+
+			roadColorHelper.handleRoadSectionStates(roadSectionStatesMap, roadSectionStatesDefinition);
+
 		} else {
 			return;
 		}
@@ -48,6 +55,7 @@ controllers.roadController = function () {
 
 	function onEntityUnselected(applicationEvent) {
 		canvasManipulator.unhighlightEntities([{ id: applicationEvent.entities[0].id }], { name: "roadController" });
+		roadColorHelper.resetRoadSectionStateHandling(roadSectionStatesMap, roadSectionStatesDefinition);
 		resetRoadSectionStates()
 	}
 
@@ -90,19 +98,19 @@ controllers.roadController = function () {
 	  
 		  switch (true) {
 			case isArrayContainsOnly(relationsArray, relationTypes.calls):
-			  state = roadSectionStates.calls;
+			  state = roadSectionStatesDefinition.calls;
 			  break;
 			
 			case isArrayContainsOnly(relationsArray, relationTypes.isCalled):
-			  state = roadSectionStates.isCalled;
+			  state = roadSectionStatesDefinition.isCalled;
 			  break;
 			
 			case isArrayContainsOnly(relationsArray, relationTypes.bidirectionalCall):
-			  state = roadSectionStates.bidirectionalCall;
+			  state = roadSectionStatesDefinition.bidirectionalCall;
 			  break;
 	  
 			default:
-			  state = roadSectionStates.ambiguous;
+			  state = roadSectionStatesDefinition.ambiguous;
 		  }
 	  
 		  roadSectionStatesMap.set(roadSection, state);

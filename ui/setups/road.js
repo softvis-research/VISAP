@@ -17,15 +17,6 @@ const setup = {
 			emphasizeMode: "RoadColor",
 			supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"]
 		},
-		{
-			name: "RoadColorHelper",
-			emphasizeColors: {
-				calls: "turquoise",
-				isCalled: "green",
-				bidirectionalCall: "magenta",
-				ambiguous: "white",
-			},
-		},
 	],
 
 	ui: {

@@ -1,4 +1,4 @@
-const createLegendHelper = function (controllerConfig) {
+const createLegendHelper = function (colors) {
 	return (function (controllerConfig) {
 
         function createLegend() {
@@ -7,10 +7,10 @@ const createLegendHelper = function (controllerConfig) {
             const canvas = document.getElementById("canvas");
     
             let legendDivElement = application.createDiv("legend");
-            createLegendItem(legendDivElement, "calls", controllerConfig.emphasizeColors.calls);
-            createLegendItem(legendDivElement, "isCalled", controllerConfig.emphasizeColors.isCalled);
-            createLegendItem(legendDivElement, "bidirectionalCall", controllerConfig.emphasizeColors.bidirectionalCall);
-            createLegendItem(legendDivElement, "ambiguous", controllerConfig.emphasizeColors.ambiguous);
+            createLegendItem(legendDivElement, "calls", colors.calls);
+            createLegendItem(legendDivElement, "isCalled", colors.isCalled);
+            createLegendItem(legendDivElement, "bidirectionalCall", colors.bidirectionalCall);
+            createLegendItem(legendDivElement, "ambiguous", colors.ambiguous);
     
             canvas.appendChild(legendDivElement);
             const legendElement = document.getElementById("legend");
@@ -55,5 +55,5 @@ const createLegendHelper = function (controllerConfig) {
             showLegend: showLegend,
             hideLegend: hideLegend,
 		};
-	})(controllerConfig);
+	})();
 };
