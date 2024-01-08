@@ -1,5 +1,5 @@
-const createLegendHelper = function (colors) {
-	return (function (controllerConfig) {
+const createLegendHelper = function (controllerConfig) {
+	return (function () {
 
         function createLegend() {
             application.loadCSS("scripts/Road/legend.css");
@@ -7,10 +7,10 @@ const createLegendHelper = function (colors) {
             const canvas = document.getElementById("canvas");
     
             let legendDivElement = application.createDiv("legend");
-            createLegendItem(legendDivElement, "calls", colors.calls);
-            createLegendItem(legendDivElement, "isCalled", colors.isCalled);
-            createLegendItem(legendDivElement, "bidirectionalCall", colors.bidirectionalCall);
-            createLegendItem(legendDivElement, "ambiguous", colors.ambiguous);
+            createLegendItem(legendDivElement, "calls", controllerConfig.roadColors.calls);
+            createLegendItem(legendDivElement, "isCalled", controllerConfig.roadColors.isCalled);
+            createLegendItem(legendDivElement, "bidirectionalCall", controllerConfig.roadColors.bidirectionalCall);
+            createLegendItem(legendDivElement, "ambiguous", controllerConfig.roadColors.ambiguous);
     
             canvas.appendChild(legendDivElement);
             const legendElement = document.getElementById("legend");
@@ -26,15 +26,15 @@ const createLegendHelper = function (colors) {
             coloredBox.classList.add("colored-box");
             coloredBox.style.backgroundColor = color;
         
-            const whiteBox = document.createElement("DIV");
-            whiteBox.classList.add("white-box");
+            const textBox = document.createElement("DIV");
+            textBox.classList.add("text-box");
         
             const legendText = document.createElement("SPAN");
             legendText.textContent = text;
         
-            whiteBox.appendChild(legendText);
+            textBox.appendChild(legendText);
             legendItem.appendChild(coloredBox);
-            legendItem.appendChild(whiteBox);
+            legendItem.appendChild(textBox);
             parentElement.appendChild(legendItem);
         }
     

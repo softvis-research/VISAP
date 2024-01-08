@@ -1,36 +1,46 @@
 controllers.roadController = function () {
 	const controllerConfig = {
 		name: "roadController",
-		emphasizeMode: "coloredRoads",
-        supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
+
+		emphasizeMode: "ColoredRoads",
+
+		showLegendOnSelect: true,
+
+		supportedEntityTypes: [
+			"Class", 
+			"Report", 
+			"FunctionGroup", 
+			"Interface"],
+
+		relationTypes: {
+			calls: "calls",
+			isCalled: "isCalled",
+			bidirectionalCall: "bidirectionalCall",
+			ambiguous: "ambiguous"
+		},
+
+		roadColors: {
+			ambiguous: "white",
+			calls: "turquoise",
+			isCalled: "orange",
+			bidirectionalCall: "magenta",
+		},
 	}
 
-	const relationTypes = {
-		calls: "REL__calls",
-		isCalled: "REL__isCalled",
-		bidirectionalCall: "REL__bidirectionalCall",
-		ambiguous: "REL__ambiguous"
-	}
-	const roadSectionStatesDefinition = {
-		calls: "STATE_calls",
-		isCalled: "STATE__isCalled",
-		bidirectionalCall: "STATE__bidirectionalCall",
-		ambiguous: "STATE__ambiguous"
-	}
-
-	let roadSectionRelationsMap = new Map();
-    let roadSectionStatesMap = new Map();
+	let roadSectionRelationsTypeMap = new Map();
+	let roadSectionStatesMap = new Map();
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
-
-		roadColorHelper = createRoadColorHelper(controllerConfig)
-		roadColorHelper.initialize(setupConfig);
-
+		if(controllerConfig.emphasizeMode == "ColoredRoads") {
+			roadColorHelper = createRoadColorHelper(controllerConfig);
+			roadColorHelper.initialize();
+		}
 		events.selected.on.subscribe(onEntitySelected);
 		events.selected.off.subscribe(onEntityUnselected);
 	}
 
+	// handle supported entity types on select
 	function onEntitySelected(applicationEvent) {
 		const entityType = applicationEvent.entities[0].type;
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
@@ -38,11 +48,10 @@ controllers.roadController = function () {
 			canvasManipulator.highlightEntities(startElement, "red", { name: "roadController" });
 
 			startElementId = startElement[0].id
-			console.log("START-ELEMENT: " + startElementId)
 			determineRoadSectionRelations(startElementId)
 			determineRoadSectionStates()
 
-			roadColorHelper.handleRoadSectionStates(roadSectionStatesMap, roadSectionStatesDefinition);
+			roadColorHelper.handleRoadSectionStates(roadSectionStatesMap, controllerConfig.roadSectionStatesDefinition);
 
 		} else {
 			return;
@@ -50,78 +59,80 @@ controllers.roadController = function () {
 	}
 
 	function onEntityUnselected(applicationEvent) {
-		canvasManipulator.unhighlightEntities([{ id: applicationEvent.entities[0].id }], { name: "roadController" });
-		roadColorHelper.resetRoadSectionStateHandling(roadSectionStatesMap, roadSectionStatesDefinition);
-		resetRoadSectionStates()
+		const entityType = applicationEvent.entities[0].type;
+		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
+			canvasManipulator.unhighlightEntities([{ id: applicationEvent.entities[0].id }], { name: "roadController" });
+			roadColorHelper.resetRoadSectionStateHandling(roadSectionStatesMap, controllerConfig.roadSectionStatesDefinition);
+			resetRoadSectionStates()
+		}
 	}
 
 	// determine all relations of a startElement
 	function determineRoadSectionRelations(startElementId) {
-        // 1. get all destinationElements for startElement
-        const destinationElements = model.getAllRoadDestinationElementsForStartElement(startElementId)
-        // 2. determine which destinationElements calls the startElement
-        const isDestinationElements = model.getAllRoadStartElementsForDestinationElement(startElementId);
-		// 3. determine all destinationElements which call the startElement AND the startElement also calls the destinationElement 
-		// => add a "bidirectionalCall" relation to all involved roadSections 
-		const bidirectionalCallElements = destinationElements.filter(id => isDestinationElements.includes(id));
-		bidirectionalCallElements.length !== 0 && addRelationToRoadSection(startElementId, bidirectionalCallElements, relationTypes.bidirectionalCall)
-		// 4. determine all destinationElements that get called by the startElement but do not call the startElement
-		// => add a "calls" relation to all involved roadSections 
-		const callsElements = destinationElements.filter(id => !isDestinationElements.includes(id));
-		callsElements.length !== 0 && addRelationToRoadSection(startElementId, callsElements, relationTypes.calls)
-		// 5. determine all destinationElements that call the startElement but are not called by the startElement
-		// => add a "isCalled" relation to all involved roadSections
-		const isCalledElements = isDestinationElements.filter(id => !destinationElements.includes(id));
-		isCalledElements.length !== 0 && addRelationToRoadSection(startElementId, isCalledElements, relationTypes.isCalled);
-		console.log(roadSectionRelationsMap)
+
+		// get elements called by startElement and that call the startElement
+		const destinationsOfStart = model.getRoadDestinationsForStartElement(startElementId);
+		const startIsDestination = model.getRoadStartElementsForDestination(destinationElementId = startElementId);
+	
+		// adds relation to roadSections
+		function addRelationIfNotEmpty(elements, relationType) {
+			if (elements.length !== 0) {
+				addRelationToRoadSection(startElementId, elements, relationType);
+			}
+		}
+		
+		// apply logic to determine all relations a roadSection has (e.g. calls, calls, bidirectional, calls, isCalled, ...)
+		const bidirectionalCallElements = destinationsOfStart.filter(id => startIsDestination.includes(id));
+		addRelationIfNotEmpty(bidirectionalCallElements, controllerConfig.relationTypes.bidirectionalCall);
+	
+		const callsElements = destinationsOfStart.filter(id => !startIsDestination.includes(id));
+		addRelationIfNotEmpty(callsElements, controllerConfig.relationTypes.calls);
+	
+		const isCalledElements = startIsDestination.filter(id => !destinationsOfStart.includes(id));
+		addRelationIfNotEmpty(isCalledElements, controllerConfig.relationTypes.isCalled);
 	}
+	
 
 	// helper function to get all roadSections and add relations to a map with their relation
-	function addRelationToRoadSection(startElementId, elements, relation) {
+	function addRelationToRoadSection(startElementId, elements, relationType) {
 		elements.forEach(id => {
-			const roadSections = model.getAllRoadSectionsForStartAndDestinationElement(id, startElementId)
-			roadSections.forEach(rs => {
-				const existingRelations = roadSectionRelationsMap.get(rs) || [];
-				const newRelations = [...existingRelations, relation];
-				roadSectionRelationsMap.set(rs, newRelations)
+			const roadSections = model.getRoadSectionsForUniqiueRelation(id, startElementId)
+			roadSections.forEach(roadSection => {
+				const existingRelations = roadSectionRelationsTypeMap.get(roadSection) || [];
+				const newRelations = [...existingRelations, relationType];
+				roadSectionRelationsTypeMap.set(roadSection, newRelations)
 			})
 		})
 	}
 
-	// check all added relations on roadSections and assign a determinable undeterminable (ambiguous)or determinable (calls, isCalled, bidirectionalCall) state 
+	// check all added relations on roadSections and assign a determinable undeterminable (ambiguous) or determinable (calls, isCalled, bidirectionalCall) state 
 	function determineRoadSectionStates() {
-		roadSectionRelationsMap.forEach((relationsArray, roadSection) => {
-		  let state;
-	  
-		  switch (true) {
-			case isArrayContainsOnly(relationsArray, relationTypes.calls):
-			  state = roadSectionStatesDefinition.calls;
-			  break;
-			
-			case isArrayContainsOnly(relationsArray, relationTypes.isCalled):
-			  state = roadSectionStatesDefinition.isCalled;
-			  break;
-			
-			case isArrayContainsOnly(relationsArray, relationTypes.bidirectionalCall):
-			  state = roadSectionStatesDefinition.bidirectionalCall;
-			  break;
-	  
-			default:
-			  state = roadSectionStatesDefinition.ambiguous;
-		  }
-	  
-		  roadSectionStatesMap.set(roadSection, state);
+		roadSectionRelationsTypeMap.forEach((relationsArray, roadSection) => {
+			let state;
+			switch (true) {
+				case isArrayContainsOnly(relationsArray, controllerConfig.relationTypes.calls):
+					state = controllerConfig.relationTypes.calls;
+					break;
+				case isArrayContainsOnly(relationsArray, controllerConfig.relationTypes.isCalled):
+					state = controllerConfig.relationTypes.isCalled;
+					break;
+				case isArrayContainsOnly(relationsArray, controllerConfig.relationTypes.bidirectionalCall):
+					state = controllerConfig.relationTypes.bidirectionalCall;
+					break;
+				default:
+					state = controllerConfig.relationTypes.ambiguous;
+			}
+			roadSectionStatesMap.set(roadSection, state);
 		});
-	  }
-	  
-	  // helper function to check if an array contains only a specific value
-	  function isArrayContainsOnly(arr, value) {
+	}
+
+	// helper function to check if an array contains only a specific value
+	function isArrayContainsOnly(arr, value) {
 		return arr.every(item => item === value);
-	  }
-	  
+	}
 
 	function resetRoadSectionStates() {
-		roadSectionRelationsMap.clear();
+		roadSectionRelationsTypeMap.clear();
 		roadSectionStatesMap.clear();
 	}
 

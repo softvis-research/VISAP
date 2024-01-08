@@ -14,8 +14,15 @@ const setup = {
 		},
 		{
 			name: "roadController",
-			emphasizeMode: "RoadColor",
-			supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"]
+			supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
+			emphasizeMode: "ColoredRoads",
+			roadColors: {
+				ambiguous: "white",
+				calls: "turquoise",
+				isCalled: "orange",
+				bidirectionalCall: "magenta",
+			},
+			showLegendOnSelect: true,
 		},
 	],
 
