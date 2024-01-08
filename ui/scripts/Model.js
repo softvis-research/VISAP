@@ -8,6 +8,7 @@ controllers.model = (function () {
 
 	let roadRelationsStartElementDestinationElementMap = new Map();
 	let roadRelationsStartElementRoadSectionsMap = new Map();
+	let roadRelationsStartElementDestinationElementRoadSectionsMap = new Map();
 
 	function initialize() {
 		//subscribe for changing status of entities on events
@@ -219,6 +220,16 @@ controllers.model = (function () {
 				roadRelationsStartElementRoadSectionsMap.set(roadRelation.startElementId, updatedSections);
 			} else {
 				roadRelationsStartElementRoadSectionsMap.set(roadRelation.startElementId, removeDuplicates([...roadRelation.roadSectionsIds]));
+			}
+
+			// set up StartElement + DestinationElement (concat-ID with @) -> RoadSections map; duplicates removed
+			const key = roadRelation.startElementId + "@" + roadRelation.destinationElementId;
+			if (roadRelationsStartElementDestinationElementRoadSectionsMap.has(key)) {
+				const existingSections = roadRelationsStartElementDestinationElementRoadSectionsMap.get(key);
+				const updatedSections = removeDuplicates([...existingSections, ...roadRelation.roadSectionsIds]);
+				roadRelationsStartElementDestinationElementRoadSectionsMap.set(key, updatedSections);
+			} else {
+				roadRelationsStartElementDestinationElementRoadSectionsMap.set(key, removeDuplicates([...roadRelation.roadSectionsIds]));
 			}
 
 			// set up StartElement -> DestinationElement(s) map; duplicates removed
@@ -442,6 +453,19 @@ controllers.model = (function () {
 		}
 	}
 
+	function getAllRoadSectionsForStartAndDestinationElement(startElementId, destinationElementId) {
+		const key1 = startElementId + "@" + destinationElementId;
+		const key2 = destinationElementId + "@" + startElementId;
+	
+		const roadSections1 = roadRelationsStartElementDestinationElementRoadSectionsMap.get(key1) || [];
+		const roadSections2 = roadRelationsStartElementDestinationElementRoadSectionsMap.get(key2) || [];
+	
+		const combinedRoadSections = [...roadSections1, ...roadSections2];
+		
+		return combinedRoadSections;
+	}
+
+
 	function getAllRoadDestinationElementsForStartElement(startElementId) {
 		if (roadRelationsStartElementDestinationElementMap.has(startElementId)) {
 			return roadRelationsStartElementDestinationElementMap.get(startElementId);
@@ -528,6 +552,7 @@ controllers.model = (function () {
 		getAllRoadSectionsForStartElement: getAllRoadSectionsForStartElement,
 		getAllRoadDestinationElementsForStartElement: getAllRoadDestinationElementsForStartElement,
 		getAllRoadStartElementsForDestinationElement: getAllRoadStartElementsForDestinationElement,
+		getAllRoadSectionsForStartAndDestinationElement: getAllRoadSectionsForStartAndDestinationElement
 	};
 
 })();

@@ -24,10 +24,6 @@ controllers.roadController = function () {
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
 
-        // LD TODO: Outsource in specific controller
-		// legendHelper = createLegendHelper(controllerConfig)
-		// legendHelper.createLegend()
-
 		roadColorHelper = createRoadColorHelper(controllerConfig)
 		roadColorHelper.initialize(setupConfig);
 
@@ -42,9 +38,9 @@ controllers.roadController = function () {
 			canvasManipulator.highlightEntities(startElement, "red", { name: "roadController" });
 
 			startElementId = startElement[0].id
+			console.log("START-ELEMENT: " + startElementId)
 			determineRoadSectionRelations(startElementId)
 			determineRoadSectionStates()
-			console.log(roadSectionStatesMap)
 
 			roadColorHelper.handleRoadSectionStates(roadSectionStatesMap, roadSectionStatesDefinition);
 
@@ -68,21 +64,22 @@ controllers.roadController = function () {
 		// 3. determine all destinationElements which call the startElement AND the startElement also calls the destinationElement 
 		// => add a "bidirectionalCall" relation to all involved roadSections 
 		const bidirectionalCallElements = destinationElements.filter(id => isDestinationElements.includes(id));
-		addRelationToRoadSection(bidirectionalCallElements, relationTypes.bidirectionalCall)
+		bidirectionalCallElements.length !== 0 && addRelationToRoadSection(startElementId, bidirectionalCallElements, relationTypes.bidirectionalCall)
 		// 4. determine all destinationElements that get called by the startElement but do not call the startElement
 		// => add a "calls" relation to all involved roadSections 
 		const callsElements = destinationElements.filter(id => !isDestinationElements.includes(id));
-		addRelationToRoadSection(callsElements, relationTypes.calls)
+		callsElements.length !== 0 && addRelationToRoadSection(startElementId, callsElements, relationTypes.calls)
 		// 5. determine all destinationElements that call the startElement but are not called by the startElement
 		// => add a "isCalled" relation to all involved roadSections
 		const isCalledElements = isDestinationElements.filter(id => !destinationElements.includes(id));
-		addRelationToRoadSection(isCalledElements, relationTypes.isCalled)
+		isCalledElements.length !== 0 && addRelationToRoadSection(startElementId, isCalledElements, relationTypes.isCalled);
+		console.log(roadSectionRelationsMap)
 	}
 
 	// helper function to get all roadSections and add relations to a map with their relation
-	function addRelationToRoadSection(elements, relation) {
+	function addRelationToRoadSection(startElementId, elements, relation) {
 		elements.forEach(id => {
-			const roadSections = model.getAllRoadSectionsForStartElement(id);
+			const roadSections = model.getAllRoadSectionsForStartAndDestinationElement(id, startElementId)
 			roadSections.forEach(rs => {
 				const existingRelations = roadSectionRelationsMap.get(rs) || [];
 				const newRelations = [...existingRelations, relation];

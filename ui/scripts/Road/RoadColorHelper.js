@@ -8,10 +8,10 @@ const createRoadColorHelper = function (controllerConfig) {
         }
 
         const roadOffsetY = {
-            ambiguous: 0.001,
+            ambiguous: 0.005,
             calls: 0.002,
-            isCalled: 0.003,
-            bidirectional: 0.004,
+            isCalled: 0.006,
+            bidirectionalCall: 0.004,
         }
 
         function initialize(setupConfig) {
