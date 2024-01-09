@@ -12,7 +12,6 @@ import org.aeonbits.owner.Config.LoadPolicy;
     Sources.CONFIG_PATH + "metropolis/Shape.properties",
 })
 public interface Shape extends Config {
-
     @DefaultValue("Cylinder")
     CityElement.CityShape attributeBuilding();
 
@@ -33,8 +32,6 @@ public interface Shape extends Config {
 
     CityElement.CityShape defaultBuildingValue();
 
-
-    // Test
     @DefaultValue("Cylinder")
     CityElement.CityShape tableBuilding();
 
