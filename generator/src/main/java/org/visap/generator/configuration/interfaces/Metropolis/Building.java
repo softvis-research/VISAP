@@ -6,8 +6,8 @@ import org.visap.generator.configuration.Sources;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    Sources.CONFIG_LOCAL_PATH + "Building.properties",
-    Sources.CONFIG_PATH + "Building.properties",
+    Sources.CONFIG_LOCAL_PATH + "metropolis/Building.properties",
+    Sources.CONFIG_PATH + "metropolis/Building.properties",
 })
 public interface Building extends Config {
     @DefaultValue("2")
