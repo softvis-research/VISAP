@@ -8,8 +8,8 @@ import org.aeonbits.owner.Config.LoadPolicy;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    Sources.CONFIG_LOCAL_PATH + "Shape.properties",
-    Sources.CONFIG_PATH + "Shape.properties",
+    Sources.CONFIG_LOCAL_PATH + "metropolis/Shape.properties",
+    Sources.CONFIG_PATH + "metropolis/Shape.properties",
 })
 public interface Shape extends Config {
 
