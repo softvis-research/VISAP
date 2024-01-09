@@ -15,5 +15,4 @@ public interface Assets extends Config {
 
     @DefaultValue("assets/ground.jpg")
     String ground();
-
 }
