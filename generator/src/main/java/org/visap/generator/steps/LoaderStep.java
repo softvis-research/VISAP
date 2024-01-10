@@ -38,7 +38,7 @@ public class LoaderStep {
         }
 
         if (pathToNodesCsv.isEmpty() && pathToReferenceCsv.isEmpty()) {
-            System.out.println("Nodes and Reference CSV files weren't found. Please check the input folder and make sure that you are executing the program from the generator directory.");
+            System.out.println("Nodes and Reference CSV files weren't found. Please check the input folder and make sure that you are executing the program while you are in the VISAP directory.");
             System.exit(0);
         } else if (pathToNodesCsv.isEmpty()) {
             System.out.println("Nodes CSV file wasn't found");
