@@ -69,11 +69,9 @@ controllers.roadController = function () {
 
 	// determine all relations of a startElement
 	function determineRoadSectionRelations(startElementId) {
-
 		// get elements called by startElement and that call the startElement
-		const destinationsOfStart = model.getRoadDestinationsForStartElement(startElementId);
-		const startIsDestination = model.getRoadStartElementsForDestination(destinationElementId = startElementId);
-	
+		const destinationsOfStart = roadModel.getRoadDestinationsForStartElement(startElementId);
+		const startIsDestination = roadModel.getRoadStartElementsForDestination(destinationElementId = startElementId);
 		// adds relation to roadSections
 		function addRelationIfNotEmpty(elements, relationType) {
 			if (elements.length !== 0) {
@@ -96,7 +94,7 @@ controllers.roadController = function () {
 	// helper function to get all roadSections and add relations to a map with their relation
 	function addRelationToRoadSection(startElementId, elements, relationType) {
 		elements.forEach(id => {
-			const roadSections = model.getRoadSectionsForUniqiueRelation(id, startElementId)
+			const roadSections = roadModel.getRoadSectionsForUniqiueRelation(id, startElementId)
 			roadSections.forEach(roadSection => {
 				const existingRelations = roadSectionRelationsTypeMap.get(roadSection) || [];
 				const newRelations = [...existingRelations, relationType];
