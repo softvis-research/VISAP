@@ -1,8 +1,8 @@
 controllers.relationController = function () {
 	// for clarity and consistency in handling relation array tuples
 	// outgoing meaning a relation from this to something else, incoming meaning a relation from somewhere else to this
-	const outgoing = 0;
-	const incoming = 1;
+	const OUTGOING = 0;
+	const INCOMING = 1;
 
 	// list of entities whose relations to others are being displayed (not including intermediate steps of recursive relations)
 	let sourceEntities = new Array();
@@ -35,8 +35,10 @@ controllers.relationController = function () {
 		sourceStartAtBorder: false,
 		targetEndAtBorder: false,
 		createEndpoints: false,
-		connectorColor: { r: 0, g: 0, b: 1 },
-		reverseConnectorColor: { r: 1, g: 0, b: 0},
+		enableOutgoingConnectors: true,
+		enableIncomingConnectors: true,
+		outgoingConnectorColor: { r: 0, g: 0, b: 1 },
+		incomingConnectorColor: { r: 1, g: 0, b: 0},
 		endpointColor: { r: 0, g: 0, b: 0 },
 		curvedConnectors: false,
 
@@ -166,7 +168,7 @@ controllers.relationController = function () {
 	}
 
 	function createRelation(sourceEntity, relatedEntity, direction) {
-		const relationIdConnector = direction === outgoing ? "--2--" : "--fr--";
+		const relationIdConnector = direction === OUTGOING ? "--2--" : "--fr--";
 		const relation = model.createEntity(
 			"Relation",
 			sourceEntity.id + relationIdConnector + relatedEntity.id,
@@ -183,15 +185,15 @@ controllers.relationController = function () {
 
 	// add these new relations to the internal relation state - duplicates will be filtered
 	function loadRelations(newRelationMap, relationDirection) {
-		const filterOutgoing = relationDirection === incoming;
-		const filterIncoming = relationDirection === outgoing;
+		const filterOutgoing = relationDirection === INCOMING;
+		const filterIncoming = relationDirection === OUTGOING;
 
 		const newRelations = [];
 		for (const [sourceEntity, [relatedEntitiesOutgoing, relatedEntitiesIncoming]] of newRelationMap) {
 			// merge into one array for easier traversal
 			const newRelatedEntities = Array.prototype.concat(
-				filterOutgoing ? [] : relatedEntitiesOutgoing.map(entity => [entity, outgoing]),
-				filterIncoming ? [] : relatedEntitiesIncoming.map(entity => [entity, incoming])
+				filterOutgoing ? [] : relatedEntitiesOutgoing.map(entity => [entity, OUTGOING]),
+				filterIncoming ? [] : relatedEntitiesIncoming.map(entity => [entity, INCOMING])
 			);
 			const oldRelatedEntities = relatedEntitiesMap.get(sourceEntity);
 			const relatedEntitiesOfSourceEntity = new Set(oldRelatedEntities);
@@ -235,7 +237,7 @@ controllers.relationController = function () {
 			controllerConfig.relationClasses[relationsConfig] : relationsConfig;
 		if (!Array.isArray(relationsProperties)) return relatedEntitiesOfSourceEntity;
 
-		for (const direction of [outgoing, incoming]) {
+		for (const direction of [OUTGOING, INCOMING]) {
 			const relationProperty = relationsProperties[direction];
 			if (relationProperty && typeof relationProperty === 'string' && sourceEntity[relationProperty]) {
 				const relatedEntities = sourceEntity[relationProperty];
@@ -256,8 +258,8 @@ controllers.relationController = function () {
 		}, [[], []]);
 		// load relations separately for each set, filtered to match the same direction
 		const newRelations = Array.prototype.concat(
-			loadAllRelationsOf(newRelatedEntitiesByDirection[outgoing], outgoing),
-			loadAllRelationsOf(newRelatedEntitiesByDirection[incoming], incoming)
+			loadAllRelationsOf(newRelatedEntitiesByDirection[OUTGOING], OUTGOING),
+			loadAllRelationsOf(newRelatedEntitiesByDirection[INCOMING], INCOMING)
 		);
 		// recursively move through descendants
 		if (newRelations.length > 0) {
@@ -273,10 +275,13 @@ controllers.relationController = function () {
 	function createRelatedConnections(newRelations) {
 
 		newRelations.forEach(function (relation) {
+			if (!controllerConfig.enableOutgoingConnectors && relation.direction === OUTGOING) return;
+			if (!controllerConfig.enableIncomingConnectors && relation.direction === INCOMING) return;
+
 			const sourceEntity = relation.source;
 			const relatedEntity = relation.target;
 			const options = {
-				reversed: relation.direction === incoming
+				direction: relation.direction === INCOMING ? "incoming" : "outgoing"
 			};
 			//create scene element
 			const connectorElements = relationConnectionHelper.createConnector(sourceEntity, relatedEntity, relation.id, options);

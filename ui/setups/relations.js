@@ -19,7 +19,7 @@ const setup = {
 			showInnerRelations: true,
 			curvedConnectors: true,
 
-			connectorColor: { r: 0, g: 0, b: 1 },
+			outgoingConnectorColor: { r: 0, g: 0, b: 1 },
 		},
 	],
 

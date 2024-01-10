@@ -116,7 +116,7 @@ const createCurvedRelationConnectionHelper = function (controllerConfig) {
 			// create connector
 			const connector = document.createElement("a-ring");
 			setConnectorMeshProperties(connector, direction);
-			const connectorColor = options?.reversed ?  controllerConfig.reverseConnectorColor : controllerConfig.connectorColor;
+			const connectorColor = options?.direction === 'incoming' ?  controllerConfig.incomingConnectorColor : controllerConfig.outgoingConnectorColor;
 			setCommonConnectorHTMLProperties(connector, connectorColor);
 
 			connector.setAttribute("position", centralPosition);

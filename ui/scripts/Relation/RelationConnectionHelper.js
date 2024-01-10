@@ -107,7 +107,7 @@ const createRelationConnectionHelper = function (controllerConfig) {
 			const connector = document.createElement("a-cylinder");
 			const halfwayPoint = combineObjectProperties(sourcePosition, delta, (left, right) => left + right / 2);
 			setConnectorMeshProperties(connector, halfwayPoint, direction, connectorSize, distance);
-			const connectorColor = options?.reversed ?  controllerConfig.reverseConnectorColor : controllerConfig.connectorColor;
+			const connectorColor = options?.direction === 'incoming' ?  controllerConfig.incomingConnectorColor : controllerConfig.outgoingConnectorColor;
 			setCommonConnectorHTMLProperties(connector, connectorColor);
 			connector.setAttribute("radius", 5);
 			connector.setAttribute("id", relationId);
