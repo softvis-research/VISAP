@@ -94,7 +94,7 @@ controllers.roadController = function () {
 	// helper function to get all roadSections and add relations to a map with their relation
 	function addRelationToRoadSection(startElementId, elements, relationType) {
 		elements.forEach(id => {
-			const roadSections = roadModel.getRoadSectionsForUniqiueRelation(id, startElementId)
+			const roadSections = roadModel.getRoadSectionsOfUniqueRelationship(id, startElementId)
 			roadSections.forEach(roadSection => {
 				const existingRelations = roadSectionRelationsTypeMap.get(roadSection) || [];
 				const newRelations = [...existingRelations, relationType];

@@ -1,12 +1,11 @@
 controllers.roadModel = (function () {
 
-	let roadRelationsStartElementsDestinationMap = new Map(); //
-	let roadRelationsStartElementsRoadSectionsMap = new Map();
-	let roadRelationsUniqueRoadSectionsMap = new Map();
+	let startElementsDestinationMap = new Map(); //
+	let startElementsRoadSectionsMap = new Map();
+	let relationshipRoadSectionsMap = new Map();
 
 	// model data from roads.json
 	function createRoadRelationsFromRoadsData(roadsDataArray) {
-		const roadRelations = [];
 
 		roadsDataArray.forEach(function (entry) {
 
@@ -17,37 +16,37 @@ controllers.roadModel = (function () {
 				entry.road_sections,
 			);
 
-			// set up startElement -> destinationElements map; duplicates removed
-			if (roadRelationsStartElementsDestinationMap.has(roadRelation.startElementId)) {
-				const existingDestinations = roadRelationsStartElementsDestinationMap.get(roadRelation.startElementId);
-				const updatedDestinations = removeDuplicates([...existingDestinations, roadRelation.destinationElementId]);
-				roadRelationsStartElementsDestinationMap.set(roadRelation.startElementId, updatedDestinations);
+			// set up startElement -> destinationElements map
+			if (startElementsDestinationMap.has(roadRelation.startElementId)) {
+				const existingDestinations = startElementsDestinationMap.get(roadRelation.startElementId);
+				const updatedDestinations = [...existingDestinations, roadRelation.destinationElementId];
+				startElementsDestinationMap.set(roadRelation.startElementId, updatedDestinations);
 			} else {
-				roadRelationsStartElementsDestinationMap.set(roadRelation.startElementId, [roadRelation.destinationElementId]);
+				startElementsDestinationMap.set(roadRelation.startElementId, [roadRelation.destinationElementId]);
 			}
 
-			// set up startElement -> roadSections map; duplicates removed
-			if (roadRelationsStartElementsRoadSectionsMap.has(roadRelation.startElementId)) {
-				const existingRoadSections = roadRelationsStartElementsRoadSectionsMap.get(roadRelation.startElementId);
-				const updatedRoadSections = removeDuplicates([...existingRoadSections, ...roadRelation.roadSectionsIds]);
-				roadRelationsStartElementsRoadSectionsMap.set(roadRelation.startElementId, updatedRoadSections);
+			// set up startElement -> roadSections map
+			if (startElementsRoadSectionsMap.has(roadRelation.startElementId)) {
+				const existingRoadSections = startElementsRoadSectionsMap.get(roadRelation.startElementId);
+				const updatedRoadSections = [...existingRoadSections, ...roadRelation.roadSectionsIds];
+				startElementsRoadSectionsMap.set(roadRelation.startElementId, updatedRoadSections);
 			} else {
-				roadRelationsStartElementsRoadSectionsMap.set(roadRelation.startElementId, removeDuplicates([...roadRelation.roadSectionsIds]));
+				startElementsRoadSectionsMap.set(roadRelation.startElementId, [...roadRelation.roadSectionsIds]);
 			}
 
-			// set up startElement + destinationElement (concat ID with @) -> roadSections map; duplicates removed
+			// set up startElement + destinationElement (concat ID with @) -> roadSections map
 			const key = roadRelation.startElementId + "@" + roadRelation.destinationElementId;
-			if (roadRelationsUniqueRoadSectionsMap.has(key)) {
-				const existingRoadSections = roadRelationsUniqueRoadSectionsMap.get(key);
-				const updatedRoadSections = removeDuplicates([...existingRoadSections, ...roadRelation.roadSectionsIds]);
-				roadRelationsUniqueRoadSectionsMap.set(key, updatedRoadSections);
+			if (relationshipRoadSectionsMap.has(key)) {
+				const existingRoadSections = relationshipRoadSectionsMap.get(key);
+				const updatedRoadSections = [...existingRoadSections, ...roadRelation.roadSectionsIds];
+				relationshipRoadSectionsMap.set(key, updatedRoadSections);
 			} else {
-				roadRelationsUniqueRoadSectionsMap.set(key, removeDuplicates([...roadRelation.roadSectionsIds]));
+				relationshipRoadSectionsMap.set(key, [...roadRelation.roadSectionsIds]);
 			}
 
-			roadRelations.push(roadRelation);
+
+			// set up startElement -> roadSections ->
 		});
-		return roadRelations;
 	}
 
 	// object map
@@ -63,20 +62,20 @@ controllers.roadModel = (function () {
 
 	// get all roadSections for a startElement
 	function getRoadSectionsForStartElement(startElementId) {
-		if (roadRelationsStartElementsRoadSectionsMap.has(startElementId)) {
-			return roadRelationsStartElementsRoadSectionsMap.get(startElementId);
+		if (startElementsRoadSectionsMap.has(startElementId)) {
+			return startElementsRoadSectionsMap.get(startElementId);
 		} else {
 			return [];
 		}
 	}
 
 	// get all roadSections for a unique relation between tweo entities (order of ID's doesn't matter)
-	function getRoadSectionsForUniqiueRelation(entityId1, entityId2) {
+	function getRoadSectionsOfUniqueRelationship(entityId1, entityId2) {
 		const key1 = entityId1 + "@" + entityId2;
 		const key2 = entityId2 + "@" + entityId1;
 
-		const roadSections1 = roadRelationsUniqueRoadSectionsMap.get(key1) || [];
-		const roadSections2 = roadRelationsUniqueRoadSectionsMap.get(key2) || [];
+		const roadSections1 = relationshipRoadSectionsMap.get(key1) || [];
+		const roadSections2 = relationshipRoadSectionsMap.get(key2) || [];
 
 		const roadSections = [...roadSections1, ...roadSections2];
 
@@ -85,8 +84,8 @@ controllers.roadModel = (function () {
 
 	// get all destinationElements for a startElement
 	function getRoadDestinationsForStartElement(startElementId) {
-		if (roadRelationsStartElementsDestinationMap.has(startElementId)) {
-			return roadRelationsStartElementsDestinationMap.get(startElementId);
+		if (startElementsDestinationMap.has(startElementId)) {
+			return startElementsDestinationMap.get(startElementId);
 		} else {
 			return [];
 		}
@@ -95,7 +94,7 @@ controllers.roadModel = (function () {
 	// get all startElements for a destinationElement
 	function getRoadStartElementsForDestination(destinationElementId) {
 		const startElements = [];
-		for (const [startElement, destinationElements] of roadRelationsStartElementsDestinationMap.entries()) {
+		for (const [startElement, destinationElements] of startElementsDestinationMap.entries()) {
 			if (destinationElements.includes(destinationElementId)) {
 				startElements.push(startElement);
 			}
@@ -103,18 +102,12 @@ controllers.roadModel = (function () {
 		return startElements;
 	}
 
-	// removes duplicates by identity, does not guarantee order
-	function removeDuplicates(arr) {
-		return [...new Set(arr)];
-	}
-
 	return {
-		// roads
 		createRoadRelationsFromRoadsData: createRoadRelationsFromRoadsData,
 		getRoadSectionsForStartElement: getRoadSectionsForStartElement,
 		getRoadDestinationsForStartElement: getRoadDestinationsForStartElement,
 		getRoadStartElementsForDestination: getRoadStartElementsForDestination,
-		getRoadSectionsForUniqiueRelation: getRoadSectionsForUniqiueRelation
+		getRoadSectionsOfUniqueRelationship: getRoadSectionsOfUniqueRelationship
 	};
 
 })();
