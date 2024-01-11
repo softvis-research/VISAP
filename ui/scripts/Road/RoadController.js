@@ -146,6 +146,7 @@ controllers.roadController = function () {
 
 		roadObjectsCalls = roadModel.getRoadRelationsForStartElement(startElementId)
 		roadObjectsCalls.forEach(roadObject => {
+			console.log(roadObject.roadSectionsIds)
 			calculateAngleBetweenRoadSections(roadObject.roadSectionsIds)
 		})
 
@@ -153,25 +154,37 @@ controllers.roadController = function () {
 		// roadObjectsIsCalled = roadModel.getRoadRelationsForDestination(startElementId)
 
 	}
-
+	
+	function angleToDirection(angleDegrees) {
+		if (angleDegrees >= 45 && angleDegrees < 135) {
+			return "East";
+		} else if (angleDegrees >= 135 && angleDegrees < 225) {
+			return "South";
+		} else if (angleDegrees >= 225 && angleDegrees < 315) {
+			return "West";
+		} else {
+			return "North";
+		}
+	}
+	
 	function calculateAngleBetweenRoadSections(roadSections) {
 		const degreesToRadians = degrees => degrees * (Math.PI / 180);
 	
 		for (let i = 0; i < roadSections.length - 1; i++) {
 			const roadSection1 = roadSections[i];
-			const center1 = canvasManipulator.getCenterOfEntity({ id: roadSection1 });
+			const center1 = roundCoordinates(canvasManipulator.getCenterOfEntity({ id: roadSection1 }));
 			console.log(`Center of RoadSection ${roadSection1}:`, center1);
 	
 			for (let j = i + 1; j < roadSections.length; j++) {
 				const roadSection2 = roadSections[j];
-				const center2 = canvasManipulator.getCenterOfEntity({ id: roadSection2 });
+				const center2 = roundCoordinates(canvasManipulator.getCenterOfEntity({ id: roadSection2 }));
 				console.log(`Center of RoadSection ${roadSection2}:`, center2);
 	
 				const deltaX = center2.x - center1.x;
-				const deltaY = center2.y - center1.y;
+				const deltaZ = center2.z - center1.z;
 	
 				// Calculate the angle in radians
-				let angleRadians = Math.atan2(deltaY, deltaX);
+				let angleRadians = Math.atan2(deltaZ, deltaX);
 	
 				// Convert angle to degrees
 				let angleDegrees = angleRadians * (180 / Math.PI);
@@ -182,8 +195,21 @@ controllers.roadController = function () {
 				}
 	
 				console.log(`Angle between RoadSection ${roadSection1} and RoadSection ${roadSection2}: ${angleDegrees} degrees`);
+				
+				const direction = angleToDirection(angleDegrees);
+				console.log(`Direction between RoadSection ${roadSection1} and RoadSection ${roadSection2}: ${direction}`);
 			}
 		}
+	}
+	
+	
+	function roundCoordinates(coordinates) {
+		const precision = 10;
+		return {
+			x: Number(coordinates.x.toFixed(precision)),
+			y: Number(coordinates.y.toFixed(precision)),
+			z: Number(coordinates.z.toFixed(precision)),
+		};
 	}
 
 	
