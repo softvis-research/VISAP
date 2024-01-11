@@ -27,7 +27,7 @@ public interface Setup extends Config {
     @Config.DefaultValue("true")
     boolean silentMode();
 
-    // Cypher RegEx
+    // Cypher RegEx, separate multiple entries with commas
     @Config.DefaultValue(".*")
     List<String> packagesWhitelist();
 }
