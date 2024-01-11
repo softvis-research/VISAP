@@ -144,14 +144,14 @@ controllers.roadController = function () {
 
 	function assignRoadSectionDirection3D(startElementId) {
 
-		roadObjectsCalls = roadModel.getRoadRelationsForStartElement(startElementId)
+		roadObjectsCalls = roadModel.getRoadObjectsForStartElement(startElementId)
 		roadObjectsCalls.forEach(roadObject => {
 			console.log(roadObject.roadSectionsIds)
 			calculateAngleBetweenRoadSections(roadObject.roadSectionsIds)
 		})
 
 
-		// roadObjectsIsCalled = roadModel.getRoadRelationsForDestination(startElementId)
+		roadObjectsIsCalled = roadModel.getRoadObjectsForStartElement(startElementId)
 
 	}
 	
