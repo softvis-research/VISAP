@@ -48,7 +48,6 @@ controllers.roadController = function () {
 
 			startElementId = startElement[0].id
 			assignRoadSectionRelativeProperties(startElementId)
-			determineRoadSectionStates()
 
 			roadColorHelper.handleRoadSectionStates(roadSectionRelativePropertiesMap);
 
@@ -69,11 +68,13 @@ controllers.roadController = function () {
 	function assignRoadSectionRelativeProperties(startElementId) {
 		const destinationsOfStart = roadModel.getRoadDestinationsForStartElement(startElementId);
 		const startIsDestination = roadModel.getRoadStartElementsForDestination(destinationElementId = startElementId);
-		determineRoadSectionRelations(startElementId, destinationsOfStart, startIsDestination)
+		assignAllRoadSectionRelations(startElementId, destinationsOfStart, startIsDestination);
+		assignRoadSectionStates();
+		assignRoadSectionDirection3D(startElementId);
 	}
 
 	// determine all relations of a startElement
-	function determineRoadSectionRelations(startElementId, destinationsOfStart, startIsDestination) {
+	function assignAllRoadSectionRelations(startElementId, destinationsOfStart, startIsDestination) {
 		// get elements called by startElement and that call the startElement
 
 		// adds relation to roadSections
@@ -101,19 +102,19 @@ controllers.roadController = function () {
 			const roadSections = roadModel.getRoadSectionsOfUniqueRelationship(id, startElementId)
 			roadSections.forEach(roadSection => {
 				const existingProperties = roadSectionRelativePropertiesMap.get(roadSection) || {};
-				const existingRelations = existingProperties.relations || [];				
+				const existingRelations = existingProperties.relations || [];
 				const newRelations = [...existingRelations, relationType];
-				roadSectionProperties = { relations: newRelations };
+				roadSectionProperties = { ...existingProperties, relations: newRelations };
 				roadSectionRelativePropertiesMap.set(roadSection, roadSectionProperties)
 			})
 		})
 	}
 
 	// check all added relations on roadSections and assign a determinable undeterminable (ambiguous) or determinable (calls, isCalled, bidirectionalCall) state 
-	// check all added relations on roadSections and assign a determinable undeterminable (ambiguous) or determinable (calls, isCalled, bidirectionalCall) state 
-	function determineRoadSectionStates() {
-		console.log("x")
-		console.log(roadSectionRelativePropertiesMap)
+	function assignRoadSectionStates() {
+		console.log("x");
+		console.log(roadSectionRelativePropertiesMap);
+
 		roadSectionRelativePropertiesMap.forEach((roadSectionProperties, roadSection) => {
 			const relationsArray = roadSectionProperties.relations;
 			let state;
@@ -133,11 +134,62 @@ controllers.roadController = function () {
 					default:
 						state = controllerConfig.relationTypes.ambiguous;
 				}
-				roadSectionProperties = { relations: [...relationsArray], state: state };
+
+				// Update the state property in roadSectionProperties
+				roadSectionProperties = { ...roadSectionProperties, state: state };
 				roadSectionRelativePropertiesMap.set(roadSection, roadSectionProperties);
 			}
 		});
 	}
+
+	function assignRoadSectionDirection3D(startElementId) {
+
+		roadObjectsCalls = roadModel.getRoadRelationsForStartElement(startElementId)
+		roadObjectsCalls.forEach(roadObject => {
+			calculateAngleBetweenRoadSections(roadObject.roadSectionsIds)
+		})
+
+
+		// roadObjectsIsCalled = roadModel.getRoadRelationsForDestination(startElementId)
+
+	}
+
+	function calculateAngleBetweenRoadSections(roadSections) {
+		const degreesToRadians = degrees => degrees * (Math.PI / 180);
+	
+		for (let i = 0; i < roadSections.length - 1; i++) {
+			const roadSection1 = roadSections[i];
+			const center1 = canvasManipulator.getCenterOfEntity({ id: roadSection1 });
+			console.log(`Center of RoadSection ${roadSection1}:`, center1);
+	
+			for (let j = i + 1; j < roadSections.length; j++) {
+				const roadSection2 = roadSections[j];
+				const center2 = canvasManipulator.getCenterOfEntity({ id: roadSection2 });
+				console.log(`Center of RoadSection ${roadSection2}:`, center2);
+	
+				const deltaX = center2.x - center1.x;
+				const deltaY = center2.y - center1.y;
+	
+				// Calculate the angle in radians
+				let angleRadians = Math.atan2(deltaY, deltaX);
+	
+				// Convert angle to degrees
+				let angleDegrees = angleRadians * (180 / Math.PI);
+	
+				// Ensure the angle is positive
+				if (angleDegrees < 0) {
+					angleDegrees += 360;
+				}
+	
+				console.log(`Angle between RoadSection ${roadSection1} and RoadSection ${roadSection2}: ${angleDegrees} degrees`);
+			}
+		}
+	}
+
+	
+
+
+
 
 
 	// helper function to check if an array contains only a specific value

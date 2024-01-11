@@ -1,5 +1,7 @@
 controllers.roadModel = (function () {
 
+	let roadRelations = []
+
 	let startElementsDestinationMap = new Map(); //
 	let startElementsRoadSectionsMap = new Map();
 	let relationshipRoadSectionsMap = new Map();
@@ -15,6 +17,8 @@ controllers.roadModel = (function () {
 				entry.destination_element,
 				entry.road_sections,
 			);
+
+			roadRelations.push(roadRelation)
 
 			// set up startElement -> destinationElements map
 			if (startElementsDestinationMap.has(roadRelation.startElementId)) {
@@ -43,9 +47,6 @@ controllers.roadModel = (function () {
 			} else {
 				relationshipRoadSectionsMap.set(key, [...roadRelation.roadSectionsIds]);
 			}
-
-
-			// set up startElement -> roadSections ->
 		});
 	}
 
@@ -58,6 +59,16 @@ controllers.roadModel = (function () {
 			roadSectionsIds,
 		}
 		return roadRelation;
+	}
+
+	// Get roadRelations for a given startElementId
+	function getRoadRelationsForStartElement(startElementId) {
+		return roadRelations.filter(roadRelation => roadRelation.startElementId === startElementId);
+	}
+
+	// Get roadRelations for a given destinationElementId
+	function getRoadRelationsForDestination(destinationElementId) {
+		return roadRelations.filter(roadRelation => roadRelation.destinationElementId === destinationElementId);
 	}
 
 	// get all roadSections for a startElement
@@ -103,11 +114,14 @@ controllers.roadModel = (function () {
 	}
 
 	return {
-		createRoadRelationsFromRoadsData: createRoadRelationsFromRoadsData,
-		getRoadSectionsForStartElement: getRoadSectionsForStartElement,
-		getRoadDestinationsForStartElement: getRoadDestinationsForStartElement,
-		getRoadStartElementsForDestination: getRoadStartElementsForDestination,
-		getRoadSectionsOfUniqueRelationship: getRoadSectionsOfUniqueRelationship
-	};
+        createRoadRelationsFromRoadsData: createRoadRelationsFromRoadsData,
+        getRoadSectionsForStartElement: getRoadSectionsForStartElement,
+        getRoadDestinationsForStartElement: getRoadDestinationsForStartElement,
+        getRoadStartElementsForDestination: getRoadStartElementsForDestination,
+        getRoadSectionsOfUniqueRelationship: getRoadSectionsOfUniqueRelationship,
+        getRoadRelationsForStartElement: getRoadRelationsForStartElement,
+        getRoadRelationsForDestination: getRoadRelationsForDestination
+    };
+
 
 })();
