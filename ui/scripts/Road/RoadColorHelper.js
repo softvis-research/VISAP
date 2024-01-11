@@ -18,9 +18,12 @@ const createRoadColorHelper = function (controllerConfig) {
         }
 
         // handle roadSection coloring and offset by state
-        function handleRoadSectionStates(roadSectionStatesMap) {
+        function handleRoadSectionStates(roadSectionRelativePropertiesMap) {
+            console.log(roadSectionRelativePropertiesMap)
             if (controllerConfig.showLegendOnSelect) legendHelper.showLegend()
-            roadSectionStatesMap.forEach((state, roadSection) => {
+            roadSectionRelativePropertiesMap.forEach((roadSectionProperties, roadSection) => {
+                const state = roadSectionProperties.state
+
                 switch (state) {
                     case controllerConfig.relationTypes.calls:
                         colorRoadSections(roadSection, controllerConfig.roadColors.calls)
@@ -46,10 +49,11 @@ const createRoadColorHelper = function (controllerConfig) {
         }
 
         // reset all coloring and offset
-        function resetRoadSectionStateHandling(roadSectionStatesMap) {
+        function resetRoadSectionStateHandling(roadSectionRelativePropertiesMap) {
             if (controllerConfig.showLegendOnSelect) legendHelper.hideLegend()
-            roadSectionStatesMap.forEach((state, roadSection) => {
+            roadSectionRelativePropertiesMap.forEach((roadSectionProperties, roadSection) => {
                 resetColorRoadSections(roadSection)
+                const state = roadSectionProperties.state
                 switch (state) {
                     case controllerConfig.relationTypes.calls:
                         resetOffsetRoadSectionsY(roadSection, roadOffsetY.calls)
