@@ -64,7 +64,9 @@ public class CsvFilesInputFilter {
 
         try {
             Stream<Path> entries = Files.list(folderPath);
-            return entries.findFirst().isEmpty();
+            Boolean result = entries.findFirst().isEmpty();
+            entries.close();
+            return result;
         } catch (IOException e) {
             e.printStackTrace();
         }
