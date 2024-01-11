@@ -1,5 +1,7 @@
 package org.visap.generator.configuration.interfaces;
 
+import java.util.List;
+
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;
 import org.visap.generator.configuration.Sources;
@@ -24,4 +26,8 @@ public interface Setup extends Config {
 
     @Config.DefaultValue("true")
     boolean silentMode();
+
+    // Cypher RegEx
+    @Config.DefaultValue(".*")
+    List<String> packagesWhitelist();
 }

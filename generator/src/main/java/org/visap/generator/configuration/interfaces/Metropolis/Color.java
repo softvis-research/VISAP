@@ -58,8 +58,6 @@ public interface Color extends Config {
      @DefaultValue("#FFFFFF")
      String defaultBuildingValue();
 
-
-     // Test
      @DefaultValue("#229954")
      String ddicDistrict();
      @DefaultValue("#1A5276")

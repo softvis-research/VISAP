@@ -14,6 +14,7 @@ import org.visap.generator.metaphors.metropolis.steps.MetropolisLayouter;
 import org.visap.generator.model.AFrameExporter;
 import org.visap.generator.model.MetaDataOutput;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class AFrameExporterStep {
@@ -27,6 +28,9 @@ public class AFrameExporterStep {
         boolean isSilentMode = Config.setup.silentMode();
 
         nodeRepository = new SourceNodeRepository();
+        
+        List<String> whitelist = Config.setup.packagesWhitelist();
+        nodeRepository.applyPackageWhitelist(whitelist);
         nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);
         nodeRepository.loadNodesByRelation(SAPRelationLabels.TYPEOF, true);

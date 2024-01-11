@@ -19,30 +19,46 @@ public class SourceNodeRepository {
     private Log log = LogFactory.getLog(this.getClass());
     private DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
 
-    /*
-     * Node does not implement a comparable interface to use Sets
-     * -> use Maps with ID to Node
-     */
+    // Node does not implement a comparable interface to use Sets
+    //-> use Maps with ID to Node
 
     private Map<Long, Node> nodeById;
-
     private Map<String, Map<Long, Node>> nodesByLabel;
-
     private Map<String, Map<Boolean, Map<Long, Map<Long, Node>>>> nodesByRelation;
 
-    public SourceNodeRepository() {
-        nodeById = new HashMap<>();
-        nodesByLabel = new HashMap<>();
-        nodesByRelation = new HashMap<>();
+    private String packageWhitelistQuery;
 
+    public SourceNodeRepository() {
+        this.nodeById = new HashMap<>();
+        this.nodesByLabel = new HashMap<>();
+        this.nodesByRelation = new HashMap<>();
+
+        this.packageWhitelistQuery = "n.PACKAGE =~ '.*'";
         log.info("Created");
     }
 
-    public void loadNodesByPropertyValue(SAPNodeProperties property, String value) {
+    public void applyPackageWhitelist(List<String> whitelist) {
+        if (whitelist.isEmpty()) {
+            return;
+        }
+        this.packageWhitelistQuery = constructWhereWhitelist(whitelist);
+    }
 
+    private String constructWhereWhitelist(List<String> whitelist) {
+        StringBuilder query = new StringBuilder();
+        for (String entry : whitelist) {
+            query.append("n.PACKAGE =~ '" + entry + "'").append(" OR ");
+        }
+        // Remove the extra OR at the end, see https://stackoverflow.com/a/3395329
+        query.setLength(query.length() - 4);
+        return query.toString();
+    }
+
+    public void loadNodesByPropertyValue(SAPNodeProperties property, String value) {
         AtomicInteger counter = new AtomicInteger(0);
 
-        List<Record> records = connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n");
+        String query = "MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n";
+        List<Record> records = connector.executeRead(query);
         for (Record result : records) {
             Node sourceNode = result.get("n").asNode();
 
@@ -78,10 +94,10 @@ public class SourceNodeRepository {
         String relatedNodesStatement = "";
         if (forward) {
             relatedNodesStatement = "MATCH (m)-[:" + relationType.name() + "]->(n) WHERE ID(m) IN " + nodeIDString
-                    + " RETURN m, n";
+                    + "AND " + this.packageWhitelistQuery + " RETURN m, n";
         } else {
             relatedNodesStatement = "MATCH (m)<-[:" + relationType.name() + "]-(n) WHERE ID(m) IN " + nodeIDString
-                    + " RETURN m, n";
+                    + "AND " + this.packageWhitelistQuery + " RETURN m, n";
         }
 
         AtomicInteger nodeCounter = new AtomicInteger(0);
@@ -95,7 +111,7 @@ public class SourceNodeRepository {
         for (Record result : records) {
             Node nNode = result.get("n").asNode();
 
-            if (!nodeExist(nNode)) {
+            if (!nodeExists(nNode)) {
                 addNodeByID(nNode);
                 addNodesByProperty(nNode);
 
@@ -139,7 +155,7 @@ public class SourceNodeRepository {
 
     public void loadNodesWithRelation(SAPRelationLabels relationLabel) {
 
-        List<Record> records = connector.executeRead(" MATCH (m)-[:" + relationLabel.name() + "]->(n) RETURN m, n");
+        List<Record> records = connector.executeRead(" MATCH (m)-[:" + relationLabel.name() + "]->(n) WHERE + " + this.packageWhitelistQuery + " RETURN m, n");
         for (Record result : records) {
             Node mNode = result.get("m").asNode();
             Node nNode = result.get("n").asNode();
@@ -162,7 +178,7 @@ public class SourceNodeRepository {
         if (!nodesByRelation.containsKey(relationLabel.name())) {
             return new TreeSet<>();
         }
-        ;
+
         Map<Boolean, Map<Long, Map<Long, Node>>> relationMap = nodesByRelation.get(relationLabel.name());
 
         Map<Long, Map<Long, Node>> directedRelationMap = relationMap.get(direction);
@@ -202,12 +218,11 @@ public class SourceNodeRepository {
         return nodesByProperty;
     }
 
-    // Laden Property
     public Collection<Node> getNodesByIdenticalPropertyValuesNodes(SAPNodeProperties property, String value) {
 
         Collection<Node> nodesByLabelAndProperty = new ArrayList<>();
 
-        List<Record> records = connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n");
+        List<Record> records = connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) WHERE + " + this.packageWhitelistQuery + " RETURN n");
         for (Record r : records) {
             Node propertyValue = r.get("n").asNode();
             nodesByLabelAndProperty.add(propertyValue);
@@ -236,17 +251,17 @@ public class SourceNodeRepository {
         return nodesByLabelAndProperty;
     }
 
-    private boolean nodeExist(Node node) {
+    private boolean nodeExists(Node node) {
         Long nodeID = node.id();
-        if (nodeById.containsKey(nodeID)) {
+        if (this.nodeById.containsKey(nodeID)) {
             return true;
         }
         return false;
     }
 
     private void addNodeByID(Node node) {
-        if (!nodeExist(node)) {
-            nodeById.put(node.id(), node);
+        if (!nodeExists(node)) {
+            this.nodeById.put(node.id(), node);
         }
     }
 
@@ -299,5 +314,4 @@ public class SourceNodeRepository {
             nodeIDMap.put(nNodeID, nNode);
         }
     }
-
 }
