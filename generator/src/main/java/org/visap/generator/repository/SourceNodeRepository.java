@@ -20,7 +20,7 @@ public class SourceNodeRepository {
     private DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
 
     /*
-     * Node not implements comparable interface to use Sets
+     * Node does not implement a comparable interface to use Sets
      * -> use Maps with ID to Node
      */
 
@@ -50,8 +50,7 @@ public class SourceNodeRepository {
             addNodesByProperty(sourceNode);
 
             counter.addAndGet(1);
-        }
-        ;
+        };
 
         log.info(counter.get() + " Nodes added with property \"" + property + "\" and value \"" + value + "\"");
     }
