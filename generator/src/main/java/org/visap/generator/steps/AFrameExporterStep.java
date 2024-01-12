@@ -29,7 +29,7 @@ public class AFrameExporterStep {
 
         nodeRepository = new SourceNodeRepository();
         
-        List<String> whitelist = Config.setup.packagesWhitelist();
+        List<String> whitelist = Config.setup.packageWhitelist();
         nodeRepository.applyPackageWhitelist(whitelist);
         nodeRepository.loadNodesByPropertyValue(SAPNodeProperties.type_name, SAPNodeTypes.Namespace.name());
         nodeRepository.loadNodesByRelation(SAPRelationLabels.CONTAINS, true);

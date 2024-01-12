@@ -29,5 +29,5 @@ public interface Setup extends Config {
 
     // Cypher RegEx, separate multiple entries with commas
     @Config.DefaultValue(".*")
-    List<String> packagesWhitelist();
+    List<String> packageWhitelist();
 }

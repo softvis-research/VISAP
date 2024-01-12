@@ -41,10 +41,10 @@ public class SourceNodeRepository {
         if (whitelist.isEmpty()) {
             return;
         }
-        this.packageWhitelistQuery = constructWhereWhitelist(whitelist);
+        this.packageWhitelistQuery = constructWhereClause(whitelist);
     }
 
-    private String constructWhereWhitelist(List<String> whitelist) {
+    private String constructWhereClause(List<String> whitelist) {
         StringBuilder query = new StringBuilder();
         for (String entry : whitelist) {
             query.append("n.PACKAGE =~ '" + entry + "'").append(" OR ");
