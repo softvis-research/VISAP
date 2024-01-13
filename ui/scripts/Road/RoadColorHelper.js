@@ -26,7 +26,7 @@ const createRoadColorHelper = function (controllerConfig) {
                     text: `RoadColorHelper - handleRoadSectionStates – ${state} - unknown state, return`
                     return;
                 }
-                roadSectionEntity = document.getElementById(roadSectionId)
+                const roadSectionEntity = document.getElementById(roadSectionId)
                 colorRoadSections(roadSectionEntity, controllerConfig.roadColors[state])
                 offsetRoadSectionsY(roadSectionEntity, state)
             });
