@@ -28,13 +28,13 @@ controllers.roadController = function () {
 	}
 
 	let roadSectionRelativePropertiesMap = new Map();
-	let mode = controllerConfig.emphasizeMode
+	let mode;
 	let helpers = {}
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
 		roadColorHelper = createRoadColorHelper(controllerConfig);
-		roadLinesHelper = createRoadLinesHelper(controllerConfig);
+		roadStripesHelper = createRoadStripesHelper(controllerConfig);
 
 		// store helpers to make them downstream accessable depending on defined emphasizeMode via helpers[emphasizeMode].<> 
 		helpers = {
@@ -43,12 +43,15 @@ controllers.roadController = function () {
 				handleRoadSectionStates: roadColorHelper.handleRoadSectionStates,
 				resetRoadSectionStateHandling: roadColorHelper.resetRoadSectionStateHandling
 			}, 
-			RoadLinesHelper: {
-				//initialize: RoadLinesHelper.initialize(),
-				//handleRoadSectionStates: roadLinesHelper.handleRoadSectionStates,
-				//resetRoadSectionStateHandling: roadLinesHelper.resetRoadSectionStateHandling
+			ColoredStripes: {
+				initialize: roadStripesHelper.initialize,
+				handleRoadSectionStates: roadStripesHelper.handleRoadSectionStates,
+				resetRoadSectionStateHandling: roadStripesHelper.resetRoadSectionStateHandling
 			}, 
 		}
+
+		mode = controllerConfig.emphasizeMode
+		console.log(mode)
 		helpers[mode].initialize()
 		events.selected.on.subscribe(onEntitySelected);
 		events.selected.off.subscribe(onEntityUnselected);
