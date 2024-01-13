@@ -9,7 +9,6 @@ const createRoadStripesHelper = function (controllerConfig) {
             }
         }
 
-        // handle roadSection coloring and offset by state
         function handleRoadSectionStates(roadSectionRelativePropertiesMap) {
             if (controllerConfig.showLegendOnSelect) legendHelper.showLegend()
             roadSectionRelativePropertiesMap.forEach((roadSectionProperties, roadSectionId) => {
@@ -30,65 +29,42 @@ const createRoadStripesHelper = function (controllerConfig) {
         }
 
         function createStripe(roadSectionEntity, color) {
-            // Get the original position
-            entity = document.getElementById(roadSectionEntity.id)
-            const originalPosition = entity.getAttribute("position");
 
-            // Clone the entity
-            const clonedEntity = entity.cloneNode(true);
-            clonedEntity.setAttribute("id", entity.id + "_stripe"); // Change the ID to avoid conflicts
-
-            // Calculate the new position (move it up)
-            const newPosition = { x: originalPosition.x, y: originalPosition.y + 1, z: originalPosition.z };
-
-            // Set the cloned entity's position
-            clonedEntity.setAttribute("position", newPosition);
-
-            // Add the cloned entity to the scene
-            const scene = document.querySelector("a-scene");
-            scene.appendChild(clonedEntity);
-            colorStripes(clonedEntity, color)
-            adjustStripeProportions(clonedEntity)
-        }
-
-        function adjustStripeProportions(clonedEntity) {
-            const isRotationHorizontal = checkIfRotationIsHorizontally(clonedEntity);
-            console.log(isRotationHorizontal)
+            const originalPosition = roadSectionEntity.getAttribute("position");
+            const originalWidth = roadSectionEntity.getAttribute("width");
+            const originalDepth = roadSectionEntity.getAttribute("depth");
         
-            if (isRotationHorizontal) {
-                clonedEntity.setAttribute("depth", (clonedEntity.getAttribute("depth") - 1.5 )); 
-                clonedEntity.setAttribute("width", (clonedEntity.getAttribute("width") - 0.5 )); 
-
-            } else {
-                clonedEntity.setAttribute("depth", (clonedEntity.getAttribute("depth") - 0.5 )); 
-                clonedEntity.setAttribute("width", (clonedEntity.getAttribute("width") - 1.5 )); 
+            const stripeEntity = document.createElement("a-entity");
+            const newID = roadSectionEntity.id + "_stripe";
+            stripeEntity.setAttribute("id", newID);
+        
+            const newPosition = { x: originalPosition.x, y: originalPosition.y + 0.5, z: originalPosition.z };
+            stripeEntity.setAttribute("position", newPosition);
+        
+            stripeEntity.setAttribute("geometry", `primitive: box; width: ${originalWidth -0.5}; height: 0.1; depth: ${originalDepth -0.5}`);
+            stripeEntity.setAttribute("material", `color: ${color}`);
+        
+            const scene = document.querySelector("a-scene");
+            scene.appendChild(stripeEntity);
+        }
+        
+    
+        function checkIfRotationIsHorizontally(stripeEntity) {
+        
+            if (stripeEntity) {
+                const width = stripeEntity.getAttribute("width");
+                const depth = stripeEntity.getAttribute("depth");
+                return width > depth;
             }
         }
-
-        function colorStripes(clonedEntity, color) {
-            canvasManipulator.changeColorOfEntities([ clonedEntity ], color, { name: controllerConfig.name });
-        }
-
+        
         function removeStripes() {
-            // Find all entities with "_stripe" at the end of the id
             const stripeEntities = document.querySelectorAll('[id$="_stripe"]');
 
-            // Remove each found entity from the scene
             stripeEntities.forEach((stripeEntity) => {
                 const scene = document.querySelector("a-scene");
                 scene.removeChild(stripeEntity);
             });
-        }
-
-        function checkIfRotationIsHorizontally(roadSectionEntity) {
-            
-            console.log(roadSectionEntity)
-        
-            if (roadSectionEntity) {
-                const width = roadSectionEntity.getAttribute("width");
-                const depth = roadSectionEntity.getAttribute("depth");
-                return width > depth;
-            }
         }
 
 
