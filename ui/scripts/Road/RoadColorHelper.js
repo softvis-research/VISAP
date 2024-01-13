@@ -78,11 +78,11 @@ const createRoadColorHelper = function (controllerConfig) {
         }
 
         function colorRoadSections(roadSection, color) {
-            canvasManipulator.changeColorOfEntities([{ id: roadSection }], color, { name: "roadController" });
+            canvasManipulator.changeColorOfEntities([{ id: roadSection }], color, { name: controllerConfig.name });
         }
 
         function resetColorRoadSections(roadSection) {
-            canvasManipulator.changeColorOfEntities([{ id: roadSection }], "black", { name: "roadController" });
+            canvasManipulator.changeColorOfEntities([{ id: roadSection }], "black", { name: controllerConfig.name });
         }
 
         function offsetRoadSectionsY(roadSection, offsetY) {

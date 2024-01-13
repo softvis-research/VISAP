@@ -44,7 +44,7 @@ controllers.roadController = function () {
 		const entityType = applicationEvent.entities[0].type;
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
 			startElement = [applicationEvent.entities[0]]
-			canvasManipulator.highlightEntities(startElement, "red", { name: "roadController" });
+			canvasManipulator.highlightEntities(startElement, "red", { name: controllerConfig.name });
 
 			startElementId = startElement[0].id
 			assignRoadSectionRelativeProperties(startElementId)
@@ -59,18 +59,18 @@ controllers.roadController = function () {
 	function onEntityUnselected(applicationEvent) {
 		const entityType = applicationEvent.entities[0].type;
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
-			canvasManipulator.unhighlightEntities([{ id: applicationEvent.entities[0].id }], { name: "roadController" });
+			canvasManipulator.unhighlightEntities([{ id: applicationEvent.entities[0].id }], { name: controllerConfig.name });
 			roadColorHelper.resetRoadSectionStateHandling(roadSectionRelativePropertiesMap, controllerConfig.roadSectionStatesDefinition);
 			resetRoadSectionStates()
 		}
 	}
 
+	// fill state map with necessary information for generic use in downstream modules
 	function assignRoadSectionRelativeProperties(startElementId) {
 		const destinationsOfStart = roadModel.getRoadDestinationsForStartElement(startElementId);
 		const startIsDestination = roadModel.getRoadStartElementsForDestination(destinationElementId = startElementId);
 		assignAllRoadSectionRelations(startElementId, destinationsOfStart, startIsDestination);
 		assignRoadSectionStates();
-		assignRoadSectionDirection3D(startElementId);
 	}
 
 	// determine all relations of a startElement
@@ -84,7 +84,7 @@ controllers.roadController = function () {
 			}
 		}
 
-		// apply logic to determine all relations a roadSection has (e.g. calls, calls, bidirectional, calls, isCalled, ...)
+		// apply logic to determine all relation types a roadSection has (e.g. calls, calls, bidirectional, calls, isCalled, ...)
 		const bidirectionalCallElements = destinationsOfStart.filter(id => startIsDestination.includes(id));
 		addRelationIfNotEmpty(bidirectionalCallElements, controllerConfig.relationTypes.bidirectionalCall);
 
@@ -96,7 +96,7 @@ controllers.roadController = function () {
 	}
 
 
-	// helper function to get all roadSections and add relations to a map with their relation
+	// helper function to get all roadSections and add relations to a map with their relation type
 	function addRelationToRoadSection(startElementId, elements, relationType) {
 		elements.forEach(id => {
 			const roadSections = roadModel.getRoadSectionsOfUniqueRelationship(id, startElementId)
@@ -112,14 +112,11 @@ controllers.roadController = function () {
 
 	// check all added relations on roadSections and assign a determinable undeterminable (ambiguous) or determinable (calls, isCalled, bidirectionalCall) state 
 	function assignRoadSectionStates() {
-		console.log("x");
-		console.log(roadSectionRelativePropertiesMap);
-
 		roadSectionRelativePropertiesMap.forEach((roadSectionProperties, roadSection) => {
 			const relationsArray = roadSectionProperties.relations;
 			let state;
 
-			// Check if relationsArray is defined before using it
+			// check if relationsArray is defined before using it
 			if (relationsArray) {
 				switch (true) {
 					case isArrayContainsOnly(relationsArray, controllerConfig.relationTypes.calls):
@@ -135,88 +132,12 @@ controllers.roadController = function () {
 						state = controllerConfig.relationTypes.ambiguous;
 				}
 
-				// Update the state property in roadSectionProperties
+				// update state property in roadSectionProperties
 				roadSectionProperties = { ...roadSectionProperties, state: state };
 				roadSectionRelativePropertiesMap.set(roadSection, roadSectionProperties);
 			}
 		});
 	}
-
-	function assignRoadSectionDirection3D(startElementId) {
-
-		roadObjectsCalls = roadModel.getRoadObjectsForStartElement(startElementId)
-		roadObjectsCalls.forEach(roadObject => {
-			console.log(roadObject.roadSectionsIds)
-			calculateAngleBetweenRoadSections(roadObject.roadSectionsIds)
-		})
-
-
-		roadObjectsIsCalled = roadModel.getRoadObjectsForStartElement(startElementId)
-
-	}
-	
-	function angleToDirection(angleDegrees) {
-		if (angleDegrees >= 45 && angleDegrees < 135) {
-			return "East";
-		} else if (angleDegrees >= 135 && angleDegrees < 225) {
-			return "South";
-		} else if (angleDegrees >= 225 && angleDegrees < 315) {
-			return "West";
-		} else {
-			return "North";
-		}
-	}
-	
-	function calculateAngleBetweenRoadSections(roadSections) {
-		const degreesToRadians = degrees => degrees * (Math.PI / 180);
-	
-		for (let i = 0; i < roadSections.length - 1; i++) {
-			const roadSection1 = roadSections[i];
-			const center1 = roundCoordinates(canvasManipulator.getCenterOfEntity({ id: roadSection1 }));
-			console.log(`Center of RoadSection ${roadSection1}:`, center1);
-	
-			for (let j = i + 1; j < roadSections.length; j++) {
-				const roadSection2 = roadSections[j];
-				const center2 = roundCoordinates(canvasManipulator.getCenterOfEntity({ id: roadSection2 }));
-				console.log(`Center of RoadSection ${roadSection2}:`, center2);
-	
-				const deltaX = center2.x - center1.x;
-				const deltaZ = center2.z - center1.z;
-	
-				// Calculate the angle in radians
-				let angleRadians = Math.atan2(deltaZ, deltaX);
-	
-				// Convert angle to degrees
-				let angleDegrees = angleRadians * (180 / Math.PI);
-	
-				// Ensure the angle is positive
-				if (angleDegrees < 0) {
-					angleDegrees += 360;
-				}
-	
-				console.log(`Angle between RoadSection ${roadSection1} and RoadSection ${roadSection2}: ${angleDegrees} degrees`);
-				
-				const direction = angleToDirection(angleDegrees);
-				console.log(`Direction between RoadSection ${roadSection1} and RoadSection ${roadSection2}: ${direction}`);
-			}
-		}
-	}
-	
-	
-	function roundCoordinates(coordinates) {
-		const precision = 10;
-		return {
-			x: Number(coordinates.x.toFixed(precision)),
-			y: Number(coordinates.y.toFixed(precision)),
-			z: Number(coordinates.z.toFixed(precision)),
-		};
-	}
-
-	
-
-
-
-
 
 	// helper function to check if an array contains only a specific value
 	function isArrayContainsOnly(arr, value) {
