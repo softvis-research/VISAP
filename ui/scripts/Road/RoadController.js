@@ -33,10 +33,12 @@ controllers.roadController = function () {
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
+		events.selected.on.subscribe(onEntitySelected);
+		events.selected.off.subscribe(onEntityUnselected);
+
+		// store helpers to make them downstream accessable depending on defined emphasizeMode via helpers[mode].<> 
 		roadColorHelper = createRoadColorHelper(controllerConfig);
 		roadStripesHelper = createRoadStripesHelper(controllerConfig);
-
-		// store helpers to make them downstream accessable depending on defined emphasizeMode via helpers[emphasizeMode].<> 
 		helpers = {
 			ColoredRoads: {
 				initialize: roadColorHelper.initialize,
@@ -50,11 +52,12 @@ controllers.roadController = function () {
 			}, 
 		}
 
-		mode = controllerConfig.emphasizeMode
-		console.log(mode)
+		// check if emphasizeMode is correctly defined in config, else set basic mode
+		Object.keys(helpers).includes(controllerConfig.emphasizeMode)
+		? (mode = controllerConfig.emphasizeMode)
+		: (mode = "ColoredRoads");	
+
 		helpers[mode].initialize()
-		events.selected.on.subscribe(onEntitySelected);
-		events.selected.off.subscribe(onEntityUnselected);
 	}
 
 	// handle supported entity types on select

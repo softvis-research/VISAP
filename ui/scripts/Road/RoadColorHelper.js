@@ -26,8 +26,9 @@ const createRoadColorHelper = function (controllerConfig) {
                     text: `RoadColorHelper - handleRoadSectionStates – ${state} - unknown state, return`
                     return;
                 }
-                colorRoadSections(roadSectionId, controllerConfig.roadColors[state])
-                offsetRoadSectionsY(roadSectionId, state)
+                roadSectionEntity = document.getElementById(roadSectionId)
+                colorRoadSections(roadSectionEntity, controllerConfig.roadColors[state])
+                offsetRoadSectionsY(roadSectionEntity, state)
             });
         }
 
@@ -40,27 +41,28 @@ const createRoadColorHelper = function (controllerConfig) {
                     text: `RoadColorHelper - handleRoadSectionStateHandling – ${state} - unknown state, return`
                     return;
                 }
-                resetColorRoadSections(roadSectionId)
-                resetOffsetRoadSectionsY(roadSectionId, state)
+                roadSectionEntity = document.getElementById(roadSectionId)
+                resetColorRoadSections(roadSectionEntity)
+                resetOffsetRoadSectionsY(roadSectionEntity, state)
             });
         }
 
-        function colorRoadSections(roadSectionId, color) {
-            canvasManipulator.changeColorOfEntities([{ id: roadSectionId }], color, { name: controllerConfig.name });
+        function colorRoadSections(roadSectionEntity, color) {
+            canvasManipulator.changeColorOfEntities([ roadSectionEntity ], color, { name: controllerConfig.name });
         }
 
-        function resetColorRoadSections(roadSectionId) {
-            canvasManipulator.changeColorOfEntities([{ id: roadSectionId }], "black", { name: controllerConfig.name });
+        function resetColorRoadSections(roadSectionEntity) {
+            canvasManipulator.changeColorOfEntities([ roadSectionEntity ], "black", { name: controllerConfig.name });
         }
 
-        function offsetRoadSectionsY(roadSectionId, state) {
+        function offsetRoadSectionsY(roadSectionEntity, state) {
             offsetY = roadOffsetY[state];
-            canvasManipulator.alterPositionOfEntities([{ id: roadSectionId }], {deltaY: offsetY});
+            canvasManipulator.alterPositionOfEntities([ roadSectionEntity ], {deltaY: offsetY});
         }
 
-        function resetOffsetRoadSectionsY(roadSectionId, state) {
+        function resetOffsetRoadSectionsY(roadSectionEntity, state) {
             offsetY = roadOffsetY[state];
-            canvasManipulator.alterPositionOfEntities([{ id: roadSectionId }], {deltaY: - offsetY}); // apply negative offset
+            canvasManipulator.alterPositionOfEntities([ roadSectionEntity ], {deltaY: - offsetY}); // apply negative offset
         }
 
         return {
