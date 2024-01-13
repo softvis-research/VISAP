@@ -28,25 +28,28 @@ controllers.roadController = function () {
 	}
 
 	let roadSectionRelativePropertiesMap = new Map();
+	let mode = controllerConfig.emphasizeMode
+	let helpers = {}
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
-		switch (controllerConfig.emphasizeMode) {
-			case "ColoredRoads":
-				roadColorHelper = createRoadColorHelper(controllerConfig);
-				roadColorHelper.initialize();
-				break;
-			case "LinesOnRoad":
-				//xyz = xyz(controllerConfig);
-				//xyz.initialize();
-				break;
-			default:
-				events.log.error.publish(
-					{
-						text: `RoadController - initialize – ${controllerConfig.emphasizeMode} - unknown emphasizeMode, return`
-					});
-					break;
+		roadColorHelper = createRoadColorHelper(controllerConfig);
+		roadLinesHelper = createRoadLinesHelper(controllerConfig);
+
+		// store helpers to make them downstream accessable depending on defined emphasizeMode via helpers[emphasizeMode].<> 
+		helpers = {
+			ColoredRoads: {
+				initialize: roadColorHelper.initialize,
+				handleRoadSectionStates: roadColorHelper.handleRoadSectionStates,
+				resetRoadSectionStateHandling: roadColorHelper.resetRoadSectionStateHandling
+			}, 
+			RoadLinesHelper: {
+				//initialize: RoadLinesHelper.initialize(),
+				//handleRoadSectionStates: roadLinesHelper.handleRoadSectionStates,
+				//resetRoadSectionStateHandling: roadLinesHelper.resetRoadSectionStateHandling
+			}, 
 		}
+		helpers[mode].initialize()
 		events.selected.on.subscribe(onEntitySelected);
 		events.selected.off.subscribe(onEntityUnselected);
 	}
@@ -57,12 +60,9 @@ controllers.roadController = function () {
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
 			startElement = [applicationEvent.entities[0]]
 			canvasManipulator.highlightEntities(startElement, "red", { name: controllerConfig.name });
-
 			startElementId = startElement[0].id
 			assignRoadSectionRelativeProperties(startElementId)
-
-			roadColorHelper.handleRoadSectionStates(roadSectionRelativePropertiesMap);
-
+			helpers[mode].handleRoadSectionStates(roadSectionRelativePropertiesMap)
 		} else {
 			return;
 		}
@@ -72,7 +72,7 @@ controllers.roadController = function () {
 		const entityType = applicationEvent.entities[0].type;
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
 			canvasManipulator.unhighlightEntities([{ id: applicationEvent.entities[0].id }], { name: controllerConfig.name });
-			roadColorHelper.resetRoadSectionStateHandling(roadSectionRelativePropertiesMap, controllerConfig.roadSectionStatesDefinition);
+			helpers[mode].resetRoadSectionStateHandling(roadSectionRelativePropertiesMap);
 			resetRoadSectionStates()
 		}
 	}
