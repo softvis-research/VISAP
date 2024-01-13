@@ -89,6 +89,7 @@ controllers.roadController = function () {
 		const startIsDestination = roadModel.getRoadStartElementsForDestination(destinationElementId = startElementId);
 		assignAllRoadSectionRelations(startElementId, destinationsOfStart, startIsDestination);
 		assignRoadSectionStates();
+		assignRoadSectionRamps(startElementId, startIsDestination)
 	}
 
 	// determine all relations of a startElement
@@ -157,6 +158,27 @@ controllers.roadController = function () {
 		});
 	}
 
+	function assignRoadSectionRamps(startElementId, startIsDestination) {
+		// get ramps in all involved roads
+		const rampRoadSections1 = roadModel.getRampRoadSectionsForStartElement(startElementId);
+		const rampRoadSections2 = startIsDestination.flatMap(elementId => {
+			const rampRoadSections = roadModel.getRampRoadSectionsForStartElement(elementId);
+			return rampRoadSections ? [rampRoadSections] : [];
+		});
+	
+		// combine firstRoadSections and lastRoadSections arrays
+		const combinedFirstSections = [...(rampRoadSections1?.firstRoadSections || []), ...(rampRoadSections2.flatMap(r => r?.firstRoadSections || []))];
+		const combinedLastSections = [...(rampRoadSections1?.lastRoadSections || []), ...(rampRoadSections2.flatMap(r => r?.lastRoadSections || []))];
+	
+		if (combinedFirstSections.length > 0 || combinedLastSections.length > 0) {
+			roadSectionRelativePropertiesMap.forEach((roadSectionProperties, roadSection) => {
+				const isRamp = combinedFirstSections.includes(roadSection) || combinedLastSections.includes(roadSection);
+				roadSectionProperties = { ...roadSectionProperties, isRamp: isRamp };
+				roadSectionRelativePropertiesMap.set(roadSection, roadSectionProperties);
+			});
+		}
+	}
+	
 	// helper function to check if an array contains only a specific value
 	function isArrayContainsOnly(arr, value) {
 		return arr.every(item => item === value);

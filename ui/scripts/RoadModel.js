@@ -68,6 +68,32 @@ controllers.roadModel = (function () {
         return [...roadSections1, ...roadSections2];
     }
 
+	// get ramps = first and last roadSections (facing to startElements or destinationElements)
+	function getRampRoadSectionsForStartElement(startElementId) {
+		const matchingRoadObjects = roadObjects.filter((roadRelation) => roadRelation.startElementId === startElementId);
+	
+		if (matchingRoadObjects.length === 0) {
+			return null;
+		}
+	
+		const firstRoadSections = [];
+		const lastRoadSections = [];
+	
+		matchingRoadObjects.forEach((roadRelation) => {
+			const roadSections = roadRelation.roadSectionsIds;
+	
+			if (roadSections.length > 0) {
+				firstRoadSections.push(roadSections[0]);
+				lastRoadSections.push(roadSections[roadSections.length - 1]);
+			}
+		});
+	
+		return {
+			firstRoadSections,
+			lastRoadSections,
+		};
+	}	
+
     function getRoadDestinationsForStartElement(startElementId) {
         return getRoadSectionsForElement(startElementId, startElementsDestinationMap);
     }
@@ -84,6 +110,7 @@ controllers.roadModel = (function () {
         getRoadStartElementsForDestination,
         getRoadSectionsOfUniqueRelationship,
         getRoadObjectsForStartElement,
-        getRoadObjectsForDestination
+        getRoadObjectsForDestination,
+		getRampRoadSectionsForStartElement
     };
 })();

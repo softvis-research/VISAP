@@ -2,7 +2,6 @@ const createRoadStripesHelper = function (controllerConfig) {
     return (function () {
 
         function initialize() {
-            console.log(controllerConfig)
             if (controllerConfig.showLegendOnSelect) {
                 legendHelper = createLegendHelper(controllerConfig)
                 legendHelper.createLegend()
@@ -17,9 +16,9 @@ const createRoadStripesHelper = function (controllerConfig) {
                     text: `RoadColorHelper - handleRoadSectionStates – ${state} - unknown state, return`
                     return;
                 }
+                const isRamp = roadSectionProperties.isRamp;
                 const roadSectionEntity = document.getElementById(roadSectionId)
-                console.log(roadSectionEntity)
-                createStripe(roadSectionEntity, controllerConfig.roadColors[state])
+                createStripe(roadSectionEntity, controllerConfig.roadColors[state], isRamp)
             });
         }
 
@@ -28,7 +27,7 @@ const createRoadStripesHelper = function (controllerConfig) {
             removeStripes();
         }
 
-        function createStripe(roadSectionEntity, color) {
+        function createStripe(roadSectionEntity, color, isRamp) {
 
             const originalPosition = roadSectionEntity.getAttribute("position");
             const originalWidth = roadSectionEntity.getAttribute("width");
@@ -37,8 +36,10 @@ const createRoadStripesHelper = function (controllerConfig) {
             const stripeEntity = document.createElement("a-entity");
             const newID = roadSectionEntity.id + "_stripe";
             stripeEntity.setAttribute("id", newID);
+
+            isRamp ? offsetY = 0.51 : offsetY = 0.5;
         
-            const newPosition = { x: originalPosition.x, y: originalPosition.y + 0.5, z: originalPosition.z };
+            const newPosition = { x: originalPosition.x, y: originalPosition.y + offsetY, z: originalPosition.z };
             stripeEntity.setAttribute("position", newPosition);
         
             stripeEntity.setAttribute("geometry", `primitive: box; width: ${originalWidth -0.5}; height: 0.1; depth: ${originalDepth -0.5}`);
