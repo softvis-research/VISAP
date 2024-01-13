@@ -407,7 +407,7 @@ controllers.canvasManipulator = (function () {
 		});
 	}
 
-	function alterPositionOfEntities(entities, deltaY) {
+	function alterPositionOfEntities(entities, options) {
 		entities.forEach(function (entity) {
 			const component = document.getElementById(entity.id);
 			if (!component) {
@@ -416,16 +416,20 @@ controllers.canvasManipulator = (function () {
 			}
 	
 			const currentPosition = component.getAttribute("position");
-			const newYPosition = currentPosition.y + deltaY;
+	
+			// Apply changes based on options
+			const newXPosition = (options.deltaX !== undefined) ? currentPosition.x + options.deltaX : currentPosition.x;
+			const newYPosition = (options.deltaY !== undefined) ? currentPosition.y + options.deltaY : currentPosition.y;
+			const newZPosition = (options.deltaZ !== undefined) ? currentPosition.z + options.deltaZ : currentPosition.z;
 	
 			component.setAttribute("position", {
-				x: currentPosition.x,
+				x: newXPosition,
 				y: newYPosition,
-				z: currentPosition.z
+				z: newZPosition
 			});
 		});
 	}
-
+	
 	return {
 		initialize: initialize,
 		reset: reset,
