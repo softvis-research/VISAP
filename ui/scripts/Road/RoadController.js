@@ -111,13 +111,13 @@ controllers.roadController = function () {
 	// helper function to get all roadSections and add relations to a map with their relation type
 	function addRelationToRoadSection(startElementId, elements, relationType) {
 		elements.forEach(id => {
-			const roadSections = roadModel.getRoadSectionsOfUniqueRelationship(id, startElementId)
-			roadSections.forEach(roadSection => {
-				const existingProperties = roadSectionRelativePropertiesMap.get(roadSection) || {};
+			const roadSectionsIds = roadModel.getRoadSectionsOfUniqueRelationship(id, startElementId)
+			roadSectionsIds.forEach(id => {
+				const existingProperties = roadSectionRelativePropertiesMap.get(id) || {};
 				const existingRelations = existingProperties.relations || [];
 				const newRelations = [...existingRelations, relationType];
 				roadSectionProperties = { ...existingProperties, relations: newRelations };
-				roadSectionRelativePropertiesMap.set(roadSection, roadSectionProperties)
+				roadSectionRelativePropertiesMap.set(id, roadSectionProperties)
 			})
 		})
 	}
