@@ -11,7 +11,7 @@ const createRoadColorHelper = function (controllerConfig) {
 
         function initialize() {
             console.log(controllerConfig)
-            if(controllerConfig.showLegendOnSelect) {
+            if (controllerConfig.showLegendOnSelect) {
                 legendHelper = createLegendHelper(controllerConfig)
                 legendHelper.createLegend()
             }
@@ -19,61 +19,29 @@ const createRoadColorHelper = function (controllerConfig) {
 
         // handle roadSection coloring and offset by state
         function handleRoadSectionStates(roadSectionRelativePropertiesMap) {
-            console.log(roadSectionRelativePropertiesMap)
             if (controllerConfig.showLegendOnSelect) legendHelper.showLegend()
             roadSectionRelativePropertiesMap.forEach((roadSectionProperties, roadSection) => {
-                const state = roadSectionProperties.state
-
-                switch (state) {
-                    case controllerConfig.relationTypes.calls:
-                        colorRoadSections(roadSection, controllerConfig.roadColors.calls)
-                        offsetRoadSectionsY(roadSection, roadOffsetY.calls)
-                        break;
-
-                    case controllerConfig.relationTypes.isCalled:
-                        colorRoadSections(roadSection, controllerConfig.roadColors.isCalled)
-                        offsetRoadSectionsY(roadSection, roadOffsetY.isCalled)
-                        break;
-
-                    case controllerConfig.relationTypes.bidirectionalCall:
-                        colorRoadSections(roadSection, controllerConfig.roadColors.bidirectionalCall)
-                        offsetRoadSectionsY(roadSection, roadOffsetY.bidirectionalCall)
-                        break;
-
-                    case controllerConfig.relationTypes.ambiguous:
-                        colorRoadSections(roadSection, controllerConfig.roadColors.ambiguous)
-                        offsetRoadSectionsY(roadSection, roadOffsetY.ambiguous)
-                        break;
+                const state = roadSectionProperties.state;
+                if (!Object.values(controllerConfig.relationTypes).includes(state)) {
+                    text: `createRoadColorHelper - handleRoadSectionStates – ${state} - unknown state, return`
+                    return;
                 }
+                colorRoadSections(roadSection, controllerConfig.roadColors[state])
+                offsetRoadSectionsY(roadSection, state)
             });
         }
 
         // reset all coloring and offset
         function resetRoadSectionStateHandling(roadSectionRelativePropertiesMap) {
             if (controllerConfig.showLegendOnSelect) legendHelper.hideLegend()
+            resetColorRoadSections(roadSection)
             roadSectionRelativePropertiesMap.forEach((roadSectionProperties, roadSection) => {
-                resetColorRoadSections(roadSection)
-                const state = roadSectionProperties.state
-                switch (state) {
-                    case controllerConfig.relationTypes.calls:
-                        resetOffsetRoadSectionsY(roadSection, roadOffsetY.calls)
-                        break;
-
-                    case controllerConfig.relationTypes.isCalled:
-                        resetOffsetRoadSectionsY(roadSection, roadOffsetY.isCalled)
-                        break;
-
-                    case controllerConfig.relationTypes.bidirectionalCall:
-                        resetOffsetRoadSectionsY(roadSection, roadOffsetY.bidirectionalCall)
-                        break;
-
-                    case controllerConfig.relationTypes.ambiguous:
-                        resetOffsetRoadSectionsY(roadSection, roadOffsetY.ambiguous)
-                        break;
-
-                    default:
-                        console.log("Unknown state");
+                const state = roadSectionProperties.state;
+                if (!Object.values(controllerConfig.relationTypes).includes(state)) {
+                    text: `createRoadColorHelper - handleRoadSectionStateHandling – ${state} - unknown state, return`
+                    return;
                 }
+                resetOffsetRoadSectionsY(roadSection, state)
             });
         }
 
@@ -85,11 +53,13 @@ const createRoadColorHelper = function (controllerConfig) {
             canvasManipulator.changeColorOfEntities([{ id: roadSection }], "black", { name: controllerConfig.name });
         }
 
-        function offsetRoadSectionsY(roadSection, offsetY) {
+        function offsetRoadSectionsY(roadSection, state) {
+            offsetY = roadOffsetY[state];
             canvasManipulator.alterPositionOfEntities([{ id: roadSection }], offsetY);
         }
 
-        function resetOffsetRoadSectionsY(roadSection, offsetY) {
+        function resetOffsetRoadSectionsY(roadSection, state) {
+            offsetY = roadOffsetY[state];
             canvasManipulator.alterPositionOfEntities([{ id: roadSection }], - offsetY); // apply negative offset
         }
 
