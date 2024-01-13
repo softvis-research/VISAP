@@ -31,9 +31,21 @@ controllers.roadController = function () {
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
-		if (controllerConfig.emphasizeMode == "ColoredRoads") {
-			roadColorHelper = createRoadColorHelper(controllerConfig);
-			roadColorHelper.initialize();
+		switch (controllerConfig.emphasizeMode) {
+			case "ColoredRoads":
+				roadColorHelper = createRoadColorHelper(controllerConfig);
+				roadColorHelper.initialize();
+				break;
+			case "LinesOnRoad":
+				//xyz = xyz(controllerConfig);
+				//xyz.initialize();
+				break;
+			default:
+				events.log.error.publish(
+					{
+						text: `RoadController - initialize – ${controllerConfig.emphasizeMode} - unknown emphasizeMode, return`
+					});
+					break;
 		}
 		events.selected.on.subscribe(onEntitySelected);
 		events.selected.off.subscribe(onEntityUnselected);
