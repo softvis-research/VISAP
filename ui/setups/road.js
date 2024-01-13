@@ -23,6 +23,7 @@ const setup = {
 				bidirectionalCall: "magenta",
 			},
 			showLegendOnSelect: true,
+			enableTransparency: true
 		},
 	],
 

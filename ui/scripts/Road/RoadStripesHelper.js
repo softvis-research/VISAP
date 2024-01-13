@@ -8,7 +8,7 @@ const createRoadStripesHelper = function (controllerConfig) {
             }
         }
 
-        function handleRoadSectionStates(roadSectionRelativePropertiesMap) {
+        function handleRoadSectionEmphasizing(roadSectionRelativePropertiesMap) {
             if (controllerConfig.showLegendOnSelect) legendHelper.showLegend()
             roadSectionRelativePropertiesMap.forEach((roadSectionProperties, roadSectionId) => {
                 const state = roadSectionProperties.state;
@@ -22,7 +22,7 @@ const createRoadStripesHelper = function (controllerConfig) {
             });
         }
 
-        function resetRoadSectionStateHandling(roadSectionRelativePropertiesMap) {
+        function resetRoadSectionEmphasizing(roadSectionRelativePropertiesMap) {
             if (controllerConfig.showLegendOnSelect) legendHelper.hideLegend()
             removeStripes();
         }
@@ -71,8 +71,8 @@ const createRoadStripesHelper = function (controllerConfig) {
 
         return {
             initialize: initialize,
-            handleRoadSectionStates: handleRoadSectionStates,
-            resetRoadSectionStateHandling: resetRoadSectionStateHandling,
+            handleRoadSectionEmphasizing,
+            resetRoadSectionEmphasizing,
         };
     })();
 };

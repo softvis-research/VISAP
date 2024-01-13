@@ -6,6 +6,8 @@ controllers.roadController = function () {
 
 		showLegendOnSelect: true,
 
+		enableTransparency: true,
+
 		supportedEntityTypes: [
 			"Class",
 			"Report",
@@ -42,13 +44,13 @@ controllers.roadController = function () {
 		helpers = {
 			ColoredRoads: {
 				initialize: roadColorHelper.initialize,
-				handleRoadSectionStates: roadColorHelper.handleRoadSectionStates,
-				resetRoadSectionStateHandling: roadColorHelper.resetRoadSectionStateHandling
+				handleRoadSectionEmphasizing: roadColorHelper.handleRoadSectionEmphasizing,
+				resetRoadSectionEmphasizing: roadColorHelper.resetRoadSectionEmphasizing
 			}, 
 			ColoredStripes: {
 				initialize: roadStripesHelper.initialize,
-				handleRoadSectionStates: roadStripesHelper.handleRoadSectionStates,
-				resetRoadSectionStateHandling: roadStripesHelper.resetRoadSectionStateHandling
+				handleRoadSectionEmphasizing: roadStripesHelper.handleRoadSectionEmphasizing,
+				resetRoadSectionEmphasizing: roadStripesHelper.resetRoadSectionEmphasizing
 			}, 
 		}
 
@@ -66,9 +68,14 @@ controllers.roadController = function () {
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
 			startElement = [applicationEvent.entities[0]]
 			canvasManipulator.highlightEntities(startElement, "red", { name: controllerConfig.name });
+			
 			startElementId = startElement[0].id
+			// if (controllerConfig.enableTransparency) handleTransparancy(startElementId)
+
+			// setup properties for each involved roadSection (e.g. state)
 			assignRoadSectionRelativeProperties(startElementId)
-			helpers[mode].handleRoadSectionStates(roadSectionRelativePropertiesMap)
+			// 
+			helpers[mode].handleRoadSectionEmphasizing(roadSectionRelativePropertiesMap)
 		} else {
 			return;
 		}
@@ -78,8 +85,8 @@ controllers.roadController = function () {
 		const entityType = applicationEvent.entities[0].type;
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
 			canvasManipulator.unhighlightEntities([{ id: applicationEvent.entities[0].id }], { name: controllerConfig.name });
-			helpers[mode].resetRoadSectionStateHandling(roadSectionRelativePropertiesMap);
-			resetRoadSectionStates()
+			helpers[mode].resetRoadSectionEmphasizing(roadSectionRelativePropertiesMap);
+			resetRoadSectionRelativeProperties()
 		}
 	}
 
@@ -184,7 +191,7 @@ controllers.roadController = function () {
 		return arr.every(item => item === value);
 	}
 
-	function resetRoadSectionStates() {
+	function resetRoadSectionRelativeProperties() {
 		roadSectionRelativePropertiesMap.clear();
 	}
 

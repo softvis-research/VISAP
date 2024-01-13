@@ -1,14 +1,6 @@
 const createRoadColorHelper = function (controllerConfig) {
     return (function () {
 
-        // set an offset to handle stacked sections
-        const roadOffsetY = {
-            ambiguous: 0.005,
-            calls: 0.002,
-            isCalled: 0.006,
-            bidirectionalCall: 0.004,
-        }
-
         function initialize() {
             console.log(controllerConfig)
             if (controllerConfig.showLegendOnSelect) {
@@ -18,27 +10,28 @@ const createRoadColorHelper = function (controllerConfig) {
         }
 
         // handle roadSection coloring and offset by state
-        function handleRoadSectionStates(roadSectionRelativePropertiesMap) {
+        function handleRoadSectionEmphasizing(roadSectionRelativePropertiesMap) {
             if (controllerConfig.showLegendOnSelect) legendHelper.showLegend()
             roadSectionRelativePropertiesMap.forEach((roadSectionProperties, roadSectionId) => {
                 const state = roadSectionProperties.state;
                 if (!Object.values(controllerConfig.relationTypes).includes(state)) {
-                    text: `RoadColorHelper - handleRoadSectionStates – ${state} - unknown state, return`
+                    text: `RoadColorHelper - handleRoadSectionEmphasizing – ${state} - unknown state, return`
                     return;
                 }
                 const roadSectionEntity = document.getElementById(roadSectionId)
+                const isRamp = roadSectionProperties.isRamp;
                 colorRoadSections(roadSectionEntity, controllerConfig.roadColors[state])
-                offsetRoadSectionsY(roadSectionEntity, state)
+                offsetRoadSectionsY(roadSectionEntity, state, isRamp)
             });
         }
 
         // reset all coloring and offset
-        function resetRoadSectionStateHandling(roadSectionRelativePropertiesMap) {
+        function resetRoadSectionEmphasizing(roadSectionRelativePropertiesMap) {
             if (controllerConfig.showLegendOnSelect) legendHelper.hideLegend()
             roadSectionRelativePropertiesMap.forEach((roadSectionProperties, roadSectionId) => {
                 const state = roadSectionProperties.state;
                 if (!Object.values(controllerConfig.relationTypes).includes(state)) {
-                    text: `RoadColorHelper - handleRoadSectionStateHandling – ${state} - unknown state, return`
+                    text: `RoadColorHelper - resetRoadSectionEmphasizing – ${state} - unknown state, return`
                     return;
                 }
                 roadSectionEntity = document.getElementById(roadSectionId)
@@ -55,8 +48,8 @@ const createRoadColorHelper = function (controllerConfig) {
             canvasManipulator.changeColorOfEntities([ roadSectionEntity ], "black", { name: controllerConfig.name });
         }
 
-        function offsetRoadSectionsY(roadSectionEntity, state) {
-            offsetY = roadOffsetY[state];
+        function offsetRoadSectionsY(roadSectionEntity, state, isRamp) {
+            isRamp? offsetY = 0.05 : offsetY = 0.04
             canvasManipulator.alterPositionOfEntities([ roadSectionEntity ], {deltaY: offsetY});
         }
 
@@ -66,9 +59,9 @@ const createRoadColorHelper = function (controllerConfig) {
         }
 
         return {
-            initialize: initialize,
-            handleRoadSectionStates: handleRoadSectionStates,
-            resetRoadSectionStateHandling: resetRoadSectionStateHandling,
+            initialize,
+            handleRoadSectionEmphasizing,
+            resetRoadSectionEmphasizing,
         };
     })();
 };
