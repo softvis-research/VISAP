@@ -250,7 +250,10 @@ controllers.roadController = function () {
 
 			if (!involvedElements.has(id)) {
 				if (value.type === "roadSection") {
-					if (controllerConfig.enableRoadVanishing) canvasManipulator.changeColorOfEntities([{ id }], "grey", { name: controllerConfig.name });
+					if (controllerConfig.enableRoadVanishing) {
+						canvasManipulator.alterPositionOfEntities([{ id }], {deltaY: - 0.1}); // apply negative offset
+						canvasManipulator.changeColorOfEntities([{ id }], "grey", { name: controllerConfig.name });
+					}
 					canvasManipulator.changeTransparencyOfEntities([{ id }], 0.3, { name: controllerConfig.name });
 					transparentElements.set(id, "roadSection")
 				} else {
@@ -264,7 +267,10 @@ controllers.roadController = function () {
 	function resetTransparencyOfElements() {
 		transparentElements.forEach((value, id) => {
 			if (value.includes("roadSection")) {
-				if (controllerConfig.enableRoadVanishing) canvasManipulator.changeColorOfEntities([{ id }], "black", { name: controllerConfig.name });
+				if (controllerConfig.enableRoadVanishing) {
+					canvasManipulator.alterPositionOfEntities([{ id }], {deltaY: 0.1}); // apply negative offset
+					canvasManipulator.changeColorOfEntities([{ id }], "black", { name: controllerConfig.name });
+				}
 			}
 			canvasManipulator.resetTransparencyOfEntities([{ id }], { name: controllerConfig.name });
 		});
