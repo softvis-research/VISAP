@@ -50,8 +50,8 @@ controllers.roadModel = (function () {
 		return map.has(elementId) ? map.get(elementId) : [];
 	}
 
-	function getRoadObjectsForStartElement(startElementId) {
-		return roadObjects.filter(roadRelation => roadRelation.startElementId === startElementId);
+	function getRoadObjectsForStartElement(startElement) {
+		return roadObjects.filter(roadRelation => roadRelation.startElementId === startElement.id);
 	}
 
 	function getRoadObjectsForDestination(destinationElementId) {
@@ -69,8 +69,8 @@ controllers.roadModel = (function () {
 	}
 
 	// get ramps = first and last roadSections (facing to startElements or destinationElements)
-	function getRampRoadSectionsForStartElement(startElementId) {
-		const matchingRoadObjects = roadObjects.filter((roadRelation) => roadRelation.startElementId === startElementId);
+	function getRampRoadSectionsForStartElement(startElement) {
+		const matchingRoadObjects = roadObjects.filter((roadRelation) => roadRelation.startElement === startElement.id);
 
 		if (matchingRoadObjects.length === 0) {
 			return null;
@@ -94,13 +94,13 @@ controllers.roadModel = (function () {
 		};
 	}
 
-	function getRoadDestinationsForStartElement(startElementId) {
-		return getRoadSectionsForElement(startElementId, startElementsDestinationMap);
+	function getRoadDestinationsForStartElement(startElement) {
+		return getRoadSectionsForElement(startElement.id, startElementsDestinationMap);
 	}
 
-	function getRoadStartElementsForDestination(destinationElementId) {
+	function getRoadStartElementsForDestination(destinationElement) {
 		const startElements = [...startElementsDestinationMap.keys()]
-			.filter(startElement => startElementsDestinationMap.get(startElement).includes(destinationElementId));
+			.filter(startElement => startElementsDestinationMap.get(startElement).includes(destinationElement.id));
 		return startElements;
 	}
 
