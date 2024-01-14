@@ -73,7 +73,7 @@ const createRoadStripesHelper = function (controllerConfig) {
             signEntity.setAttribute("material", `color: ${color}`);
             
             // Rotate the traffic sign
-            signEntity.setAttribute("rotation", { x: 45, y: 0, z: 90 });
+            signEntity.setAttribute("rotation", { x: 45, y: 45, z: 90 });
             
             // Append the sign entity to the scene
             const scene = document.querySelector("a-scene");
