@@ -15,11 +15,11 @@ async function initializeApplication() {
 	// parsing the setup happens later, since it requires controllers to be running
 	const setupLoaded = application.startLoadingSetup(paths.setupPath, paths.defaultSetupPath);
 	const metadataLoaded = application.startLoadingMetadata(paths.metadataPath, paths.defaultMetadataPath);
-	const roadsDataLoaded = application.startLoadingRoadsData(paths.roadsDataPath, paths.defaultRoadsDataPath); // LD TODO: Inbound
+	const roadsDataLoaded = application.startLoadingRoadsData(paths.roadsDataPath, paths.defaultRoadsDataPath);
 	const modelLoaded = application.startLoadingModel(paths.modelPath, paths.defaultModeLPath);
 
 	try {
-		await Promise.all([setupLoaded, metadataLoaded, modelLoaded]);
+		await Promise.all([setupLoaded, metadataLoaded, roadsDataLoaded, modelLoaded]);
 	} catch (error) {
 		alert(error);
 		return;
@@ -155,7 +155,7 @@ controllers.application = (function () {
     				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultRoadsDataPath));
     				else return response.json();
     			}).then(roadsDataJson => {
-    				roadModel.createRoadObjectsFromData(roadsDataJson);
+    				roadModel.createRoadsFromData(roadsDataJson);
     		});
     	}
 

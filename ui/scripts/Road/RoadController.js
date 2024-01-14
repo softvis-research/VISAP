@@ -99,16 +99,16 @@ controllers.roadController = function () {
 
 	// fill state map with necessary information for generic use in downstream modules
 	function assignRoadSectionRelativeProperties() {
-		const destinationsOfStartIds = roadModel.getRoadDestinationsForStartElement(startElement);
-		const startIsDestinationIds = roadModel.getRoadStartElementsForDestination(destinationElement = startElement);
+		const destinationsOfStartRoadSectionIds = roadModel.getRoadSectionIdsOfDestinationForOfStartElement(startElement);
+		const startAsDestinationRoadSectionIds = roadModel.getRoadStartElementsForDestination(destinationElement = startElement);
 
-		assignAllRoadSectionRelations(destinationsOfStartIds, startIsDestinationIds);
+		assignAllRoadSectionRelations(destinationsOfStartRoadSectionIds, startAsDestinationRoadSectionIds);
 		assignRoadSectionStates();
-		assignRoadSectionRamps(startIsDestinationIds)
+		assignRoadSectionRamps(startAsDestinationRoadSectionIds)
 	}
 
 	// determine all relations of a startElement
-	function assignAllRoadSectionRelations(destinationsOfStartIds, startIsDestinationIds) {
+	function assignAllRoadSectionRelations(destinationsOfStartRoadSectionIds, startAsDestinationRoadSectionIds) {
 		// get elements called by startElement and that call the startElement
 
 		// adds relation to roadSections
@@ -119,15 +119,15 @@ controllers.roadController = function () {
 		}
 
 		// apply logic to determine all relation types a roadSection has (e.g. calls, calls, bidirectional, calls, isCalled, ...)
-		const bidirectionalCallElements = destinationsOfStartIds.filter(id => startIsDestinationIds.includes(id));
+		const bidirectionalCallElements = destinationsOfStartRoadSectionIds.filter(id => startAsDestinationRoadSectionIds.includes(id));
 		console.log(bidirectionalCallElements)
 		addRelationIfNotEmpty(bidirectionalCallElements, controllerConfig.relationTypes.bidirectionalCall);
 
-		const callsElements = destinationsOfStartIds.filter(id => !startIsDestinationIds.includes(id));
+		const callsElements = destinationsOfStartRoadSectionIds.filter(id => !startAsDestinationRoadSectionIds.includes(id));
 		console.log(callsElements)
 		addRelationIfNotEmpty(callsElements, controllerConfig.relationTypes.calls);
 
-		const isCalledElements = startIsDestinationIds.filter(id => !destinationsOfStartIds.includes(id));
+		const isCalledElements = startAsDestinationRoadSectionIds.filter(id => !destinationsOfStartRoadSectionIds.includes(id));
 		console.log(isCalledElements)
 		addRelationIfNotEmpty(isCalledElements, controllerConfig.relationTypes.isCalled);
 	}
@@ -136,7 +136,7 @@ controllers.roadController = function () {
 	// helper function to get all roadSections and add relations to a map with their relation type
 	function addRelationToRoadSection(elements, relationType) {
 		elements.forEach(id => {
-			const roadSectionsIds = roadModel.getRoadSectionsOfUniqueRelationship(id, startElement.id)
+			const roadSectionsIds = roadModel.getRoadSectionIdsOfUniqueRelationship(id, startElement.id)
 			roadSectionsIds.forEach(id => {
 				const existingProperties = roadSectionRelativePropertiesMap.get(id) || {};
 				const existingRelations = existingProperties.relations || [];
@@ -209,7 +209,7 @@ controllers.roadController = function () {
 	function handleTransparency() {
 		let involvedElements = new Map();
 
-		[...roadModel.getRoadDestinationsForStartElement(startElement)].forEach(id => {
+		[...roadModel.getRoadSectionIdsOfDestinationForOfStartElement(startElement)].forEach(id => {
 			involvedElements.set(id, { id, type: "entity" });
 		});
 
@@ -219,7 +219,7 @@ controllers.roadController = function () {
 
 		involvedElements.set(startElement.id, { id: startElement.id, type: "entity" });
 
-		const allRoadSections = roadModel.getAllRoadSections();
+		const allRoadSections = roadModel.getAllRoadSectionIds();
 
 		allRoadSections.forEach(id => {
 			if (roadSectionRelativePropertiesMap.has(id)) {
