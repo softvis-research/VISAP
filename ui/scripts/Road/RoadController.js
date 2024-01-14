@@ -33,7 +33,7 @@ controllers.roadController = function () {
 	let mode;
 	let helpers = {}
 
-	let transparentElements = []
+	let transparentElements = new Map();
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
@@ -75,13 +75,13 @@ controllers.roadController = function () {
 			canvasManipulator.highlightEntities(startElement, "red", { name: controllerConfig.name });
 
 			startElementId = startElement[0].id
-
-			if (controllerConfig.enableTransparency) handleTransparency(startElementId)
-
 			// setup properties for each involved roadSection (e.g. state)
 			assignRoadSectionRelativeProperties(startElementId)
 			// 
 			helpers[mode].handleRoadSectionEmphasizing(roadSectionRelativePropertiesMap)
+
+			if (controllerConfig.enableTransparency) handleTransparency(startElementId)
+
 		} else {
 			return;
 		}
@@ -93,50 +93,8 @@ controllers.roadController = function () {
 			canvasManipulator.unhighlightEntities([{ id: applicationEvent.entities[0].id }], { name: controllerConfig.name });
 			helpers[mode].resetRoadSectionEmphasizing(roadSectionRelativePropertiesMap);
 			resetRoadSectionRelativeProperties()
-			resetTransparencyOfElements()
+			if (controllerConfig.enableTransparency) resetTransparencyOfElements()
 		}
-	}
-
-	function handleTransparency(startElementId) {
-		let involvedElements = new Set();
-		involvedElements.add(roadModel.getRoadDestinationsForStartElement(startElementId));
-		involvedElements.add(roadModel.getRoadStartElementsForDestination(destinationElementId = startElementId));
-
-		// flatten the set to contain single string values
-		involvedElements = new Set([...involvedElements].flat());
-		involvedElements.add(startElementId)
-
-		const allElements = model.getAllEntities();
-
-		// helper function to check nested property existence
-		function hasNestedProperty(obj, propPath) {
-			const props = propPath.split('.');
-			return props.every(p => obj.hasOwnProperty(p) && (obj = obj[p]));
-		}
-
-		allElements.forEach((value, id) => {
-			// Check if the value is an object and has the nested "belongsTo" attribute
-			if (typeof value === 'object' && hasNestedProperty(value, 'belongsTo.type')) {
-				console.log(value.belongsTo.id)
-				// check if nested "belongsTo.type" value is in the involvedElements set
-				if (involvedElements.has(value.belongsTo.id)) {
-					// Skip calling canvasManipulator if it belongs to the involvedElements
-					return;
-				}
-			}
-
-			if (!involvedElements.has(id)) {
-				canvasManipulator.changeTransparencyOfEntities([{ id }], 0.3, { name: controllerConfig.name });
-				transparentElements.push(id)
-			}
-		});
-	}
-
-	function resetTransparencyOfElements() {
-		transparentElements.forEach(id => {
-			canvasManipulator.resetTransparencyOfEntities([{ id }], { name: controllerConfig.name });
-		})
-		transparentElements = []
 	}
 
 	// fill state map with necessary information for generic use in downstream modules
@@ -187,6 +145,11 @@ controllers.roadController = function () {
 
 	// check all added relations on roadSections and assign a determinable undeterminable (ambiguous) or determinable (calls, isCalled, bidirectionalCall) state 
 	function assignRoadSectionStates() {
+
+		// helper function to check if an array contains only a specific value
+		function isArrayContainsOnly(arr, value) {
+			return arr.every(item => item === value);
+		}
 		roadSectionRelativePropertiesMap.forEach((roadSectionProperties, roadSection) => {
 			const relationsArray = roadSectionProperties.relations;
 			let state;
@@ -235,13 +198,67 @@ controllers.roadController = function () {
 		}
 	}
 
-	function resetRoadSectionRelativeProperties() {
-		roadSectionRelativePropertiesMap.clear();
+	function handleTransparency(startElementId) {
+		let involvedElements = new Map();
+
+		involvedElements.set(roadModel.getRoadDestinationsForStartElement(startElementId), "entity");
+		involvedElements.set(roadModel.getRoadStartElementsForDestination(startElementId), "entity");
+		involvedElements.set(startElementId, "entity");
+
+		// Add road sections that are included in roadSectionRelativePropertiesMap
+		const allRoadSections = roadModel.getAllRoadSections();
+		const involvedRoadSections = allRoadSections.filter(roadSection => roadSectionRelativePropertiesMap.has(roadSection));
+
+		// Convert the Map to an array of key-value pairs, flatten, and convert back to Map
+		involvedElements = new Map([...involvedElements, ...Array.from(involvedRoadSections.entries())]);
+
+		const allElements = new Map(model.getAllEntities());
+
+		// Helper function to check nested property existence
+		function hasNestedProperty(obj, propPath) {
+			const props = propPath.split('.');
+			return props.every(p => obj.hasOwnProperty(p) && (obj = obj[p]));
+		}
+
+		// Add street sections to allElements
+		allRoadSections.forEach(roadSection => {
+			allElements.set(roadSection, { id: roadSection, type: "roadSection" });
+		});
+
+		allElements.forEach((value, id) => {
+			// Check if the value is an object and has the nested "belongsTo" attribute
+			if (typeof value === 'object' && hasNestedProperty(value, 'belongsTo.type')) {
+				// check if nested "belongsTo.type" value is in the involvedElements set
+				if (involvedElements.has(value.belongsTo.id)) {
+					return;
+				}
+			}
+
+			if (!involvedElements.has(value)) {
+				if (value.type === "roadSection") {
+					canvasManipulator.changeColorOfEntities([{ id }], "grey", { name: controllerConfig.name });
+					canvasManipulator.changeTransparencyOfEntities([{ id }], 0.3, { name: controllerConfig.name });
+					transparentElements.set(id, "roadSection")
+				} else {
+					canvasManipulator.changeTransparencyOfEntities([{ id }], 0.3, { name: controllerConfig.name });
+					transparentElements.set(id, "entity")
+				}
+			}
+		});
 	}
 
-	// helper function to check if an array contains only a specific value
-	function isArrayContainsOnly(arr, value) {
-		return arr.every(item => item === value);
+	function resetTransparencyOfElements() {
+		transparentElements.forEach((value, id) => {
+			if (value.includes("roadSection")) {
+				canvasManipulator.changeColorOfEntities([{ id }], "black", { name: controllerConfig.name });
+			}
+			canvasManipulator.resetTransparencyOfEntities([{ id }], { name: controllerConfig.name });
+		});
+		transparentElements.clear();
+	}
+
+	function resetRoadSectionRelativeProperties() {
+		roadSectionRelativePropertiesMap.clear();
 	}
 
 	return {
