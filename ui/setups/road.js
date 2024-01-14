@@ -17,7 +17,7 @@ const setup = {
 			supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
 			emphasizeMode: "ColoredStripes", // choose ColoredRoads, ColoredStripes
 			roadColors: {
-				ambiguous: "white",
+				ambiguous: "silver",
 				calls: "turquoise",
 				isCalled: "orange",
 				bidirectionalCall: "magenta",
