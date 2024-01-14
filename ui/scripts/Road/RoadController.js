@@ -33,11 +33,16 @@ controllers.roadController = function () {
 	let mode;
 	let helpers = {}
 
+	let transparentElements = []
+
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
 		events.selected.on.subscribe(onEntitySelected);
 		events.selected.off.subscribe(onEntityUnselected);
+		initializeHelpers(controllerConfig)
+	}
 
+	function initializeHelpers(controllerConfig) {
 		// store helpers to make them downstream accessable depending on defined emphasizeMode via helpers[mode].<> 
 		roadColorHelper = createRoadColorHelper(controllerConfig);
 		roadStripesHelper = createRoadStripesHelper(controllerConfig);
@@ -46,18 +51,18 @@ controllers.roadController = function () {
 				initialize: roadColorHelper.initialize,
 				handleRoadSectionEmphasizing: roadColorHelper.handleRoadSectionEmphasizing,
 				resetRoadSectionEmphasizing: roadColorHelper.resetRoadSectionEmphasizing
-			}, 
+			},
 			ColoredStripes: {
 				initialize: roadStripesHelper.initialize,
 				handleRoadSectionEmphasizing: roadStripesHelper.handleRoadSectionEmphasizing,
 				resetRoadSectionEmphasizing: roadStripesHelper.resetRoadSectionEmphasizing
-			}, 
+			},
 		}
 
 		// check if emphasizeMode is correctly defined in config, else set basic mode
 		Object.keys(helpers).includes(controllerConfig.emphasizeMode)
-		? (mode = controllerConfig.emphasizeMode)
-		: (mode = "ColoredRoads");	
+			? (mode = controllerConfig.emphasizeMode)
+			: (mode = "ColoredRoads");
 
 		helpers[mode].initialize()
 	}
@@ -68,9 +73,10 @@ controllers.roadController = function () {
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
 			startElement = [applicationEvent.entities[0]]
 			canvasManipulator.highlightEntities(startElement, "red", { name: controllerConfig.name });
-			
+
 			startElementId = startElement[0].id
-			// if (controllerConfig.enableTransparency) handleTransparancy(startElementId)
+
+			if (controllerConfig.enableTransparency) handleTransparency(startElementId)
 
 			// setup properties for each involved roadSection (e.g. state)
 			assignRoadSectionRelativeProperties(startElementId)
@@ -87,7 +93,50 @@ controllers.roadController = function () {
 			canvasManipulator.unhighlightEntities([{ id: applicationEvent.entities[0].id }], { name: controllerConfig.name });
 			helpers[mode].resetRoadSectionEmphasizing(roadSectionRelativePropertiesMap);
 			resetRoadSectionRelativeProperties()
+			resetTransparencyOfElements()
 		}
+	}
+
+	function handleTransparency(startElementId) {
+		let involvedElements = new Set();
+		involvedElements.add(roadModel.getRoadDestinationsForStartElement(startElementId));
+		involvedElements.add(roadModel.getRoadStartElementsForDestination(destinationElementId = startElementId));
+
+		// flatten the set to contain single string values
+		involvedElements = new Set([...involvedElements].flat());
+		involvedElements.add(startElementId)
+
+		const allElements = model.getAllEntities();
+
+		// helper function to check nested property existence
+		function hasNestedProperty(obj, propPath) {
+			const props = propPath.split('.');
+			return props.every(p => obj.hasOwnProperty(p) && (obj = obj[p]));
+		}
+
+		allElements.forEach((value, id) => {
+			// Check if the value is an object and has the nested "belongsTo" attribute
+			if (typeof value === 'object' && hasNestedProperty(value, 'belongsTo.type')) {
+				console.log(value.belongsTo.id)
+				// check if nested "belongsTo.type" value is in the involvedElements set
+				if (involvedElements.has(value.belongsTo.id)) {
+					// Skip calling canvasManipulator if it belongs to the involvedElements
+					return;
+				}
+			}
+
+			if (!involvedElements.has(id)) {
+				canvasManipulator.changeTransparencyOfEntities([{ id }], 0.3, { name: controllerConfig.name });
+				transparentElements.push(id)
+			}
+		});
+	}
+
+	function resetTransparencyOfElements() {
+		transparentElements.forEach(id => {
+			canvasManipulator.resetTransparencyOfEntities([{ id }], { name: controllerConfig.name });
+		})
+		transparentElements = []
 	}
 
 	// fill state map with necessary information for generic use in downstream modules
@@ -172,11 +221,11 @@ controllers.roadController = function () {
 			const rampRoadSections = roadModel.getRampRoadSectionsForStartElement(elementId);
 			return rampRoadSections ? [rampRoadSections] : [];
 		});
-	
+
 		// combine firstRoadSections and lastRoadSections arrays
 		const combinedFirstSections = [...(rampRoadSections1?.firstRoadSections || []), ...(rampRoadSections2.flatMap(r => r?.firstRoadSections || []))];
 		const combinedLastSections = [...(rampRoadSections1?.lastRoadSections || []), ...(rampRoadSections2.flatMap(r => r?.lastRoadSections || []))];
-	
+
 		if (combinedFirstSections.length > 0 || combinedLastSections.length > 0) {
 			roadSectionRelativePropertiesMap.forEach((roadSectionProperties, roadSection) => {
 				const isRamp = combinedFirstSections.includes(roadSection) || combinedLastSections.includes(roadSection);
@@ -185,14 +234,14 @@ controllers.roadController = function () {
 			});
 		}
 	}
-	
-	// helper function to check if an array contains only a specific value
-	function isArrayContainsOnly(arr, value) {
-		return arr.every(item => item === value);
-	}
 
 	function resetRoadSectionRelativeProperties() {
 		roadSectionRelativePropertiesMap.clear();
+	}
+
+	// helper function to check if an array contains only a specific value
+	function isArrayContainsOnly(arr, value) {
+		return arr.every(item => item === value);
 	}
 
 	return {
