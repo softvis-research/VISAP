@@ -81,7 +81,7 @@ controllers.roadController = function () {
 			// 
 			helpers[mode].handleRoadSectionEmphasizing(roadSectionRelativePropertiesMap);
 
-			if (controllerConfig.enableTransparency) handleTransparency();
+			if (controllerConfig.enableTransparency) toggleMutingEffects();
 		} else {
 			return;
 		}
@@ -93,7 +93,7 @@ controllers.roadController = function () {
 			canvasManipulator.unhighlightEntities([{ id: applicationEvent.entities[0].id }], { name: controllerConfig.name });
 			helpers[mode].resetRoadSectionEmphasizing(roadSectionRelativePropertiesMap);
 			resetRoadSectionRelativeProperties()
-			if (controllerConfig.enableTransparency) resetTransparencyOfElements()
+			if (controllerConfig.enableTransparency) resetMutingEffects()
 		}
 	}
 
@@ -206,7 +206,7 @@ controllers.roadController = function () {
 	}
 	
 
-	function handleTransparency() {
+	function toggleMutingEffects() {
 		let involvedElements = new Map();
 
 		[...roadModel.getRoadSectionIdsOfDestinationForOfStartElement(startElement)].forEach(id => {
@@ -264,7 +264,7 @@ controllers.roadController = function () {
 		});
 	}
 
-	function resetTransparencyOfElements() {
+	function resetMutingEffects() {
 		transparentElements.forEach((value, id) => {
 			if (value.includes("roadSection")) {
 				if (controllerConfig.enableRoadVanishing) {
