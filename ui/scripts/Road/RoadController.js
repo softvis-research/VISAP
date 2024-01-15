@@ -81,6 +81,7 @@ controllers.roadController = function () {
 
 			// setup properties for each involved roadSection (e.g., state)
 			assignRoadSectionRelativeProperties();
+			console.log(includedRoadSections)
 			// 
 			// helpers[mode].handleRoadSectionEmphasizing(roadSectionRelativePropertiesMap);
 
@@ -102,9 +103,9 @@ controllers.roadController = function () {
 
 	// fill state map with necessary information for generic use in downstream modules
 	function assignRoadSectionRelativeProperties() {
-		const destinationsOfStartElementRoadIds = (roadModel.getRoadIdsForStartElementId(startElementComponent.id))
+		const destinationsOfStartElementRoadIds = roadModel.getRoadIdsForStartElementId(startElementComponent.id)
 		const startAsDestinationElementRoadIds = roadModel.getRoadIdsForDestinationElementId(destinationElementId = startElementComponent.id);
-
+		console.log(destinationsOfStartElementRoadIds)
 		assignRelationsToRoadSectionObjs(destinationsOfStartElementRoadIds, startAsDestinationElementRoadIds);
 		assignRoadSectionObjStates();
 	}

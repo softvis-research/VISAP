@@ -18,11 +18,14 @@ controllers.roadModel = (function () {
 	function createRoadSectionObjArr(roadsDataArr) {
 		// assume ordered roadSections to assign its place in road
 		for (let placeInOrder = 0; placeInOrder < roadsDataArr.road_sections.length - 1; placeInOrder++) {
+			const isStartRamp = placeInOrder === 0;
+			const isEndRamp = placeInOrder === roadsDataArr.road_sections.length - 1;
+	
 			const roadSectionObj = mapRoadSectionObj(
 				roadsDataArr.road_sections[placeInOrder],
 				placeInOrder,
-				placeInOrder = 0 ? true : false, // is startRamp
-				placeInOrder = roadsDataArr.road_sections.length - 1 ? true : false, // is endRamp
+				isStartRamp,
+				isEndRamp,
 			);
 			updateMap(roadIdRoadSectionObjMap, roadsDataArr.id, roadSectionObj);
 		}
@@ -67,6 +70,7 @@ controllers.roadModel = (function () {
 	}
 	
 	function getRoadIdsForDestinationElementId(destinationElementId) {
+		console.log(roadIdStartDestinationElementRelationObjMap)
 		return getMatchingRoadIds(relationObj => relationObj.destinationElementId === destinationElementId);
 	}
 	
