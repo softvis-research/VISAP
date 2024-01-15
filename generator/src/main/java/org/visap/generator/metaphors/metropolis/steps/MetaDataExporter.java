@@ -61,7 +61,7 @@ public class MetaDataExporter {
         boolean hasElements = false;
         for (final CityElement element : elements) {
 
-            if (element.getSourceNode() == null) {
+            if (element.getSourceNodeCell().node == null) {
                 continue;
             } else {
 
@@ -112,7 +112,7 @@ public class MetaDataExporter {
 
     private String getNodeMetaInfo(CityElement element) {
         StringBuilder builder = new StringBuilder();
-        NodeCell nodeCell = new NodeCell(element.getSourceNode());
+        NodeCell nodeCell = element.getSourceNodeCell();
         // For some accessory elements there is no source node
         if (nodeCell.node == null) {
             return "";
@@ -145,7 +145,7 @@ public class MetaDataExporter {
 
     private String getRelationsMetaInfo(CityElement element) {
         StringBuilder builder = new StringBuilder();
-        NodeCell nodeCell = new NodeCell(element.getSourceNode());
+        NodeCell nodeCell = element.getSourceNodeCell();
 
         // For some accessory elements there is no source node
         if (nodeCell.node == null) {
@@ -176,7 +176,7 @@ public class MetaDataExporter {
 
     private String getAdditionalMetaInfo(CityElement element) {
         StringBuilder builder = new StringBuilder();
-        NodeCell nodeCell = new NodeCell(element.getSourceNode());
+        NodeCell nodeCell = element.getSourceNodeCell();
         String nodeType = nodeCell.node.get("type").asString();
 
         // signature for methods
@@ -188,7 +188,7 @@ public class MetaDataExporter {
     }
 
     private String getQualifiedName(CityElement element) {
-        NodeCell nodeCell = new NodeCell(element.getSourceNode());
+        NodeCell nodeCell = element.getSourceNodeCell();
         List<String> qualifiedNameAsList = getQualifiedNameAsList(nodeCell);
         return String.join(".", qualifiedNameAsList); // returns "name1.name2.name3"
     }

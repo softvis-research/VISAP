@@ -129,7 +129,7 @@ public class MetropolisDesigner {
     private void designBuilding(CityElement building) {
         CityElement.CitySubType refBuildingType = building.getSubType();
 
-        if (building.getSourceNode() == null && refBuildingType == null) {
+        if (building.getSourceNodeCell().node == null && refBuildingType == null) {
             return;
         } else {
 

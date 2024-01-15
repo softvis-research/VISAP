@@ -75,7 +75,7 @@ public class MetropolisCreator {
         long relationCounter = 0;
 
         for (CityElement element : cityElements) {
-            NodeCell sourceNodeCell = new NodeCell(element.getSourceNode());
+            NodeCell sourceNodeCell = element.getSourceNodeCell();
 
             if (element.getSourceNodeType() == SAPNodeTypes.Report) {
                 if (element.getType() == CityElement.CityType.Building) {
@@ -203,7 +203,7 @@ public class MetropolisCreator {
 
         for (NodeCell sourceNodeCell : sourceNodeCells) {
             CityElement cityElement = new CityElement(cityType);
-            cityElement.setSourceNode(sourceNodeCell.node);
+            cityElement.setSourceNodeCell(sourceNodeCell);
             cityElements.add(cityElement);
         }
 

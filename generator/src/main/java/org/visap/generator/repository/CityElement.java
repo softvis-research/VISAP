@@ -2,10 +2,12 @@ package org.visap.generator.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.visap.generator.database.NodeCell;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPNodeTypes;
+
 import org.neo4j.driver.Value;
-import org.neo4j.driver.types.Node;
+
 import java.util.*;
 
 public class CityElement {
@@ -54,7 +56,7 @@ public class CityElement {
 
     private Long nodeID;
 
-    private Node sourceNode;
+    private NodeCell sourceNodeCell;
 
     private List<CityElement> subElements;
     private CityElement parentElement;
@@ -91,23 +93,23 @@ public class CityElement {
     }
 
     public Long getSourceNodeID() {
-        return sourceNode.id();
+        return sourceNodeCell.node.id();
     }
 
-    public Node getSourceNode() {
-        return sourceNode;
+    public NodeCell getSourceNodeCell() {
+        return sourceNodeCell;
     }
 
-    public void setSourceNode(Node sourceNode) {
-        this.sourceNode = sourceNode;
+    public void setSourceNodeCell(NodeCell sourceNodeCell) {
+        this.sourceNodeCell = sourceNodeCell;
     }
 
     public SAPNodeTypes getSourceNodeType() {
-        Node sourceNode = getSourceNode();
-        if (sourceNode == null) {
+        NodeCell sourceNodeCell = getSourceNodeCell();
+        if (sourceNodeCell == null) {
             return null;
         }
-        return SAPNodeTypes.valueOf(sourceNode.get(SAPNodeProperties.type_name.name()).asString());
+        return SAPNodeTypes.valueOf(sourceNodeCell.node.get(SAPNodeProperties.type_name.name()).asString());
     }
 
     public double getHeight() {
@@ -229,17 +231,17 @@ public class CityElement {
 
     public String getSourceNodeProperty(SAPNodeProperties sapNodeProperties) {
 
-        Node sourceNode = getSourceNode();
+        NodeCell sourceNodeCell = getSourceNodeCell();
 
         try {
-            if (sourceNode == null) {
+            if (sourceNodeCell.node == null) {
                 throw new Exception("sourceNode is equal null");
             }
         } catch (Exception e) {
             log.error(e.getMessage());
         }
 
-        Value propertyValue = sourceNode.get(sapNodeProperties.name());
+        Value propertyValue = sourceNodeCell.node.get(sapNodeProperties.name());
         try {
             if (propertyValue == null) {
                 // throw new Exception("propertyValue is equal null");

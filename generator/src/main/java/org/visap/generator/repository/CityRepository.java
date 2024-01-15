@@ -5,8 +5,8 @@ import org.apache.commons.logging.LogFactory;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.database.DatabaseConnector;
+import org.visap.generator.database.NodeCell;
 import org.neo4j.driver.Value;
-import org.neo4j.driver.types.Node;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -64,9 +64,9 @@ public class CityRepository {
 
         for (CityElement element : elementsByType) {
 
-            Node sourceNode = element.getSourceNode();
+            NodeCell sourceNodeCell = element.getSourceNodeCell();
 
-            if (sourceNode == null) {
+            if (sourceNodeCell == null) {
                 CityElement.CitySubType subType = element.getSubType();
                 String subTypeString = subType.toString();
                 if (!subTypeString.equals(sourcePropertyValue)) {
@@ -77,7 +77,7 @@ public class CityRepository {
                 continue;
             }
 
-            Value propertyValue = sourceNode.get(sourceProperty.toString());
+            Value propertyValue = sourceNodeCell.node.get(sourceProperty.toString());
             if (propertyValue == null) {
                 continue;
             }
@@ -100,9 +100,9 @@ public class CityRepository {
 
         for (CityElement element : elementsByType) {
 
-            Node sourceNode = element.getSourceNode();
+            NodeCell sourceNodeCell = element.getSourceNodeCell();
 
-            if (sourceNode == null) {
+            if (sourceNodeCell.node == null) {
                 CityElement.CitySubType subType = element.getSubType();
                 String subTypeString = subType.toString();
                 if (!subTypeString.equals(sourcePropertyValue)) {
@@ -113,7 +113,7 @@ public class CityRepository {
                 continue;
             }
 
-            Value propertyValue = sourceNode.get(sourceProperty.toString());
+            Value propertyValue = sourceNodeCell.node.get(sourceProperty.toString());
             if (propertyValue == null) {
                 continue;
             }
@@ -160,11 +160,11 @@ public class CityRepository {
         AtomicInteger sourceRelationCounter = new AtomicInteger(0);
         AtomicInteger childRelationCounter = new AtomicInteger(0);
         elementsByHash.forEach((id, element) -> {
-            Node elementsBySourceNode = element.getSourceNode();
-            if (elementsBySourceNode != null) {
+            NodeCell elementsBySourceNode = element.getSourceNodeCell();
+            if (elementsBySourceNode.node != null) {
 
                 String statement = "MATCH (sourceNode:Elements), (acityNode:Elements)" +
-                        "WHERE ID(sourceNode) = " + elementsBySourceNode.id() +
+                        "WHERE ID(sourceNode) = " + elementsBySourceNode.node.id() +
                         "  AND ID(acityNode) =  " + element.getNodeID() +
                         "  CREATE (sourceNode)<-[r:SOURCE]-(acityNode)";
 
@@ -204,11 +204,10 @@ public class CityRepository {
         });
 
         elementsByHash.forEach((id, element) -> {
-            Node elementsBySourceNode = element.getSourceNode();
-            if (elementsBySourceNode != null) {
-
+            NodeCell elementsBySourceNode = element.getSourceNodeCell();
+            if (elementsBySourceNode.node != null) {
                 String statement = "MATCH (sourceNode:Elements), (acityNode:Elements)" +
-                        "WHERE ID(sourceNode) = " + elementsBySourceNode.id() +
+                        "WHERE ID(sourceNode) = " + elementsBySourceNode.node.id() +
                         "  AND ID(acityNode) =  " + element.getNodeID() +
                         "  CREATE (sourceNode)<-[r:SOURCE]-(acityNode)";
 
@@ -249,7 +248,7 @@ public class CityRepository {
         elementsByTypeMap.put(element.getHash(), element);
 
         // add to source node id map
-        if (element.getSourceNode() != null) {
+        if (element.getSourceNodeCell().node != null) {
             elementsBySourceID.put(element.getSourceNodeID(), element);
         }
     }
@@ -272,7 +271,7 @@ public class CityRepository {
         elementsByTypeMap.remove(element.getHash(), element);
 
         // delete from source node id map
-        if (element.getSourceNode() != null) {
+        if (element.getSourceNodeCell().node != null) {
             elementsBySourceID.remove(element.getSourceNodeID(), element);
         }
     }
