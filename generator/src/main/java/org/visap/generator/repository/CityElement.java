@@ -6,8 +6,6 @@ import org.visap.generator.database.NodeCell;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPNodeTypes;
 
-import org.neo4j.driver.Value;
-
 import java.util.*;
 
 public class CityElement {
@@ -241,17 +239,11 @@ public class CityElement {
             log.error(e.getMessage());
         }
 
-        Value propertyValue = sourceNodeCell.node.get(sapNodeProperties.name());
-        try {
-            if (propertyValue == null) {
-                // throw new Exception("propertyValue is equal null");
-            }
-        } catch (Exception e) {
-            // log.error(e.getMessage());
-            log.error(e + "propertyValue is equal null"); // Fehler führt schon in viel eherer Verarbeitung zum Abbruch
+        if (sourceNodeCell.node.get(sapNodeProperties.name()) == null) {
+            log.error("propertyValue is equal null"); // Fehler führt schon in viel eherer Verarbeitung zum Abbruch
         }
 
-        String sourceNodeProperty = propertyValue.asString();
+        String sourceNodeProperty = sourceNodeCell.node.get(sapNodeProperties.name()).asString();
 
         return sourceNodeProperty;
     }

@@ -6,7 +6,6 @@ import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.database.DatabaseConnector;
 import org.visap.generator.database.NodeCell;
-import org.neo4j.driver.Value;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -77,12 +76,11 @@ public class CityRepository {
                 continue;
             }
 
-            Value propertyValue = sourceNodeCell.node.get(sourceProperty.toString());
-            if (propertyValue == null) {
+            if (sourceNodeCell.node.get(sourceProperty.toString()) == null) {
                 continue;
             }
 
-            String propertyValueString = propertyValue.asString();
+            String propertyValueString = sourceNodeCell.node.get(sourceProperty.toString()).asString();
             if (!propertyValueString.equals(sourcePropertyValue)) {
                 continue;
             }
@@ -113,12 +111,11 @@ public class CityRepository {
                 continue;
             }
 
-            Value propertyValue = sourceNodeCell.node.get(sourceProperty.toString());
-            if (propertyValue == null) {
+            if (sourceNodeCell.node.get(sourceProperty.toString()) == null) {
                 continue;
             }
 
-            String propertyValueString = propertyValue.asString();
+            String propertyValueString = sourceNodeCell.node.get(sourceProperty.toString()).asString();
             if (!propertyValueString.equals(sourcePropertyValue)) {
                 continue;
             }
