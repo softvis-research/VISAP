@@ -155,7 +155,7 @@ controllers.application = (function () {
     				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultRoadsDataPath));
     				else return response.json();
     			}).then(roadsDataJson => {
-    				roadModel.createRoadsFromData(roadsDataJson);
+    				roadModel.createRoadObjsFromData(roadsDataJson);
     		});
     	}
 
