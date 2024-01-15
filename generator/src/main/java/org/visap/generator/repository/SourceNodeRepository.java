@@ -162,7 +162,7 @@ public class SourceNodeRepository {
 
     public Collection<NodeCell> getRelatedNodeCells(Node node, SAPRelationLabels relationLabel, Boolean direction) {
         Collection<Node> relatedNodes = this.getRelatedNodes(node, relationLabel, direction);
-        Collection<NodeCell> nodeCells = new TreeSet<NodeCell>();
+        Collection<NodeCell> nodeCells = new ArrayList<NodeCell>();
 
         for (Node relatedNode : relatedNodes) {
             nodeCells.add(new NodeCell(relatedNode));
@@ -196,7 +196,7 @@ public class SourceNodeRepository {
 
     public Collection<NodeCell> getNodeCellsByProperty(SAPNodeProperties property, String value) {
         Collection<Node> relatedNodes = this.getNodesByProperty(property, value);
-        Collection<NodeCell> nodeCells = new TreeSet<NodeCell>();
+        Collection<NodeCell> nodeCells = new ArrayList<NodeCell>();
 
         for (Node relatedNode : relatedNodes) {
             nodeCells.add(new NodeCell(relatedNode));
