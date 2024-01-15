@@ -24,7 +24,8 @@ const setup = {
 			},
 			showLegendOnSelect: true,
 			enableTransparency: true,
-			enableRoadVanishing: true,
+			enableRoadVanishing: false,
+			spawnTrafficSigns: false,
 		},
 	],
 

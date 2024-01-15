@@ -1,8 +1,6 @@
 const createRoadStripesHelper = function (controllerConfig) {
     return (function () {
 
-        spawnTrafficSigns = true;
-
         function initialize() {
             if (controllerConfig.showLegendOnSelect) {
                 legendHelper = createLegendHelper(controllerConfig)
@@ -20,22 +18,26 @@ const createRoadStripesHelper = function (controllerConfig) {
                 }
                 const isRamp = roadSectionProperties.isRamp;
                 const roadSectionEntity = document.getElementById(roadSectionId)
-                createStripe(roadSectionEntity, controllerConfig.roadColors[state], isRamp, state)
+                createStripe(roadSectionEntity, isRamp, state)
+                
+                // spawn traffic signs on ramps
+                if (controllerConfig.spawnTrafficSigns && isRamp && state !== controllerConfig.relationTypes.ambiguous) {
+                    createTrafficSign(roadSectionEntity, state);
+                }
             });
         }
 
-        function resetRoadSectionEmphasizing(roadSectionRelativePropertiesMap) {
+        function resetRoadSectionEmphasizing() {
             if (controllerConfig.showLegendOnSelect) legendHelper.hideLegend()
             resetTrafficSigns()
             removeStripes();
         }
        
-        function createStripe(roadSectionEntity, color, isRamp, state) {
+        function createStripe(roadSectionEntity, isRamp, state) {
             const originalPosition = roadSectionEntity.getAttribute("position");
             const originalWidth = roadSectionEntity.getAttribute("width");
             const originalDepth = roadSectionEntity.getAttribute("depth");
             
-            // Spawn regular stripe
             const stripeEntity = document.createElement("a-entity");
             const stripeID = roadSectionEntity.id + "_stripe";
             stripeEntity.setAttribute("id", stripeID);
@@ -45,41 +47,36 @@ const createRoadStripesHelper = function (controllerConfig) {
             stripeEntity.setAttribute("position", stripePosition);
             
             stripeEntity.setAttribute("geometry", `primitive: box; width: ${originalWidth - 0.5}; height: 0.1; depth: ${originalDepth - 0.5}`);
-            stripeEntity.setAttribute("material", `color: ${color}`);
+            stripeEntity.setAttribute("material", `color: ${controllerConfig.roadColors[state]}`);
             
             const scene = document.querySelector("a-scene");
             scene.appendChild(stripeEntity);
-            
-            if (isRamp && state !== "ambiguous" && spawnTrafficSigns) {
-                // Call the createTrafficSign function
-                createTrafficSign(roadSectionEntity, color, offsetY);
-            }
         }
 
-        function createTrafficSign(roadSectionEntity, color, offsetY) {
+        function createTrafficSign(roadSectionEntity, state) {
+            const color = controllerConfig.roadColors[state]
+            const offsetY = 0.51
             const originalPosition = roadSectionEntity.getAttribute("position");
             
-            // Create the traffic sign entity
             const signEntity = document.createElement("a-entity");
             const signID = roadSectionEntity.id + "_sign";
             signEntity.setAttribute("id", signID);
             
-            const signOffsetY = 1.2; // Adjust the offset based on your preference
+            const signOffsetY = 1.2;
             const signPosition = { x: originalPosition.x, y: originalPosition.y + offsetY + signOffsetY, z: originalPosition.z };
             signEntity.setAttribute("position", signPosition);
             
-            // Use standard mesh primitives for the traffic sign
+            // use standard mesh primitives for the traffic sign
             signEntity.setAttribute("geometry", "primitive: box; width: 0.9; height: 0.1; depth: 0.9");
             signEntity.setAttribute("material", `color: ${color}`);
             
-            // Rotate the traffic sign
+            // rotate the traffic sign
             signEntity.setAttribute("rotation", { x: 45, y: 45, z: 90 });
             
-            // Append the sign entity to the scene
             const scene = document.querySelector("a-scene");
             scene.appendChild(signEntity);
         
-            // Create a cylinder as the foot of the traffic sign
+            // create a cylinder as the foot of the traffic sign
             const footEntity = document.createElement("a-cylinder");
             const footID = roadSectionEntity.id + "_foot";
             footEntity.setAttribute("id", footID);
@@ -91,7 +88,6 @@ const createRoadStripesHelper = function (controllerConfig) {
             footEntity.setAttribute("height", 1);
             footEntity.setAttribute("material", "color: silver");
         
-            // Append the foot entity to the scene
             scene.appendChild(footEntity);
         }
         
@@ -110,7 +106,6 @@ const createRoadStripesHelper = function (controllerConfig) {
             });
         }
         
-    
         function checkIfRotationIsHorizontally(stripeEntity) {
         
             if (stripeEntity) {
@@ -128,7 +123,6 @@ const createRoadStripesHelper = function (controllerConfig) {
                 scene.removeChild(stripeEntity);
             });
         }
-
 
         return {
             initialize: initialize,

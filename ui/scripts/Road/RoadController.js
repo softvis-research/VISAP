@@ -5,10 +5,9 @@ controllers.roadController = function () {
 		emphasizeMode: "ColoredRoads",
 
 		showLegendOnSelect: true,
-
 		enableTransparency: true,
-
 		enableRoadVanishing: true,
+		spawnTrafficSigns: true,
 
 		supportedEntityTypes: [
 			"Class",
@@ -29,6 +28,7 @@ controllers.roadController = function () {
 			isCalled: "orange",
 			bidirectionalCall: "magenta",
 		},
+
 	}
 
 	let roadSectionRelativePropertiesMap = new Map();
@@ -91,7 +91,7 @@ controllers.roadController = function () {
 		const entityType = applicationEvent.entities[0].type;
 		if (controllerConfig.supportedEntityTypes.includes(entityType)) {
 			canvasManipulator.unhighlightEntities([{ id: applicationEvent.entities[0].id }], { name: controllerConfig.name });
-			helpers[mode].resetRoadSectionEmphasizing(roadSectionRelativePropertiesMap);
+			helpers[mode].resetRoadSectionEmphasizing();
 			resetRoadSectionRelativeProperties()
 			if (controllerConfig.enableTransparency) resetMutingEffects()
 		}
@@ -120,15 +120,12 @@ controllers.roadController = function () {
 
 		// apply logic to determine all relation types a roadSection has (e.g. calls, calls, bidirectional, calls, isCalled, ...)
 		const bidirectionalCallElements = destinationsOfStartRoadSectionIds.filter(id => startAsDestinationRoadSectionIds.includes(id));
-		console.log(bidirectionalCallElements)
 		addRelationIfNotEmpty(bidirectionalCallElements, controllerConfig.relationTypes.bidirectionalCall);
 
 		const callsElements = destinationsOfStartRoadSectionIds.filter(id => !startAsDestinationRoadSectionIds.includes(id));
-		console.log(callsElements)
 		addRelationIfNotEmpty(callsElements, controllerConfig.relationTypes.calls);
 
 		const isCalledElements = startAsDestinationRoadSectionIds.filter(id => !destinationsOfStartRoadSectionIds.includes(id));
-		console.log(isCalledElements)
 		addRelationIfNotEmpty(isCalledElements, controllerConfig.relationTypes.isCalled);
 	}
 
@@ -181,21 +178,18 @@ controllers.roadController = function () {
 		});
 	}
 
-	function assignRoadSectionRamps( startIsDestination) {
-		// get ramps in all involved roads
+	function assignRoadSectionRamps(startIsDestination) {
+		// get ramps (first or last items) in all involved roads
 		const rampRoadSections1 = roadModel.getRampRoadSectionsForStartElement(startElement.id);
 		const rampRoadSections2 = startIsDestination.flatMap(id => {
-			const rampRoadSections = roadModel.getRampRoadSectionsForStartElement({id});
+			const rampRoadSections = roadModel.getRampRoadSectionsForStartElement({ id });
 			return rampRoadSections ? [rampRoadSections] : [];
 		});
-	
-		console.log(rampRoadSections1);
-		console.log(rampRoadSections2);
-	
+
 		// combine firstRoadSections and lastRoadSections arrays
 		const combinedFirstSections = [...(rampRoadSections1?.firstRoadSections || []), ...(rampRoadSections2.flatMap(r => r?.firstRoadSections || []))];
 		const combinedLastSections = [...(rampRoadSections1?.lastRoadSections || []), ...(rampRoadSections2.flatMap(r => r?.lastRoadSections || []))];
-	
+
 		if (combinedFirstSections.length > 0 || combinedLastSections.length > 0) {
 			roadSectionRelativePropertiesMap.forEach((roadSectionProperties, roadSection) => {
 				const isRamp = combinedFirstSections.includes(roadSection) || combinedLastSections.includes(roadSection);
@@ -204,7 +198,6 @@ controllers.roadController = function () {
 			});
 		}
 	}
-	
 
 	function toggleMutingEffects() {
 		let involvedElements = new Map();
@@ -225,7 +218,7 @@ controllers.roadController = function () {
 			if (roadSectionRelativePropertiesMap.has(id)) {
 				involvedElements.set(id, { id, type: "roadSection" })
 			}
-			
+
 		});
 
 		const allElements = new Map(model.getAllEntities());
@@ -251,7 +244,7 @@ controllers.roadController = function () {
 			if (!involvedElements.has(id)) {
 				if (value.type === "roadSection") {
 					if (controllerConfig.enableRoadVanishing) {
-						canvasManipulator.alterPositionOfEntities([{ id }], {deltaY: - 0.1}); // apply negative offset
+						canvasManipulator.alterPositionOfEntities([{ id }], { deltaY: - 0.1 }); // apply negative offset
 						canvasManipulator.changeColorOfEntities([{ id }], "grey", { name: controllerConfig.name });
 					}
 					canvasManipulator.changeTransparencyOfEntities([{ id }], 0.3, { name: controllerConfig.name });
@@ -268,7 +261,7 @@ controllers.roadController = function () {
 		transparentElements.forEach((value, id) => {
 			if (value.includes("roadSection")) {
 				if (controllerConfig.enableRoadVanishing) {
-					canvasManipulator.alterPositionOfEntities([{ id }], {deltaY: 0.1}); // apply negative offset
+					canvasManipulator.alterPositionOfEntities([{ id }], { deltaY: 0.1 });
 					canvasManipulator.changeColorOfEntities([{ id }], "black", { name: controllerConfig.name });
 				}
 			}
