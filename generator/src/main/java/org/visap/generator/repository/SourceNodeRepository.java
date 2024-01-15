@@ -194,6 +194,16 @@ public class SourceNodeRepository {
         return nodesByLabel.get(label.name()).values();
     }
 
+    public Collection<NodeCell> getNodeCellsByProperty(SAPNodeProperties property, String value) {
+        Collection<Node> relatedNodes = this.getNodesByProperty(property, value);
+        Collection<NodeCell> nodeCells = new TreeSet<NodeCell>();
+
+        for (Node relatedNode : relatedNodes) {
+            nodeCells.add(new NodeCell(relatedNode));
+        }
+        return nodeCells;
+    }
+
     public Collection<Node> getNodesByProperty(SAPNodeProperties property, String value) {
         Collection<Node> nodesByID = getNodes();
         List<Node> nodesByProperty = new ArrayList<>();

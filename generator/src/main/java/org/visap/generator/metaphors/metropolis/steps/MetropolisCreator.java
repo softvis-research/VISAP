@@ -5,10 +5,10 @@ import org.apache.commons.logging.LogFactory;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.visap.generator.abap.enums.SAPRelationLabels;
+import org.visap.generator.database.NodeCell;
 import org.visap.generator.repository.CityElement;
 import org.visap.generator.repository.CityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
-import org.neo4j.driver.types.Node;
 
 import java.util.*;
 
@@ -75,18 +75,18 @@ public class MetropolisCreator {
         long relationCounter = 0;
 
         for (CityElement element : cityElements) {
-            Node sourceNode = element.getSourceNode();
+            NodeCell sourceNodeCell = new NodeCell(element.getSourceNode());
 
             if (element.getSourceNodeType() == SAPNodeTypes.Report) {
                 if (element.getType() == CityElement.CityType.Building) {
                     continue;
                 }
 
-                createMetropolisRelationsForIdenticalNodes(nodeRepository, sourceNode, element);
+                createMetropolisRelationsForIdenticalNodes(nodeRepository, sourceNodeCell, element);
                 relationCounter++;
             }
 
-            Collection<CityElement> childElements = getChildElementsBySourceNode(nodeRepository, sourceNode);
+            Collection<CityElement> childElements = getChildElementsBySourceNode(nodeRepository, sourceNodeCell);
 
             for (CityElement childElement : childElements) {
                 // No nesting of packages
@@ -114,10 +114,10 @@ public class MetropolisCreator {
         log.info(relationCounter + " childRelations for relation \"CONTAINS\" created");
     }
 
-    private void createMetropolisRelationsForIdenticalNodes(SourceNodeRepository nodeRepository, Node sourceNode,
+    private void createMetropolisRelationsForIdenticalNodes(SourceNodeRepository nodeRepository, NodeCell sourceNodeCell,
             CityElement element) {
 
-        CityElement buildingParentElements = getParentElementBySourceNode(nodeRepository, sourceNode);
+        CityElement buildingParentElements = getParentElementBySourceNode(nodeRepository, sourceNodeCell);
 
         element.setParentElement(buildingParentElements);
         buildingParentElements.addSubElement(element);
@@ -155,15 +155,15 @@ public class MetropolisCreator {
         }
     }
 
-    private Collection<CityElement> getChildElementsBySourceNode(SourceNodeRepository nodeRepository, Node node) {
-        Collection<Node> childNodes = nodeRepository.getRelatedNodes(node, SAPRelationLabels.CONTAINS, true);
-        if (childNodes.isEmpty()) {
+    private Collection<CityElement> getChildElementsBySourceNode(SourceNodeRepository nodeRepository, NodeCell nodeCell) {
+        Collection<NodeCell> childNodeCells = nodeRepository.getRelatedNodeCells(nodeCell.node, SAPRelationLabels.CONTAINS, true);
+        if (childNodeCells.isEmpty()) {
             return new TreeSet<>();
         }
 
         List<CityElement> childElements = new ArrayList<>();
-        for (Node childNode : childNodes) {
-            Long childNodeID = childNode.id();
+        for (NodeCell childNodeCell : childNodeCells) {
+            Long childNodeID = childNodeCell.node.id();
             CityElement childElement = repository.getElementBySourceID(childNodeID);
             if (childElement == null) {
                 continue;
@@ -173,14 +173,14 @@ public class MetropolisCreator {
         return childElements;
     }
 
-    private CityElement getParentElementBySourceNode(SourceNodeRepository nodeRepository, Node node) {
-        Collection<Node> parentNodes = nodeRepository.getRelatedNodes(node, SAPRelationLabels.CONTAINS, false);
-        if (parentNodes.isEmpty()) {
+    private CityElement getParentElementBySourceNode(SourceNodeRepository nodeRepository, NodeCell nodeCell) {
+        Collection<NodeCell> parentNodeCells = nodeRepository.getRelatedNodeCells(nodeCell.node, SAPRelationLabels.CONTAINS, false);
+        if (parentNodeCells.isEmpty()) {
             return null;
         }
 
-        Node parentNode = parentNodes.iterator().next();
-        Long parentNodeId = parentNode.id();
+        NodeCell parentNode = parentNodeCells.iterator().next();
+        Long parentNodeId = parentNode.node.id();
 
         CityElement parentElement = repository.getElementBySourceID(parentNodeId);
         return parentElement;
@@ -188,22 +188,22 @@ public class MetropolisCreator {
 
     private void createACityElementsFromSourceNodes(SourceNodeRepository nodeRepository, CityElement.CityType cityType,
             SAPNodeProperties property, SAPNodeTypes nodeType) {
-        Collection<Node> sourceNodes = nodeRepository.getNodesByProperty(property, nodeType.name());
+        Collection<NodeCell> sourceNodeCells = nodeRepository.getNodeCellsByProperty(property, nodeType.name());
 
-        log.info(sourceNodes.size() + " SourceNodes with property \"" + property + "\" and value \"" + nodeType.name()
+        log.info(sourceNodeCells.size() + " SourceNodes with property \"" + property + "\" and value \"" + nodeType.name()
                 + "\" loaded");
-        List<CityElement> cityElements = createACityElements(sourceNodes, cityType);
+        List<CityElement> cityElements = createACityElements(sourceNodeCells, cityType);
         repository.addElements(cityElements);
 
         log.info(cityElements.size() + " ACityElements of type \"" + cityType + "\" created");
     }
 
-    private List<CityElement> createACityElements(Collection<Node> sourceNodes, CityElement.CityType cityType) {
+    private List<CityElement> createACityElements(Collection<NodeCell> sourceNodeCells, CityElement.CityType cityType) {
         List<CityElement> cityElements = new ArrayList<>();
 
-        for (Node sourceNode : sourceNodes) {
+        for (NodeCell sourceNodeCell : sourceNodeCells) {
             CityElement cityElement = new CityElement(cityType);
-            cityElement.setSourceNode(sourceNode);
+            cityElement.setSourceNode(sourceNodeCell.node);
             cityElements.add(cityElement);
         }
 
