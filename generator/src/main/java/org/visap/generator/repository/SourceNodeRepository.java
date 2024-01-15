@@ -7,6 +7,7 @@ import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPRelationLabels;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.database.DatabaseConnector;
+import org.visap.generator.database.NodeCell;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Value;
 import org.neo4j.driver.types.Node;
@@ -159,11 +160,21 @@ public class SourceNodeRepository {
         return nodeById.values();
     }
 
+    public Collection<NodeCell> getRelatedNodeCells(Node node, SAPRelationLabels relationLabel, Boolean direction) {
+        Collection<Node> relatedNodes = this.getRelatedNodes(node, relationLabel, direction);
+        Collection<NodeCell> nodeCells = new TreeSet<NodeCell>();
+
+        for (Node relatedNode : relatedNodes) {
+            nodeCells.add(new NodeCell(relatedNode));
+        }
+        return nodeCells;
+    }
+
     public Collection<Node> getRelatedNodes(Node node, SAPRelationLabels relationLabel, Boolean direction) {
         if (!nodesByRelation.containsKey(relationLabel.name())) {
             return new TreeSet<>();
         }
-        ;
+
         Map<Boolean, Map<Long, Map<Long, Node>>> relationMap = nodesByRelation.get(relationLabel.name());
 
         Map<Long, Map<Long, Node>> directedRelationMap = relationMap.get(direction);

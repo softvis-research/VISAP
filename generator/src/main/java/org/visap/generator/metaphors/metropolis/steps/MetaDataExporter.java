@@ -8,7 +8,7 @@ import org.visap.generator.abap.enums.SAPRelationLabels;
 import org.visap.generator.repository.CityElement;
 import org.visap.generator.repository.CityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
-import org.neo4j.driver.types.Node;
+import org.visap.generator.database.NodeCell;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -112,9 +112,9 @@ public class MetaDataExporter {
 
     private String getNodeMetaInfo(CityElement element) {
         StringBuilder builder = new StringBuilder();
-        Node node = element.getSourceNode();
+        NodeCell nodeCell = new NodeCell(element.getSourceNode());
         // For some accessory elements there is no source node
-        if (node == null) {
+        if (nodeCell.node == null) {
             return "";
         }
         Arrays.asList(SAPNodeProperties.values()).forEach(prop -> {
@@ -123,12 +123,12 @@ public class MetaDataExporter {
             }
 
             // Don't write properties with NULL value
-            if (node.get(prop.toString()).isNull()) {
+            if (nodeCell.node.get(prop.toString()).isNull()) {
                 return;
             }
 
             // Remove extra "" (written by Neo4j)
-            String propValue = node.get(prop.toString()).toString().replaceAll("\"", "");
+            String propValue = nodeCell.node.get(prop.toString()).toString().replaceAll("\"", "");
 
             // Write strings with quotation marks and numbers without
             if (NumberUtils.isCreatable(propValue)) {
@@ -145,10 +145,10 @@ public class MetaDataExporter {
 
     private String getRelationsMetaInfo(CityElement element) {
         StringBuilder builder = new StringBuilder();
-        Node node = element.getSourceNode();
+        NodeCell nodeCell = new NodeCell(element.getSourceNode());
 
         // For some accessory elements there is no source node
-        if (node == null) {
+        if (nodeCell.node == null) {
             return "";
         }
 
@@ -157,18 +157,18 @@ public class MetaDataExporter {
         }
 
         // Add REFERENCES and INHERIT relations
-        String nodeType = node.get("type").asString();
+        String nodeType = nodeCell.node.get("type").asString();
         if (AMetaDataMap.getNodesWithReferencesRelationByType().contains(nodeType)) {
-            builder.append("\"calls\": \"" + getRelations(node, SAPRelationLabels.REFERENCES, true) + "\",\n");
-            builder.append("\"calledBy\": \"" + getRelations(node, SAPRelationLabels.REFERENCES, false) + "\",\n");
+            builder.append("\"calls\": \"" + getRelations(nodeCell, SAPRelationLabels.REFERENCES, true) + "\",\n");
+            builder.append("\"calledBy\": \"" + getRelations(nodeCell, SAPRelationLabels.REFERENCES, false) + "\",\n");
         }
         if (AMetaDataMap.getNodesWithInheritRelationByType().contains(nodeType)) {
-            builder.append("\"subClassOf\": \"" + getRelations(node, SAPRelationLabels.INHERIT, true) + "\",\n");
-            builder.append("\"superClassOf\": \"" + getRelations(node, SAPRelationLabels.INHERIT, false) + "\",\n");
+            builder.append("\"subClassOf\": \"" + getRelations(nodeCell, SAPRelationLabels.INHERIT, true) + "\",\n");
+            builder.append("\"superClassOf\": \"" + getRelations(nodeCell, SAPRelationLabels.INHERIT, false) + "\",\n");
         }
         if (AMetaDataMap.getNodesWithUsesRelationByType().contains(nodeType)) {
-            builder.append("\"use\": \"" + getRelations(node, SAPRelationLabels.USES, true) + "\",\n");
-            builder.append("\"usedby\": \"" + getRelations(node, SAPRelationLabels.USES, false) + "\",\n");
+            builder.append("\"use\": \"" + getRelations(nodeCell, SAPRelationLabels.USES, true) + "\",\n");
+            builder.append("\"usedby\": \"" + getRelations(nodeCell, SAPRelationLabels.USES, false) + "\",\n");
         }
 
         return builder.toString();
@@ -176,8 +176,8 @@ public class MetaDataExporter {
 
     private String getAdditionalMetaInfo(CityElement element) {
         StringBuilder builder = new StringBuilder();
-        Node node = element.getSourceNode();
-        String nodeType = node.get("type").asString();
+        NodeCell nodeCell = new NodeCell(element.getSourceNode());
+        String nodeType = nodeCell.node.get("type").asString();
 
         // signature for methods
         if (nodeType.equals("METH")) {
@@ -188,37 +188,37 @@ public class MetaDataExporter {
     }
 
     private String getQualifiedName(CityElement element) {
-        Node node = element.getSourceNode();
-        List<String> qualifiedNameAsList = getQualifiedNameAsList(node);
+        NodeCell nodeCell = new NodeCell(element.getSourceNode());
+        List<String> qualifiedNameAsList = getQualifiedNameAsList(nodeCell);
         return String.join(".", qualifiedNameAsList); // returns "name1.name2.name3"
     }
 
-    private List<String> getQualifiedNameAsList(Node node) {
+    private List<String> getQualifiedNameAsList(NodeCell nodeCell) {
         List<String> qualifiedNameAsList = new ArrayList<>();
-        Collection<Node> parentNodes = nodeRepository.getRelatedNodes(node, SAPRelationLabels.CONTAINS, false);
-        if (!parentNodes.isEmpty()) {
-            qualifiedNameAsList.addAll(getQualifiedNameAsList(parentNodes.iterator().next()));
+        Collection<NodeCell> parentNodeCells = nodeRepository.getRelatedNodeCells(nodeCell.node, SAPRelationLabels.CONTAINS, false);
+        if (!parentNodeCells.isEmpty()) {
+            qualifiedNameAsList.addAll(getQualifiedNameAsList(parentNodeCells.iterator().next()));
         }
 
-        String nodeName = node.get(SAPNodeProperties.object_name.name()).asString();
+        String nodeName = nodeCell.node.get(SAPNodeProperties.object_name.name()).asString();
         qualifiedNameAsList.add(nodeName);
         return qualifiedNameAsList;
     }
 
-    private String getRelations(Node node, SAPRelationLabels label, Boolean direction) {
-        Collection<Node> nodes = nodeRepository.getRelatedNodes(node, label, direction);
-        if (nodes.isEmpty()) {
+    private String getRelations(NodeCell nodeCell, SAPRelationLabels label, Boolean direction) {
+        Collection<NodeCell> nodeCells = nodeRepository.getRelatedNodeCells(nodeCell.node, label, direction);
+        if (nodeCells.isEmpty()) {
             return "";
         }
 
-        List<String> nodesHashes = getNodesHashes(nodes);
+        List<String> nodesHashes = getNodeCellHashes(nodeCells);
         return String.join(", ", nodesHashes); // returns "hash, hash_2, hash*"
     }
 
-    private List<String> getNodesHashes(Collection<Node> nodes) {
+    private List<String> getNodeCellHashes(Collection<NodeCell> nodeCells) {
         List<String> nodesHashes = new ArrayList<>();
-        for (Node node : nodes) {
-            Long nodeId = node.id();
+        for (NodeCell nodeCell : nodeCells) {
+            Long nodeId = nodeCell.node.id();
             CityElement cityElement = cityRepository.getElementBySourceID(nodeId);
             if (cityElement == null) {
                 continue;

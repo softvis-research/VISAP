@@ -1,6 +1,6 @@
 package org.visap.generator.metaphors.metropolis.layouts.kdtree;
 
-import org.neo4j.driver.types.Node;
+import org.visap.generator.database.NodeCell;
 
 import java.util.Arrays;
 
@@ -18,7 +18,7 @@ public class CityRectangle implements Comparable<CityRectangle> {
 	double length;
 	double area;
 	// @Accessors(PUBLIC_GETTER, PUBLIC_SETTER) var Node nodeLink
-	Node nodeLink;
+	NodeCell nodeLinkCell;
 	double upperLeftX;
 	double upperLeftY;
 	double bottomRightX;
@@ -185,11 +185,11 @@ public class CityRectangle implements Comparable<CityRectangle> {
 		return upperLeftY;
 	}
 
-	public Node getNodeLink() {
-		return nodeLink;
+	public NodeCell getNodeLinkCell() {
+		return nodeLinkCell;
 	}
 
-	public void setNodeLink(Node nodeLink) {
-		this.nodeLink = nodeLink;
+	public void setNodeLinkCell(NodeCell nodeLinkCell) {
+		this.nodeLinkCell = nodeLinkCell;
 	}
 }
