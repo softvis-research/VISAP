@@ -1,5 +1,5 @@
 controllers.roadModel = (function () {
-	let roadObjArr = []
+	let globalRoadObjMap = new Map();
 
 	function createRoadObjsFromData(roadsDTO) {
 		roadsDTO.forEach(roadDTO => {
@@ -8,7 +8,7 @@ controllers.roadModel = (function () {
 				roadDTO.destination_element,
 				roadDTO.road_sections
 			);
-			roadObjArr.push(roadObj);
+			globalRoadObjMap.set(roadDTO.id, roadObj);
 		})
 	}
 
@@ -21,11 +21,23 @@ controllers.roadModel = (function () {
 	}
 
 	function getRoadObjsForStartElementId(startElementId) {
-		return roadObjArr.filter(roadObj => roadObj.startElementId === startElementId);
+		const result = new Map();
+		globalRoadObjMap.forEach((roadObj, roadId) => {
+			if (roadObj.startElementId === startElementId) {
+				result.set(roadId, roadObj);
+			}
+		});
+		return result;
 	}
-	
+
 	function getRoadObjsForDestinationElementId(destinationElementId) {
-		return roadObjArr.filter(roadObj => roadObj.destinationElementId === destinationElementId);
+		const result = new Map();
+		globalRoadObjMap.forEach((roadObj, roadId) => {
+			if (roadObj.destinationElementId === destinationElementId) {
+				result.set(roadId, roadObj);
+			}
+		});
+		return result;
 	}
 
 	return {
