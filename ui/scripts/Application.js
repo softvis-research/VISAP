@@ -154,8 +154,8 @@ controllers.application = (function () {
     			}).then(response => {
     				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultRoadsDataPath));
     				else return response.json();
-    			}).then(roadsDataJson => {
-    				roadModel.createRoadObjsFromData(roadsDataJson);
+    			}).then(roadsDTO => {
+    				roadModel.createRoadObjsFromData(roadsDTO);
     		});
     	}
 

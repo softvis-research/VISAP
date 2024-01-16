@@ -1,116 +1,36 @@
 controllers.roadModel = (function () {
-	let roadIdStartDestinationElementRelationObjMap = new Map();
-	let roadIdRoadSectionObjMap = new Map();
+	let roadObjArr = []
 
-	function createRoadObjsFromData(roadsDataArr) {
-		roadsDataArr.forEach(createRoadStartDestinationRelationObjArr);
-		roadsDataArr.forEach(createRoadSectionObjArr);
-	}
-
-	function createRoadStartDestinationRelationObjArr(roadsDataArr) {
-		const roadStartDestinationRelationObj = mapRoadStartDestinationRelationObj(
-			roadsDataArr.start_element,
-			roadsDataArr.destination_element,
-		);
-		updateMap(roadIdStartDestinationElementRelationObjMap, roadsDataArr.id, roadStartDestinationRelationObj)
-	}
-
-	function createRoadSectionObjArr(roadsDataArr) {
-		// assume ordered roadSections to assign its place in road
-		for (let placeInOrder = 0; placeInOrder < roadsDataArr.road_sections.length - 1; placeInOrder++) {
-			const isStartRamp = placeInOrder === 0;
-			const isEndRamp = placeInOrder === roadsDataArr.road_sections.length - 1;
-	
-			const roadSectionObj = mapRoadSectionObj(
-				roadsDataArr.road_sections[placeInOrder],
-				placeInOrder,
-				isStartRamp,
-				isEndRamp,
+	function createRoadObjsFromData(roadsDTO) {
+		roadsDTO.forEach(roadDTO => {
+			const roadObj = mapRoadObjs(
+				roadDTO.start_element,
+				roadDTO.destination_element,
+				roadDTO.road_sections
 			);
-			updateMap(roadIdRoadSectionObjMap, roadsDataArr.id, roadSectionObj);
-		}
+			roadObjArr.push(roadObj);
+		})
 	}
 
-	// obj mappers
-
-	function mapRoadStartDestinationRelationObj(startElementId, destinationElementId) {
+	function mapRoadObjs(startElementId, destinationElementId, roadSectionsArr) {
 		return {
 			startElementId,
 			destinationElementId,
+			roadSectionsArr,
 		};
 	}
 
-	function mapRoadSectionObj(roadSectionId, placeInOrder, isStartRamp, isEndRamp) {
-		return {
-			roadSectionId,
-			placeInOrder,
-			isStartRamp,
-			isEndRamp,
-			relationTypes: [],
-			state: null,
-		};
-	}
-
-	// getters
-
-	function getRoadSectionObjsForRoadId(roadId) {
-		return roadIdRoadSectionObjMap.get(roadId) || [];
-	}
-
-	function getAllRoadSectionObjsForRoadIds(roadIds) {
-		return roadIds.map(roadId => roadIdRoadSectionObjMap.get(roadId) || []).flat();
-	}
-
-	function getRoadSectionObjsForRoadId(roadId) {
-		return roadIdRoadSectionObjMap.get(roadId) || [];
+	function getRoadObjsForStartElementId(startElementId) {
+		return roadObjArr.filter(roadObj => roadObj.startElementId === startElementId);
 	}
 	
-	function getRoadIdsForStartElementId(startElementId) {
-		return getMatchingRoadIds(relationObj => relationObj.startElementId === startElementId);
-	}
-	
-	function getRoadIdsForDestinationElementId(destinationElementId) {
-		console.log(roadIdStartDestinationElementRelationObjMap)
-		return getMatchingRoadIds(relationObj => relationObj.destinationElementId === destinationElementId);
-	}
-	
-	function getRoadIdsForStartDestinationElementRelation(elementId1, elementId2) {
-		return getMatchingRoadIds(relationObj =>
-			(relationObj.startElementId === elementId1 && relationObj.destinationElementId === elementId2) ||
-			(relationObj.startElementId === elementId2 && relationObj.destinationElementId === elementId1)
-		);
-	}
-
-	// helper
-
-	// set up getters for map operations
-	function getMatchingRoadIds(predicate) {
-		const matchingRoadIds = [];
-	
-		roadIdStartDestinationElementRelationObjMap.forEach((relationObj, roadId) => {
-			if (relationObj && predicate(relationObj)) {
-				matchingRoadIds.push(roadId);
-			}
-		});
-	
-		return matchingRoadIds;
-	}
-	
-	// handle map updates set-adding objects or arrays to key
-	function updateMap(map, key, ...values) {
-		if (map.has(key)) {
-			map.get(key).push(...values);
-		} else {
-			map.set(key, values.length === 1 ? [values[0]] : [...values]);
-		}
+	function getRoadObjsForDestinationElementId(destinationElementId) {
+		return roadObjArr.filter(roadObj => roadObj.destinationElementId === destinationElementId);
 	}
 
 	return {
 		createRoadObjsFromData,
-		getRoadSectionObjsForRoadId,
-		getAllRoadSectionObjsForRoadIds,
-		getRoadIdsForStartElementId,
-		getRoadIdsForDestinationElementId,
-		getRoadIdsForStartDestinationElementRelation,
-	};	
+		getRoadObjsForStartElementId,
+		getRoadObjsForDestinationElementId,
+	};
 })();
