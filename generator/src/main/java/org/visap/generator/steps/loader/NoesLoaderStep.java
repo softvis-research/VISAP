@@ -39,7 +39,7 @@ public class NoesLoaderStep {
         }
 
         userInput.close();
-        connector.close();
+       // connector.close();
         log.info("NoesLoader step was completed");
     }
 
