@@ -15,17 +15,19 @@ const setup = {
 		{
 			name: "roadController",
 			supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
-			emphasizeMode: "ColoredStripes", // choose ColoredRoads, ColoredStripes
-			roadColors: {
-				ambiguous: "silver",
+			roadHighlightMode: "MultiColorStripes", // choose MultiColorStripes, <PLACEHOLDER>
+			
+			colorsMultiColorStripes: {
+				undecided: "silver",
 				calls: "turquoise",
 				isCalled: "orange",
 				bidirectionalCall: "magenta",
 			},
+			// NOTE: don't set them in any other way by now. They need to be re-implemented.
 			showLegendOnSelect: true,
-			enableTransparency: true,
-			enableRoadVanishing: false,
-			spawnTrafficSigns: false,
+			// enableTransparency: true,
+			// enableRoadVanishing: false,
+			// spawnTrafficSigns: false,
 		},
 	],
 

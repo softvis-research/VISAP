@@ -1,123 +1,73 @@
 controllers.roadModel = (function () {
-	let roadsArr = [];
-	let startOnDestinationsIdMap = new Map();
-	let startOnRoadSectionsIdMap = new Map();
-	let roadSectionIdsOnStartDestinationKeyMap = new Map();
+	let globalRoadObjMap = new Map();
 
-	function createRoadsFromData(roadsDataArray) {
-		roadsDataArray.forEach(createRoad);
+	function createRoadObjsFromData(roadsDTO) {
+		roadsDTO.forEach(roadDTO => {
+			const roadObjProperty = {
+				startElementId: roadDTO.start_element,
+				destinationElementId: roadDTO.destination_element,
+				roadSectionArr: roadDTO.road_sections,
+			};
+			globalRoadObjMap.set(roadDTO.id, roadObjProperty);
+		});
 	}
 
-	function createRoad(dataEntry) {
-		const road = mapRoadObj(
-			dataEntry.id,
-			dataEntry.start_element,
-			dataEntry.destination_element,
-			dataEntry.road_sections
-		);
+	/************************
+			Getter
+	************************/
 
-		roadsArr.push(road);
-
-		updateMap(startOnDestinationsIdMap, road.startElementId, road.destinationElementId);
-		updateMap(startOnRoadSectionsIdMap, road.startElementId, ...road.roadSectionsIds);
-
-		const key = generateKey(road.startElementId, road.destinationElementId);
-		updateMap(roadSectionIdsOnStartDestinationKeyMap, key, ...road.roadSectionsIds);
+	function getRoadObjsForStartElementId(startElementId) {
+		return getRoadObjsByPredicate(roadObj => roadObj.startElementId === startElementId);
 	}
 
-	function mapRoadObj(roadId, startElementId, destinationElementId, roadSectionsIds) {
-		return {
-			roadId,
-			startElementId,
-			destinationElementId,
-			roadSectionsIds,
-		};
+	function getRoadObjsForDestinationElementId(destinationElementId) {
+		return getRoadObjsByPredicate(roadObj => roadObj.destinationElementId === destinationElementId);
 	}
 
-	function updateMap(map, key, ...values) {
-		if (map.has(key)) {
-			map.get(key).push(...values);
-		} else {
-			map.set(key, [...values]);
-		}
+	function getRoadSectionIdsForStartElementId(startElementId) {
+		return Array.from(getRoadObjsByPredicate(roadObj =>
+			roadObj.startElementId === startElementId
+		).values()).flatMap(roadObj => roadObj.roadSectionArr);
 	}
 
-	function generateKey(entityId1, entityId2) {
-		return entityId1 < entityId2 ? `${entityId1}@${entityId2}` : `${entityId2}@${entityId1}`;
+	function getRoadSectionIdsForDestinationElementId(destinationElementId) {
+		return Array.from(getRoadObjsByPredicate(roadObj =>
+			roadObj.destinationElementId === destinationElementId
+		).values()).flatMap(roadObj => roadObj.roadSectionArr);
 	}
 
-	function getRoadsForStartElement(startElement) {
-		return roadsArr.filter(road => road.startElementId === startElement.id);
+	function getRoadSectionIdsForUniqueElementIdRelation(elementIdA, elementIdB) {
+		const roadSectionsMatchingAtoB = getRoadObjsByPredicate(roadObj =>
+			roadObj.startElementId === elementIdA && roadObj.destinationElementId === elementIdB
+		).values();
+
+		const roadSectionsMatchingBtoA = getRoadObjsByPredicate(roadObj =>
+			roadObj.startElementId === elementIdB && roadObj.destinationElementId === elementIdA
+		).values();
+
+		return [].concat(...roadSectionsMatchingAtoB, ...roadSectionsMatchingBtoA).flatMap(roadObj => roadObj.roadSectionArr);
 	}
 
-	function getRoadsForDestination(destinationElementId) {
-		return roadsArr.filter(road => road.destinationElementId === destinationElementId);
-	}
+	/************************
+			Helper
+	************************/
 
-	function getRoadSectionIdsOfUniqueRelationship(entityId1, entityId2) {
-		const key1 = generateKey(entityId1, entityId2);
-		const key2 = generateKey(entityId2, entityId1);
-
-		const roadSections1 = roadSectionIdsOnStartDestinationKeyMap.get(key1) || [];
-		const roadSections2 = roadSectionIdsOnStartDestinationKeyMap.get(key2) || [];
-
-		return [...roadSections1, ...roadSections2];
-	}
-
-	// "Ramps" are first and last roadSections on a road (facing to startElements or destinationElements)
-	function getRampRoadSectionsForStartElement(startElement) {
-		const matchingRoads = roadsArr.filter((road) => road.startElement === startElement.id);
-
-		if (matchingRoads.length === 0) {
-			return null;
-		}
-
-		const firstRoadSections = [];
-		const lastRoadSections = [];
-
-		matchingRoads.forEach((road) => {
-			const roadSections = road.roadSectionsIds;
-
-			if (roadSections.length > 0) {
-				firstRoadSections.push(roadSections[0]);
-				lastRoadSections.push(roadSections[roadSections.length - 1]);
+	function getRoadObjsByPredicate(predicate) {
+		const result = new Map();
+		globalRoadObjMap.forEach((roadObj, roadId) => {
+			if (predicate(roadObj)) {
+				result.set(roadId, roadObj);
 			}
 		});
-
-		return {
-			firstRoadSections,
-			lastRoadSections,
-		};
-	}
-
-	function getRoadSectionIdsOfDestinationForOfStartElement(startElement) {
-		return startOnDestinationsIdMap.has(startElement.id) ? startOnDestinationsIdMap.get(startElement.id) : [];
-	}
-
-	function getRoadStartElementsForDestination(destinationElement) {
-		const startElements = [...startOnDestinationsIdMap.keys()]
-			.filter(startElement => startOnDestinationsIdMap.get(startElement).includes(destinationElement.id));
-		return startElements;
-	}
-
-	function getAllRoadSectionIds() {
-		let allRoadSections = [];
-
-		roadsArr.forEach(road => {
-			allRoadSections.push(...road.roadSectionsIds);
-		});
-
-		return allRoadSections;
+		return result;
 	}
 
 	return {
-		createRoadsFromData,
-		getRoadSectionIdsOfDestinationForOfStartElement,
-		getRoadStartElementsForDestination,
-		getRoadSectionIdsOfUniqueRelationship,
-		getRoadsForStartElement,
-		getRoadsForDestination,
-		getRampRoadSectionsForStartElement,
-		getAllRoadSectionIds
+		createRoadObjsFromData,
+		getRoadObjsForStartElementId,
+		getRoadObjsForDestinationElementId,
+		getRoadSectionIdsForStartElementId,
+		getRoadSectionIdsForDestinationElementId,
+		getRoadSectionIdsForUniqueElementIdRelation
 	};
 })();
