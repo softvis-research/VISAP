@@ -2,7 +2,7 @@ controllers.roadController = function () {
 	const controllerConfig = {
 		name: "roadController",
 
-		roadHighlightMode: "ColoredRoads",
+		roadHighlightMode: "MultiColorStripes",
 
 		showLegendOnSelect: true,
 		// enableTransparency: true,
@@ -11,8 +11,8 @@ controllers.roadController = function () {
 
 		supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
 
-		roadColors: {
-			ambiguous: "white",
+		colorsMultiColorStripes: {
+			undecided: "silver",
 			calls: "turquoise",
 			isCalled: "orange",
 			bidirectionalCall: "magenta",
@@ -21,7 +21,7 @@ controllers.roadController = function () {
 	}
 
 	let usedHighlightMode;
-	let helpers = {}
+	let roadHighlightHelper = {}
 	let globalStartElementComponent;
 	let globalRelatedRoadObjsMap = new Map();
 
@@ -36,26 +36,27 @@ controllers.roadController = function () {
 	}
 
 	function initializeHelpers() {
-		roadColorHelper = createRoadColorHelper(controllerConfig);
-		roadStripesHelper = createRoadStripesHelper(controllerConfig);
-		helpers = {
-			ColoredRoads: {
-				initialize: roadColorHelper.initialize,
-				highlightRelatedRoadsForStartElement: roadColorHelper.highlightRelatedRoadsForStartElement,
-				resetRoadsHighlight: roadColorHelper.resetRoadsHighlight
+		multiColorStripesHelper = createMultiColorStripesHelper(controllerConfig);
+		// roadStripesHelper = createX(controllerConfig);
+		roadHighlightHelper = {
+			MultiColorStripes: {
+				initialize: multiColorStripesHelper.initialize,
+				highlightRelatedRoadsForStartElement: multiColorStripesHelper.highlightRelatedRoadsForStartElement,
+				resetRoadsHighlight: multiColorStripesHelper.resetRoadsHighlight
 			},
-			ColoredStripes: {
-				initialize: roadStripesHelper.initialize,
-				highlightRelatedRoadsForStartElement: roadStripesHelper.highlightRelatedRoadsForStartElement,
-				resetRoadsHighlight: roadStripesHelper.resetRoadsHighlight
-			},
+			// X: {
+			// 	initialize: X.initialize,
+			// 	highlightRelatedRoadsForStartElement: X.highlightRelatedRoadsForStartElement,
+			// 	resetRoadsHighlight: X.resetRoadsHighlight
+			// },
 		}
 
-		Object.keys(helpers).includes(controllerConfig.roadHighlightMode)
-			? (usedRoadHighlightMode = controllerConfig.roadHighlightMode)
-			: (usedRoadHighlightMode = "ColoredRoads"); // default
+		Object.keys(roadHighlightHelper).includes(controllerConfig.roadHighlightMode)
+			? (mode = controllerConfig.roadHighlightMode)
+			: (mode = "ColoredRoads"); // default
 
-		helpers[usedRoadHighlightMode].initialize()
+		console.log(mode)
+		roadHighlightHelper[mode].initialize()
 	}
 
 	//
@@ -84,17 +85,16 @@ controllers.roadController = function () {
 	function handleRoadsHighlightForStartElement() {
 		storeRelatedRoadObjsInMap();
 
-		helpers[usedRoadHighlightMode]
+		roadHighlightHelper[mode]
 			.highlightRelatedRoadsForStartElement(globalStartElementComponent, globalRelatedRoadObjsMap);
 	}
 
 	function handleRoadsHighlightsReset() {
-		helpers[usedRoadHighlightMode]
+		roadHighlightHelper[mode]
 			.resetRoadsHighlight(globalRelatedRoadObjsMap);
 
 		globalRelatedRoadObjsMap.clear();
 	}
-
 
 	function storeRelatedRoadObjsInMap() {
 		const startCallsOtherElements = roadModel.getRoadObjsForStartElementId(globalStartElementComponent.id);
@@ -103,8 +103,6 @@ controllers.roadController = function () {
 
 		globalRelatedRoadObjsMap = new Map([...startCallsOtherElements, ...startIsCalledByOtherElements]);
 	}
-
-
 
 	//
 	// selection highlighting

@@ -7,10 +7,10 @@ const createLegendHelper = function (controllerConfig) {
             const canvas = document.getElementById("canvas");
     
             let legendDivElement = application.createDiv("legend");
-            createLegendItem(legendDivElement, "calls", controllerConfig.roadColors.calls);
-            createLegendItem(legendDivElement, "isCalled", controllerConfig.roadColors.isCalled);
-            createLegendItem(legendDivElement, "bidirectionalCall", controllerConfig.roadColors.bidirectionalCall);
-            createLegendItem(legendDivElement, "ambiguous", controllerConfig.roadColors.ambiguous);
+            createLegendItem(legendDivElement, "calls", controllerConfig.colorsMultiColorStripes.calls);
+            createLegendItem(legendDivElement, "isCalled", controllerConfig.colorsMultiColorStripes.isCalled);
+            createLegendItem(legendDivElement, "bidirectionalCall", controllerConfig.colorsMultiColorStripes.bidirectionalCall);
+            createLegendItem(legendDivElement, "undecided", controllerConfig.colorsMultiColorStripes.undecided);
     
             canvas.appendChild(legendDivElement);
             const legendElement = document.getElementById("legend");

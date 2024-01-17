@@ -15,13 +15,14 @@ const setup = {
 		{
 			name: "roadController",
 			supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
-			roadHighlightMode: "ColoredRoads", // choose ColoredRoads, ColoredStripes
-			// roadColors: {
-			// 	ambiguous: "silver",
-			// 	calls: "turquoise",
-			// 	isCalled: "orange",
-			// 	bidirectionalCall: "magenta",
-			// },
+			roadHighlightMode: "MultiColorStripes", // choose MultiColorStripes, X
+			
+			colorsMultiColorStripes: {
+				undecided: "silver",
+				calls: "turquoise",
+				isCalled: "orange",
+				bidirectionalCall: "magenta",
+			},
 			showLegendOnSelect: true,
 			// enableTransparency: true,
 			// enableRoadVanishing: false,
