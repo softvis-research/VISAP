@@ -4,7 +4,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         let domHelper;
         let globalStartElementComponent;
         let globalRelatedRoadObjsMap = new Map();
-        let globalRoadSectionStateMap = new Map();
+        let globalRoadSectionRotationMap = new Map();
         const globalScene = document.querySelector("a-scene");
 
 
@@ -18,10 +18,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 domHelper.initialize();
                 domHelper.createLegend(
                     [
-                        { text: "calls", color: controllerConfig.colorsMultiColorStripes.calls },
-                        { text: "isCalled", color: controllerConfig.colorsMultiColorStripes.isCalled },
-                        { text: "bidirectionalCall", color: controllerConfig.colorsMultiColorStripes.bidirectionalCall },
-                        { text: "undecided", color: controllerConfig.colorsMultiColorStripes.undecided },
+                        { text: "calls", color: controllerConfig.colorsParallelColorStripes.calls },
+                        { text: "isCalled", color: controllerConfig.colorsParallelColorStripes.isCalled },
                     ]);
             }
         }
@@ -31,7 +29,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             globalRelatedRoadObjsMap = relatedObjsMap;
 
             domHelper.handleLegendForAction("select");
-            setRoadSectionStatesMap();
+            setRoadSectionRotationMap();
             handleRoadStripsCreation();
         }
 
@@ -44,66 +42,33 @@ const createParallelColorStripesHelper = function (controllerConfig) {
            Road Section States
         ************************/
 
-        // setting individual states roadSections based on its inherent relations
-        function setRoadSectionStatesMap() {
+        function setRoadSectionRotationMap() {
+            setRotationForRoadSectionsCalls()
+            setRotationForRoadSectionsIsCalled()  // const roadObjsWhereGlobalStartElementIsDestination = getRoadObjsWhereGlobalStartElementIsDestination();
 
-            function isArrayContainsOnly(arr, value) {
-                return arr.length > 0 && arr.every(item => item === value);
-            }
-
-            const roadSectionIdsAllRelationsMap = getMapOfAllRelationsOfRoadSections();
-
-            roadSectionIdsAllRelationsMap.forEach((relationsArr, roadSectionId) => {
-                let state;
-
-                switch (true) {
-                    case isArrayContainsOnly(relationsArr, "calls"):
-                        state = "calls";
-                        break;
-                    case isArrayContainsOnly(relationsArr, "isCalled"):
-                        state = "isCalled";
-                        break;
-                    case isArrayContainsOnly(relationsArr, "bidirectionalCall"):
-                        state = "bidirectionalCall";
-                        break;
-                    default:
-                        state = "undecided";
-                }
-                globalRoadSectionStateMap.set(roadSectionId, state);
-            });
         }
 
-        // map all inherent relation types states of roadSectios. These can be multiple as different roads can merge
-        function getMapOfAllRelationsOfRoadSections() {
-
-            const roadSectionIdsAllRelationsMap = new Map();
-            // get both directions
-            const destinationOfStartElementIdArr = getDestinationOfStartElementIdArr();
-            const startAsDestinationElementIdArr = getStartAsDestinationElementIdArr()
-            
-            const bidirectionalCallElementIds = destinationOfStartElementIdArr.filter(id => startAsDestinationElementIdArr.includes(id));
-            const callsElementIds = destinationOfStartElementIdArr.filter(id => !startAsDestinationElementIdArr.includes(id));
-            const isCalledElementIds = startAsDestinationElementIdArr.filter(id => !destinationOfStartElementIdArr.includes(id));
-
-            addRelationsToRoadSectionRelationMap(bidirectionalCallElementIds, "bidirectionalCall", roadSectionIdsAllRelationsMap);
-            addRelationsToRoadSectionRelationMap(callsElementIds, "calls", roadSectionIdsAllRelationsMap);
-            addRelationsToRoadSectionRelationMap(isCalledElementIds, "isCalled", roadSectionIdsAllRelationsMap);
-
-            return roadSectionIdsAllRelationsMap;
+        function setRotationForRoadSectionsCalls() {
+            const roadObjsForGlobalStartElement = getRoadObjsForGlobalStartElement();
+            roadObjsForGlobalStartElement.forEach(roadObj => {
+                setRotationForStartRamp(roadObj);
+            })
         }
 
         // start calls other elements
-        function getDestinationOfStartElementIdArr() {
-             return Array.from(globalRelatedRoadObjsMap.values())
-            .filter(roadObj => roadObj.startElementId === globalStartElementComponent.id)
-            .map(roadObj => roadObj.destinationElementId);
+        function getRoadObjsForGlobalStartElement() {
+            return Array.from(globalRelatedRoadObjsMap.values())
+                .filter(roadObj => roadObj.startElementId === globalStartElementComponent.id);
         }
 
         // other elements call start
-        function getStartAsDestinationElementIdArr() {
+        function getRoadObjsWhereGlobalStartElementIsDestination() {
             return Array.from(globalRelatedRoadObjsMap.values())
-            .filter(roadObj => roadObj.startElementId != globalStartElementComponent.id)
-            .map(roadObj => roadObj.startElementId);
+                .filter(roadObj => roadObj.startElementId != globalStartElementComponent.id);
+        }
+
+        function setRotationForStartRamp(roadObj) {
+            road
         }
 
         function addRelationsToRoadSectionRelationMap(elementIdArr, relation, roadSectionIdsAllRelationsMap) {
