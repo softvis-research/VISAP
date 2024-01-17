@@ -3,21 +3,13 @@ controllers.roadModel = (function () {
 
     function createRoadObjsFromData(roadsDTO) {
         roadsDTO.forEach(roadDTO => {
-            const roadObjProperty = mapRoadObjProperties(
-                roadDTO.start_element,
-                roadDTO.destination_element,
-                roadDTO.road_sections
-            );
+            const roadObjProperty = {
+                startElementId: roadDTO.start_element,
+                destinationElementId: roadDTO.destination_element,
+                roadSectionArr: roadDTO.road_sections,
+            };
             globalRoadObjMap.set(roadDTO.id, roadObjProperty);
-        })
-    }
-
-    function mapRoadObjProperties(startElementId, destinationElementId, roadSectionArr) {
-        return {
-            startElementId,
-            destinationElementId,
-            roadSectionArr,
-        };
+        });
     }
 
     // getters
