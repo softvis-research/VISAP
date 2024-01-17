@@ -23,6 +23,7 @@ const setup = {
 				isCalled: "orange",
 				bidirectionalCall: "magenta",
 			},
+			// NOTE: don't set them in any other way by now. They need to be re-implemented.
 			showLegendOnSelect: true,
 			// enableTransparency: true,
 			// enableRoadVanishing: false,
