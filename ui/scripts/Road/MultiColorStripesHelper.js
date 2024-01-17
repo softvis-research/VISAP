@@ -1,7 +1,7 @@
 const createMultiColorStripesHelper = function (controllerConfig) {
     return (function () {
 
-        let legendHelper;
+        let domHelper;
         let globalStartElementComponent;
         let globalRelatedRoadObjsMap = new Map();
         let globalRoadSectionStateMap = new Map();
@@ -14,9 +14,9 @@ const createMultiColorStripesHelper = function (controllerConfig) {
 
         function initialize() {
             if (controllerConfig.showLegendOnSelect) {
-                legendHelper = createLegendHelper(controllerConfig);
-                legendHelper.initialize();
-                legendHelper.createLegend(
+                domHelper = createDomHelper(controllerConfig);
+                domHelper.initialize();
+                domHelper.createLegend(
                     [
                         { text: "calls", color: controllerConfig.colorsMultiColorStripes.calls },
                         { text: "isCalled", color: controllerConfig.colorsMultiColorStripes.isCalled },
@@ -30,14 +30,14 @@ const createMultiColorStripesHelper = function (controllerConfig) {
             globalStartElementComponent = startElementComponent;
             globalRelatedRoadObjsMap = relatedObjsMap;
 
-            handleLegendForAction("select");
+            domHelper.handleLegendForAction("select");
             setRoadSectionStatesMap();
             handleRoadStripsCreation();
         }
 
         function resetRoadsHighlight() {
-            handleLegendForAction("unselect");
-            removeComponentByIdMarking("_stripe");
+            domHelper.handleLegendForAction("unselect");
+            domHelper.removeComponentByIdMarking("_stripe");
         }
 
         /************************
@@ -81,7 +81,6 @@ const createMultiColorStripesHelper = function (controllerConfig) {
             const destinationOfStartElementIdArr = getDestinationOfStartElementIdArr();
             const startAsDestinationElementIdArr = getStartAsDestinationElementIdArr()
             
-
             const bidirectionalCallElementIds = destinationOfStartElementIdArr.filter(id => startAsDestinationElementIdArr.includes(id));
             const callsElementIds = destinationOfStartElementIdArr.filter(id => !startAsDestinationElementIdArr.includes(id));
             const isCalledElementIds = startAsDestinationElementIdArr.filter(id => !destinationOfStartElementIdArr.includes(id));
@@ -181,33 +180,6 @@ const createMultiColorStripesHelper = function (controllerConfig) {
         function determineColorOfRoadSectionIdByState(roadSectionId) {
             const state = globalRoadSectionStateMap.get(roadSectionId);
             return controllerConfig.colorsMultiColorStripes[state];
-        }
-
-        /************************
-              DOM Helper
-        ************************/
-
-        function resetRoadsHighlight() {
-            handleLegendForAction("unselect");
-            removeComponentByIdMarking("_stripe")
-        }
-
-        function removeComponentByIdMarking(markingStr) {
-            const components = document.querySelectorAll(`[id$="${markingStr}"]`);
-
-            components.forEach((c) => {
-                const scene = document.querySelector("a-scene");
-                scene.removeChild(c);
-            });
-        }
-
-        function handleLegendForAction(action) {
-            if (controllerConfig.showLegendOnSelect) {
-                switch (action) {
-                    case "select": legendHelper.showLegend(); break;
-                    case "unselect": legendHelper.hideLegend(); break;
-                }
-            }
         }
 
         return {
