@@ -77,16 +77,10 @@ const createMultiColorStripesHelper = function (controllerConfig) {
         function getMapOfAllRelationsOfRoadSections() {
 
             const roadSectionIdsAllRelationsMap = new Map();
-
-            // start calls other elements
-            const destinationOfStartElementIdArr = Array.from(globalRelatedRoadObjsMap.values())
-                .filter(roadObj => roadObj.startElementId === globalStartElementComponent.id)
-                .map(roadObj => roadObj.destinationElementId);
-
-            // other elements call start
-            const startAsDestinationElementIdArr = Array.from(globalRelatedRoadObjsMap.values())
-                .filter(roadObj => roadObj.startElementId != globalStartElementComponent.id)
-                .map(roadObj => roadObj.startElementId);
+            // get both directions
+            const destinationOfStartElementIdArr = getDestinationOfStartElementIdArr();
+            const startAsDestinationElementIdArr = getStartAsDestinationElementIdArr()
+            
 
             const bidirectionalCallElementIds = destinationOfStartElementIdArr.filter(id => startAsDestinationElementIdArr.includes(id));
             const callsElementIds = destinationOfStartElementIdArr.filter(id => !startAsDestinationElementIdArr.includes(id));
@@ -97,6 +91,20 @@ const createMultiColorStripesHelper = function (controllerConfig) {
             addRelationsToRoadSectionRelationMap(isCalledElementIds, "isCalled", roadSectionIdsAllRelationsMap);
 
             return roadSectionIdsAllRelationsMap;
+        }
+
+        // start calls other elements
+        function getDestinationOfStartElementIdArr() {
+             return Array.from(globalRelatedRoadObjsMap.values())
+            .filter(roadObj => roadObj.startElementId === globalStartElementComponent.id)
+            .map(roadObj => roadObj.destinationElementId);
+        }
+
+        // other elements call start
+        function getStartAsDestinationElementIdArr() {
+            return Array.from(globalRelatedRoadObjsMap.values())
+            .filter(roadObj => roadObj.startElementId != globalStartElementComponent.id)
+            .map(roadObj => roadObj.startElementId);
         }
 
         function addRelationsToRoadSectionRelationMap(elementIdArr, relation, roadSectionIdsAllRelationsMap) {
