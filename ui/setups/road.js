@@ -15,7 +15,7 @@ const setup = {
 		{
 			name: "roadController",
 			supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
-			roadHighlightMode: "MultiColorStripes", // choose MultiColorStripes, <PLACEHOLDER>
+			roadHighlightMode: "MultiColorStripes", // choose MultiColorStripes, ParallelColorStripes, ...
 			
 			colorsMultiColorStripes: {
 				undecided: "silver",
@@ -23,6 +23,12 @@ const setup = {
 				isCalled: "orange",
 				bidirectionalCall: "magenta",
 			},
+
+			colorsParallelColorStripes: {
+				calls: "blue",
+				isCalled: "red",
+			},
+
 			// NOTE: don't set them in any other way by now. They need to be re-implemented.
 			showLegendOnSelect: true,
 			// enableTransparency: true,

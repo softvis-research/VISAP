@@ -19,6 +19,12 @@ controllers.roadController = function () {
 			bidirectionalCall: "magenta",
 		},
 
+		colorsParallelColorStripes: {
+			calls: "blue",
+			isCalled: "red",
+		},
+
+
 	}
 
 	let roadHighlightHelper = {}
@@ -39,19 +45,18 @@ controllers.roadController = function () {
 	// intitialize roadHighlightHelpers based on mode defined in config, making public functions accessible via roadHighlightHelper[mode]
 	function initializeHelpers() {
 		multiColorStripesHelper = createMultiColorStripesHelper(controllerConfig);
-		// TODO: add further roadHighlightHelpers here:
-		// roadStripesHelper = createX(controllerConfig);
+		parallelColorStripesHelper = createParallelColorStripesHelper(controllerConfig);
 		roadHighlightHelper = {
 			MultiColorStripes: {
 				initialize: multiColorStripesHelper.initialize,
 				highlightRelatedRoadsForStartElement: multiColorStripesHelper.highlightRelatedRoadsForStartElement,
 				resetRoadsHighlight: multiColorStripesHelper.resetRoadsHighlight
 			},
-			// X: {
-			// 	initialize: X.initialize,
-			// 	highlightRelatedRoadsForStartElement: X.highlightRelatedRoadsForStartElement,
-			// 	resetRoadsHighlight: X.resetRoadsHighlight
-			// },
+			ParallelColorStripes: {
+				initialize: parallelColorStripesHelper.initialize,
+				highlightRelatedRoadsForStartElement: parallelColorStripesHelper.highlightRelatedRoadsForStartElement,
+				resetRoadsHighlight: parallelColorStripesHelper.resetRoadsHighlight
+			},
 		}
 
 		Object.keys(roadHighlightHelper).includes(controllerConfig.roadHighlightMode)
