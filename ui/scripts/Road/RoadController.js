@@ -5,6 +5,7 @@ controllers.roadController = function () {
 		roadHighlightMode: "MultiColorStripes",
 
 		showLegendOnSelect: true,
+		// TODO: Re-Implement
 		// enableTransparency: true,
 		// enableRoadVanishing: true,
 		// spawnTrafficSigns: true,
@@ -20,13 +21,13 @@ controllers.roadController = function () {
 
 	}
 
-	let usedHighlightMode;
 	let roadHighlightHelper = {}
 	let globalStartElementComponent;
 	let globalRelatedRoadObjsMap = new Map();
 
-	//
-	// initialization
+	/************************
+		Initialization
+	************************/
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
@@ -35,8 +36,10 @@ controllers.roadController = function () {
 		initializeHelpers();
 	}
 
+	// intitialize roadHighlightHelpers based on mode defined in config, making public functions accessible via roadHighlightHelper[mode]
 	function initializeHelpers() {
 		multiColorStripesHelper = createMultiColorStripesHelper(controllerConfig);
+		// TODO: add further roadHighlightHelpers here:
 		// roadStripesHelper = createX(controllerConfig);
 		roadHighlightHelper = {
 			MultiColorStripes: {
@@ -55,18 +58,17 @@ controllers.roadController = function () {
 			? (mode = controllerConfig.roadHighlightMode)
 			: (mode = "ColoredRoads"); // default
 
-		console.log(mode)
-		roadHighlightHelper[mode].initialize()
+		roadHighlightHelper[mode].initialize();
 	}
 
-	//
-	// selection handling
+	/************************
+	   Selection Handling
+	************************/
 
 	function onEntitySelected(applicationEvent) {
 		if (controllerConfig.supportedEntityTypes.includes(applicationEvent.entities[0].type)) {
 			globalStartElementComponent = applicationEvent.entities[0];
 			highlightStartElement();
-
 			handleRoadsHighlightForStartElement();
 		}
 	}
@@ -79,23 +81,23 @@ controllers.roadController = function () {
 		}
 	}
 
-	//
-	// road helper calls
+	/************************
+	 Selection Highlighting
+	************************/
 
-	function handleRoadsHighlightForStartElement() {
-		storeRelatedRoadObjsInMap();
-
-		roadHighlightHelper[mode]
-			.highlightRelatedRoadsForStartElement(globalStartElementComponent, globalRelatedRoadObjsMap);
+	function highlightStartElement() {
+		canvasManipulator.highlightEntities([globalStartElementComponent], "red", { name: controllerConfig.name });
 	}
 
-	function handleRoadsHighlightsReset() {
-		roadHighlightHelper[mode]
-			.resetRoadsHighlight(globalRelatedRoadObjsMap);
-
-		globalRelatedRoadObjsMap.clear();
+	function unhighlightStartElement() {
+		canvasManipulator.unhighlightEntities([globalStartElementComponent], { name: controllerConfig.name });
 	}
 
+	/************************
+	    Road Helper Calls
+	************************/
+
+	// prepare a map of all related roadObjs as necessary input for every roadHighlighHelper
 	function storeRelatedRoadObjsInMap() {
 		const startCallsOtherElements = roadModel.getRoadObjsForStartElementId(globalStartElementComponent.id);
 		const tmpDestinationElementComponent = globalStartElementComponent;
@@ -104,15 +106,14 @@ controllers.roadController = function () {
 		globalRelatedRoadObjsMap = new Map([...startCallsOtherElements, ...startIsCalledByOtherElements]);
 	}
 
-	//
-	// selection highlighting
-
-	function highlightStartElement() {
-		canvasManipulator.highlightEntities([globalStartElementComponent], "red", { name: controllerConfig.name });
+	function handleRoadsHighlightForStartElement() {
+		storeRelatedRoadObjsInMap();
+		roadHighlightHelper[mode].highlightRelatedRoadsForStartElement(globalStartElementComponent, globalRelatedRoadObjsMap);
 	}
 
-	function unhighlightStartElement() {
-		canvasManipulator.unhighlightEntities([globalStartElementComponent], { name: controllerConfig.name });
+	function handleRoadsHighlightsReset() {
+		roadHighlightHelper[mode].resetRoadsHighlight();
+		globalRelatedRoadObjsMap.clear();
 	}
 
 	return {
