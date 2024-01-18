@@ -44,14 +44,14 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
         function setRoadSectionRotationMap() {
             setRotationForRoadSectionsCalls()
-            setRotationForRoadSectionsIsCalled()  // const roadObjsWhereGlobalStartElementIsDestination = getRoadObjsWhereGlobalStartElementIsDestination();
+            // setRotationForRoadSectionsIsCalled()  // const roadObjsWhereGlobalStartElementIsDestination = getRoadObjsWhereGlobalStartElementIsDestination();
 
         }
 
         function setRotationForRoadSectionsCalls() {
             const roadObjsForGlobalStartElement = getRoadObjsForGlobalStartElement();
             roadObjsForGlobalStartElement.forEach(roadObj => {
-                setRotationForStartRamp(roadObj);
+                setDirectionForStartRamp(roadObj);
             })
         }
 
@@ -67,21 +67,32 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 .filter(roadObj => roadObj.startElementId != globalStartElementComponent.id);
         }
 
-        function setRotationForStartRamp(roadObj) {
-            road
+        function setDirectionForStartRamp(roadObj) {
+            const startRampId = roadObj.roadSectionArr[0];
+            console.log(startRampId);
+            const startRampMidPos = document.getElementById(startRampId).getAttribute("position");
+            const startElementMidPos = globalStartElementComponent.getAttribute("position");
+
+            const pointDirectionsBools = determinePointDirectionXZ(startRampMidPos, startElementMidPos);
+            const trueDirection = Object.keys(pointDirectionsBools)
+                .filter(key => pointDirectionsBools[key] && ["east", "west", "north", "south"]
+                .includes(key))[0];
+
+            globalRoadSectionRotationMap.set(startRampId, trueDirection);
+            console.log(globalRoadSectionRotationMap);
         }
 
-        function addRelationsToRoadSectionRelationMap(elementIdArr, relation, roadSectionIdsAllRelationsMap) {
-            elementIdArr.forEach(elementId => {
-                const roadSectionIds = roadModel.getRoadSectionIdsForUniqueElementIdRelation(elementId, globalStartElementComponent.id)
-                roadSectionIds.forEach(roadSectionId => {
-                    if (!roadSectionIdsAllRelationsMap.has(roadSectionId)) {
-                        roadSectionIdsAllRelationsMap.set(roadSectionId, [relation]);
-                    } else {
-                        roadSectionIdsAllRelationsMap.get(roadSectionId).push(relation);
-                    }
-                });
-            })
+        function determinePointDirectionXZ(point, refPoint) {
+            const { x, z } = point;
+
+            return {
+                east: x < refPoint.x,
+                west: x > refPoint.x,
+                north: z > refPoint.z,
+                south: z < refPoint.z,
+                onVerticalLine: x === refPoint.x,
+                onHorizontalLine: z === refPoint.z,
+            };
         }
 
         /************************
@@ -130,21 +141,6 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             const color = determineColorOfRoadSectionIdByState(roadSectionId)
             stripeComponent.setAttribute("material", `color: ${color}`);
             return stripeComponent;
-        }
-
-        // startRamp: first roadSection of a road
-        function determineIfRoadSectionIsStartRamp(roadObj, roadSectionId) {
-            return roadObj.roadSectionArr.length > 0 && roadObj.roadSectionArr[0] === roadSectionId;
-        }
-
-        // endRamp = last roadSection of a road
-        function determineIfRoadSectionIsEndRamp(roadObj, roadSectionId) {
-            return roadObj.roadSectionArr.length > 0 && roadObj.roadSectionArr[roadObj.roadSectionArr.length - 1] === roadSectionId;
-        }
-
-        function determineColorOfRoadSectionIdByState(roadSectionId) {
-            const state = globalRoadSectionStateMap.get(roadSectionId);
-            return controllerConfig.colorsMultiColorStripes[state];
         }
 
         return {
