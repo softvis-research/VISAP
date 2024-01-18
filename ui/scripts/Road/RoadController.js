@@ -72,14 +72,16 @@ controllers.roadController = function () {
 
 	function onEntitySelected(applicationEvent) {
 		if (controllerConfig.supportedEntityTypes.includes(applicationEvent.entities[0].type)) {
-			globalStartElementComponent = applicationEvent.entities[0];
+			const appEventEntity = applicationEvent.entities[0];
+			globalStartElementComponent = document.getElementById(appEventEntity.id)
 			highlightStartElement();
 			handleRoadsHighlightForStartElement();
 		}
 	}
 
 	function onEntityUnselected(applicationEvent) {
-		if (controllerConfig.supportedEntityTypes.includes(applicationEvent.entities[0].type)) {
+		const appEventEntity = applicationEvent.entities[0];
+		if (controllerConfig.supportedEntityTypes.includes(appEventEntity.type)) {
 			unhighlightStartElement();
 
 			handleRoadsHighlightsReset();
