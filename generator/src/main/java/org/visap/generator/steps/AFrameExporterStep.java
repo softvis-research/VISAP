@@ -48,7 +48,7 @@ public class AFrameExporterStep {
         MetropolisLayouter layouter = new MetropolisLayouter(cityRepository, nodeRepository);
         layouter.layoutRepository();
 
-        if (!Config.features.roads()) {
+        if (Config.features.roads()) {
             if (!isSilentMode) {
                 System.out.print("RoadNetworkLayouter step to be processed. Press any key to continue...");
                 userInput.nextLine();
