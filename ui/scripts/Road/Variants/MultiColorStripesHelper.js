@@ -1,7 +1,7 @@
 const createMultiColorStripesHelper = function (controllerConfig) {
     return (function () {
 
-        let domHelper;
+        let globalDomHelper;
         let globalStartElementComponent;
         let globalRelatedRoadObjsMap = new Map();
         let globalRoadSectionStateMap = new Map();
@@ -14,9 +14,9 @@ const createMultiColorStripesHelper = function (controllerConfig) {
 
         function initialize() {
             if (controllerConfig.showLegendOnSelect) {
-                domHelper = createDomHelper(controllerConfig);
-                domHelper.initialize();
-                domHelper.createLegend(
+                globalDomHelper = createDomHelper(controllerConfig);
+                globalDomHelper.initialize();
+                globalDomHelper.createLegend(
                     [
                         { text: "calls", color: controllerConfig.colorsMultiColorStripes.calls },
                         { text: "isCalled", color: controllerConfig.colorsMultiColorStripes.isCalled },
@@ -30,14 +30,14 @@ const createMultiColorStripesHelper = function (controllerConfig) {
             globalStartElementComponent = startElementComponent;
             globalRelatedRoadObjsMap = relatedObjsMap;
 
-            domHelper.handleLegendForAction("select");
+            globalDomHelper.handleLegendForAction("select");
             setRoadSectionStatesMap();
             handleRoadStripsCreation();
         }
 
         function resetRoadsHighlight() {
-            domHelper.handleLegendForAction("unselect");
-            domHelper.removeComponentByIdMarking("_stripe");
+            globalDomHelper.handleLegendForAction("unselect");
+            globalDomHelper.removeComponentByIdMarking("_stripe");
         }
 
         /************************

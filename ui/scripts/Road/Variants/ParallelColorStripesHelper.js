@@ -1,7 +1,8 @@
 const createParallelColorStripesHelper = function (controllerConfig) {
     return (function () {
 
-        let domHelper;
+        let globalDomHelper;
+        let roadSectionDirectionHelper;
         let globalStartElementComponent;
         let globalRelatedRoadObjsMap = new Map();
         let globalRoadSectionDirectionMap = new Map();
@@ -14,92 +15,32 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
         function initialize() {
             if (controllerConfig.showLegendOnSelect) {
-                domHelper = createDomHelper(controllerConfig);
-                domHelper.initialize();
-                domHelper.createLegend(
+                globalDomHelper = createDomHelper(controllerConfig);
+                globalDomHelper.initialize();
+                globalDomHelper.createLegend(
                     [
                         { text: "calls", color: controllerConfig.colorsParallelColorStripes.calls },
                         { text: "isCalled", color: controllerConfig.colorsParallelColorStripes.isCalled },
                     ]);
             }
+            roadSectionDirectionHelper = createRoadSectionDirectionHelper();
         }
 
         function highlightRelatedRoadsForStartElement(startElementComponent, relatedObjsMap) {
             globalStartElementComponent = startElementComponent;
             globalRelatedRoadObjsMap = relatedObjsMap;
 
-            domHelper.handleLegendForAction("select");
-            setRoadSectionDirectionMap();
-            handleParallelStripsCreation();
+            globalDomHelper.handleLegendForAction("select");
+            globalRoadSectionDirectionMap = roadSectionDirectionHelper.getDirectionsMapForRelatedStartElementRoads(globalStartElementComponent, globalRelatedRoadObjsMap);
+            console.log(globalRoadSectionDirectionMap)
+            // handleParallelStripsCreation();
         }
 
         function resetRoadsHighlight() {
-            domHelper.handleLegendForAction("unselect");
-            domHelper.removeComponentByIdMarking("_stripe");
+            globalDomHelper.handleLegendForAction("unselect");
+            globalDomHelper.removeComponentByIdMarking("_stripe");
         }
 
-        /************************
-         Road Section Directions
-        ************************/
-
-        function setRoadSectionDirectionMap() {
-            setDirectionForRoadSectionsCalls();
-            setDirectionForRoadSectionsIsCalled();
-        }
-
-        function setDirectionForRoadSectionsCalls() {
-            const roadObjsForGlobalStartElement = getRoadObjsForGlobalStartElement();
-            roadObjsForGlobalStartElement.forEach(roadObj => {
-                setDirectionForStartRamp(roadObj);
-            })
-        }
-
-        // start calls other elements
-        function getRoadObjsForGlobalStartElement() {
-            return Array.from(globalRelatedRoadObjsMap.values())
-                .filter(roadObj => roadObj.startElementId === globalStartElementComponent.id);
-        }
-
-        function setDirectionForRoadSectionsIsCalled() {
-            const roadObjsWhereGlobalStartElementIsDestination = getRoadObjsWhereGlobalStartElementIsDestination();
-            roadObjsWhereGlobalStartElementIsDestination.forEach(roadObj => {
-                //
-            })
-        }
-
-        // other elements call start
-        function getRoadObjsWhereGlobalStartElementIsDestination() {
-            return Array.from(globalRelatedRoadObjsMap.values())
-                .filter(roadObj => roadObj.startElementId != globalStartElementComponent.id);
-        }
-
-        function setDirectionForStartRamp(roadObj) {
-            const startRampId = roadObj.roadSectionArr[0];
-            console.log(startRampId);
-            const startRampMidPos = document.getElementById(startRampId).getAttribute("position");
-            const startElementMidPos = globalStartElementComponent.getAttribute("position");
-
-            const pointDirectionsBools = determinePointDirectionRefXZ(startRampMidPos, startElementMidPos);
-            const trueDirection = Object.keys(pointDirectionsBools)
-                .filter(key => pointDirectionsBools[key] && ["east", "west", "north", "south"]
-                    .includes(key))[0];
-
-            globalRoadSectionDirectionMap.set(startRampId, trueDirection);
-            console.log(globalRoadSectionDirectionMap);
-        }
-
-        function determinePointDirectionRefXZ(point, refPoint) {
-            const { x, z } = point;
-
-            return {
-                east: x < refPoint.x,
-                west: x > refPoint.x,
-                north: z > refPoint.z,
-                south: z < refPoint.z,
-                onVerticalLine: x === refPoint.x,
-                onHorizontalLine: z === refPoint.z,
-            };
-        }
 
         /************************
                 Stripes
@@ -107,12 +48,12 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
         function handleParallelStripsCreation() {
             globalRelatedRoadObjsMap.forEach(roadObj => {
-                spawnStripesForRoadObj(roadObj);
+                spawnParallelStripesForRoadObj(roadObj);
                 if (controllerConfig.spawnTrafficSigns) spawnTrafficSigns();
             })
         }
 
-        function spawnStripesForRoadObj(roadObj) {
+        function spawnParallelStripesForRoadObj(roadObj) {
             roadObj.roadSectionArr.forEach(roadSectionId => {
                 if (globalRoadSectionStateMap.get(roadSectionId)) {
                     const stripeId = roadSectionId + "_stripe"; // marking string to later handle related components

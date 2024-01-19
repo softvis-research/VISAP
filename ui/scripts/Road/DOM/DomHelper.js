@@ -5,7 +5,6 @@ const createDomHelper = function (controllerConfig) {
 
         function initialize() {
             // legend ops
-            application.loadCSS("scripts/Road/legend.css");
             legendHelper = createLegendHelper(controllerConfig);
             legendHelper.initialize();
         }
