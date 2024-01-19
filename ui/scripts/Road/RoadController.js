@@ -2,7 +2,7 @@ controllers.roadController = function () {
 	const controllerConfig = {
 		name: "roadController",
 
-		roadHighlightMode: "MultiColorStripes",
+		roadHighlightVariant: "MultiColorStripes",
 
 		showLegendOnSelect: true,
 		// TODO: Re-Implement
@@ -42,7 +42,7 @@ controllers.roadController = function () {
 		initializeHelpers();
 	}
 
-	// intitialize roadHighlightHelpers based on mode defined in config, making public functions accessible via roadHighlightHelper[mode]
+	// intitialize roadHighlightHelpers based on variant defined in config, making public functions accessible via roadHighlightHelper[variant]
 	function initializeHelpers() {
 		multiColorStripesHelper = createMultiColorStripesHelper(controllerConfig);
 		parallelColorStripesHelper = createParallelColorStripesHelper(controllerConfig);
@@ -59,11 +59,11 @@ controllers.roadController = function () {
 			},
 		}
 
-		Object.keys(roadHighlightHelper).includes(controllerConfig.roadHighlightMode)
-			? (mode = controllerConfig.roadHighlightMode)
-			: (mode = "ColoredRoads"); // default
+		Object.keys(roadHighlightHelper).includes(controllerConfig.roadHighlightVariant)
+			? (variant = controllerConfig.roadHighlightVariant)
+			: (variant = "ColoredRoads"); // default
 
-		roadHighlightHelper[mode].initialize();
+		roadHighlightHelper[variant].initialize();
 	}
 
 	/************************
@@ -115,11 +115,11 @@ controllers.roadController = function () {
 
 	function handleRoadsHighlightForStartElement() {
 		storeRelatedRoadObjsInMap();
-		roadHighlightHelper[mode].highlightRelatedRoadsForStartElement(globalStartElementComponent, globalRelatedRoadObjsMap);
+		roadHighlightHelper[variant].highlightRelatedRoadsForStartElement(globalStartElementComponent, globalRelatedRoadObjsMap);
 	}
 
 	function handleRoadsHighlightsReset() {
-		roadHighlightHelper[mode].resetRoadsHighlight();
+		roadHighlightHelper[variant].resetRoadsHighlight();
 		globalRelatedRoadObjsMap.clear();
 	}
 

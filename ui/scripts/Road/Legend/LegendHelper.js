@@ -2,7 +2,7 @@ const createLegendHelper = function (controllerConfig) {
     return (function () {
 
         function initialize() {
-            application.loadCSS("scripts/Road/legend.css");
+            application.loadCSS("scripts/Road/Legend/legend.css");
         }
 
         function createLegend(legendItems) {

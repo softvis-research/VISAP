@@ -4,7 +4,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         let domHelper;
         let globalStartElementComponent;
         let globalRelatedRoadObjsMap = new Map();
-        let globalRoadSectionRotationMap = new Map();
+        let globalRoadSectionDirectionMap = new Map();
         const globalScene = document.querySelector("a-scene");
 
 
@@ -29,8 +29,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             globalRelatedRoadObjsMap = relatedObjsMap;
 
             domHelper.handleLegendForAction("select");
-            setRoadSectionRotationMap();
-            handleRoadStripsCreation();
+            setRoadSectionDirectionMap();
+            handleParallelStripsCreation();
         }
 
         function resetRoadsHighlight() {
@@ -39,16 +39,15 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         }
 
         /************************
-           Road Section States
+         Road Section Directions
         ************************/
 
-        function setRoadSectionRotationMap() {
-            setRotationForRoadSectionsCalls()
-            // setRotationForRoadSectionsIsCalled()  // const roadObjsWhereGlobalStartElementIsDestination = getRoadObjsWhereGlobalStartElementIsDestination();
-
+        function setRoadSectionDirectionMap() {
+            setDirectionForRoadSectionsCalls();
+            setDirectionForRoadSectionsIsCalled();
         }
 
-        function setRotationForRoadSectionsCalls() {
+        function setDirectionForRoadSectionsCalls() {
             const roadObjsForGlobalStartElement = getRoadObjsForGlobalStartElement();
             roadObjsForGlobalStartElement.forEach(roadObj => {
                 setDirectionForStartRamp(roadObj);
@@ -59,6 +58,13 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         function getRoadObjsForGlobalStartElement() {
             return Array.from(globalRelatedRoadObjsMap.values())
                 .filter(roadObj => roadObj.startElementId === globalStartElementComponent.id);
+        }
+
+        function setDirectionForRoadSectionsIsCalled() {
+            const roadObjsWhereGlobalStartElementIsDestination = getRoadObjsWhereGlobalStartElementIsDestination();
+            roadObjsWhereGlobalStartElementIsDestination.forEach(roadObj => {
+                //
+            })
         }
 
         // other elements call start
@@ -73,16 +79,16 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             const startRampMidPos = document.getElementById(startRampId).getAttribute("position");
             const startElementMidPos = globalStartElementComponent.getAttribute("position");
 
-            const pointDirectionsBools = determinePointDirectionXZ(startRampMidPos, startElementMidPos);
+            const pointDirectionsBools = determinePointDirectionRefXZ(startRampMidPos, startElementMidPos);
             const trueDirection = Object.keys(pointDirectionsBools)
                 .filter(key => pointDirectionsBools[key] && ["east", "west", "north", "south"]
-                .includes(key))[0];
+                    .includes(key))[0];
 
-            globalRoadSectionRotationMap.set(startRampId, trueDirection);
-            console.log(globalRoadSectionRotationMap);
+            globalRoadSectionDirectionMap.set(startRampId, trueDirection);
+            console.log(globalRoadSectionDirectionMap);
         }
 
-        function determinePointDirectionXZ(point, refPoint) {
+        function determinePointDirectionRefXZ(point, refPoint) {
             const { x, z } = point;
 
             return {
@@ -99,7 +105,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 Stripes
         ************************/
 
-        function handleRoadStripsCreation() {
+        function handleParallelStripsCreation() {
             globalRelatedRoadObjsMap.forEach(roadObj => {
                 spawnStripesForRoadObj(roadObj);
                 if (controllerConfig.spawnTrafficSigns) spawnTrafficSigns();
