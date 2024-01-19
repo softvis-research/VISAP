@@ -1,9 +1,9 @@
 const createRoadSectionDirectionHelper = function (controllerConfig) {
     return (function () {
 
-        let globalRoadSectionDirectionMap;
         let globalStartElementComponent;
-        let globalRelatedRoadObjsMap = new Map();
+        let globalRelatedRoadObjsMap;
+        let globalRoadSectionDirectionMap = new Map();
 
         /************************
             Public Functions
@@ -26,8 +26,10 @@ const createRoadSectionDirectionHelper = function (controllerConfig) {
         function setDirectionsForRoadSectionsCalls() {
             const roadObjsForStartElement = getRoadObjsForStartElement();
             roadObjsForStartElement.forEach(roadObj => {
-                setDirectionForStartRampBasedOnStartElement(roadObj); // setting first roadSection per outgoing road as reference direction
-                // setDirectionForAdjacentRoadSections(roadObj);
+                // setting first roadSection per outgoing road as reference direction
+                const startRampRoadSectionId = roadObj.roadSectionArr[0];
+                setDirectionForStartRampBasedOnStartElement(startRampRoadSectionId);
+                setDirectionByRoadSectionsAdjacency(roadObj);
             })
         }
 
@@ -43,7 +45,8 @@ const createRoadSectionDirectionHelper = function (controllerConfig) {
         function setDirectionsForRoadSectionsIsCalled() {
             const roadObjsWhereStartElementIsDestination = getRoadObjsWhereStartElementIsDestination();
             roadObjsWhereStartElementIsDestination.forEach(roadObj => {
-                //
+                // reversing roadSection order here as startElement and its ramps serve as reference
+                setDirectionByRoadSectionsAdjacency(roadObj, reverse = true);
             })
         }
 
@@ -56,24 +59,36 @@ const createRoadSectionDirectionHelper = function (controllerConfig) {
           Directions Operations
         ************************/
 
-        function setDirectionForStartRampBasedOnStartElement(roadObj) {
-            const startRampRoadSectionId = roadObj.roadSectionArr[0];
-            console.log(startRampRoadSectionId);
+        function setDirectionForStartRampBasedOnStartElement(startRampRoadSectionId) {
             const startRampMidPos = document.getElementById(startRampRoadSectionId).getAttribute("position");
             const startElementMidPos = globalStartElementComponent.getAttribute("position");
 
-            const pointDirectionsBools = determinePointDirectionRefXZ(startRampMidPos, startElementMidPos);
+            const pointDirectionsBools = determineRelativeElementDirection(startRampMidPos, startElementMidPos);
             const trueDirection = Object.keys(pointDirectionsBools)
                 .filter(key => pointDirectionsBools[key] && ["east", "west", "north", "south"]
-                    .includes(key))[0];
+                    .includes(key))[0]; // not considering lining
 
             addToMapIfKeyNotExists(startRampRoadSectionId, trueDirection, globalRoadSectionDirectionMap)
         }
 
-        function determinePointDirectionRefXZ(point, refPoint) {
+        function setDirectionByRoadSectionsAdjacency(roadObj, sectionReverse = false) {
+            console.log("HERE>")
+            let roadSectionOrderedArr = roadObj.roadSectionArr;
+            if (sectionReverse) roadSectionOrderedArr = roadSectionOrderedArr.reverse();
+
+            for (let i = 1; i < roadSectionOrderedArr.lenth; i++) {
+                const refPointDirection = globalRoadSectionDirectionMap(roadSectionOrderedArr[i-1]);
+                const refPointMidPos = document.getElementById(roadSectionOrderedArr[i-1]).getAttribute("position");
+                const roadSectionMidPos = document.getElementById(roadSectionOrderedArr[i]).getAttribute("position");
+                const roadSectionDirection = determineRelativeElementDirection(roadSectionMidPos, refPointMidPos, refPointDirection);
+                addToMapIfKeyNotExists(roadSectionOrderedArr[i], roadSectionDirection, globalRoadSectionDirectionMap)
+            }
+        }
+
+        function determineRelativeElementDirection(point, refPoint, refDirection = false) {
             const { x, z } = point;
 
-            return {
+            const directionMap = {
                 east: x < refPoint.x,
                 west: x > refPoint.x,
                 north: z > refPoint.z,
@@ -81,6 +96,30 @@ const createRoadSectionDirectionHelper = function (controllerConfig) {
                 onVerticalLine: x === refPoint.x,
                 onHorizontalLine: z === refPoint.z,
             };
+
+            // adjust direction mapping based on the reference direction
+            if (refDirection) {
+
+                if (refDirection === "north") {
+                    directionMap.east = x > refPoint.x; // flip east-west
+                    directionMap.west = x < refPoint.x;
+                    directionMap.north = false;
+                } else if (refDirection === "south") {
+                    directionMap.east = x < refPoint.x;
+                    directionMap.west = x > refPoint.x;
+                    directionMap.south = false;
+                } else if (refDirection === "east") {
+                    directionMap.north = z < refPoint.z; // flip north-south
+                    directionMap.south = z > refPoint.z;
+                    directionMap.east = false;
+                } else if (refDirection === "west") {
+                    directionMap.north = z > refPoint.z;
+                    directionMap.south = z < refPoint.z;
+                    directionMap.west = false;
+                }
+            }
+
+            return directionMap;
         }
 
         /************************

@@ -2,7 +2,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
     return (function () {
 
         let globalDomHelper;
-        let roadSectionDirectionHelper;
+        let globalRoadSectionDirectionHelper;
         let globalStartElementComponent;
         let globalRelatedRoadObjsMap = new Map();
         let globalRoadSectionDirectionMap = new Map();
@@ -23,7 +23,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                         { text: "isCalled", color: controllerConfig.colorsParallelColorStripes.isCalled },
                     ]);
             }
-            roadSectionDirectionHelper = createRoadSectionDirectionHelper();
+            globalRoadSectionDirectionHelper = createRoadSectionDirectionHelper();
         }
 
         function highlightRelatedRoadsForStartElement(startElementComponent, relatedObjsMap) {
@@ -31,7 +31,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             globalRelatedRoadObjsMap = relatedObjsMap;
 
             globalDomHelper.handleLegendForAction("select");
-            globalRoadSectionDirectionMap = roadSectionDirectionHelper.getDirectionsMapForRelatedStartElementRoads(globalStartElementComponent, globalRelatedRoadObjsMap);
+            globalRoadSectionDirectionMap = globalRoadSectionDirectionHelper.getDirectionsMapForRelatedStartElementRoads(globalStartElementComponent, globalRelatedRoadObjsMap);
             console.log(globalRoadSectionDirectionMap)
             // handleParallelStripsCreation();
         }
