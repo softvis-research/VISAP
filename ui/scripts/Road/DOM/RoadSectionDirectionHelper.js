@@ -15,8 +15,6 @@ const createRoadSectionDirectionHelper = function (controllerConfig) {
             globalStartElementComponent = startElementComponent;
             globalRelatedRoadObjsMap = relatedRoadObjsMap;
 
-            console.log(globalStartElementComponent.id)
-
             setDirectionsForRoadSectionsCalls();
             setDirectionsForRoadSectionsIsCalled();
 
@@ -94,8 +92,6 @@ const createRoadSectionDirectionHelper = function (controllerConfig) {
         function getDirectionOfAdjacentRoadSection(midPoint, refMidPoint, refDirection) {
             const { x, z } = midPoint;
 
-            console.log(refDirection)
-            
             // imagine a compass turning its needle based on your direction: here, assigned directions depend on reference directions
             switch (refDirection) {
                 case "west":
@@ -121,10 +117,6 @@ const createRoadSectionDirectionHelper = function (controllerConfig) {
                     if (x > refMidPoint.x && z > refMidPoint.z) return "west";
                     if (x < refMidPoint.x && z > refMidPoint.z) return "east";
                     break;
-        
-                default:
-                    console.error("Invalid reference direction.");
-                    return null;
             }
         }
         
