@@ -48,7 +48,7 @@ const createRoadSectionDirectionHelper = function (controllerConfig) {
                 // reversing logic keeps startElement perspective for roads leading from elsewhere
                 const lastIdx = roadObj.roadSectionArr.length-1;
                 setDirectionForInitialRoadSection(roadObj.roadSectionArr[lastIdx]);
-                setDirectionsForOrderedRoadSections(roadObj.roadSectionArr.reverse());
+                setDirectionsForOrderedRoadSections([...roadObj.roadSectionArr].reverse());
             })
         }
 
