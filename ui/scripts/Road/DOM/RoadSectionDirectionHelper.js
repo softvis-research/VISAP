@@ -17,7 +17,7 @@ const createRoadSectionDirectionHelper = function (controllerConfig) {
 
             setDirectionsForRoadSectionsCalls();
             setDirectionsForRoadSectionsIsCalled();
-
+            console.log(globalRoadSectionDirectionMap)
             return globalRoadSectionDirectionMap;
         }
 

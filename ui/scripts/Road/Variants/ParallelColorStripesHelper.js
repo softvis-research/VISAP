@@ -57,11 +57,11 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         function spawnParallelStripesForRoadObj(roadObj) {
             roadObj.roadSectionArr.forEach(roadSectionId => {
                 const stripeId = roadSectionId + "_stripe"; // marking string to later handle related components
-                stripeComponent = createStripeComponent(stripeId);
+                let stripeComponent = createStripeComponent(stripeId);
 
                 roadObj.startElementId === globalStartElementComponent.id ? isRightLane = true : isRightLane = false;
                 stripeComponent = setStripeComponentProperties(stripeComponent, roadSectionId, isRightLane);
-
+                globalScene = document.querySelector("a-scene");
                 globalScene.appendChild(stripeComponent);
             })
         }
@@ -73,7 +73,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         }
 
         function setStripeComponentProperties(stripeComponent, roadSectionId, isRightLane) {
-            roadSectionComponent = document.getElementById(roadSectionId)
+            const roadSectionComponent = document.getElementById(roadSectionId)
 
             const originalPosition = roadSectionComponent.getAttribute("position");
             const originalWidth = roadSectionComponent.getAttribute("width");
@@ -88,10 +88,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 color = controllerConfig.colorsParallelColorStripes.isCalled;
             }
 
-            let { offsetX, offsetZ }  = getXZOffsetForLane(roadSectionId, isRightLane, 0.2)
-
-            console.log(offsetX)
-            console.log(offsetZ)
+            let { offsetX, offsetZ } = getXZOffsetForLane(roadSectionId, isRightLane, 0.2)
 
             const stripePosition = { x: originalPosition.x + offsetX, y: originalPosition.y + offsetY, z: originalPosition.z + offsetZ };
             stripeComponent.setAttribute("position", stripePosition);
@@ -101,26 +98,39 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         }
 
         function getXZOffsetForLane(roadSectionId, isRightLane, baseOffset) {
-            
+
             const direction = globalRoadSectionDirectionMap.get(roadSectionId);
             let offsetX = baseOffset;
             let offsetZ = baseOffset;
             switch (direction) {
                 case "west":
-                    isRightLane ? offsetX = baseOffset : offsetZ = - baseOffset
+                    if (!isRightLane) {
+                        offsetX = 0
+                        offsetZ = - baseOffset;
+                    }
                     break;
                 case "east":
-                    isRightLane ? offsetX = - baseOffset : offsetZ = baseOffset
+                    if (isRightLane) {
+                        offsetX = 0;
+                        offsetZ = - baseOffset
+                    }
                     break;
 
                 case "south":
-                    isRightLane ? offsetX = baseOffset : offsetZ =  - baseOffset
+                    if (!isRightLane) {
+                        offsetX = - baseOffset
+                        offsetZ = 0;
+                    }
                     break;
 
                 case "north":
-                    isRightLane ? offsetX = - baseOffset : offsetZ =  baseOffset
+                    if (isRightLane) {
+                        offsetX = - baseOffset
+                        offsetZ = 0;
+                    }
                     break;
             }
+
             return {
                 offsetX,
                 offsetZ
