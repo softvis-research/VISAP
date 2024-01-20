@@ -15,7 +15,7 @@ const setup = {
 		{
 			name: "roadController",
 			supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
-			roadHighlightVariant: "MultiColorStripes", // choose MultiColorStripes, ParallelColorStripes, ...
+			roadHighlightVariant: "ParallelColorStripes", // choose MultiColorStripes, ParallelColorStripes, ...
 			
 			colorsMultiColorStripes: {
 				undecided: "silver",
