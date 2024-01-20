@@ -31,12 +31,13 @@ const createMultiColorStripesHelper = function (controllerConfig) {
             globalRelatedRoadObjsMap = relatedObjsMap;
 
             globalDomHelper.handleLegendForAction("select");
-            setRoadSectionStatesMap();
+            globalDomHelper.handleUnrelatedEntityMonochromacyForAction("select", globalRelatedRoadObjsMap)
             handleRoadStripsCreation();
         }
 
         function resetRoadsHighlight() {
             globalDomHelper.handleLegendForAction("unselect");
+            globalDomHelper.handleUnrelatedEntityMonochromacyForAction("unselect", globalRelatedRoadObjsMap)
             globalDomHelper.removeComponentByIdMarking("_stripe");
         }
 
@@ -124,6 +125,7 @@ const createMultiColorStripesHelper = function (controllerConfig) {
         ************************/
 
         function handleRoadStripsCreation() {
+            setRoadSectionStatesMap();
             globalRelatedRoadObjsMap.forEach(roadObj => {
                 spawnStripesForRoadObj(roadObj);
                 if (controllerConfig.spawnTrafficSigns) spawnTrafficSigns();

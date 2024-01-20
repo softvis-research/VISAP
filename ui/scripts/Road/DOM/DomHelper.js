@@ -31,11 +31,50 @@ const createDomHelper = function (controllerConfig) {
             }
         }
 
+        function handleUnrelatedEntityMonochromacyForAction(action, relatedRoadObjsMap) {
+            if (controllerConfig.enableMonochromeForUnrelatedEntities) {
+
+                const unrelatedEntities = getAllUnrelatedEntities(relatedRoadObjsMap);
+                console.log(unrelatedEntities)
+                
+                switch (action) {
+                    case "select": canvasManipulator.changeColorOfEntities(unrelatedEntities, "silver", { name: controllerConfig.name }); break;
+                    case "unselect": canvasManipulator.resetColorOfEntities(unrelatedEntities, { name: controllerConfig.name }); break;
+                }
+            }
+        }
+
+        function getAllUnrelatedEntities(relatedRoadObjsMap) {
+            const allEntities = model.getAllEntities();
+            const unrelatedEntities = [];
+        
+            allEntities.forEach(entity => {
+                const entityId = entity.id;
+                const belongsToId = entity.belongsTo && entity.belongsTo.id;
+                const entityType = entity.type
+        
+                const isUnrelated = !Array.from(relatedRoadObjsMap.values())
+                    .some(({ startElementId, destinationElementId }) =>
+                        entityId === startElementId || entityId === destinationElementId ||
+                        belongsToId === startElementId || belongsToId === destinationElementId ||
+                        entityType === "Namespace"
+                    ) 
+        
+                if (isUnrelated) {
+                    unrelatedEntities.push(entity);
+                }
+            });
+        
+            return unrelatedEntities;
+        }
+        
+
         return {
             initialize,
             removeComponentByIdMarking,
             createLegend,
             handleLegendForAction,
+            handleUnrelatedEntityMonochromacyForAction,
         };
     })();
 };

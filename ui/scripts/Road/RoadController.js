@@ -6,7 +6,7 @@ controllers.roadController = function () {
 
 		showLegendOnSelect: true,
 		// TODO: Re-Implement
-		// enableTransparency: true,
+		enableMonochromeForUnrelatedEntities: true,
 		// enableRoadVanishing: true,
 		// spawnTrafficSigns: true,
 
@@ -20,8 +20,8 @@ controllers.roadController = function () {
 		},
 
 		colorsParallelColorStripes: {
-			calls: "blue",
-			isCalled: "red",
+			calls: "orange",
+			isCalled: "magenta",
 		},
 
 
@@ -83,7 +83,6 @@ controllers.roadController = function () {
 		const appEventEntity = applicationEvent.entities[0];
 		if (controllerConfig.supportedEntityTypes.includes(appEventEntity.type)) {
 			unhighlightStartElement();
-
 			handleRoadsHighlightsReset();
 		}
 	}
@@ -101,7 +100,7 @@ controllers.roadController = function () {
 	}
 
 	/************************
-	    Road Helper Calls
+		Road Helper Calls
 	************************/
 
 	// prepare a map of all related roadObjs as necessary input for every roadHighlighHelper
@@ -115,12 +114,16 @@ controllers.roadController = function () {
 
 	function handleRoadsHighlightForStartElement() {
 		storeRelatedRoadObjsInMap();
-		globalRoadHighlightHelper[variant].startRoadHighlightActionsForStartElement(globalStartElementComponent, globalRelatedRoadObjsMap);
+		if (globalRelatedRoadObjsMap.size != 0) {
+			globalRoadHighlightHelper[variant].startRoadHighlightActionsForStartElement(globalStartElementComponent, globalRelatedRoadObjsMap);
+		}
 	}
 
 	function handleRoadsHighlightsReset() {
-		globalRoadHighlightHelper[variant].resetRoadsHighlight();
-		globalRelatedRoadObjsMap.clear();
+		if (globalRelatedRoadObjsMap.size != 0) {
+			globalRoadHighlightHelper[variant].resetRoadsHighlight();
+			globalRelatedRoadObjsMap.clear();
+		}
 	}
 
 	return {

@@ -32,12 +32,13 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             globalRelatedRoadObjsMap = relatedObjsMap;
 
             globalDomHelper.handleLegendForAction("select");
-
+            globalDomHelper.handleUnrelatedEntityMonochromacyForAction("select", globalRelatedRoadObjsMap)
             handleParallelStripsCreation();
         }
 
         function resetRoadsHighlight() {
             globalDomHelper.handleLegendForAction("unselect");
+            globalDomHelper.handleUnrelatedEntityMonochromacyForAction("unselect", globalRelatedRoadObjsMap)
             globalDomHelper.removeComponentByIdMarking("_stripe");
         }
 
@@ -81,10 +82,10 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             let offsetY;
             let color;
             if (isRightLane) {
-                offsetY = 0.52;
+                offsetY = 0.50;
                 color = controllerConfig.colorsParallelColorStripes.calls;
             } else {
-                offsetY = 0.50;
+                offsetY = 0.55;
                 color = controllerConfig.colorsParallelColorStripes.isCalled;
             }
 
@@ -107,12 +108,16 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     if (!isRightLane) {
                         offsetX = 0
                         offsetZ = - baseOffset;
+                    } else {
+                        offsetX = 0
                     }
                     break;
                 case "east":
                     if (isRightLane) {
                         offsetX = 0;
                         offsetZ = - baseOffset
+                    } else {
+                        offsetX = 0
                     }
                     break;
 
@@ -120,6 +125,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     if (!isRightLane) {
                         offsetX = - baseOffset
                         offsetZ = 0;
+                    } else {
+                        offsetZ = - baseOffset
                     }
                     break;
 
@@ -127,6 +134,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     if (isRightLane) {
                         offsetX = - baseOffset
                         offsetZ = 0;
+                    } else {
+                        offsetZ = - baseOffset
                     }
                     break;
             }
