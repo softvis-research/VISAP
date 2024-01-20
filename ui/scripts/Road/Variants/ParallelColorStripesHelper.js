@@ -6,8 +6,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         let globalStartElementComponent;
         let globalRelatedRoadObjsMap = new Map();
         let globalRoadSectionDirectionMap = new Map();
-        const globalScene = document.querySelector("a-scene");
-
+        let globalScene;
 
         /************************
             Public Functions
@@ -15,6 +14,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
         function initialize() {
             if (controllerConfig.showLegendOnSelect) {
+                globalScene = document.querySelector("a-scene");
                 globalDomHelper = createDomHelper(controllerConfig);
                 globalDomHelper.initialize();
                 globalDomHelper.createLegend(
@@ -26,14 +26,14 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             globalRoadSectionDirectionHelper = createRoadSectionDirectionHelper();
         }
 
-        function highlightRelatedRoadsForStartElement(startElementComponent, relatedObjsMap) {
+
+        function startRoadHighlightActionsForStartElement(startElementComponent, relatedObjsMap) {
             globalStartElementComponent = startElementComponent;
             globalRelatedRoadObjsMap = relatedObjsMap;
 
             globalDomHelper.handleLegendForAction("select");
-            globalRoadSectionDirectionMap = globalRoadSectionDirectionHelper.getDirectionsMapForRelatedStartElementRoads(globalStartElementComponent, globalRelatedRoadObjsMap);
-            console.log(globalRoadSectionDirectionMap)
-            // handleParallelStripsCreation();
+
+            handleParallelStripsCreation();
         }
 
         function resetRoadsHighlight() {
@@ -41,26 +41,28 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             globalDomHelper.removeComponentByIdMarking("_stripe");
         }
 
-
         /************************
                 Stripes
         ************************/
 
         function handleParallelStripsCreation() {
+            globalRoadSectionDirectionMap = globalRoadSectionDirectionHelper
+                .getDirectionsMapForRelatedStartElementRoads(globalStartElementComponent, globalRelatedRoadObjsMap);
             globalRelatedRoadObjsMap.forEach(roadObj => {
                 spawnParallelStripesForRoadObj(roadObj);
-                if (controllerConfig.spawnTrafficSigns) spawnTrafficSigns();
+                // if (controllerConfig.spawnTrafficSigns) spawnTrafficSigns(roadObj);
             })
         }
 
         function spawnParallelStripesForRoadObj(roadObj) {
             roadObj.roadSectionArr.forEach(roadSectionId => {
-                if (globalRoadSectionStateMap.get(roadSectionId)) {
-                    const stripeId = roadSectionId + "_stripe"; // marking string to later handle related components
-                    stripeComponent = createStripeComponent(stripeId);
-                    setStripeComponentProperties(stripeComponent, roadObj, roadSectionId);
-                    globalScene.appendChild(stripeComponent);
-                }
+                const stripeId = roadSectionId + "_stripe"; // marking string to later handle related components
+                stripeComponent = createStripeComponent(stripeId);
+
+                roadObj.startElementId === globalStartElementComponent.id ? isRightLane = true : isRightLane = false;
+                stripeComponent = setStripeComponentProperties(stripeComponent, roadSectionId, isRightLane);
+
+                globalScene.appendChild(stripeComponent);
             })
         }
 
@@ -70,29 +72,64 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             return stripeComponent;
         }
 
-        // setting properties based on roadSection components the stripes will flow above
-        function setStripeComponentProperties(stripeComponent, roadObj, roadSectionId) {
+        function setStripeComponentProperties(stripeComponent, roadSectionId, isRightLane) {
             roadSectionComponent = document.getElementById(roadSectionId)
 
             const originalPosition = roadSectionComponent.getAttribute("position");
             const originalWidth = roadSectionComponent.getAttribute("width");
             const originalDepth = roadSectionComponent.getAttribute("depth");
+            let offsetY;
+            let color;
+            if (isRightLane) {
+                offsetY = 0.52;
+                color = controllerConfig.colorsParallelColorStripes.calls;
+            } else {
+                offsetY = 0.50;
+                color = controllerConfig.colorsParallelColorStripes.isCalled;
+            }
 
-            const isStartRamp = determineIfRoadSectionIsStartRamp(roadObj, roadSectionId)
-            const isEndRamp = determineIfRoadSectionIsEndRamp(roadObj, roadSectionId)
+            let { offsetX, offsetZ }  = getXZOffsetForLane(roadSectionId, isRightLane, 0.2)
 
-            isStartRamp || isEndRamp ? offsetY = 0.51 : offsetY = 0.50; // small offset for ramps so they lie above undecided colors
-            const stripePosition = { x: originalPosition.x, y: originalPosition.y + offsetY, z: originalPosition.z };
+            console.log(offsetX)
+            console.log(offsetZ)
+
+            const stripePosition = { x: originalPosition.x + offsetX, y: originalPosition.y + offsetY, z: originalPosition.z + offsetZ };
             stripeComponent.setAttribute("position", stripePosition);
-            stripeComponent.setAttribute("geometry", `primitive: box; width: ${originalWidth - 0.5}; height: 0.1; depth: ${originalDepth - 0.5}`);
-            const color = determineColorOfRoadSectionIdByState(roadSectionId)
+            stripeComponent.setAttribute("geometry", `primitive: box; width: ${originalWidth - 0.8}; height: 0.1; depth: ${originalDepth - 0.8}`);
             stripeComponent.setAttribute("material", `color: ${color}`);
             return stripeComponent;
         }
 
+        function getXZOffsetForLane(roadSectionId, isRightLane, baseOffset) {
+            
+            const direction = globalRoadSectionDirectionMap.get(roadSectionId);
+            let offsetX = baseOffset;
+            let offsetZ = baseOffset;
+            switch (direction) {
+                case "west":
+                    isRightLane ? offsetX = baseOffset : offsetZ = - baseOffset
+                    break;
+                case "east":
+                    isRightLane ? offsetX = - baseOffset : offsetZ = baseOffset
+                    break;
+
+                case "south":
+                    isRightLane ? offsetX = baseOffset : offsetZ =  - baseOffset
+                    break;
+
+                case "north":
+                    isRightLane ? offsetX = - baseOffset : offsetZ =  baseOffset
+                    break;
+            }
+            return {
+                offsetX,
+                offsetZ
+            }
+        }
+
         return {
             initialize,
-            highlightRelatedRoadsForStartElement,
+            startRoadHighlightActionsForStartElement,
             resetRoadsHighlight,
         };
     })();

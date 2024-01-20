@@ -26,7 +26,7 @@ const createMultiColorStripesHelper = function (controllerConfig) {
             }
         }
 
-        function highlightRelatedRoadsForStartElement(startElementComponent, relatedObjsMap) {
+        function startRoadHighlightActionsForStartElement(startElementComponent, relatedObjsMap) {
             globalStartElementComponent = startElementComponent;
             globalRelatedRoadObjsMap = relatedObjsMap;
 
@@ -184,7 +184,7 @@ const createMultiColorStripesHelper = function (controllerConfig) {
 
         return {
             initialize,
-            highlightRelatedRoadsForStartElement,
+            startRoadHighlightActionsForStartElement,
             resetRoadsHighlight,
         };
     })();

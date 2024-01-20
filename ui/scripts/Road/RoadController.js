@@ -49,12 +49,12 @@ controllers.roadController = function () {
 		globalRoadHighlightHelper = {
 			MultiColorStripes: {
 				initialize: multiColorStripesHelper.initialize,
-				highlightRelatedRoadsForStartElement: multiColorStripesHelper.highlightRelatedRoadsForStartElement,
+				startRoadHighlightActionsForStartElement: multiColorStripesHelper.startRoadHighlightActionsForStartElement,
 				resetRoadsHighlight: multiColorStripesHelper.resetRoadsHighlight
 			},
 			ParallelColorStripes: {
 				initialize: parallelColorStripesHelper.initialize,
-				highlightRelatedRoadsForStartElement: parallelColorStripesHelper.highlightRelatedRoadsForStartElement,
+				startRoadHighlightActionsForStartElement: parallelColorStripesHelper.startRoadHighlightActionsForStartElement,
 				resetRoadsHighlight: parallelColorStripesHelper.resetRoadsHighlight
 			},
 		}
@@ -115,7 +115,7 @@ controllers.roadController = function () {
 
 	function handleRoadsHighlightForStartElement() {
 		storeRelatedRoadObjsInMap();
-		globalRoadHighlightHelper[variant].highlightRelatedRoadsForStartElement(globalStartElementComponent, globalRelatedRoadObjsMap);
+		globalRoadHighlightHelper[variant].startRoadHighlightActionsForStartElement(globalStartElementComponent, globalRelatedRoadObjsMap);
 	}
 
 	function handleRoadsHighlightsReset() {
