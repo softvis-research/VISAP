@@ -39,7 +39,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         function resetRoadsHighlight() {
             globalDomHelper.handleLegendForAction("unselect");
             globalDomHelper.handleUnrelatedEntityMonochromacyForAction("unselect", globalRelatedRoadObjsMap)
-            globalDomHelper.removeComponentByIdMarking("_stripe");
+            globalDomHelper.removeComponentByIdMarking("_stripe_right");
+            globalDomHelper.removeComponentByIdMarking("_stripe_left");
         }
 
         /************************
@@ -57,17 +58,22 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
         function spawnParallelStripesForRoadObj(roadObj) {
             roadObj.roadSectionArr.forEach(roadSectionId => {
-                const stripeId = roadSectionId + "_stripe"; // marking string to later handle related components
-                const roadSectionComponent = document.getElementById(roadSectionId);
-            
-                const stripeComponent = roadSectionComponent.cloneNode(true); // clone to keep properties of original
-                stripeComponent.setAttribute("id", stripeId);
                 const roadSectionSpecialProperties = getSpecialPropertiesOfRoadSection(roadObj, roadSectionId);
+                const stripeComponent = createStripeComponent(roadSectionId, roadSectionSpecialProperties)
                 setStripeComponentProperties(stripeComponent, roadSectionId, roadSectionSpecialProperties);
-    
                 globalScene = document.querySelector("a-scene");
                 globalScene.appendChild(stripeComponent);
             });
+        }
+
+        function createStripeComponent(roadSectionId, roadSectionSpecialProperties) {
+            const roadSectionComponent = document.getElementById(roadSectionId);
+            const stripeComponent = roadSectionComponent.cloneNode(true); // clone to keep properties of original
+            let laneStr;
+            roadSectionSpecialProperties.isRightLane ? laneStr = "right" : laneStr = "left";
+            const stripeId = `${roadSectionId}_stripe_${laneStr}`; // marking string to later handle related components
+            stripeComponent.setAttribute("id", stripeId);
+            return stripeComponent;
         }
 
         function getSpecialPropertiesOfRoadSection(roadObj, roadSectionId) {
@@ -77,10 +83,10 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             if (roadSectionId) isStartRamp = roadObj.roadSectionArr[0] === roadSectionId ? true : false;
             else isStartRamp = [...roadObj.roadSectionArr].reverse()[0] === roadSectionId ? true : false;
 
-            let isEndRamp; 
-            if (roadSectionId) isEndRamp = roadObj.roadSectionArr[roadObj.roadSectionArr.length-1] === roadSectionId ? true : false;
-            else isEndRamp = [...roadObj.roadSectionArr].reverse()[roadObj.roadSectionArr.length-1] === roadSectionId ? true : false;
-            
+            let isEndRamp;
+            if (roadSectionId) isEndRamp = roadObj.roadSectionArr[roadObj.roadSectionArr.length - 1] === roadSectionId ? true : false;
+            else isEndRamp = [...roadObj.roadSectionArr].reverse()[roadObj.roadSectionArr.length - 1] === roadSectionId ? true : false;
+
             return {
                 isRightLane,
                 isStartRamp,
@@ -100,7 +106,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             // geometry
             const originalWidth = roadSectionComponent.getAttribute("width");
             const originalDepth = roadSectionComponent.getAttribute("depth");
-            stripeComponent.setAttribute("geometry", `primitive: box; width: ${originalWidth - 0.7}; height: 0.05; depth: ${originalDepth - 0.7}`);
+            const { plusWidth, plusDepth } = getNewWidthDepthForLane(roadSectionId)
+            stripeComponent.setAttribute("geometry", `primitive: box; width: ${originalWidth - 0.7 + plusWidth}; height: 0.05; depth: ${originalDepth - 0.7 + plusDepth}`);
 
             // color
             const color = getColorForLane(roadSectionSpecialProperties.isRightLane)
@@ -110,7 +117,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         }
 
         function getOffsetForLane(roadSectionId, isRightLane) {
-            
+
             const direction = globalRoadSectionDirectionMap.get(roadSectionId);
 
             let offsetX;
@@ -143,29 +150,20 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             }
         }
 
-        function getNewWidthDepthForLane(roadSectionId, isRightLane){
+        function getNewWidthDepthForLane(roadSectionId, isRightLane) {
             const direction = globalRoadSectionDirectionMap.get(roadSectionId);
-            let width;
-            let depth;
-
-            if (isRightLane) {
-                switch (direction) {
-                    case "west": offsetX = 0; offsetZ = baseOffset; break;
-                    case "east": offsetX = 0; offsetZ = - baseOffset; break;
-                    case "south": offsetX = baseOffset; offsetZ = baseOffset; break;
-                    case "north": offsetX = - baseOffset; offsetZ = 0; break;
-                }
-            } else {
-                switch (direction) {
-                    case "west": offsetX = 0; offsetZ = - baseOffset; break;
-                    case "east": offsetX = 0; offsetZ = baseOffset; break;
-                    case "south": offsetX = - baseOffset; offsetZ = - baseOffset; break;
-                    case "north": offsetX = baseOffset; offsetZ = - baseOffset; break;
-                }
+            let plusWidth;
+            let plusDepth;
+            switch (direction) {
+                case "west": plusWidth = 5; plusDepth = 0; break;
+                case "east": plusWidth = 5; plusDepth = 0; break;
+                case "south": plusWidth = 0; plusDepth = 5; break;
+                case "north": plusWidth = 0; plusDepth = 5; break;
             }
+
             return {
-                width,
-                depth
+                plusWidth,
+                plusDepth
             }
         }
 
