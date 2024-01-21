@@ -58,57 +58,102 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         function spawnParallelStripesForRoadObj(roadObj) {
             roadObj.roadSectionArr.forEach(roadSectionId => {
                 const stripeId = roadSectionId + "_stripe"; // marking string to later handle related components
-                let stripeComponent = createStripeComponent(stripeId);
-
-                roadObj.startElementId === globalStartElementComponent.id ? isRightLane = true : isRightLane = false;
-                stripeComponent = setStripeComponentProperties(stripeComponent, roadSectionId, isRightLane);
+                const roadSectionComponent = document.getElementById(roadSectionId);
+            
+                const stripeComponent = roadSectionComponent.cloneNode(true); // clone to keep properties of original
+                stripeComponent.setAttribute("id", stripeId);
+                const roadSectionSpecialProperties = getSpecialPropertiesOfRoadSection(roadObj, roadSectionId);
+                setStripeComponentProperties(stripeComponent, roadSectionId, roadSectionSpecialProperties);
+    
                 globalScene = document.querySelector("a-scene");
                 globalScene.appendChild(stripeComponent);
-            })
+            });
         }
 
-        function createStripeComponent(stripeId) {
-            const stripeComponent = document.createElement("a-entity");
-            stripeComponent.setAttribute("id", stripeId);
-            return stripeComponent;
+        function getSpecialPropertiesOfRoadSection(roadObj, roadSectionId) {
+            const isRightLane = roadObj.startElementId === globalStartElementComponent.id ? true : false;
+
+            let isStartRamp;
+            if (roadSectionId) isStartRamp = roadObj.roadSectionArr[0] === roadSectionId ? true : false;
+            else isStartRamp = [...roadObj.roadSectionArr].reverse()[0] === roadSectionId ? true : false;
+
+            let isEndRamp; 
+            if (roadSectionId) isEndRamp = roadObj.roadSectionArr[roadObj.roadSectionArr.length-1] === roadSectionId ? true : false;
+            else isEndRamp = [...roadObj.roadSectionArr].reverse()[roadObj.roadSectionArr.length-1] === roadSectionId ? true : false;
+            
+            return {
+                isRightLane,
+                isStartRamp,
+                isEndRamp
+            }
         }
 
-        function setStripeComponentProperties(stripeComponent, roadSectionId, isRightLane) {
+        function setStripeComponentProperties(stripeComponent, roadSectionId, roadSectionSpecialProperties) {
             const roadSectionComponent = document.getElementById(roadSectionId)
 
+            // position
             const originalPosition = roadSectionComponent.getAttribute("position");
-            const originalWidth = roadSectionComponent.getAttribute("width");
-            const originalDepth = roadSectionComponent.getAttribute("depth");
-            let offsetY;
-            let color;
-            if (isRightLane) {
-                offsetY = 0.50;
-                color = controllerConfig.colorsParallelColorStripes.calls;
-            } else {
-                offsetY = 0.55;
-                color = controllerConfig.colorsParallelColorStripes.isCalled;
-            }
-
-            let { offsetX, offsetZ } = getXZOffsetForLane(roadSectionId, isRightLane, 0.25)
-
+            const { offsetX, offsetY, offsetZ } = getOffsetForLane(roadSectionId, roadSectionSpecialProperties.isRightLane)
             const stripePosition = { x: originalPosition.x + offsetX, y: originalPosition.y + offsetY, z: originalPosition.z + offsetZ };
             stripeComponent.setAttribute("position", stripePosition);
+
+            // geometry
+            const originalWidth = roadSectionComponent.getAttribute("width");
+            const originalDepth = roadSectionComponent.getAttribute("depth");
             stripeComponent.setAttribute("geometry", `primitive: box; width: ${originalWidth - 0.7}; height: 0.05; depth: ${originalDepth - 0.7}`);
-            stripeComponent.setAttribute("material", `color: ${color}`);
+
+            // color
+            const color = getColorForLane(roadSectionSpecialProperties.isRightLane)
+            stripeComponent.setAttribute("color", color);
+
             return stripeComponent;
         }
 
-        function getXZOffsetForLane(roadSectionId, isRightLane, baseOffset) {
+        function getOffsetForLane(roadSectionId, isRightLane) {
+            
             const direction = globalRoadSectionDirectionMap.get(roadSectionId);
+
             let offsetX;
+            let offsetY;
             let offsetZ;
+
+            const baseOffset = 0.25
+
+            if (isRightLane) {
+                offsetY = 0.52;
+                switch (direction) {
+                    case "west": offsetX = 0; offsetZ = baseOffset; break;
+                    case "east": offsetX = baseOffset; offsetZ = - baseOffset; break;
+                    case "south": offsetX = baseOffset; offsetZ = 0; break;
+                    case "north": offsetX = - baseOffset; offsetZ = - baseOffset; break;
+                }
+            } else {
+                offsetY = 0.50;
+                switch (direction) {
+                    case "west": offsetX = 0; offsetZ = - baseOffset; break;
+                    case "east": offsetX = 0; offsetZ = baseOffset; break;
+                    case "south": offsetX = - baseOffset; offsetZ = 0; break;
+                    case "north": offsetX = baseOffset; offsetZ = 0; break;
+                }
+            }
+            return {
+                offsetX,
+                offsetY,
+                offsetZ
+            }
+        }
+
+        function getNewWidthDepthForLane(roadSectionId, isRightLane){
+            const direction = globalRoadSectionDirectionMap.get(roadSectionId);
+            let width;
+            let depth;
 
             if (isRightLane) {
                 switch (direction) {
                     case "west": offsetX = 0; offsetZ = baseOffset; break;
                     case "east": offsetX = 0; offsetZ = - baseOffset; break;
                     case "south": offsetX = baseOffset; offsetZ = baseOffset; break;
-                    case "north": offsetX = - baseOffset; offsetZ = - baseOffset; break;
+                    case "north": offsetX = - baseOffset; offsetZ = 0; break;
                 }
             } else {
                 switch (direction) {
@@ -119,9 +164,14 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 }
             }
             return {
-                offsetX,
-                offsetZ
+                width,
+                depth
             }
+        }
+
+        function getColorForLane(isRightLane) {
+            if (isRightLane) return controllerConfig.colorsParallelColorStripes.calls;
+            return controllerConfig.colorsParallelColorStripes.isCalled;
         }
 
         return {
