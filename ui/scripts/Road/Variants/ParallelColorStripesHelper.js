@@ -89,57 +89,35 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 color = controllerConfig.colorsParallelColorStripes.isCalled;
             }
 
-            let { offsetX, offsetZ } = getXZOffsetForLane(roadSectionId, isRightLane, 0.2)
+            let { offsetX, offsetZ } = getXZOffsetForLane(roadSectionId, isRightLane, 0.25)
 
             const stripePosition = { x: originalPosition.x + offsetX, y: originalPosition.y + offsetY, z: originalPosition.z + offsetZ };
             stripeComponent.setAttribute("position", stripePosition);
-            stripeComponent.setAttribute("geometry", `primitive: box; width: ${originalWidth - 0.8}; height: 0.1; depth: ${originalDepth - 0.8}`);
+            stripeComponent.setAttribute("geometry", `primitive: box; width: ${originalWidth - 0.7}; height: 0.1; depth: ${originalDepth - 0.7}`);
             stripeComponent.setAttribute("material", `color: ${color}`);
             return stripeComponent;
         }
 
         function getXZOffsetForLane(roadSectionId, isRightLane, baseOffset) {
-
             const direction = globalRoadSectionDirectionMap.get(roadSectionId);
-            let offsetX = baseOffset;
-            let offsetZ = baseOffset;
-            switch (direction) {
-                case "west":
-                    if (!isRightLane) {
-                        offsetX = 0
-                        offsetZ = - baseOffset;
-                    } else {
-                        offsetX = 0
-                    }
-                    break;
-                case "east":
-                    if (isRightLane) {
-                        offsetX = 0;
-                        offsetZ = - baseOffset
-                    } else {
-                        offsetX = 0
-                    }
-                    break;
+            let offsetX;
+            let offsetZ;
 
-                case "south":
-                    if (!isRightLane) {
-                        offsetX = - baseOffset
-                        offsetZ = 0;
-                    } else {
-                        offsetZ = - baseOffset
-                    }
-                    break;
-
-                case "north":
-                    if (isRightLane) {
-                        offsetX = - baseOffset
-                        offsetZ = 0;
-                    } else {
-                        offsetZ = - baseOffset
-                    }
-                    break;
+            if (isRightLane) {
+                switch (direction) {
+                    case "west": offsetX = 0; offsetZ = baseOffset; break;
+                    case "east": offsetX = 0; offsetZ = - baseOffset; break;
+                    case "south": offsetX = baseOffset; offsetZ = 0; break;
+                    case "north": offsetX = - baseOffset; offsetZ = 0; break;
+                }
+            } else {
+                switch (direction) {
+                    case "west": offsetX = 0; offsetZ = - baseOffset; break;
+                    case "east": offsetX = 0; offsetZ = baseOffset; break;
+                    case "south": offsetX = - baseOffset; offsetZ = 0; break;
+                    case "north": offsetX = baseOffset; offsetZ = 0; break;
+                }
             }
-
             return {
                 offsetX,
                 offsetZ
