@@ -93,7 +93,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
             const stripePosition = { x: originalPosition.x + offsetX, y: originalPosition.y + offsetY, z: originalPosition.z + offsetZ };
             stripeComponent.setAttribute("position", stripePosition);
-            stripeComponent.setAttribute("geometry", `primitive: box; width: ${originalWidth - 0.7}; height: 0.1; depth: ${originalDepth - 0.7}`);
+            stripeComponent.setAttribute("geometry", `primitive: box; width: ${originalWidth - 0.7}; height: 0.05; depth: ${originalDepth - 0.7}`);
             stripeComponent.setAttribute("material", `color: ${color}`);
             return stripeComponent;
         }
@@ -107,15 +107,15 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 switch (direction) {
                     case "west": offsetX = 0; offsetZ = baseOffset; break;
                     case "east": offsetX = 0; offsetZ = - baseOffset; break;
-                    case "south": offsetX = baseOffset; offsetZ = 0; break;
-                    case "north": offsetX = - baseOffset; offsetZ = 0; break;
+                    case "south": offsetX = baseOffset; offsetZ = baseOffset; break;
+                    case "north": offsetX = - baseOffset; offsetZ = - baseOffset; break;
                 }
             } else {
                 switch (direction) {
                     case "west": offsetX = 0; offsetZ = - baseOffset; break;
                     case "east": offsetX = 0; offsetZ = baseOffset; break;
-                    case "south": offsetX = - baseOffset; offsetZ = 0; break;
-                    case "north": offsetX = baseOffset; offsetZ = 0; break;
+                    case "south": offsetX = - baseOffset; offsetZ = - baseOffset; break;
+                    case "north": offsetX = baseOffset; offsetZ = - baseOffset; break;
                 }
             }
             return {
