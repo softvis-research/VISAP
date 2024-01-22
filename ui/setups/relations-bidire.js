@@ -22,8 +22,8 @@ const setup = {
 			enableOutgoingConnectors: true,
 			enableIncomingConnectors: true,
 
-			outgoingConnectorColor: { r: 0.5, g: 0.1, b: 0.2 },
-			incomingConnectorColor: { r: 0.1, g: 0.6, b: 0.5 },
+			outgoingConnectorColor: { r: 0, g: 0.1, b: 1 },
+			incomingConnectorColor: { r: 1, g: 0, b: 0.1 },
 		},
 	],
 
