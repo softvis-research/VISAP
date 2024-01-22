@@ -106,8 +106,10 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             // geometry
             const originalWidth = roadSectionComponent.getAttribute("width");
             const originalDepth = roadSectionComponent.getAttribute("depth");
-            const { plusWidth, plusDepth } = getNewWidthDepthForLane(roadSectionId)
-            stripeComponent.setAttribute("geometry", `primitive: box; width: ${originalWidth - 0.7 + plusWidth}; height: 0.05; depth: ${originalDepth - 0.7 + plusDepth}`);
+
+            const shrinkPct = 0.70
+            const { newWidth, newDepth } = getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, shrinkPct)
+            stripeComponent.setAttribute("geometry", `primitive: box; width: ${newWidth}; height: 0.05; depth: ${newDepth}`);
 
             // color
             const color = getColorForLane(roadSectionSpecialProperties.isRightLane)
@@ -130,9 +132,9 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 offsetY = 0.52;
                 switch (direction) {
                     case "west": offsetX = 0; offsetZ = baseOffset; break;
-                    case "east": offsetX = baseOffset; offsetZ = - baseOffset; break;
+                    case "east": offsetX = 0; offsetZ = - baseOffset; break;
                     case "south": offsetX = baseOffset; offsetZ = 0; break;
-                    case "north": offsetX = - baseOffset; offsetZ = - baseOffset; break;
+                    case "north": offsetX = - baseOffset; offsetZ = 0; break;
                 }
             } else {
                 offsetY = 0.50;
@@ -150,20 +152,20 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             }
         }
 
-        function getNewWidthDepthForLane(roadSectionId, isRightLane) {
+        function getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, shrinkPct) {
             const direction = globalRoadSectionDirectionMap.get(roadSectionId);
-            let plusWidth;
-            let plusDepth;
+            let newWidth;
+            let newDepth;
             switch (direction) {
-                case "west": plusWidth = 5; plusDepth = 0; break;
-                case "east": plusWidth = 5; plusDepth = 0; break;
-                case "south": plusWidth = 0; plusDepth = 5; break;
-                case "north": plusWidth = 0; plusDepth = 5; break;
+                case "west": newWidth = originalWidth ; newDepth = originalDepth * (1 - shrinkPct); break;
+                case "east": newWidth = originalWidth; newDepth = originalDepth * (1 - shrinkPct); break;
+                case "south": newWidth = originalWidth * (1 - shrinkPct); newDepth = originalDepth ; break;
+                case "north": newWidth = originalWidth  * (1 - shrinkPct); newDepth = originalDepth; break;
             }
 
             return {
-                plusWidth,
-                plusDepth
+                newWidth,
+                newDepth
             }
         }
 
