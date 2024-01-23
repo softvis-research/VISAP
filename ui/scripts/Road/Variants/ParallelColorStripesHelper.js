@@ -5,7 +5,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         let globalRoadSectionPropertiesHelper;
         let globalStartElementComponent;
         let globalRelatedRoadObjsMap = new Map();
-        let globalRoadSectionDirectionMap = new Map();
+        let globalRoadSectionPropertiesMap = new Map();
         let globalScene;
 
         /************************
@@ -48,8 +48,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         ************************/
 
         function handleParallelStripsCreation() {
-            globalRoadSectionDirectionMap = globalRoadSectionPropertiesHelper
-                .getDirectionsMapForRelatedStartElementRoads(globalStartElementComponent, globalRelatedRoadObjsMap);
+            globalRoadSectionPropertiesMap = globalRoadSectionPropertiesHelper
+                .getPropertiesMapForRelatedStartElementRoads(globalStartElementComponent, globalRelatedRoadObjsMap);
             globalRelatedRoadObjsMap.forEach(roadObj => {
                 spawnParallelStripesForRoadObj(roadObj);
                 // if (controllerConfig.spawnTrafficSigns) spawnTrafficSigns(roadObj);
@@ -120,7 +120,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
         function getOffsetForLane(roadSectionId, isRightLane) {
 
-            const direction = globalRoadSectionDirectionMap.get(roadSectionId);
+            const {direction} = globalRoadSectionPropertiesMap.get(roadSectionId);
 
             let offsetX;
             let offsetY;
@@ -153,7 +153,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         }
 
         function getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, shrinkPct) {
-            const direction = globalRoadSectionDirectionMap.get(roadSectionId);
+            const {direction} = globalRoadSectionPropertiesMap.get(roadSectionId);
             let newWidth;
             let newDepth;
             switch (direction) {
