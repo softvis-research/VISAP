@@ -1,4 +1,4 @@
-const createRoadSectionDirectionHelper = function (controllerConfig) {
+const createRoadSectionPropertiesHelper = function (controllerConfig) {
     return (function () {
 
         let globalStartElementComponent;
@@ -19,6 +19,17 @@ const createRoadSectionDirectionHelper = function (controllerConfig) {
             setDirectionsForRoadSectionsIsCalled();
             console.log(globalRoadSectionDirectionMap)
             return globalRoadSectionDirectionMap;
+        }
+
+        function createRoadSectionPropertiesObj() {
+            const roadSectionPropertiesObj = {
+                direction,
+                isRightLane,
+                isStartRamp,
+                isEndRamp,
+                isPartOfCurve,
+            }
+            return roadSectionPropertiesObj;    
         }
 
         /************************
@@ -80,6 +91,7 @@ const createRoadSectionDirectionHelper = function (controllerConfig) {
 
         function getInitialRoadSectionDirectionRelativeToStartElement(midPoint, startElementMidPoint) {
             const { x, z } = midPoint;
+            // keeps undefined if n roadSections share the same midPoint (overlaps), which indicates an inconsistent import
             const directionMap = {
                 east: x < startElementMidPoint.x,
                 west: x > startElementMidPoint.x,
