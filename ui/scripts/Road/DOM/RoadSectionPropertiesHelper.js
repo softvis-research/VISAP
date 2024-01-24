@@ -16,7 +16,6 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
             globalRelatedRoadObjsMap = relatedRoadObjsMap;
 
             setRoadSectionPropertiesMap();
-            console.log(globalRoadSectionPropertiesMap)
 
             return globalRoadSectionPropertiesMap;
         }
@@ -45,6 +44,27 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
             setDirectionsForCommonRoadSectionsWithOriginWhichIsNotStartElement();
             setPositionForAllRoadSection();
             setWidthDepthHeightForAllRoadSection();
+
+            console.log(globalRoadSectionPropertiesMap)
+        }
+
+        function addAllRelevantRoadSectionsToMap() {
+            const roadObjsWithStartElementAsOrigin = getRoadObjsWithStartElementAsOrigin();
+            const roadObjsWithOriginWhichIsNotStartElement = getRoadObjsWithOriginWhichIsNotStartElement();
+
+            roadObjsWithStartElementAsOrigin.forEach(roadObj => {
+                roadObj.roadSectionArr.forEach(roadSectionId => {
+                    const defaultPropertiesObj = createRoadSectionPropertiesObj();
+                    addToMapIfKeyOrValueNotExists(roadSectionId, defaultPropertiesObj, globalRoadSectionPropertiesMap);
+                })
+            })
+
+            roadObjsWithOriginWhichIsNotStartElement.forEach(roadObj => {
+                roadObj.roadSectionArr.forEach(roadSectionId => {
+                    const defaultPropertiesObj = createRoadSectionPropertiesObj();
+                    addToMapIfKeyOrValueNotExists(roadSectionId, defaultPropertiesObj, globalRoadSectionPropertiesMap);
+                })
+            })
         }
 
         function setPositionForAllRoadSection() {
@@ -67,26 +87,7 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                     width, depth, height
                 }, globalRoadSectionPropertiesMap)
             })
-        }
-
-        function addAllRelevantRoadSectionsToMap() {
-            const roadObjsWithStartElementAsOrigin = getRoadObjsWithStartElementAsOrigin();
-            const roadObjsWithOriginWhichIsNotStartElement = getRoadObjsWithOriginWhichIsNotStartElement();
-
-            roadObjsWithStartElementAsOrigin.forEach(roadObj => {
-                roadObj.roadSectionArr.forEach(roadSectionId => {
-                    const defaultPropertiesObj = createRoadSectionPropertiesObj();
-                    addToMapIfKeyOrValueNotExists(roadSectionId, defaultPropertiesObj, globalRoadSectionPropertiesMap);
-                })
-            })
-
-            roadObjsWithOriginWhichIsNotStartElement.forEach(roadObj => {
-                roadObj.roadSectionArr.forEach(roadSectionId => {
-                    const defaultPropertiesObj = createRoadSectionPropertiesObj();
-                    addToMapIfKeyOrValueNotExists(roadSectionId, defaultPropertiesObj, globalRoadSectionPropertiesMap);
-                })
-            })
-        }
+        }   
 
         function setPropertiesForInitialRoadSectionsWithStartElementAsOrigin() {
             const roadObjsWithStartElementAsOrigin = getRoadObjsWithStartElementAsOrigin();
@@ -128,7 +129,7 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                 for (let i = 1; i < roadObj.roadSectionArr.length; i++) {
                     addToMapIfKeyOrValueNotExists(roadObj.roadSectionArr[i], {
                         elementOrigin: roadObj.startElementId,
-                        direction: directions[i - 1]
+                        direction: directions[i]
                     }, globalRoadSectionPropertiesMap)
                 }
             })
@@ -141,9 +142,9 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                 const reverseOrderedArr = [...roadObj.roadSectionArr].reverse();
                 const directions = getDirectionsForOrderedRoadSections(reverseOrderedArr);
                 for (let i = 1; i < roadObj.roadSectionArr.length; i++) {
-                    addToMapIfKeyOrValueNotExists(roadObj.roadSectionArr[i], {
+                    addToMapIfKeyOrValueNotExists(reverseOrderedArr[i], {
                         elementOrigin: roadObj.startElementId,
-                        direction: directions[i - 1]
+                        direction: directions[i]
                     }, globalRoadSectionPropertiesMap)
                 }
             })
@@ -184,44 +185,43 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
 
         function getDirectionsForOrderedRoadSections(roadSectionOrderedArr) {
             let directionsArr = [];
+            directionsArr.push(globalRoadSectionPropertiesMap.get(roadSectionOrderedArr[0]).direction)
             for (let i = 1; i < roadSectionOrderedArr.length; i++) {
                 const midPoint = document.getElementById(roadSectionOrderedArr[i]).getAttribute("position");
                 const refMidPoint = document.getElementById(roadSectionOrderedArr[i - 1]).getAttribute("position");
-                const refProperties = globalRoadSectionPropertiesMap.get(roadSectionOrderedArr[i - 1]);
-                const refDirection = refProperties.direction
+                const refDirection = directionsArr[i - 1];
                 const direction = getDirectionOfAdjacentRoadSection(midPoint, refMidPoint, refDirection);
+                console.log(direction)
                 directionsArr.push(direction);
             }
             return directionsArr;
         }
 
         function getDirectionOfAdjacentRoadSection(midPoint, refMidPoint, refDirection) {
-            const { x, z } = midPoint;
-
             // imagine a compass turning its needle based on your direction: here, assigned directions depend on reference directions
             switch (refDirection) {
                 case "west":
-                    if (x > refMidPoint.x && z === refMidPoint.z) return "west";
-                    if (x > refMidPoint.x && z > refMidPoint.z) return "north";
-                    if (x > refMidPoint.x && z < refMidPoint.z) return "south";
+                    if (midPoint.x > refMidPoint.x && midPoint.z === refMidPoint.z) return "west";
+                    if (midPoint.x > refMidPoint.x && midPoint.z > refMidPoint.z) return "north";
+                    if (midPoint.x > refMidPoint.x && midPoint.z < refMidPoint.z) return "south";
                     break;
 
                 case "east":
-                    if (x < refMidPoint.x && z === refMidPoint.z) return "east";
-                    if (x < refMidPoint.x && z > refMidPoint.z) return "north";
-                    if (x < refMidPoint.x && z < refMidPoint.z) return "south";
+                    if (midPoint.x < refMidPoint.x && midPoint.z === refMidPoint.z) return "east";
+                    if (midPoint.x < refMidPoint.x && midPoint.z > refMidPoint.z) return "north";
+                    if (midPoint.x < refMidPoint.x && midPoint.z < refMidPoint.z) return "south";
                     break;
 
                 case "south":
-                    if (x === refMidPoint.x && z < refMidPoint.z) return "south";
-                    if (x > refMidPoint.x && z < refMidPoint.z) return "west";
-                    if (x < refMidPoint.x && z < refMidPoint.z) return "east";
+                    if (midPoint.x === refMidPoint.x && midPoint.z < refMidPoint.z) return "south";
+                    if (midPoint.x > refMidPoint.x && midPoint.z < refMidPoint.z) return "west";
+                    if (midPoint.x < refMidPoint.x && midPoint.z < refMidPoint.z) return "east";
                     break;
 
                 case "north":
-                    if (x === refMidPoint.x && z > refMidPoint.z) return "north";
-                    if (x > refMidPoint.x && z > refMidPoint.z) return "west";
-                    if (x < refMidPoint.x && z > refMidPoint.z) return "east";
+                    if (midPoint.x === refMidPoint.x && midPoint.z > refMidPoint.z) return "north";
+                    if (midPoint.x > refMidPoint.x && midPoint.z > refMidPoint.z) return "west";
+                    if (midPoint.x < refMidPoint.x && midPoint.z > refMidPoint.z) return "east";
                     break;
             }
         }
