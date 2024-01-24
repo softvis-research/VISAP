@@ -10,13 +10,10 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
         ************************/
 
         function getPropertiesMapForRelatedStartElementRoads(startElementComponent, relatedRoadObjsMap) {
-            resetState();
-
             globalStartElementComponent = startElementComponent;
             globalRelatedRoadObjsMap = relatedRoadObjsMap;
-
             setRoadSectionPropertiesMap();
-
+            console.log(globalRoadSectionPropertiesMap)
             return globalRoadSectionPropertiesMap;
         }
 
@@ -37,15 +34,39 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
         }
 
         function setRoadSectionPropertiesMap() {
+            resetCurrentMap();
             addAllRelevantRoadSectionsToMap();
             setPropertiesForInitialRoadSectionsWithStartElementAsOrigin();
             setDirectionsForCommonRoadSectionsWithStartElementAsOrigin();
             setPropertiesForInitialRoadSectionsWithOriginWhichIsNotStartElement()
             setDirectionsForCommonRoadSectionsWithOriginWhichIsNotStartElement();
             setPositionForAllRoadSection();
-            setWidthDepthHeightForAllRoadSection();
+            setDimensionForAllRoadSection();
+            setIsFinalElementForAllRoadSection();
+            setIsStartingInCurveForAllRoadSection();
+            setIsEndingInCurveForAllRoadSection();
+        }
 
-            console.log(globalRoadSectionPropertiesMap)
+        function setIsStartingInCurveForAllRoadSection() {
+           
+        }
+
+        function setIsEndingInCurveForAllRoadSection() {
+            
+        }
+
+        function setIsFinalElementForAllRoadSection() {
+            globalRelatedRoadObjsMap.forEach(roadObj => {
+                let lastIdx;
+                // as startElement is always POV, in isCalled-relations, the first element of this road is the final 
+                roadObj.startElementId === globalStartElementComponent.id ?
+                    lastIdx = roadObj.roadSectionArr.length - 1
+                    : lastIdx = 0
+                const finalRoadSectionId = roadObj.roadSectionArr[lastIdx];
+                addToMapIfKeyOrValueNotExists(finalRoadSectionId, {
+                    isFinalElement: true,
+                }, globalRoadSectionPropertiesMap)
+            })
         }
 
         function addAllRelevantRoadSectionsToMap() {
@@ -77,7 +98,7 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
             })
         }
 
-        function setWidthDepthHeightForAllRoadSection() {
+        function setDimensionForAllRoadSection() {
             globalRoadSectionPropertiesMap.forEach((_, roadSectionId) => {
                 const roadSectionComponent = document.getElementById(roadSectionId);
                 const width = roadSectionComponent.getAttribute("width");
@@ -87,7 +108,7 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                     width, depth, height
                 }, globalRoadSectionPropertiesMap)
             })
-        }   
+        }
 
         function setPropertiesForInitialRoadSectionsWithStartElementAsOrigin() {
             const roadObjsWithStartElementAsOrigin = getRoadObjsWithStartElementAsOrigin();
@@ -230,7 +251,7 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
               Other Helper
         ************************/
 
-        function resetState() {
+        function resetCurrentMap() {
             globalRoadSectionPropertiesMap.clear();
         }
 
