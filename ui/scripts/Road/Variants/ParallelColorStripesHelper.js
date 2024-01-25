@@ -5,8 +5,11 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         let globalRoadSectionPropertiesHelper;
         let globalStartElementComponent;
         let globalRelatedRoadObjsMap = new Map();
-        let globalRoadSectionPropertiesMap = new Map();
+        let globalRoadSectionPropsMap = new Map();
         let globalScene;
+        
+        // TODO: Create more globals to adjust base props of stripe component in spot
+        const globalStripeShrinkPct = 0.70
 
         /************************
             Public Functions
@@ -26,21 +29,20 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             globalRoadSectionPropertiesHelper = createRoadSectionPropertiesHelper();
         }
 
-
-        function startRoadHighlightActionsForStartElement(startElementComponent, relatedObjsMap) {
+        // entry for all logical actions leading to the offered visualization by this variant in GUI
+        function startRoadHighlightActionsForStartElement(startElementComponent, relatedRoadObjsMap) {
             globalStartElementComponent = startElementComponent;
-            globalRelatedRoadObjsMap = relatedObjsMap;
+            globalRelatedRoadObjsMap = relatedRoadObjsMap;
 
             globalDomHelper.handleLegendForAction("select");
-            globalDomHelper.handleUnrelatedEntityMonochromacyForAction("select", globalRelatedRoadObjsMap)
+            globalDomHelper.handleUnrelatedEntityMonochromacyForAction("select", globalRelatedRoadObjsMap);
             handleParallelStripsCreation();
         }
 
         function resetRoadsHighlight() {
             globalDomHelper.handleLegendForAction("unselect");
             globalDomHelper.handleUnrelatedEntityMonochromacyForAction("unselect", globalRelatedRoadObjsMap)
-            globalDomHelper.removeComponentByIdMarking("_stripe_right");
-            globalDomHelper.removeComponentByIdMarking("_stripe_left");
+            globalDomHelper.removeComponentByIdMarking("_stripe");
         }
 
         /************************
@@ -48,105 +50,117 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         ************************/
 
         function handleParallelStripsCreation() {
-            globalRoadSectionPropertiesMap = globalRoadSectionPropertiesHelper
-                .getPropertiesMapForRelatedStartElementRoads(globalStartElementComponent, globalRelatedRoadObjsMap);
+            globalRoadSectionPropsMap = globalRoadSectionPropertiesHelper
+                .getPropsMapForRelatedRoadsStartElementPOV(globalStartElementComponent, globalRelatedRoadObjsMap);
             globalRelatedRoadObjsMap.forEach(roadObj => {
                 spawnParallelStripesForRoadSection(roadObj);
             })
         }
 
         function spawnParallelStripesForRoadSection(roadObj) {
-            roadObj.roadSectionArr.forEach(roadSectionId => {
-                const stripeComponent = createStripeComponent(roadObj, roadSectionId)
-                setStripeComponentProperties(stripeComponent, roadObj, roadSectionId);
+            const stripeComponentArr = createStripeComponentsForRoadObj(roadObj);
+            stripeComponentArr.forEach(stripeComponent => {
+                const stripeComponentId = stripeComponent.id
+                const roadSectionId = stripeComponentId.replace(/_stripe$/, '');
+
+                // stripe props depending on clone roadSection and its place in roadObj
+                setStripeComponentProps(stripeComponent, roadSectionId, roadObj); 
                 globalScene = document.querySelector("a-scene");
                 globalScene.appendChild(stripeComponent);
             })
         }
 
-        function createStripeComponent(roadObj, roadSectionId) {
+        // HTML-Component
+        function createStripeComponentsForRoadObj(roadObj) {
+            const stripeComponentArr = [];
+            roadObj.roadSectionArr.forEach(roadSectionId => {
+                const roadSectionComponent = document.getElementById(roadSectionId);
+                const stripeComponent = roadSectionComponent.cloneNode(true); // clone keeps original props for new component
+                const stripeId = `${roadSectionId}_stripe`;
+                stripeComponent.setAttribute("id", stripeId);
+                stripeComponentArr.push(stripeComponent);
+            })
+            return stripeComponentArr;
+        }
+
+        function setStripeComponentProps(stripeComponent, roadSectionId, roadObj) {
             const roadSectionComponent = document.getElementById(roadSectionId);
-            const stripeComponent = roadSectionComponent.cloneNode(true); // clone to keep properties of original
-            const laneSide = getLaneSideForRoadSection(roadObj);
-            const stripeId = `${roadSectionId}_stripe_${laneSide}`; // marking string to later handle related components
-            stripeComponent.setAttribute("id", stripeId);
-            return stripeComponent;
-        }
 
-        function getLaneSideForRoadSection(roadObj) {
-            if (roadObj.startElementId === globalStartElementComponent.id) return "right";
-            return "left"
-        }
-
-        function setStripeComponentProperties(stripeComponent, roadObj, roadSectionId) {
-            const roadSectionPropertiesObj = globalRoadSectionPropertiesMap.get(roadSectionId);
-            const roadSectionComponent = document.getElementById(roadSectionId)
+            const laneSide = getLaneSideForRoadObj(roadObj); // stripes on left or right lane
 
             // position
-            const laneSide = getLaneSideForRoadSection(roadObj);
             const originalPosition = roadSectionComponent.getAttribute("position");
-            const { offsetX, offsetY, offsetZ } = getOffsetForLane(roadSectionId, laneSide)
-            const stripePosition = { x: originalPosition.x + offsetX, y: originalPosition.y + offsetY, z: originalPosition.z + offsetZ };
+            const { newX, newY, newZ } = getNewPositionForLane(roadSectionId, originalPosition, laneSide,)
+            const stripePosition = { x: newX, y: newY, z: newZ };
             stripeComponent.setAttribute("position", stripePosition);
 
             // geometry
             const originalWidth = roadSectionComponent.getAttribute("width");
             const originalDepth = roadSectionComponent.getAttribute("depth");
-
-            const shrinkPct = 0.70
-            const { newWidth, newDepth } = getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, shrinkPct)
+            const { newWidth, newDepth } = getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth)
             stripeComponent.setAttribute("geometry", `primitive: box; width: ${newWidth}; height: 0.05; depth: ${newDepth}`);
 
             // color
             const color = getColorForLane(laneSide)
             stripeComponent.setAttribute("color", color);
-
-            return stripeComponent;
         }
 
-        function getOffsetForLane(roadSectionId, laneSide) {
-
-            const { direction } = globalRoadSectionPropertiesMap.get(roadSectionId);
-
-            let offsetX;
-            let offsetY;
-            let offsetZ;
-
+        function getNewPositionForLane(roadSectionId, originalPosition, laneSide) {
+            const { direction } = globalRoadSectionPropsMap.get(roadSectionId);
+            let newX;
+            let newY;
+            let newZ;
             const baseOffset = 0.25
 
             if (laneSide === "right") {
-                offsetY = 0.52;
+                newY = 0.52;
                 switch (direction) {
-                    case "west": offsetX = 0; offsetZ = baseOffset; break;
-                    case "east": offsetX = 0; offsetZ = - baseOffset; break;
-                    case "south": offsetX = baseOffset; offsetZ = 0; break;
-                    case "north": offsetX = - baseOffset; offsetZ = 0; break;
+                    case "west": newX = originalPosition.x; newZ = originalPosition.z + baseOffset; break;
+                    case "east": newX = originalPosition.x; newZ = originalPosition.z - baseOffset; break;
+                    case "south": newX = originalPosition.x + baseOffset; newZ = originalPosition.z; break;
+                    case "north": newX = originalPosition.x - baseOffset; newZ = originalPosition.z; break;
                 }
             } else {
-                offsetY = 0.50;
+                newY = 0.50;
                 switch (direction) {
-                    case "west": offsetX = 0; offsetZ = - baseOffset; break;
-                    case "east": offsetX = 0; offsetZ = baseOffset; break;
-                    case "south": offsetX = - baseOffset; offsetZ = 0; break;
-                    case "north": offsetX = baseOffset; offsetZ = 0; break;
+                    case "west": newX = originalPosition.x; newZ = originalPosition.z - baseOffset; break;
+                    case "east": newX = originalPosition.x; newZ = originalPosition.z + baseOffset; break;
+                    case "south": newX = originalPosition.x - baseOffset; newZ = originalPosition.z; break;
+                    case "north": newX = originalPosition.x + baseOffset; newZ = originalPosition.z; break;
                 }
             }
-            return {
-                offsetX,
-                offsetY,
-                offsetZ
-            }
+
+            return { newX, newY, newZ }
         }
 
-        function getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, shrinkPct) {
-            const { direction } = globalRoadSectionPropertiesMap.get(roadSectionId);
+        function getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth) {
+            const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
+
+            const { direction } = propertiesObj
+            const { isEndingInCurve } = propertiesObj;
             let newWidth;
             let newDepth;
             switch (direction) {
-                case "west": newWidth = originalWidth; newDepth = originalDepth * (1 - shrinkPct); break;
-                case "east": newWidth = originalWidth; newDepth = originalDepth * (1 - shrinkPct); break;
-                case "south": newWidth = originalWidth * (1 - shrinkPct); newDepth = originalDepth; break;
-                case "north": newWidth = originalWidth * (1 - shrinkPct); newDepth = originalDepth; break;
+                case "west": {
+                    newWidth = originalWidth;
+                    newDepth = originalDepth * (1 - globalStripeShrinkPct);
+                    break;
+                }
+                case "east": {
+                    newWidth = originalWidth;
+                    newDepth = originalDepth * (1 - globalStripeShrinkPct);
+                    break;
+                }
+                case "south": {
+                    newWidth = originalWidth * (1 - globalStripeShrinkPct);
+                    newDepth = originalDepth;
+                    break;
+                }
+                case "north": {
+                    newWidth = originalWidth * (1 - globalStripeShrinkPct);
+                    newDepth = originalDepth;
+                    break;
+                }
             }
 
             return {
@@ -155,9 +169,14 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             }
         }
 
+        function getLaneSideForRoadObj(roadObj) {
+            if (roadObj.startElementId === globalStartElementComponent.id) return "right";
+            return "left"
+        }
+
         function getColorForLane(laneSide) {
             if (laneSide === "right") return controllerConfig.colorsParallelColorStripes.calls;
-            return controllerConfig.colorsParallelColorStripes.isCalled;
+            else return controllerConfig.colorsParallelColorStripes.isCalled;
         }
 
         return {

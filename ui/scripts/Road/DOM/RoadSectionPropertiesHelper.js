@@ -3,22 +3,27 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
 
         let globalStartElementComponent;
         let globalRelatedRoadObjsMap;
-        let globalRoadSectionPropertiesMap = new Map();
+        let globalRoadSectionPropsMap = new Map();
 
         /************************
             Public Functions
         ************************/
 
-        function getPropertiesMapForRelatedStartElementRoads(startElementComponent, relatedRoadObjsMap) {
+        // returns a props map for individual roadSections where startElement serves as reference for every attribute
+        function getPropsMapForRelatedRoadsStartElementPOV(startElementComponent, relatedRoadObjsMap) {
             globalStartElementComponent = startElementComponent;
             globalRelatedRoadObjsMap = relatedRoadObjsMap;
             setRoadSectionPropertiesMap();
-            console.log(globalRoadSectionPropertiesMap)
-            return globalRoadSectionPropertiesMap;
+            return globalRoadSectionPropsMap;
         }
 
+        /************************
+             Enriching Props
+        ************************/
+
         function createRoadSectionPropertiesObj(p = {}) {
-            const roadSectionPropertiesObj = {
+            // augment as needed and set values in 'setRoadSectionPropertiesMap'
+            const roadSectionPropsObj = {
                 elementOrigin: p.elementOrigin || null,
                 isInitialElement: p.isStartRamp || false,
                 isFinalElement: p.isEndRamp || false,
@@ -26,116 +31,78 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                 isStartingInCurve: p.isStartingInCurve || false,
                 isEndingInCurve: p.isEndingInCurve || false,
             };
-            return roadSectionPropertiesObj;
+            return roadSectionPropsObj;
         }
 
         function setRoadSectionPropertiesMap() {
-            resetCurrentMap();
-            addAllRelevantRoadSectionsToMap();
-            setPropertiesForInitialRoadSectionsWithStartElementAsOrigin();
-            setDirectionsForCommonRoadSectionsWithStartElementAsOrigin();
-            setPropertiesForInitialRoadSectionsWithOriginWhichIsNotStartElement()
-            setDirectionsForCommonRoadSectionsWithOriginWhichIsNotStartElement();
+            //basic ops
+            resetCurrentRoadSectionPropsMap();
+            addAllRelevantRoadSectionsToMapWithEmptyProps();
+            // calls
+            setPropsForInitialRoadSectionsInCallsRelation();
+            setDirectionsForSubsequentRoadSectionsInCallsRelation();
+            // isCalled
+            setPropsForInitialRoadSectionsInIsCalledRelation()
+            setDirectionsForSubsequentRoadSectionsInIsCalledRelation();
+            // further props
             setIsFinalElementForAllRoadSection();
             setIsEndingInCurveForAllRoadSection();
             setIsStartingInCurveForAllRoadSection();
         }
 
-        function setIsEndingInCurveForAllRoadSection() {
-            globalRelatedRoadObjsMap.forEach(roadObj => {
-                let roadSectionArr = roadObj.startElementId != globalStartElementComponent.id
-                    ? [...roadObj.roadSectionArr].reverse()
-                    : roadObj.roadSectionArr;
-                
-                    for(let i = 0; i < roadSectionArr.length -1; i ++) {
-                        const directionOfCurrent = globalRoadSectionPropertiesMap.get(roadSectionArr[i]);
-                        const directionOfSuccessor = globalRoadSectionPropertiesMap.get(roadSectionArr[i + 1]);
-                        const isEndingInCurve = directionOfCurrent != directionOfSuccessor;
-                        addToMapIfKeyOrValueNotExists(roadSectionArr[i], {
-                            isEndingInCurve,
-                        }, globalRoadSectionPropertiesMap)
-                    }
+        function resetCurrentRoadSectionPropsMap() {
+            globalRoadSectionPropsMap.clear();
+        }
 
-                    // last roadSection can't end in a curve so it is always false
-                    addToMapIfKeyOrValueNotExists(roadSectionArr[roadSectionArr.length - 1], {
-                        isEndingInCurve: false,
-                    }, globalRoadSectionPropertiesMap)
+        function addAllRelevantRoadSectionsToMapWithEmptyProps() {
+            const allRoadObjs = [...getRoadObjsInCallsRelation(), ...getRoadObjsInIsCalledRelation()];
+
+            allRoadObjs.forEach(roadObj => {
+                roadObj.roadSectionArr.forEach(roadSectionId => {
+                    const defaultPropertiesObj = createRoadSectionPropertiesObj({});
+                    addToMapIfKeyOrValueNotExists(roadSectionId, defaultPropertiesObj, globalRoadSectionPropsMap);
+                });
             });
         }
 
-        function setIsStartingInCurveForAllRoadSection() {
-            globalRelatedRoadObjsMap.forEach(roadObj => {
-                let roadSectionArr = roadObj.startElementId != globalStartElementComponent.id
-                    ? [...roadObj.roadSectionArr].reverse()
-                    : roadObj.roadSectionArr;
-                
-                    for(let i = 1; i < roadSectionArr.length; i ++) {
-                        const directionOfCurrent = globalRoadSectionPropertiesMap.get(roadSectionArr[i]);
-                        const directionOfPredecessor = globalRoadSectionPropertiesMap.get(roadSectionArr[i - 1]);
-                        const isStartingInCurve = directionOfCurrent != directionOfPredecessor;
-                        addToMapIfKeyOrValueNotExists(roadSectionArr[i], {
-                            isStartingInCurve,
-                        }, globalRoadSectionPropertiesMap)
-                    }
+        /************************
+                Calls
+        ************************/
 
-                    // first roadSection can't start in a curve so it is always false
-                    addToMapIfKeyOrValueNotExists(roadSectionArr[0], {
-                        isStartingInCurve: false,
-                    }, globalRoadSectionPropertiesMap)
-            });
-        }
-
-        function setIsFinalElementForAllRoadSection() {
-            globalRelatedRoadObjsMap.forEach(roadObj => {
-                let lastIdx;
-                // as startElement is always POV, in isCalled-relations, the first element of this road is the final 
-                roadObj.startElementId === globalStartElementComponent.id ?
-                    lastIdx = roadObj.roadSectionArr.length - 1
-                    : lastIdx = 0
-                const finalRoadSectionId = roadObj.roadSectionArr[lastIdx];
-                addToMapIfKeyOrValueNotExists(finalRoadSectionId, {
-                    isFinalElement: true,
-                }, globalRoadSectionPropertiesMap)
-            })
-        }
-
-        function addAllRelevantRoadSectionsToMap() {
-            const roadObjsWithStartElementAsOrigin = getRoadObjsWithStartElementAsOrigin();
-            const roadObjsWithOriginWhichIsNotStartElement = getRoadObjsWithOriginWhichIsNotStartElement();
-
-            roadObjsWithStartElementAsOrigin.forEach(roadObj => {
-                roadObj.roadSectionArr.forEach(roadSectionId => {
-                    const defaultPropertiesObj = createRoadSectionPropertiesObj();
-                    addToMapIfKeyOrValueNotExists(roadSectionId, defaultPropertiesObj, globalRoadSectionPropertiesMap);
-                })
-            })
-
-            roadObjsWithOriginWhichIsNotStartElement.forEach(roadObj => {
-                roadObj.roadSectionArr.forEach(roadSectionId => {
-                    const defaultPropertiesObj = createRoadSectionPropertiesObj();
-                    addToMapIfKeyOrValueNotExists(roadSectionId, defaultPropertiesObj, globalRoadSectionPropertiesMap);
-                })
-            })
-        }
-
-        function setPropertiesForInitialRoadSectionsWithStartElementAsOrigin() {
-            const roadObjsWithStartElementAsOrigin = getRoadObjsWithStartElementAsOrigin();
-            roadObjsWithStartElementAsOrigin.forEach(roadObj => {
+        function setPropsForInitialRoadSectionsInCallsRelation() {
+            const roadObjsInCallsRelation = getRoadObjsInCallsRelation();
+            roadObjsInCallsRelation.forEach(roadObj => {
                 const initialRoadSectionId = roadObj.roadSectionArr[0];
                 const direction = getDirectionForInitialRoadSection(initialRoadSectionId);
                 addToMapIfKeyOrValueNotExists(initialRoadSectionId, {
                     elementOrigin: roadObj.startElementId,
-                    isInitialElement: true,
                     direction,
-                }, globalRoadSectionPropertiesMap)
+                }, globalRoadSectionPropsMap)
             })
         }
 
-        function setPropertiesForInitialRoadSectionsWithOriginWhichIsNotStartElement() {
-            const roadObjsWithOriginWhichIsNotStartElement = getRoadObjsWithOriginWhichIsNotStartElement();
+        function setDirectionsForSubsequentRoadSectionsInCallsRelation() {
+            const roadObjsInCallsRelation = getRoadObjsInCallsRelation();
+            roadObjsInCallsRelation.forEach(roadObj => {
+                const directions = getDirectionsForOrderedRoadSections(roadObj.roadSectionArr);
+                for (let i = 1; i < roadObj.roadSectionArr.length; i++) {
+                    addToMapIfKeyOrValueNotExists(roadObj.roadSectionArr[i], {
+                        elementOrigin: roadObj.startElementId,
+                        direction: directions[i]
+                    }, globalRoadSectionPropsMap)
+                }
+            })
+        }
 
-            roadObjsWithOriginWhichIsNotStartElement.forEach(roadObj => {
-                // last roadSection serves as initialElement – as in isCalled-relations, roads get flipped to keep startElement as POV
+        /************************
+                isCalled
+        ************************/
+
+        function setPropsForInitialRoadSectionsInIsCalledRelation() {
+            const roadObjsInIsCalledRelation = getRoadObjsInIsCalledRelation();
+
+            roadObjsInIsCalledRelation.forEach(roadObj => {
+                // last roadSection serves as initialElement – as in isCalled-relations, roads get flipped to keep startElement as reference
                 const lastIdx = roadObj.roadSectionArr.length - 1;
                 const initialRoadSectionId = roadObj.roadSectionArr[lastIdx];
                 const direction = getDirectionForInitialRoadSection(initialRoadSectionId);
@@ -143,65 +110,34 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                     elementOrigin: roadObj.startElementId,
                     isInitialElement: true,
                     direction,
-                }, globalRoadSectionPropertiesMap)
+                }, globalRoadSectionPropsMap)
             })
         }
 
-        /************************
-            Calls RoadSections
-        ************************/
-
-        function setDirectionsForCommonRoadSectionsWithStartElementAsOrigin() {
-            const roadObjsWithStartElementAsOrigin = getRoadObjsWithStartElementAsOrigin();
-            roadObjsWithStartElementAsOrigin.forEach(roadObj => {
-                const directions = getDirectionsForOrderedRoadSections(roadObj.roadSectionArr);
-                for (let i = 1; i < roadObj.roadSectionArr.length; i++) {
-                    addToMapIfKeyOrValueNotExists(roadObj.roadSectionArr[i], {
-                        elementOrigin: roadObj.startElementId,
-                        direction: directions[i]
-                    }, globalRoadSectionPropertiesMap)
-                }
-            })
-        }
-
-        function setDirectionsForCommonRoadSectionsWithOriginWhichIsNotStartElement() {
-            const roadObjsWithOriginWhichIsNotStartElement = getRoadObjsWithOriginWhichIsNotStartElement();
-            roadObjsWithOriginWhichIsNotStartElement.forEach(roadObj => {
-                // reversing road – as in isCalled-relations, roads get flipped to keep startElement as POV
+        function setDirectionsForSubsequentRoadSectionsInIsCalledRelation() {
+            const roadObjsInIsCalledRelation = getRoadObjsInIsCalledRelation();
+            roadObjsInIsCalledRelation.forEach(roadObj => {
+                // reversing road – as in isCalled-relations, roads get flipped to keep startElement as reference
                 const reverseOrderedArr = [...roadObj.roadSectionArr].reverse();
                 const directions = getDirectionsForOrderedRoadSections(reverseOrderedArr);
                 for (let i = 1; i < roadObj.roadSectionArr.length; i++) {
                     addToMapIfKeyOrValueNotExists(reverseOrderedArr[i], {
                         elementOrigin: roadObj.startElementId,
                         direction: directions[i]
-                    }, globalRoadSectionPropertiesMap)
+                    }, globalRoadSectionPropsMap)
                 }
             })
         }
 
-        function getRoadObjsWithStartElementAsOrigin() {
-            return Array.from(globalRelatedRoadObjsMap.values())
-                .filter(roadObj => roadObj.startElementId === globalStartElementComponent.id); // startElement calls other elements
-        }
-
         /************************
-          isCalled RoadSections
-        ************************/
-
-        function getRoadObjsWithOriginWhichIsNotStartElement() {
-            return Array.from(globalRelatedRoadObjsMap.values())
-                .filter(roadObj => roadObj.startElementId != globalStartElementComponent.id); // startElement is called by other elements
-        }
-
-        /************************
-          Directions Operations
+             Directions Ops
         ************************/
 
         function getDirectionForInitialRoadSection(initialRoadSectionId) {
+            // initial roadSections direction is based on startElement position
+            // this also included isCalled roads, as their order gets reversed to keep startElement as reference
             const midPointOfInitialRoadSection = document.getElementById(initialRoadSectionId).getAttribute("position");
             const startElementMidPoint = globalStartElementComponent.getAttribute("position");
-
-            // keeps undefined if n roadSections share the same midPoint (overlaps), which indicates an inconsistent import
             const directionMap = {
                 east: midPointOfInitialRoadSection.x < startElementMidPoint.x,
                 west: midPointOfInitialRoadSection.x > startElementMidPoint.x,
@@ -214,7 +150,7 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
 
         function getDirectionsForOrderedRoadSections(roadSectionOrderedArr) {
             let directionsArr = [];
-            directionsArr.push(globalRoadSectionPropertiesMap.get(roadSectionOrderedArr[0]).direction)
+            directionsArr.push(globalRoadSectionPropsMap.get(roadSectionOrderedArr[0]).direction)
             for (let i = 1; i < roadSectionOrderedArr.length; i++) {
                 const midPoint = document.getElementById(roadSectionOrderedArr[i]).getAttribute("position");
                 const refMidPoint = document.getElementById(roadSectionOrderedArr[i - 1]).getAttribute("position");
@@ -256,12 +192,80 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
         }
 
         /************************
-              Other Helper
+               Other Ops
         ************************/
 
-        function resetCurrentMap() {
-            globalRoadSectionPropertiesMap.clear();
+        function setIsEndingInCurveForAllRoadSection() {
+            globalRelatedRoadObjsMap.forEach(roadObj => {
+                let roadSectionArr = roadObj.startElementId != globalStartElementComponent.id
+                    ? [...roadObj.roadSectionArr].reverse()
+                    : roadObj.roadSectionArr;
+
+                for (let i = 0; i < roadSectionArr.length - 1; i++) {
+                    const directionOfCurrent = globalRoadSectionPropsMap.get(roadSectionArr[i]);
+                    const directionOfSuccessor = globalRoadSectionPropsMap.get(roadSectionArr[i + 1]);
+                    const isEndingInCurve = directionOfCurrent != directionOfSuccessor;
+                    addToMapIfKeyOrValueNotExists(roadSectionArr[i], {
+                        isEndingInCurve,
+                    }, globalRoadSectionPropsMap)
+                }
+
+                // last roadSection can't end in a curve so it is always false
+                addToMapIfKeyOrValueNotExists(roadSectionArr[roadSectionArr.length - 1], {
+                    isEndingInCurve: false,
+                }, globalRoadSectionPropsMap)
+            });
         }
+
+        function setIsStartingInCurveForAllRoadSection() {
+            globalRelatedRoadObjsMap.forEach(roadObj => {
+                let roadSectionArr = roadObj.startElementId != globalStartElementComponent.id
+                    ? [...roadObj.roadSectionArr].reverse()
+                    : roadObj.roadSectionArr;
+
+                for (let i = 1; i < roadSectionArr.length; i++) {
+                    const directionOfCurrent = globalRoadSectionPropsMap.get(roadSectionArr[i]);
+                    const directionOfPredecessor = globalRoadSectionPropsMap.get(roadSectionArr[i - 1]);
+                    const isStartingInCurve = directionOfCurrent != directionOfPredecessor;
+                    addToMapIfKeyOrValueNotExists(roadSectionArr[i], {
+                        isStartingInCurve,
+                    }, globalRoadSectionPropsMap)
+                }
+
+                // first roadSection can't start in a curve so it is always false
+                addToMapIfKeyOrValueNotExists(roadSectionArr[0], {
+                    isStartingInCurve: false,
+                }, globalRoadSectionPropsMap)
+            });
+        }
+
+        function setIsFinalElementForAllRoadSection() {
+            globalRelatedRoadObjsMap.forEach(roadObj => {
+                let lastIdx;
+                // fixing startElement as reference means that roadObjs' roadSectionArrs that lead towards startElement (isCalled) are reversed
+                roadObj.startElementId === globalStartElementComponent.id ?
+                    lastIdx = roadObj.roadSectionArr.length - 1
+                    : lastIdx = 0
+                const finalRoadSectionId = roadObj.roadSectionArr[lastIdx];
+                addToMapIfKeyOrValueNotExists(finalRoadSectionId, {
+                    isFinalElement: true,
+                }, globalRoadSectionPropsMap)
+            })
+        }
+
+        function getRoadObjsInCallsRelation() {
+            return Array.from(globalRelatedRoadObjsMap.values())
+                .filter(roadObj => roadObj.startElementId === globalStartElementComponent.id); // startElement calls other elements
+        }
+
+        function getRoadObjsInIsCalledRelation() {
+            return Array.from(globalRelatedRoadObjsMap.values())
+                .filter(roadObj => roadObj.startElementId != globalStartElementComponent.id); // startElement is called by other elements
+        }
+
+        /************************
+                 Helper
+        ************************/
 
         function addToMapIfKeyOrValueNotExists(key, value, map) {
             const existingValue = map.get(key);
@@ -278,7 +282,7 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
         }
 
         return {
-            getPropertiesMapForRelatedStartElementRoads,
+            getPropsMapForRelatedRoadsStartElementPOV,
         };
     })();
 };
