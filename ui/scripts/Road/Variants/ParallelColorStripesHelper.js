@@ -78,7 +78,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 const stripeComponent = roadSectionComponent.cloneNode(true); // clone keeps original props for new component
                 const stripeId = `${roadSectionId}_stripe`;
                 stripeComponent.setAttribute("id", stripeId);
-                stripeComponentArr.push(stripeComponent);
+                // check if necessary properties are set correctly before pushing
+                if (hasValidRoadSectionProps(roadSectionId)) stripeComponentArr.push(stripeComponent);
             })
             return stripeComponentArr;
         }
@@ -107,9 +108,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
         function getNewPositionForLane(roadSectionId, originalPosition, laneSide) {
             const { direction } = globalRoadSectionPropsMap.get(roadSectionId);
-            let newX;
-            let newY;
-            let newZ;
+            let newX, newY, newZ;
             const baseOffset = 0.25
 
             if (laneSide === "right") {
@@ -137,9 +136,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
 
             const { direction } = propertiesObj
-            const { isEndingInCurve } = propertiesObj;
-            let newWidth;
-            let newDepth;
+            let newWidth, newDepth;
             switch (direction) {
                 case "west": {
                     newWidth = originalWidth  -0.2;
@@ -167,6 +164,13 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 newWidth,
                 newDepth
             }
+        }
+
+        function hasValidRoadSectionProps(roadSectionId) {
+            const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
+            const { direction } = propertiesObj;
+            if (!direction) return false;
+            return true;
         }
 
         function getLaneSideForRoadObj(roadObj) {
