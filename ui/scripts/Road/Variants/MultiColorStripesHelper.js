@@ -1,5 +1,7 @@
 const createMultiColorStripesHelper = function (controllerConfig) {
     return (function () {
+        
+        // TODO: Refactor to grab necessary attributes from RoadSectionPropertiesHelper
 
         let globalDomHelper;
         let globalStartElementComponent;
@@ -26,6 +28,7 @@ const createMultiColorStripesHelper = function (controllerConfig) {
             }
         }
 
+        // entry for all logical actions leading to the offered visualization by this variant in GUI
         function startRoadHighlightActionsForStartElement(startElementComponent, relatedObjsMap) {
             globalStartElementComponent = startElementComponent;
             globalRelatedRoadObjsMap = relatedObjsMap;

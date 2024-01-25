@@ -5,10 +5,7 @@ controllers.roadController = function () {
 		roadHighlightVariant: "MultiColorStripes",
 
 		showLegendOnSelect: true,
-		// TODO: Re-Implement
 		enableMonochromeForUnrelatedEntities: true,
-		// enableRoadVanishing: true,
-		// spawnTrafficSigns: true,
 
 		supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
 
@@ -23,8 +20,6 @@ controllers.roadController = function () {
 			calls: "orange",
 			isCalled: "magenta",
 		},
-
-
 	}
 
 	let globalRoadHighlightHelper = {}
@@ -42,10 +37,12 @@ controllers.roadController = function () {
 		initializeHelpers();
 	}
 
-	// intitialize roadHighlightHelpers based on variant defined in config, making public functions accessible via roadHighlightHelper[variant]
+	// intitialize roadHighlightHelpers based on variant defined in config, making respective helpers a generic global
 	function initializeHelpers() {
 		multiColorStripesHelper = createMultiColorStripesHelper(controllerConfig);
 		parallelColorStripesHelper = createParallelColorStripesHelper(controllerConfig);
+
+		// add helpers API
 		globalRoadHighlightHelper = {
 			MultiColorStripes: {
 				initialize: multiColorStripesHelper.initialize,
@@ -71,9 +68,9 @@ controllers.roadController = function () {
 	************************/
 
 	function onEntitySelected(applicationEvent) {
-		if (controllerConfig.supportedEntityTypes.includes(applicationEvent.entities[0].type)) {
-			const appEventEntity = applicationEvent.entities[0];
-			globalStartElementComponent = document.getElementById(appEventEntity.id)
+		const appEventEntity = applicationEvent.entities[0];
+		if (controllerConfig.supportedEntityTypes.includes(appEventEntity.type)) {
+			globalStartElementComponent = document.getElementById(appEventEntity.id);
 			highlightStartElement();
 			handleRoadsHighlightForStartElement();
 		}
@@ -103,12 +100,11 @@ controllers.roadController = function () {
 		Road Helper Calls
 	************************/
 
-	// prepare a map of all related roadObjs as necessary input for every roadHighlighHelper
+	// prepare a global map of all related roadObjs as necessary input for every roadHighlighHelper
 	function storeRelatedRoadObjsInMap() {
 		const startCallsOtherElements = roadModel.getRoadObjsForStartElementId(globalStartElementComponent.id);
 		const tmpDestinationElementComponent = globalStartElementComponent;
 		const startIsCalledByOtherElements = roadModel.getRoadObjsForDestinationElementId(tmpDestinationElementComponent.id);
-
 		globalRelatedRoadObjsMap = new Map([...startCallsOtherElements, ...startIsCalledByOtherElements]);
 	}
 
@@ -127,6 +123,6 @@ controllers.roadController = function () {
 	}
 
 	return {
-		initialize: initialize,
+		initialize,
 	};
 }();

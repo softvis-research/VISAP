@@ -67,7 +67,6 @@ const createDomHelper = function (controllerConfig) {
         
             return unrelatedEntities;
         }
-        
 
         return {
             initialize,
