@@ -142,23 +142,23 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             let newDepth;
             switch (direction) {
                 case "west": {
-                    newWidth = originalWidth;
+                    newWidth = originalWidth  -0.2;
                     newDepth = originalDepth * (1 - globalStripeShrinkPct);
                     break;
                 }
                 case "east": {
-                    newWidth = originalWidth;
+                    newWidth = originalWidth  -0.2;
                     newDepth = originalDepth * (1 - globalStripeShrinkPct);
                     break;
                 }
                 case "south": {
                     newWidth = originalWidth * (1 - globalStripeShrinkPct);
-                    newDepth = originalDepth;
+                    newDepth = originalDepth  -0.2;
                     break;
                 }
                 case "north": {
                     newWidth = originalWidth * (1 - globalStripeShrinkPct);
-                    newDepth = originalDepth;
+                    newDepth = originalDepth  -0.2;
                     break;
                 }
             }
