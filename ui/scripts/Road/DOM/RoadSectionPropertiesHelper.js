@@ -25,10 +25,8 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                 direction: p.direction || null,
                 isStartingInCurve: p.isStartingInCurve || false,
                 isEndingInCurve: p.isEndingInCurve || false,
-                position: p.position || null,
-                width: p.width || 0,
-                depth: p.depth || 0,
-                height: p.height || 0,
+                position: p.position || null, // xyz
+                dimension: p.dimension || null // width depth height
             };
             return roadSectionPropertiesObj;
         }
@@ -129,7 +127,7 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                 const roadSectionComponent = document.getElementById(roadSectionId);
                 const position = roadSectionComponent.getAttribute("position");
                 addToMapIfKeyOrValueNotExists(roadSectionId, {
-                    position,
+                    position
                 }, globalRoadSectionPropertiesMap)
             })
         }
@@ -140,8 +138,12 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                 const width = roadSectionComponent.getAttribute("width");
                 const depth = roadSectionComponent.getAttribute("depth");
                 const height = roadSectionComponent.getAttribute("height");
+                const dimension = {
+                    width, depth, height,
+                }
+                console.log(dimension)
                 addToMapIfKeyOrValueNotExists(roadSectionId, {
-                    width, depth, height
+                    dimension,
                 }, globalRoadSectionPropertiesMap)
             })
         }
