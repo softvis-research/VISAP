@@ -25,8 +25,6 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                 direction: p.direction || null,
                 isStartingInCurve: p.isStartingInCurve || false,
                 isEndingInCurve: p.isEndingInCurve || false,
-                position: p.position || null, // xyz
-                dimension: p.dimension || null // width depth height
             };
             return roadSectionPropertiesObj;
         }
@@ -38,8 +36,6 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
             setDirectionsForCommonRoadSectionsWithStartElementAsOrigin();
             setPropertiesForInitialRoadSectionsWithOriginWhichIsNotStartElement()
             setDirectionsForCommonRoadSectionsWithOriginWhichIsNotStartElement();
-            setPositionForAllRoadSection();
-            setDimensionForAllRoadSection();
             setIsFinalElementForAllRoadSection();
             setIsEndingInCurveForAllRoadSection();
             setIsStartingInCurveForAllRoadSection();
@@ -119,32 +115,6 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                     const defaultPropertiesObj = createRoadSectionPropertiesObj();
                     addToMapIfKeyOrValueNotExists(roadSectionId, defaultPropertiesObj, globalRoadSectionPropertiesMap);
                 })
-            })
-        }
-
-        function setPositionForAllRoadSection() {
-            globalRoadSectionPropertiesMap.forEach((_, roadSectionId) => {
-                const roadSectionComponent = document.getElementById(roadSectionId);
-                const position = roadSectionComponent.getAttribute("position");
-                addToMapIfKeyOrValueNotExists(roadSectionId, {
-                    position
-                }, globalRoadSectionPropertiesMap)
-            })
-        }
-
-        function setDimensionForAllRoadSection() {
-            globalRoadSectionPropertiesMap.forEach((_, roadSectionId) => {
-                const roadSectionComponent = document.getElementById(roadSectionId);
-                const width = roadSectionComponent.getAttribute("width");
-                const depth = roadSectionComponent.getAttribute("depth");
-                const height = roadSectionComponent.getAttribute("height");
-                const dimension = {
-                    width, depth, height,
-                }
-                console.log(dimension)
-                addToMapIfKeyOrValueNotExists(roadSectionId, {
-                    dimension,
-                }, globalRoadSectionPropertiesMap)
             })
         }
 
