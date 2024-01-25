@@ -107,17 +107,32 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         }
 
         function getNewPositionForLane(roadSectionId, originalPosition, laneSide) {
-            const { direction } = globalRoadSectionPropsMap.get(roadSectionId);
+            const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
+            const { direction, isEndingInCurve, directionOfSuccessor } = propertiesObj
+
             let newX, newY, newZ;
             const baseOffset = 0.25
 
             if (laneSide === "right") {
                 newY = 0.52;
                 switch (direction) {
-                    case "west": newX = originalPosition.x; newZ = originalPosition.z + baseOffset; break;
-                    case "east": newX = originalPosition.x; newZ = originalPosition.z - baseOffset; break;
-                    case "south": newX = originalPosition.x + baseOffset; newZ = originalPosition.z; break;
-                    case "north": newX = originalPosition.x - baseOffset; newZ = originalPosition.z; break;
+                    case "west": {
+                        newX = originalPosition.x; 
+                        newZ = originalPosition.z + baseOffset; 
+                        break;
+                    }
+                    case "east": {
+                        newX = originalPosition.x; 
+                        newZ = originalPosition.z - baseOffset; 
+                        break;}
+                    case "south": {
+                        newX = originalPosition.x + baseOffset; 
+                        newZ = originalPosition.z; 
+                        break;}
+                    case "north": {
+                        newX = originalPosition.x - baseOffset; 
+                        newZ = originalPosition.z; 
+                        break;}
                 }
             } else {
                 newY = 0.50;
