@@ -18,6 +18,19 @@ public class ReferencesLoaderStep {
     private static final String folderName = "References";
     private static final String fileSuffix = "Reference.csv";
 
+    private enum ReferenceRelationType{
+        SOURCE("SRC"),
+        DESTINATION("DST");
+
+        private final String type;
+        ReferenceRelationType(String type) {
+            this.type = type;
+        }
+        private String getType(){
+            return type;
+        }
+    }
+
     public static void main(String[] args) throws Exception {
 
         boolean isSilentMode = Config.setup.silentMode();
@@ -46,28 +59,75 @@ public class ReferencesLoaderStep {
         pathToReferenceCsv = p.toString().replace("\\", "/");
         pathToReferenceCsv = pathToReferenceCsv.replace(" ", "%20");
 
+        String  mainDst = "md" , subDst = "sd", subSubDst = "ssd",
+                mainSrc = "ms" , subSrc = "ss", subSubSrc = "sss" , row= "row";
+        String queryForAllMatches = getOptionalMainMatch(mainDst, row, ReferenceRelationType.DESTINATION) +
+                getOptionalSubMatch(subDst, row, ReferenceRelationType.DESTINATION) +
+                getOptionalSubSubMatch(subSubDst, row, ReferenceRelationType.DESTINATION) +
+                getOptionalMainMatch(mainSrc, row, ReferenceRelationType.SOURCE) +
+                getOptionalSubMatch(subSrc, row, ReferenceRelationType.SOURCE) +
+                getOptionalSubSubMatch(subSubSrc, row, ReferenceRelationType.SOURCE);
         connector.executeWrite( //bessere bezeichner md-> , Query in strings splitten..
                 "LOAD CSV WITH HEADERS FROM \"file:///" + pathToReferenceCsv + "\"\n" +
                         "AS row FIELDTERMINATOR ';' WITH row WHERE row.MAIN_OBJ_NAME_SRC IS NOT NULL\n" +
-
-                        "OPTIONAL MATCH (md:Elements {MAIN_OBJ_NAME : row.MAIN_OBJ_NAME_DST, MAIN_OBJ_TYPE: row.MAIN_OBJ_TYPE_DST})\n" +
-                        "WHERE md.SUB_OBJ_NAME IS NULL AND row.SUB_OBJ_NAME_DST IS NULL \n" +
-                        "OPTIONAL MATCH (sd:Elements {MAIN_OBJ_NAME : row.MAIN_OBJ_NAME_DST, MAIN_OBJ_TYPE: row.MAIN_OBJ_TYPE_DST, SUB_OBJ_NAME: row.SUB_OBJ_NAME_DST, SUB_OBJ_TYPE: row.SUB_OBJ_TYPE_DST})\n" +
-                        "WHERE sd.SUB_SUB_OBJ_NAME IS NULL AND  row.SUB_SUB_OBJ_NAME_DST IS NULL \n" +
-                        "OPTIONAL MATCH (ssd:Elements {MAIN_OBJ_NAME : row.MAIN_OBJ_NAME_DST, MAIN_OBJ_TYPE: row.MAIN_OBJ_TYPE_DST, SUB_OBJ_NAME: row.SUB_OBJ_NAME_DST, SUB_OBJ_TYPE: row.SUB_OBJ_TYPE_DST, SUB_SUB_OBJ_NAME: row.SUB_SUB_OBJ_NAME_DST, SUB_SUB_OBJ_TYPE: row.SUB_SUB_OBJ_TYPE_DST})\n" +
-                        "WHERE row.SUB_SUB_OBJ_NAME_DST  IS NOT NULL AND row.SUB_OBJ_NAME_DST IS NOT NULL\n" +
-
-                        "OPTIONAL MATCH (ms:Elements {MAIN_OBJ_NAME : row.MAIN_OBJ_NAME_SRC, MAIN_OBJ_TYPE: row.MAIN_OBJ_TYPE_SRC})\n" +
-                        "WHERE ms.SUB_OBJ_NAME IS NULL AND row.SUB_OBJ_NAME_SRC IS NULL\n" +
-                        "OPTIONAL MATCH (ss:Elements {MAIN_OBJ_NAME : row.MAIN_OBJ_NAME_SRC, MAIN_OBJ_TYPE: row.MAIN_OBJ_TYPE_SRC, SUB_OBJ_NAME: row.SUB_OBJ_NAME_SRC, SUB_OBJ_TYPE: row.SUB_OBJ_TYPE_SRC})\n" +
-                        "where ss.SUB_SUB_OBJ_NAME IS NULL AND row.SUB_SUB_OBJ_NAME_SRC IS NULL\n" +
-                        "OPTIONAL MATCH (sss:Elements {MAIN_OBJ_NAME : row.MAIN_OBJ_NAME_SRC, MAIN_OBJ_TYPE: row.MAIN_OBJ_TYPE_SRC, SUB_OBJ_NAME: row.SUB_OBJ_NAME_SRC, SUB_OBJ_TYPE: row.SUB_OBJ_TYPE_SRC, SUB_SUB_OBJ_NAME: row.SUB_SUB_OBJ_NAME_SRC, SUB_SUB_OBJ_TYPE: row.SUB_SUB_OBJ_TYPE_SRC})\n" +
-                        "WHERE row.SUB_SUB_OBJ_NAME_SRC IS NOT NULL AND row.SUB_OBJ_NAME_SRC IS NOT NULL\n"+
-
-                        "UNWIND [ms,ss,sss] as src\n" +
-                        "UNWIND [md,sd,ssd] as dst\n" +
+                        queryForAllMatches +
+                        "UNWIND [" + mainSrc + "," + subSrc + "," + subSubSrc + "] as src\n" +
+                        "UNWIND [" + mainDst + "," + subDst + "," + subSubDst + "] as dst\n" +
                         "FOREACH (i in CASE WHEN src IS NOT NULL and dst IS NOT NULL THEN [1] ELSE [] END |\n" +
                         "CREATE (src)-[:"+ SAPRelationLabels.REFERENCES +"]->(dst) )\n"
         );
+    }
+
+    private static String getOptionalMainMatch(String node, String csvEntry, ReferenceRelationType type) {
+
+        return "OPTIONAL MATCH (" + node +
+                ":Elements {MAIN_OBJ_NAME : " +
+                csvEntry + ".MAIN_OBJ_NAME_" + type.getType() + ", " +
+                "MAIN_OBJ_TYPE: " +
+                csvEntry + ".MAIN_OBJ_TYPE_" + type.getType() +
+                " })\n" +
+                "WHERE " +
+                node +
+                ".SUB_OBJ_NAME IS NULL AND " +
+                csvEntry +
+                ".SUB_OBJ_NAME_" + type.getType() +
+                " IS NULL\n";
+    }
+
+    private static String getOptionalSubMatch(String node, String csvEntry, ReferenceRelationType type) {
+        return  new StringBuilder().append("OPTIONAL MATCH (")
+                .append(node)
+                .append(":Elements {MAIN_OBJ_NAME : ")
+                .append(csvEntry).append(".MAIN_OBJ_NAME_").append(type.getType()).append(", ")
+                .append("MAIN_OBJ_TYPE: ")
+                .append(csvEntry).append(".MAIN_OBJ_TYPE_").append(type.getType()).append(", ")
+                .append("SUB_OBJ_NAME: ")
+                .append(csvEntry).append(".SUB_OBJ_NAME_").append(type.getType()).append(", ")
+                .append("SUB_OBJ_TYPE: ")
+                .append(csvEntry).append(".SUB_OBJ_TYPE_").append(type.getType())
+                .append(" })\n")
+                .append("WHERE ")
+                .append(node).append(".SUB_SUB_OBJ_NAME IS NULL AND ")
+                .append(csvEntry).append(".SUB_SUB_OBJ_NAME_").append(type.getType())
+                .append(" IS NULL\n").toString();
+    }
+
+    private static String getOptionalSubSubMatch(String node, String csvEntry, ReferenceRelationType type) {
+        StringBuilder query = new StringBuilder("OPTIONAL MATCH (");
+        query.append(node)
+                .append(":Elements {MAIN_OBJ_NAME : ").append(csvEntry).append(".MAIN_OBJ_NAME_").append(type.getType()).append(", ")
+                .append("MAIN_OBJ_TYPE: ")
+                .append(csvEntry + ".MAIN_OBJ_TYPE_" + type.getType() + ", ")
+                .append("SUB_OBJ_NAME: ").append(csvEntry).append(".SUB_OBJ_NAME_").append(type.getType()).append(", ")
+                .append("SUB_OBJ_TYPE: ").append(csvEntry).append(".SUB_OBJ_TYPE_").append(type.getType()).append(" ,")
+                .append("SUB_SUB_OBJ_NAME: ").append(csvEntry).append(".SUB_SUB_OBJ_NAME_").append(type.getType()).append(", ")
+                .append("SUB_SUB_OBJ_TYPE: ").append(csvEntry).append(".SUB_SUB_OBJ_TYPE_").append(type.getType())
+                .append(" })\n");
+        query.append("WHERE ")
+                .append(csvEntry).append(".SUB_SUB_OBJ_NAME_").append(type.getType())
+                .append(" IS NOT NULL AND  ")
+                .append(csvEntry).append(".SUB_OBJ_NAME_").append(type.getType())
+                .append(" IS NOT NULL\n");
+        return query.toString();
     }
 }
