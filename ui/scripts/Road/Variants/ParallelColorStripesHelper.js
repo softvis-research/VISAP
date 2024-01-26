@@ -7,9 +7,6 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         let globalRelatedRoadObjsMap = new Map();
         let globalRoadSectionPropsMap = new Map();
         let globalScene;
-        
-        // TODO: Create more globals to adjust base props of stripe component in spot
-        const globalStripeShrinkPct = 0.70
 
         /************************
             Public Functions
@@ -64,7 +61,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 const roadSectionId = stripeComponentId.replace(/_stripe$/, '');
 
                 // stripe props depending on clone roadSection and its place in roadObj
-                setStripeComponentProps(stripeComponent, roadSectionId, roadObj); 
+                setStripeComponentProps(stripeComponent, roadSectionId, roadObj);
                 globalScene = document.querySelector("a-scene");
                 globalScene.appendChild(stripeComponent);
             })
@@ -89,16 +86,18 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
             const laneSide = getLaneSideForRoadObj(roadObj); // stripes on left or right lane
 
+            const originalWidth = roadSectionComponent.getAttribute("width");
+            const originalDepth = roadSectionComponent.getAttribute("depth");
+
             // position
             const originalPosition = roadSectionComponent.getAttribute("position");
-            const { newX, newY, newZ } = getNewPositionForLane(roadSectionId, originalPosition, laneSide,)
+            const { newX, newY, newZ } = getNewPositionForLane(roadSectionId, originalWidth, originalDepth, originalPosition, laneSide,)
             const stripePosition = { x: newX, y: newY, z: newZ };
             stripeComponent.setAttribute("position", stripePosition);
 
             // geometry
-            const originalWidth = roadSectionComponent.getAttribute("width");
-            const originalDepth = roadSectionComponent.getAttribute("depth");
-            const { newWidth, newDepth } = getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth)
+            
+            const { newWidth, newDepth } = getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, laneSide)
             stripeComponent.setAttribute("geometry", `primitive: box; width: ${newWidth}; height: 0.05; depth: ${newDepth}`);
 
             // color
@@ -106,75 +105,154 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             stripeComponent.setAttribute("color", color);
         }
 
-        function getNewPositionForLane(roadSectionId, originalPosition, laneSide) {
+        function getNewPositionForLane(roadSectionId, originalWidth, originalDepth, originalPosition, laneSide) {
             const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
-            const { direction, isEndingInCurve, directionOfSuccessor } = propertiesObj
+            const { direction, isEndingInCurve, directionOfSuccessor, directionOfPredecessor } = propertiesObj
 
             let newX, newY, newZ;
-            const baseOffset = 0.25
+
+            // assuming that the "thickness" of a roadSection is never bigger than its length
+            let roadSectionThickness; // thickness can be either width or depth, depending on the direction
+            if (originalWidth > originalDepth)  roadSectionThickness = originalDepth;
+            else roadSectionThickness = originalWidth;
+
+            const overlapCutoff = roadSectionThickness - roadSectionThickness/2
+
+            console.log(directionOfPredecessor)
+
 
             if (laneSide === "right") {
                 newY = 0.52;
                 switch (direction) {
                     case "west": {
-                        newX = originalPosition.x; 
-                        newZ = originalPosition.z + baseOffset; 
+                        if (directionOfSuccessor === "north" && directionOfPredecessor === "north") newX = originalPosition.x - overlapCutoff - 0.25;
+                        else if (directionOfSuccessor === "north") newX = originalPosition.x - overlapCutoff;
+                        else newX = originalPosition.x;
+                        newZ = originalPosition.z + 0.25;
                         break;
                     }
                     case "east": {
-                        newX = originalPosition.x; 
-                        newZ = originalPosition.z - baseOffset; 
-                        break;}
+                        if (directionOfSuccessor === "south" && directionOfPredecessor === "south") newX = originalPosition.x - overlapCutoff + 0.25;
+                        else if (directionOfSuccessor === "south") newX = originalPosition.x + overlapCutoff;
+                        else newX = originalPosition.x;
+                        newZ = originalPosition.z - 0.25;
+                        break;
+                    }
                     case "south": {
-                        newX = originalPosition.x + baseOffset; 
-                        newZ = originalPosition.z; 
-                        break;}
+                        newX = originalPosition.x + 0.25;
+                        if (directionOfSuccessor === "east" && directionOfPredecessor === "east") newZ = originalPosition.z - overlapCutoff - 0.25;
+                        else if (directionOfSuccessor === "east") newZ = originalPosition.z + overlapCutoff;
+                        else newZ = originalPosition.z;
+                        break;
+                    }
                     case "north": {
-                        newX = originalPosition.x - baseOffset; 
-                        newZ = originalPosition.z; 
-                        break;}
+                        newX = originalPosition.x - 0.25;
+                        if (directionOfSuccessor === "east" && directionOfPredecessor === "east") newZ = originalPosition.z - overlapCutoff + 0.25;
+                        else if (directionOfSuccessor === "east") newZ = originalPosition.z - overlapCutoff;
+                        else newZ = originalPosition.z;
+                        break;
+                    }
                 }
             } else {
                 newY = 0.50;
                 switch (direction) {
-                    case "west": newX = originalPosition.x; newZ = originalPosition.z - baseOffset; break;
-                    case "east": newX = originalPosition.x; newZ = originalPosition.z + baseOffset; break;
-                    case "south": newX = originalPosition.x - baseOffset; newZ = originalPosition.z; break;
-                    case "north": newX = originalPosition.x + baseOffset; newZ = originalPosition.z; break;
+                    case "west": {
+                        if (directionOfSuccessor === "south" && directionOfPredecessor === "east") newX = originalPosition.x - overlapCutoff/2;
+                        else if (directionOfSuccessor === "south") newX = originalPosition.x - overlapCutoff;
+                        else newX = originalPosition.x;
+                        newZ = originalPosition.z - 0.25;
+                        break;
+                    }
+                    case "east": {
+                        if (directionOfSuccessor === "north" && directionOfPredecessor === "west") newX = originalPosition.x - overlapCutoff/2;
+                        else if (directionOfSuccessor === "north") newX = originalPosition.x + overlapCutoff;
+                        else newX = originalPosition.x;
+                        newZ = originalPosition.z + 0.25;
+                        break;
+                    }
+                    case "south": {
+                        newX = originalPosition.x - 0.25;
+                        if (directionOfSuccessor === "east" && directionOfPredecessor === "south") newZ = originalPosition.z - overlapCutoff/2;
+                        else if (directionOfSuccessor === "east") newZ = originalPosition.z + overlapCutoff;
+                        else newZ = originalPosition.z;
+                        break;
+                    }
+                    case "north": {
+                        newX = originalPosition.x + 0.25;
+                        if (directionOfSuccessor === "west" && directionOfPredecessor === "north") newZ = originalPosition.z - overlapCutoff/2;
+                        else if (directionOfSuccessor === "west") newZ = originalPosition.z - overlapCutoff;
+                        else newZ = originalPosition.z;
+                        break;
+                    }
                 }
             }
 
             return { newX, newY, newZ }
         }
 
-        function getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth) {
+        function getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, laneSide) {
+            // assuming that the "thickness" of a roadSection is never bigger than its length
+            let roadSectionThickness; // thickness can be either width or depth, depending on the direction
+            if (originalWidth > originalDepth)  roadSectionThickness = originalDepth;
+            else roadSectionThickness = originalWidth;
+
+            const overlapCutoff = roadSectionThickness - roadSectionThickness/2
+
             const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
 
-            const { direction } = propertiesObj
+            const { direction, directionOfSuccessor, directionOfPredecessor } = propertiesObj
             let newWidth, newDepth;
-            switch (direction) {
-                case "west": {
-                    newWidth = originalWidth  -0.2;
-                    newDepth = originalDepth * (1 - globalStripeShrinkPct);
-                    break;
+            if (laneSide === "right") {
+                switch (direction) {
+                    case "west": {
+                        newWidth = originalWidth - 0.2;
+                        newDepth = originalDepth * (0.3);
+                        break;
+                    }
+                    case "east": {
+                        newWidth = originalWidth - 0.2;
+                        newDepth = originalDepth * (0.3);
+                        break;
+                    }
+                    case "south": {
+                        if (directionOfSuccessor === "west" && directionOfPredecessor === "west") newDepth = originalDepth - (1.4*overlapCutoff);
+                        else if (directionOfSuccessor === "west") newDepth = originalDepth - overlapCutoff;
+                        else newDepth = originalDepth - 0.2;
+                        newWidth = originalWidth * (0.3);
+                        break;
+                    }
+                    case "north": {
+                        if (directionOfSuccessor === "east" && directionOfPredecessor === "east") newDepth = originalDepth - (1.4*overlapCutoff);
+                        else if (directionOfSuccessor === "east") newDepth = originalDepth - overlapCutoff;
+                        else newDepth = originalDepth - 0.2;
+                        newWidth = originalWidth * (0.3);
+                        break;
+                    }
                 }
-                case "east": {
-                    newWidth = originalWidth  -0.2;
-                    newDepth = originalDepth * (1 - globalStripeShrinkPct);
-                    break;
-                }
-                case "south": {
-                    newWidth = originalWidth * (1 - globalStripeShrinkPct);
-                    newDepth = originalDepth  -0.2;
-                    break;
-                }
-                case "north": {
-                    newWidth = originalWidth * (1 - globalStripeShrinkPct);
-                    newDepth = originalDepth  -0.2;
-                    break;
+            } else {
+                switch (direction) {
+                    case "west": {
+                        newWidth = originalWidth - 0.25;
+                        newDepth = originalDepth * (0.3);
+                        break;
+                    }
+                    case "east": {
+                        newWidth = originalWidth - 0.25;
+                        newDepth = originalDepth * (0.3);
+                        break;
+                    }
+                    case "south": {
+                        newWidth = originalWidth * (0.3);
+                        newDepth = originalDepth - 0.25;
+                        break;
+                    }
+                    case "north": {
+                        newWidth = originalWidth * (0.3);
+                        newDepth = originalDepth - 0.25;
+                        break;
+                    }
                 }
             }
-
             return {
                 newWidth,
                 newDepth
