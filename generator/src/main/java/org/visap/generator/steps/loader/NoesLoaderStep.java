@@ -6,6 +6,7 @@ import org.visap.generator.abap.enums.SAPRelationLabels;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.database.DatabaseConnector;
 
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Scanner;
@@ -17,15 +18,14 @@ public class NoesLoaderStep {
     private static final String FolderName = "Noes";
     private static final String FileSuffix = "Noes.csv";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         boolean isSilentMode = Config.setup.silentMode();
         Scanner userInput = new Scanner(System.in);
 
         List<Path> files = new CsvFilesInputFilter(FolderName, FileSuffix).getFiles();
         if (files.isEmpty()){
-            log.info("Noes CSV file wasn't found");
-            System.exit(0);
+            throw new InvocationTargetException(new Exception(),"Noes CSV file wasn't found");
         }
 
         if (!isSilentMode) {
@@ -37,6 +37,7 @@ public class NoesLoaderStep {
             log.info("Path to Noes CSV: "+p);
             addNoesAttributeToNodes(p);
         }
+
 
         userInput.close();
        // connector.close();

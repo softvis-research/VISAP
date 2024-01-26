@@ -4,6 +4,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.database.DatabaseConnector;
+
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Scanner;
@@ -15,15 +17,14 @@ public class MetaDataLoaderStep {
     private static final String folderName = "MetaData";
     private static final String fileSuffix = "Meta.csv";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         boolean isSilentMode = Config.setup.silentMode();
         Scanner userInput = new Scanner(System.in);
 
         List<Path> files = new CsvFilesInputFilter(folderName, fileSuffix).getFiles();
         if (files.isEmpty()){
-            log.info("Meta CSV file wasn't found");
-            System.exit(0);
+            throw new InvocationTargetException(new Exception(),"Meta CSV file wasn't found");
         }
 
         if (!isSilentMode) {

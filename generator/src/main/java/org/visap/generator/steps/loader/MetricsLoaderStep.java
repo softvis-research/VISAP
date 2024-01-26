@@ -9,6 +9,7 @@ import org.neo4j.driver.types.Node;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.database.DatabaseConnector;
 
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -19,15 +20,14 @@ public class MetricsLoaderStep {
     private static final String FolderName = "Metrics";
     private static final String FileSuffix = "Metrics.csv";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         boolean isSilentMode = Config.setup.silentMode();
         Scanner userInput = new Scanner(System.in);
 
         List<Path> files = new CsvFilesInputFilter(FolderName, FileSuffix).getFiles();
         if (files.isEmpty()){
-            log.info("Metrics CSV file wasn't found");
-            System.exit(0);
+            throw new InvocationTargetException(new Exception(),"Metrics CSV file wasn't found");
         }
 
         if (!isSilentMode) {
