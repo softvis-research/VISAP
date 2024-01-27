@@ -260,15 +260,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         }
 
         function getAdjDim(originalWidth, originalDepth, direction, directionOfPredecessor, directionOfSuccessor, laneSide) {
-            let longSideCutoff;
-            if (originalWidth > originalDepth) {
-                longSideCutoff = Number(originalDepth) + (Number(originalDepth) * (-0.3));
-                shortSideCutoff = Number(originalDepth * 0.3 -0.2)
-            } else {
-                longSideCutoff = Number(originalWidth) + (Number(originalWidth) * (-0.3));
-                shortSideCutoff = Number(originalWidth * 0.3 - 0.2)
-            } 
-
+            const longSideCutoff = getLongSideCutoff(originalWidth, originalDepth);
+            const shortSideCutoff = getShortSideCutoff(originalWidth, originalDepth);
             const dictResult = getPosSizeAdjustmentForCrossingsDict(direction, directionOfPredecessor, directionOfSuccessor, laneSide)
             switch(dictResult) {
                 case "0/0": return 0;
@@ -283,11 +276,19 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             }
         }
 
-        function getAdjPos(originalWidth, originalDepth, direction, directionOfPredecessor, directionOfSuccessor, laneSide) {
-            let longSideCutoff;
-            if (originalWidth > originalDepth) longSideCutoff = Number(originalDepth) + (Number(originalDepth) * (-0.3));
-            else longSideCutoff = Number(originalWidth) + (Number(originalWidth) * (-0.3));
+        function getLongSideCutoff(originalWidth, originalDepth) {
+            if (originalWidth > originalDepth) return Number(originalDepth) + (Number(originalDepth) * (-0.3));
+            else return Number(originalWidth) + (Number(originalWidth) * (-0.3));
+        }
 
+        function getShortSideCutoff(originalWidth, originalDepth) {
+            if (originalWidth > originalDepth) return Number(originalDepth * 0.3 - 0.25)
+            else return Number(originalWidth * 0.3 - 0.25) // offset = 0.25, 0.3 = shrink
+        }
+
+        function getAdjPos(originalWidth, originalDepth, direction, directionOfPredecessor, directionOfSuccessor, laneSide) {
+            const longSideCutoff = getLongSideCutoff(originalWidth, originalDepth);
+            const shortSideCutoff = getShortSideCutoff(originalWidth, originalDepth);
             const dictResult = getPosSizeAdjustmentForCrossingsDict(direction, directionOfPredecessor, directionOfSuccessor, laneSide)
             switch(dictResult) {
                 case "0/0": return 0;
@@ -298,7 +299,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 case "-/-": return longSideCutoff;
                 case "--/-": return longSideCutoff;
                 case "--/--": return longSideCutoff;
-                case "-/--": if (originalWidth > originalDepth) return originalDepth * 0.3; else return originalWidth * 0.3;
+                case "-/--": if (originalWidth > originalDepth) return originalDepth * 0.3 - 0.5*shortSideCutoff ; else return originalWidth * 0.3 - 0.5*shortSideCutoff;
             }
         }
 
