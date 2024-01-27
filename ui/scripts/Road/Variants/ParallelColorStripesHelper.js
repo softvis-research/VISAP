@@ -111,46 +111,29 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
             let newX, newY, newZ;
 
-            // assuming that the "thickness" of a roadSection is never bigger than its length
-            let roadSectionThickness; // thickness can be either width or depth, depending on the direction
-            if (originalWidth > originalDepth)  roadSectionThickness = originalDepth;
-            else roadSectionThickness = originalWidth;
-
-            const overlapCutoff = roadSectionThickness - roadSectionThickness/2
-
-            console.log(directionOfPredecessor)
-
+            const overlapAdjustment = getAdjPos(originalWidth, originalDepth, direction, directionOfPredecessor, directionOfSuccessor, laneSide)
 
             if (laneSide === "right") {
                 newY = 0.52;
                 switch (direction) {
                     case "west": {
-                        if (directionOfSuccessor === "north" && directionOfPredecessor === "north") newX = originalPosition.x - overlapCutoff - 0.25;
-                        else if (directionOfSuccessor === "north") newX = originalPosition.x - overlapCutoff;
-                        else newX = originalPosition.x;
+                        newX = originalPosition.x;
                         newZ = originalPosition.z + 0.25;
                         break;
                     }
                     case "east": {
-                        if (directionOfSuccessor === "south" && directionOfPredecessor === "south") newX = originalPosition.x - overlapCutoff + 0.25;
-                        else if (directionOfSuccessor === "south" && directionOfPredecessor === "north") newX = originalPosition.x + overlapCutoff;
-                        else if (directionOfPredecessor === "north") newX = originalPosition.x - overlapCutoff;
-                        else newX = originalPosition.x;
+                        newX = originalPosition.x;
                         newZ = originalPosition.z - 0.25;
                         break;
                     }
                     case "south": {
                         newX = originalPosition.x + 0.25;
-                        if (directionOfSuccessor === "east" && directionOfPredecessor === "east") newZ = originalPosition.z - overlapCutoff + 0.25;
-                        else if (directionOfSuccessor === "east") newZ = originalPosition.z + overlapCutoff;
-                        else newZ = originalPosition.z;
+                        newZ = originalPosition.z;
                         break;
                     }
                     case "north": {
                         newX = originalPosition.x - 0.25;
-                        if (directionOfSuccessor === "east" && directionOfPredecessor === "east") newZ = originalPosition.z - overlapCutoff + 0.25;
-                        else if (directionOfSuccessor === "east" && directionOfPredecessor != "east") newZ = originalPosition.z - overlapCutoff;
-                        else newZ = originalPosition.z;
+                        newZ = originalPosition.z - overlapAdjustment;
                         break;
                     }
                 }
@@ -192,45 +175,32 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         }
 
         function getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, laneSide) {
-            // assuming that the "thickness" of a roadSection is never bigger than its length
-            let roadSectionThickness; // thickness can be either width or depth, depending on the direction
-            if (originalWidth > originalDepth)  roadSectionThickness = originalDepth;
-            else roadSectionThickness = originalWidth;
-
-            const overlapCutoff = roadSectionThickness - roadSectionThickness/2
-
             const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
-
             const { direction, directionOfSuccessor, directionOfPredecessor } = propertiesObj
+
+            const overlapAdjustment = getAdjDim(originalWidth, originalDepth, direction, directionOfPredecessor, directionOfSuccessor, laneSide)
+
             let newWidth, newDepth;
             if (laneSide === "right") {
                 switch (direction) {
                     case "west": {
-                        if (directionOfSuccessor === "north" && directionOfPredecessor === "north") newWidth = originalWidth - (1.4*overlapCutoff);
-                        else if (directionOfSuccessor === "north") newWidth = originalWidth - overlapCutoff;
-                        else newWidth = originalWidth - 0.2;
+                        newWidth = originalWidth - overlapAdjustment;
                         newDepth = originalDepth * (0.3);
                         break;
                     }
                     case "east": {
-                        if (directionOfSuccessor === "south" && directionOfPredecessor === "south") newWidth = originalWidth - (1.4*overlapCutoff);
-                        else if (directionOfSuccessor === "south") newWidth = originalWidth - overlapCutoff;
-                        else newWidth = originalWidth - 0.2;
+                        newWidth = originalWidth - overlapAdjustment;
                         newDepth = originalDepth * (0.3);
                         break;
                     }
                     case "south": {
-                        if (directionOfSuccessor === "east" && directionOfPredecessor === "east") newDepth = originalDepth - (1.4* overlapCutoff);
-                        else if (directionOfSuccessor === "east") newDepth = originalDepth - overlapCutoff;
-                        else newDepth = originalDepth - 0.2;
                         newWidth = originalWidth * (0.3);
+                        newDepth = originalDepth - overlapAdjustment;
                         break;
                     }
                     case "north": {
-                        if (directionOfSuccessor === "east" && directionOfPredecessor === "east") newDepth = originalDepth - (1.4*overlapCutoff);
-                        else if (directionOfSuccessor === "east") newDepth = originalDepth - overlapCutoff;
-                        else newDepth = originalDepth - 0.2;
                         newWidth = originalWidth * (0.3);
+                        newDepth = originalDepth - overlapAdjustment;
                         break;
                     }
                 }
@@ -289,14 +259,61 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             else return controllerConfig.colorsParallelColorStripes.isCalled;
         }
 
+        function getAdjDim(originalWidth, originalDepth, direction, directionOfPredecessor, directionOfSuccessor, laneSide) {
+            let longSideCutoff;
+            if (originalWidth > originalDepth) {
+                longSideCutoff = Number(originalDepth) + (Number(originalDepth) * (-0.3));
+                shortSideCutoff = Number(originalDepth * 0.3 -0.2)
+            } else {
+                longSideCutoff = Number(originalWidth) + (Number(originalWidth) * (-0.3));
+                shortSideCutoff = Number(originalWidth * 0.3 - 0.2)
+            } 
+
+            const dictResult = getPosSizeAdjustmentForCrossingsDict(direction, directionOfPredecessor, directionOfSuccessor, laneSide)
+            switch(dictResult) {
+                case "0/0": return 0;
+                case "-/0": return longSideCutoff;
+                case "0/-": return longSideCutoff;
+                case "0/--": return longSideCutoff;
+                case "--/0": return longSideCutoff;
+                case "-/-": return longSideCutoff;
+                case "--/-": return longSideCutoff;
+                case "--/--": return longSideCutoff;
+                case "-/--": return longSideCutoff + shortSideCutoff;
+            }
+        }
+
+        function getAdjPos(originalWidth, originalDepth, direction, directionOfPredecessor, directionOfSuccessor, laneSide) {
+            let longSideCutoff;
+            if (originalWidth > originalDepth) longSideCutoff = Number(originalDepth) + (Number(originalDepth) * (-0.3));
+            else longSideCutoff = Number(originalWidth) + (Number(originalWidth) * (-0.3));
+
+            const dictResult = getPosSizeAdjustmentForCrossingsDict(direction, directionOfPredecessor, directionOfSuccessor, laneSide)
+            switch(dictResult) {
+                case "0/0": return 0;
+                case "-/0": return longSideCutoff;
+                case "0/-": return longSideCutoff;
+                case "0/--": return longSideCutoff;
+                case "--/0": return longSideCutoff;
+                case "-/-": return longSideCutoff;
+                case "--/-": return longSideCutoff;
+                case "--/--": return longSideCutoff;
+                case "-/--": if (originalWidth > originalDepth) return originalDepth * 0.3; else return originalWidth * 0.3;
+            }
+        }
+
         // dir / pre / succ
         function getPosSizeAdjustmentForCrossingsDict(direction, directionOfPredecessor, directionOfSuccessor, laneSide) {
+            if(directionOfPredecessor === null) directionOfPredecessor = "none";
+            if(directionOfSuccessor === null) directionOfSuccessor = "none";
+
             const crossingRightLaneDict = {
                 north: {
                     none: { none: "0/0", east: "0/--", west: "0/-", north: "0/0" },
                     east: { none: "-/0", east: "-/--", west: "-/-", north: "-/0" },
                     west: { none: "--/0", east: "--/--", west: "--/-",  north: "--/0" },
                     north: { none: "0/0", east: "0/--", west: "0/-", north: "0/0" },
+                },
                 east: {
                     none: { none: "0/0", east: "0/0", south: "0/--", north: "0/-" },
                     east: { none: "0/0", east: "0/0", south: "0/--", north: "0/-" },
@@ -315,9 +332,9 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     west: { none: "-/0", east: "0/--", west: "-/--", south: "-/0" },
                     south: { none: "0/0", east: "0/-", west: "0/--", south: "0/0" },
                 },
-                }
+
             }
-            return crossingRightLaneDict[direction][directionOfPredecessor][directionOfSuccessor] || "Invalid combination";
+            return crossingRightLaneDict[direction][directionOfPredecessor][directionOfSuccessor] || "0/0"
         }
 
         return {
