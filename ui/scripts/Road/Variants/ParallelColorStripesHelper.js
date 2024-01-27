@@ -107,7 +107,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
         function getNewPositionForLane(roadSectionId, originalWidth, originalDepth, originalPosition, laneSide) {
             const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
-            const { direction, isEndingInCurve, directionOfSuccessor, directionOfPredecessor } = propertiesObj
+            const { direction, directionOfSuccessor, directionOfPredecessor, isInitialElement, isFinalElement } = propertiesObj
 
             let newX, newY, newZ;
 
@@ -152,12 +152,14 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     }
                     case "south": {
                         newX = originalPosition.x - 0.25;
-                        newZ = originalPosition.z - overlapAdjustment;;
+                        if (isInitialElement || isFinalElement) newZ = originalPosition.z
+                        else newZ = originalPosition.z - overlapAdjustment;
                         break;
                     }
                     case "north": {
                         newX = originalPosition.x + 0.25;
-                        newZ = originalPosition.z + overlapAdjustment;
+                        if (isInitialElement || isFinalElement) newZ = originalPosition.z
+                        else newZ = originalPosition.z + overlapAdjustment;
                         break;
                     }
                 }
@@ -168,11 +170,13 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
         function getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, laneSide) {
             const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
-            const { direction, directionOfSuccessor, directionOfPredecessor } = propertiesObj
+            const { direction, directionOfSuccessor, directionOfPredecessor, isInitialElement, isFinalElement } = propertiesObj
+
 
             const overlapAdjustment = getAdjDim(originalWidth, originalDepth, direction, directionOfPredecessor, directionOfSuccessor, laneSide)
 
             let newWidth, newDepth;
+            if (laneSide === "right") {
                 switch (direction) {
                     case "west": {
                         newWidth = originalWidth - overlapAdjustment;
@@ -195,6 +199,33 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                         break;
                     }
                 }
+            } else {
+                switch (direction) {
+                    case "west": {
+                        newWidth = originalWidth - overlapAdjustment;
+                        newDepth = originalDepth * (0.3);
+                        break;
+                    }
+                    case "east": {
+                        newWidth = originalWidth - overlapAdjustment;
+                        newDepth = originalDepth * (0.3);
+                        break;
+                    }
+                    case "south": {
+                        newWidth = originalWidth * (0.3);
+                        if (isInitialElement || isFinalElement) newDepth = originalDepth
+                        else newDepth = originalDepth - overlapAdjustment;
+                        break;
+                    }
+                    case "north": {
+                        newWidth = originalWidth * (0.3);
+                        if (isInitialElement || isFinalElement) newDepth = originalDepth
+                        else newDepth = originalDepth - overlapAdjustment;
+                        break;
+                    }
+                }
+            }
+                
             return {
                 newWidth,
                 newDepth
