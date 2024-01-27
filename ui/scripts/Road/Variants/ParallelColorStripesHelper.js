@@ -158,7 +158,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     }
                     case "north": {
                         newX = originalPosition.x + 0.25;
-                        if (isInitialElement || isFinalElement) newZ = originalPosition.z
+                        if (isInitialElement || isFinalElement) newZ = originalPosition.z 
                         else newZ = originalPosition.z + overlapAdjustment;
                         break;
                     }
@@ -330,6 +330,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             let result = crossingRightLaneDict[direction][directionOfPredecessor][directionOfSuccessor] 
             if (laneSide != "right") {
                 switch(result) {
+                        case "-/-": return "--/--";
+                        case "--/--": return "-/-";
                         case "-/0": return "0/-";
                         case "0/-": return "-/0";
                         case "0/--": return "--/0";
