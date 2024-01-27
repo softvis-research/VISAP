@@ -133,14 +133,15 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     }
                     case "east": {
                         if (directionOfSuccessor === "south" && directionOfPredecessor === "south") newX = originalPosition.x - overlapCutoff + 0.25;
-                        else if (directionOfSuccessor === "south") newX = originalPosition.x + overlapCutoff;
+                        else if (directionOfSuccessor === "south" && directionOfPredecessor === "north") newX = originalPosition.x + overlapCutoff;
+                        else if (directionOfPredecessor === "north") newX = originalPosition.x - overlapCutoff;
                         else newX = originalPosition.x;
                         newZ = originalPosition.z - 0.25;
                         break;
                     }
                     case "south": {
                         newX = originalPosition.x + 0.25;
-                        if (directionOfSuccessor === "east" && directionOfPredecessor === "east") newZ = originalPosition.z - overlapCutoff - 0.25;
+                        if (directionOfSuccessor === "east" && directionOfPredecessor === "east") newZ = originalPosition.z - overlapCutoff + 0.25;
                         else if (directionOfSuccessor === "east") newZ = originalPosition.z + overlapCutoff;
                         else newZ = originalPosition.z;
                         break;
@@ -148,7 +149,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     case "north": {
                         newX = originalPosition.x - 0.25;
                         if (directionOfSuccessor === "east" && directionOfPredecessor === "east") newZ = originalPosition.z - overlapCutoff + 0.25;
-                        else if (directionOfSuccessor === "east") newZ = originalPosition.z - overlapCutoff;
+                        else if (directionOfSuccessor === "east" && directionOfPredecessor != "east") newZ = originalPosition.z - overlapCutoff;
                         else newZ = originalPosition.z;
                         break;
                     }
@@ -205,18 +206,22 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             if (laneSide === "right") {
                 switch (direction) {
                     case "west": {
-                        newWidth = originalWidth - 0.2;
+                        if (directionOfSuccessor === "north" && directionOfPredecessor === "north") newWidth = originalWidth - (1.4*overlapCutoff);
+                        else if (directionOfSuccessor === "north") newWidth = originalWidth - overlapCutoff;
+                        else newWidth = originalWidth - 0.2;
                         newDepth = originalDepth * (0.3);
                         break;
                     }
                     case "east": {
-                        newWidth = originalWidth - 0.2;
+                        if (directionOfSuccessor === "south" && directionOfPredecessor === "south") newWidth = originalWidth - (1.4*overlapCutoff);
+                        else if (directionOfSuccessor === "south") newWidth = originalWidth - overlapCutoff;
+                        else newWidth = originalWidth - 0.2;
                         newDepth = originalDepth * (0.3);
                         break;
                     }
                     case "south": {
-                        if (directionOfSuccessor === "west" && directionOfPredecessor === "west") newDepth = originalDepth - (1.4*overlapCutoff);
-                        else if (directionOfSuccessor === "west") newDepth = originalDepth - overlapCutoff;
+                        if (directionOfSuccessor === "east" && directionOfPredecessor === "east") newDepth = originalDepth - (1.4* overlapCutoff);
+                        else if (directionOfSuccessor === "east") newDepth = originalDepth - overlapCutoff;
                         else newDepth = originalDepth - 0.2;
                         newWidth = originalWidth * (0.3);
                         break;
@@ -232,23 +237,31 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             } else {
                 switch (direction) {
                     case "west": {
-                        newWidth = originalWidth - 0.25;
+                        if (directionOfSuccessor === "south" && directionOfPredecessor === "south") newWidth = originalWidth - (1.4*overlapCutoff);
+                        else if (directionOfSuccessor === "south") newWidth = originalWidth - overlapCutoff;
+                        else newWidth = originalWidth - 0.2;
                         newDepth = originalDepth * (0.3);
                         break;
                     }
                     case "east": {
-                        newWidth = originalWidth - 0.25;
+                        if (directionOfSuccessor === "north" && directionOfPredecessor === "north") newWidth = originalWidth - (1.4*overlapCutoff);
+                        else if (directionOfSuccessor === "north") newWidth = originalWidth - overlapCutoff;
+                        else newWidth = originalWidth - 0.2;
                         newDepth = originalDepth * (0.3);
                         break;
                     }
                     case "south": {
+                        if (directionOfSuccessor === "west" && directionOfPredecessor === "west") newDepth = originalDepth - (1.4* overlapCutoff);
+                        else if (directionOfSuccessor === "west") newDepth = originalDepth - overlapCutoff;
+                        else newDepth = originalDepth - 0.2;
                         newWidth = originalWidth * (0.3);
-                        newDepth = originalDepth - 0.25;
                         break;
                     }
                     case "north": {
+                        if (directionOfSuccessor === "east" && directionOfPredecessor === "east") newDepth = originalDepth - (1.4*overlapCutoff);
+                        else if (directionOfSuccessor === "east") newDepth = originalDepth - overlapCutoff;
+                        else newDepth = originalDepth - 0.2;
                         newWidth = originalWidth * (0.3);
-                        newDepth = originalDepth - 0.25;
                         break;
                     }
                 }
@@ -274,6 +287,37 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         function getColorForLane(laneSide) {
             if (laneSide === "right") return controllerConfig.colorsParallelColorStripes.calls;
             else return controllerConfig.colorsParallelColorStripes.isCalled;
+        }
+
+        // dir / pre / succ
+        function getPosSizeAdjustmentForCrossingsDict(direction, directionOfPredecessor, directionOfSuccessor, laneSide) {
+            const crossingRightLaneDict = {
+                north: {
+                    none: { none: "0/0", east: "0/--", west: "0/-", north: "0/0" },
+                    east: { none: "-/0", east: "-/--", west: "-/-", north: "-/0" },
+                    west: { none: "--/0", east: "--/--", west: "--/-",  north: "--/0" },
+                    north: { none: "0/0", east: "0/--", west: "0/-", north: "0/0" },
+                east: {
+                    none: { none: "0/0", east: "0/0", south: "0/--", north: "0/-" },
+                    east: { none: "0/0", east: "0/0", south: "0/--", north: "0/-" },
+                    south: { none: "-/0", east: "-/0", south: "-/--", north: "-/-" },
+                    north: { none: "--/0", east: "--/0", south: "--/--", north: "--/-" },
+                },
+                west: {
+                    none: { none: "0/0", west: "0/0", south: "0/--", north: "0/-" },
+                    west: { none: "0/0", west: "0/0", south: "0/--", north: "0/-" },
+                    south: { none: "-/0", west: "-/0", south: "-/--", north: "-/-" },
+                    north: { none: "--/0", west: "--/0", south: "--/--", north: "--/-" },
+                },
+                south: {
+                    none: { none: "0/0", east: "0/-", west: "0/-", south: "0/0"},
+                    east: { none: "--/0", east: "--/-", west: "--/--", south: "--/0" },
+                    west: { none: "-/0", east: "0/--", west: "-/--", south: "-/0" },
+                    south: { none: "0/0", east: "0/-", west: "0/--", south: "0/0" },
+                },
+                }
+            }
+            return crossingRightLaneDict[direction][directionOfPredecessor][directionOfSuccessor] || "Invalid combination";
         }
 
         return {
