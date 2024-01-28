@@ -7,9 +7,9 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         let globalRelatedRoadObjsMap = new Map();
         let globalRoadSectionPropsMap = new Map();
         let globalScene;
-
-        const globalStripeOffsetRoadCenter = 0.25;
-        const globalStripeSizePct = 0.3;
+        
+        // TODO: Create more globals to adjust base props of stripe component in spot
+        const globalStripeShrinkPct = 0.70
 
         /************************
             Public Functions
@@ -64,7 +64,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 const roadSectionId = stripeComponentId.replace(/_stripe$/, '');
 
                 // stripe props depending on clone roadSection and its place in roadObj
-                setStripeComponentProps(stripeComponent, roadSectionId, roadObj);
+                setStripeComponentProps(stripeComponent, roadSectionId, roadObj); 
                 globalScene = document.querySelector("a-scene");
                 globalScene.appendChild(stripeComponent);
             })
@@ -89,18 +89,16 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
             const laneSide = getLaneSideForRoadObj(roadObj); // stripes on left or right lane
 
-            const originalWidth = roadSectionComponent.getAttribute("width");
-            const originalDepth = roadSectionComponent.getAttribute("depth");
-
             // position
             const originalPosition = roadSectionComponent.getAttribute("position");
-            const { newX, newY, newZ } = getNewPositionForLane(roadSectionId, originalWidth, originalDepth, originalPosition, laneSide,)
+            const { newX, newY, newZ } = getNewPositionForLane(roadSectionId, originalPosition, laneSide,)
             const stripePosition = { x: newX, y: newY, z: newZ };
             stripeComponent.setAttribute("position", stripePosition);
 
             // geometry
-            
-            const { newWidth, newDepth } = getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, laneSide)
+            const originalWidth = roadSectionComponent.getAttribute("width");
+            const originalDepth = roadSectionComponent.getAttribute("depth");
+            const { newWidth, newDepth } = getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth)
             stripeComponent.setAttribute("geometry", `primitive: box; width: ${newWidth}; height: 0.05; depth: ${newDepth}`);
 
             // color
@@ -108,257 +106,80 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             stripeComponent.setAttribute("color", color);
         }
 
-        function getNewPositionForLane(roadSectionId, originalWidth, originalDepth, originalPosition, laneSide) {
+        function getNewPositionForLane(roadSectionId, originalPosition, laneSide) {
             const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
-            const { direction, directionOfSuccessor, directionOfPredecessor, isInitialElement, isFinalElement } = propertiesObj
+            const { direction, isEndingInCurve, directionOfSuccessor } = propertiesObj
 
             let newX, newY, newZ;
-
-            const overlapAdjustment = getAdjPos(originalWidth, originalDepth, direction, directionOfPredecessor, directionOfSuccessor, laneSide)
+            const baseOffset = 0.25
 
             if (laneSide === "right") {
                 newY = 0.52;
                 switch (direction) {
                     case "west": {
-                        newX = originalPosition.x - overlapAdjustment;
-                        newZ = originalPosition.z + globalStripeOffsetRoadCenter;
+                        newX = originalPosition.x; 
+                        newZ = originalPosition.z + baseOffset; 
                         break;
                     }
                     case "east": {
-                        newX = originalPosition.x - overlapAdjustment;
-                        newZ = originalPosition.z - globalStripeOffsetRoadCenter;
-                        break;
-                    }
+                        newX = originalPosition.x; 
+                        newZ = originalPosition.z - baseOffset; 
+                        break;}
                     case "south": {
-                        newX = originalPosition.x + globalStripeOffsetRoadCenter;
-                        newZ = originalPosition.z - overlapAdjustment;;
-                        break;
-                    }
+                        newX = originalPosition.x + baseOffset; 
+                        newZ = originalPosition.z; 
+                        break;}
                     case "north": {
-                        newX = originalPosition.x - globalStripeOffsetRoadCenter;
-                        newZ = originalPosition.z - overlapAdjustment;
-                        break;
-                    }
+                        newX = originalPosition.x - baseOffset; 
+                        newZ = originalPosition.z; 
+                        break;}
                 }
             } else {
                 newY = 0.50;
                 switch (direction) {
-                    case "west": {
-                        newX = originalPosition.x - overlapAdjustment;
-                        newZ = originalPosition.z - globalStripeOffsetRoadCenter;
-                        break;
-                    }
-                    case "east": {
-                        newX = originalPosition.x - overlapAdjustment;
-                        newZ = originalPosition.z + globalStripeOffsetRoadCenter;
-                        break;
-                    }
-                    case "south": {
-                        newX = originalPosition.x - globalStripeOffsetRoadCenter;
-                        if (isFinalElement) newZ = originalPosition.z - overlapAdjustment;
-                        else newZ = originalPosition.z - overlapAdjustment;
-                        break;
-                    }
-                    case "north": {
-                        newX = originalPosition.x + globalStripeOffsetRoadCenter;
-                        if (isFinalElement) newZ = originalPosition.z - overlapAdjustment;
-                        else newZ = originalPosition.z - overlapAdjustment;
-                        break;
-                    }
+                    case "west": newX = originalPosition.x; newZ = originalPosition.z - baseOffset; break;
+                    case "east": newX = originalPosition.x; newZ = originalPosition.z + baseOffset; break;
+                    case "south": newX = originalPosition.x - baseOffset; newZ = originalPosition.z; break;
+                    case "north": newX = originalPosition.x + baseOffset; newZ = originalPosition.z; break;
                 }
             }
 
             return { newX, newY, newZ }
         }
 
-        function getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, laneSide) {
+        function getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth) {
             const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
-            const { direction, directionOfSuccessor, directionOfPredecessor, isInitialElement, isFinalElement } = propertiesObj
 
-
-            const overlapAdjustment = getAdjDim(originalWidth, originalDepth, direction, directionOfPredecessor, directionOfSuccessor, laneSide)
-
+            const { direction } = propertiesObj
             let newWidth, newDepth;
-            if (laneSide === "right") {
-                switch (direction) {
-                    case "west": {
-                        newWidth = originalWidth - overlapAdjustment;
-                        newDepth = originalDepth * (globalStripeSizePct);
-                        break;
-                    }
-                    case "east": {
-                        newWidth = originalWidth - overlapAdjustment;
-                        newDepth = originalDepth * (globalStripeSizePct);
-                        break;
-                    }
-                    case "south": {
-                        newWidth = originalWidth * (globalStripeSizePct);
-                        newDepth = originalDepth - overlapAdjustment;
-                        break;
-                    }
-                    case "north": {
-                        newWidth = originalWidth * (globalStripeSizePct);
-                        newDepth = originalDepth - overlapAdjustment;
-                        break;
-                    }
+            switch (direction) {
+                case "west": {
+                    newWidth = originalWidth  -0.2;
+                    newDepth = originalDepth * (1 - globalStripeShrinkPct);
+                    break;
                 }
-            } else {
-                switch (direction) {
-                    case "west": {
-                        newWidth = originalWidth - overlapAdjustment;
-                        newDepth = originalDepth * (globalStripeSizePct);
-                        break;
-                    }
-                    case "east": {
-                        newWidth = originalWidth - overlapAdjustment;
-                        newDepth = originalDepth * (globalStripeSizePct);
-                        break;
-                    }
-                    case "south": {
-                        newWidth = originalWidth * (globalStripeSizePct);
-                        if (isFinalElement) newDepth = originalDepth - overlapAdjustment;
-                        else newDepth = originalDepth - overlapAdjustment;
-                        break;
-                    }
-                    case "north": {
-                        newWidth = originalWidth * (globalStripeSizePct);
-                        if (isFinalElement) newDepth = originalDepth - overlapAdjustment;
-                        else newDepth = originalDepth - overlapAdjustment;
-                        break;
-                    }
+                case "east": {
+                    newWidth = originalWidth  -0.2;
+                    newDepth = originalDepth * (1 - globalStripeShrinkPct);
+                    break;
+                }
+                case "south": {
+                    newWidth = originalWidth * (1 - globalStripeShrinkPct);
+                    newDepth = originalDepth  -0.2;
+                    break;
+                }
+                case "north": {
+                    newWidth = originalWidth * (1 - globalStripeShrinkPct);
+                    newDepth = originalDepth  -0.2;
+                    break;
                 }
             }
-                
+
             return {
                 newWidth,
                 newDepth
             }
         }
-
-
-        function getAdjDim(originalWidth, originalDepth, direction, directionOfPredecessor, directionOfSuccessor, laneSide) {
-            const longSideCutoff = getLongSideCutoff(originalWidth, originalDepth);
-            const shortSideCutoff = getShortSideCutoff(originalWidth, originalDepth);
-            const dictResult = getPosSizeAdjustmentForCrossingsDict(direction, directionOfPredecessor, directionOfSuccessor, laneSide)
-            switch(dictResult) {
-                case "0/0"  : return 0;
-                case "-/0"  :
-                case "0/-"  : return shortSideCutoff * 2;
-                case "0/--" :
-                case "--/0" : return longSideCutoff * 2;
-                case "-/-"  : return shortSideCutoff * 2;
-                case "--/-" :
-                case "-/--" : return longSideCutoff * 2 + shortSideCutoff * 2
-                case "--/--": return longSideCutoff * 2;
-
-                case "+/+"  :
-                case "++/++":   return 0;
-                case "+/0"  :   return shortSideCutoff/2.83;
-                case "0/+"  :   return shortSideCutoff
-                case "0/++" :   return longSideCutoff * 2
-                case "++/0" :   return longSideCutoff * 2
-                case "++/+" :   return longSideCutoff * 2 + shortSideCutoff * 2
-                case "+/++" :   return -longSideCutoff + shortSideCutoff/2.83
-            }
-        }
-
-        function getAdjPos(originalWidth, originalDepth, direction, directionOfPredecessor, directionOfSuccessor, laneSide) {
-            const longSideCutoff = getLongSideCutoff(originalWidth, originalDepth);
-            const shortSideCutoff = getShortSideCutoff(originalWidth, originalDepth);
-            const dictResult = getPosSizeAdjustmentForCrossingsDict(direction, directionOfPredecessor, directionOfSuccessor, laneSide)
-            switch(dictResult) {
-                case "0/0"  :
-                case "-/-"  :
-                case "--/--":   return 0;
-                case "-/0"  :   return - shortSideCutoff/2.83;
-                case "0/-"  :   return - shortSideCutoff/2.83;
-                case "0/--" :   return longSideCutoff
-                case "--/0" :   return longSideCutoff
-                case "--/-" :   return longSideCutoff - shortSideCutoff
-                case "-/--" :   return longSideCutoff - shortSideCutoff/2.83
-
-                case "+/+"  :
-                case "++/++":   return 0;
-                case "+/0"  :   return shortSideCutoff
-                case "0/+"  :   return shortSideCutoff;
-                case "0/++" :   return - longSideCutoff
-                case "++/0" :   return - longSideCutoff
-                case "++/+" :   return - longSideCutoff + shortSideCutoff/2.83
-                case "+/++" :   return - longSideCutoff + shortSideCutoff/2.83
-            }
-        }
-
-        function getLongSideCutoff(originalWidth, originalDepth) {
-            if (originalWidth > originalDepth) return (originalDepth * globalStripeSizePct)
-            else return originalWidth * globalStripeSizePct
-        }
-
-        function getShortSideCutoff(originalWidth, originalDepth) {
-            if (originalWidth > originalDepth) return originalDepth - (originalDepth/2 + globalStripeOffsetRoadCenter/2 + (originalDepth * globalStripeSizePct))
-            else return originalWidth - (originalWidth/2 + globalStripeOffsetRoadCenter/2 + (originalWidth * globalStripeSizePct))
-        }
-
-        function getPosSizeAdjustmentForCrossingsDict(direction, directionOfPredecessor, directionOfSuccessor, laneSide) {
-            if(directionOfPredecessor === null) directionOfPredecessor = "none";
-            if(directionOfSuccessor === null) directionOfSuccessor = "none";
-            
-            // obj: direction->predecessor->successor
-            // 0: no adjustment; --: long side adjustment; -: short side adjustment
-            // sign before slash: adjustment in predecessor direction; sign after slash: adjustment in successor direction
-            const crossingRightLaneDict = {
-                north: {
-                    none : { none: "0/0",  east: "0/--",  west: "0/+",  north: "0/0"   },
-                    east : { none: "++/0",  east: "-/--",  west: "-/-",  north: "-/0"   },
-                    west : { none: "0/++", east: "--/--", west: "--/-", north: "--/0"  },
-                    north: { none: "0/0",  east: "0/--",  west: "0/-",  north: "0/0"   },
-                },
-                east: {
-                    none : { none: "0/0",  east: "0/0",  south: "0/--",  north: "0/-"  },
-                    east : { none: "0/0",  east: "0/0",  south: "0/++",  north: "0/-"  },
-                    south: { none: "-/0",  east: "-/0",  south: "-/--",  north: "-/-"  },
-                    north: { none: "--/0", east: "--/0", south: "--/--", north: "--/-" },
-                },
-                west: {
-                    none : { none: "0/0",  west: "0/0",  south: "0/--",  north: "0/-"  },
-                    west : { none: "0/0",  west: "0/0",  south: "0/-",  north: "0/--"  },
-                    south: { none: "-/0",  west: "0/++", south: "++/+",  north: "-/-"  },
-                    north: { none: "--/0", west: "--/-", south: "--/--", north: "--/-" },
-                },
-                south: {
-                    none : { none: "0/0",  east: "0/-",  west: "0/++",  south: "0/0"   },
-                    east : { none: "--/0", east: "--/-", west: "--/--", south: "--/0"  },
-                    west : { none: "--/0",  east: "0/--", west: "-/--",  south: "-/0"   },
-                    south: { none: "0/0",  east: "0/-",  west: "0/--",  south: "0/0"   },
-                },
-
-            }
-
-            let result = crossingRightLaneDict[direction][directionOfPredecessor][directionOfSuccessor] 
-            if (laneSide != "right") {
-                // reversing logic for left stripes
-                switch(result) {
-                        case "-/-"  : return "--/--";
-                        case "--/--": return "-/-"  ;
-                        case "-/0"  : return "0/-"  ;
-                        case "0/-"  : return "-/0"  ;
-                        case "0/--" : return "--/0" ;
-                        case "--/0" : return "0/--" ;
-                        case "--/-" : return "-/--" ;
-                        case "-/--" : return "--/-" ;
-
-                        case "+/+"  : return "++/++";
-                        case "++/++": return "+/+"  ;
-                        case "+/0"  : return "0/+"  ;
-                        case "0/+"  : return "+/0"  ;
-                        case "0/++" : return "++/0" ;
-                        case "++/0" : return "0/++" ;
-                        case "++/+" : return "+/++" ;
-                        case "+/++" : return "--/-" ;
-                }
-            }
-            return result || "0/0"
-        }
-
 
         function hasValidRoadSectionProps(roadSectionId) {
             const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);

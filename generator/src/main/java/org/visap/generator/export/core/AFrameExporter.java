@@ -227,7 +227,7 @@ public class AFrameExporter {
         builder.append(">");
 
         builder.append("\n");
-        if (!Config.features.outline()) {
+        if (Config.features.outline()) {
             builder.append(drawOutline(element));
         }
         builder.append("</" + getShapeExport(element.getShape()) + ">");
