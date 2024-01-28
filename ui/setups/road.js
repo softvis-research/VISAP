@@ -25,15 +25,12 @@ const setup = {
 			},
 
 			colorsParallelColorStripes: {
-				calls: "orange",
+				calls: "lime",
 				isCalled: "magenta",
 			},
 
-			// NOTE: don't set them in any other way by now. They need to be re-implemented.
 			showLegendOnSelect: true,
-			enableMonochromeForUnrelatedEntities: true,
-			// enableRoadVanishing: false,
-			// spawnTrafficSigns: false,
+			enableMonochromeForUnrelatedEntities: false,
 		},
 	],
 

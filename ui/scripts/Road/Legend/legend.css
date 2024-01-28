@@ -10,16 +10,16 @@
     position: absolute;
     top: 20px;
     right: 20px;
-    padding: 10px;
+    padding: 8px;
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 10px;
 }
 
 .legend-item {
-    font-weight: normal; /* Adjust font weight as needed */
+    font-weight: normal;
     display: flex;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     position: relative;
 }
 
@@ -34,7 +34,7 @@
 .text-box {
     font-size: small;
     font-weight: normal;
-    text-align: left;
+    text-align: right;
     background-color: black;
     color: white;
     padding: 5px 22px;
