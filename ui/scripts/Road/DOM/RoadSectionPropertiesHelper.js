@@ -31,8 +31,6 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                 direction: p.direction || null,
                 directionOfSuccessor: p.directionOfSuccessor || null,
                 directionOfPredecessor: p.directionOfPredecessor || null,
-                isStartingInCurve: p.isStartingInCurve || false,
-                isEndingInCurve: p.isEndingInCurve || false,
             };
             return roadSectionPropsObj;
         }
@@ -212,8 +210,6 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                         const isStartingInCurve = directionOfCurrent != directionOfPredecessor;
                         const isEndingInCurve = directionOfCurrent != directionOfSuccessor;
                         addToMapIfKeyOrValueNotExists(roadSectionArr[i], {
-                            isStartingInCurve,
-                            isEndingInCurve,
                             directionOfPredecessor,
                             directionOfSuccessor
                         }, globalRoadSectionPropsMap)
@@ -222,8 +218,6 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                         const directionOfSuccessor = globalRoadSectionPropsMap.get(roadSectionArr[i + 1]).direction;
                         const isEndingInCurve = directionOfCurrent != directionOfSuccessor;
                         addToMapIfKeyOrValueNotExists(roadSectionArr[i], {
-                            isStartingInCurve: false, // first roadSection can't start in a curve so it is always false
-                            isEndingInCurve,
                             directionOfSuccessor,
                         }, globalRoadSectionPropsMap)
                         // final section
@@ -231,8 +225,6 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                         const directionOfPredecessor = globalRoadSectionPropsMap.get(roadSectionArr[i - 1]).direction;
                         const isStartingInCurve = directionOfCurrent != directionOfPredecessor;
                         addToMapIfKeyOrValueNotExists(roadSectionArr[i], {
-                            isStartingInCurve,
-                            isEndingInCurve: false, // last roadSection can't end in a curve so it is always false
                             directionOfPredecessor
                         }, globalRoadSectionPropsMap)
                     }

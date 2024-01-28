@@ -161,7 +161,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     }
                     case "north": {
                         newX = originalPosition.x + globalStripeOffsetRoadCenter;
-                        if (isFinalElement) newZ = originalPosition.z 
+                        if (isFinalElement) newZ = originalPosition.z - overlapAdjustment;
                         else newZ = originalPosition.z - overlapAdjustment;
                         break;
                     }
@@ -222,7 +222,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     }
                     case "north": {
                         newWidth = originalWidth * (globalStripeSizePct);
-                        if (isFinalElement) newDepth = originalDepth
+                        if (isFinalElement) newDepth = originalDepth - overlapAdjustment;
                         else newDepth = originalDepth - overlapAdjustment;
                         break;
                     }
@@ -308,7 +308,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             const crossingRightLaneDict = {
                 north: {
                     none : { none: "0/0",  east: "0/--",  west: "0/+",  north: "0/0"   },
-                    east : { none: "-/0",  east: "-/--",  west: "-/-",  north: "-/0"   },
+                    east : { none: "++/0",  east: "-/--",  west: "-/-",  north: "-/0"   },
                     west : { none: "0/++", east: "--/--", west: "--/-", north: "--/0"  },
                     north: { none: "0/0",  east: "0/--",  west: "0/-",  north: "0/0"   },
                 },
@@ -327,7 +327,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 south: {
                     none : { none: "0/0",  east: "0/-",  west: "0/++",  south: "0/0"   },
                     east : { none: "--/0", east: "--/-", west: "--/--", south: "--/0"  },
-                    west : { none: "-/0",  east: "0/--", west: "-/--",  south: "-/0"   },
+                    west : { none: "--/0",  east: "0/--", west: "-/--",  south: "-/0"   },
                     south: { none: "0/0",  east: "0/-",  west: "0/--",  south: "0/0"   },
                 },
 
@@ -346,14 +346,14 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                         case "--/-" : return "-/--" ;
                         case "-/--" : return "--/-" ;
 
-                        // case "+/+"  : return "++/++";
-                        // case "++/++": return "+/+"  ;
-                        // case "+/0"  : return "0/+"  ;
-                        // case "0/+"  : return "+/0"  ;
-                        // case "0/++" : return "++/0" ;
-                        // case "++/0" : return "0/++" ;
-                        // case "++/+" : return "+/++" ;
-                        // case "+/++" : return "++/+" ;
+                        case "+/+"  : return "++/++";
+                        case "++/++": return "+/+"  ;
+                        case "+/0"  : return "0/+"  ;
+                        case "0/+"  : return "+/0"  ;
+                        case "0/++" : return "++/0" ;
+                        case "++/0" : return "0/++" ;
+                        case "++/+" : return "+/++" ;
+                        case "+/++" : return "--/-" ;
                 }
             }
             return result || "0/0"
