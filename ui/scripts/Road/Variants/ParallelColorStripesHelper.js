@@ -243,12 +243,12 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             switch(dictResult) {
                 case "0/0"  : return 0;
                 case "-/0"  :
-                case "0/-"  : return shortSideCutoff;
+                case "0/-"  : return shortSideCutoff * 2;
                 case "0/--" :
-                case "--/0" : return longSideCutoff;
+                case "--/0" : return longSideCutoff * 2;
                 case "-/-"  : return shortSideCutoff * 2;
                 case "--/-" :
-                case "-/--" : return longSideCutoff + shortSideCutoff;
+                case "-/--" : return longSideCutoff * 2 + shortSideCutoff * 2
                 case "--/--": return longSideCutoff * 2;
             }
         }
@@ -261,23 +261,23 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 case "0/0"  :
                 case "-/-"  :
                 case "--/--":   return 0;
-                case "-/0"  :   return shortSideCutoff;
-                case "0/-"  :   return shortSideCutoff;
-                case "0/--" :   return longSideCutoff/2
-                case "--/0" :   return longSideCutoff/2
-                case "--/-" :   return longSideCutoff/2 - shortSideCutoff
-                case "-/--" :   return longSideCutoff/2 - shortSideCutoff
+                case "-/0"  :   return shortSideCutoff/2.83;
+                case "0/-"  :   return shortSideCutoff/2.83;
+                case "0/--" :   return longSideCutoff
+                case "--/0" :   return longSideCutoff
+                case "--/-" :   return longSideCutoff - shortSideCutoff/2.83
+                case "-/--" :   return longSideCutoff - shortSideCutoff/2.83
             }
         }
 
         function getLongSideCutoff(originalWidth, originalDepth) {
-            if (originalWidth > originalDepth) return Number(originalDepth) + (Number(originalDepth) * (-globalStripeSizePct));
-            else return Number(originalWidth) + (Number(originalWidth) * (-globalStripeSizePct));
+            if (originalWidth > originalDepth) return (originalDepth * globalStripeSizePct)
+            else return originalWidth * globalStripeSizePct
         }
 
         function getShortSideCutoff(originalWidth, originalDepth) {
-            if (originalWidth > originalDepth) return Number(originalDepth * globalStripeSizePct - globalStripeOffsetRoadCenter)
-            else return Number(originalWidth * globalStripeSizePct - globalStripeOffsetRoadCenter)
+            if (originalWidth > originalDepth) return originalDepth - (originalDepth/2 + globalStripeOffsetRoadCenter/2 + (originalDepth * globalStripeSizePct))
+            else return originalWidth - (originalWidth/2 + globalStripeOffsetRoadCenter/2 + (originalWidth * globalStripeSizePct))
         }
 
         function getPosSizeAdjustmentForCrossingsDict(direction, directionOfPredecessor, directionOfSuccessor, laneSide) {
