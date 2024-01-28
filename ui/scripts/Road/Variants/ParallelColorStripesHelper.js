@@ -98,7 +98,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             // geometry
             const originalWidth = roadSectionComponent.getAttribute("width");
             const originalDepth = roadSectionComponent.getAttribute("depth");
-            const { newWidth, newDepth } = getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth)
+            const { newWidth, newDepth } = getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, laneSide)
             stripeComponent.setAttribute("geometry", `primitive: box; width: ${newWidth}; height: 0.05; depth: ${newDepth}`);
 
             // color
@@ -154,7 +154,10 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 newY = 0.50;
                 switch (direction) {
                     case "west":
-                        newX = originalPosition.x;
+                        if (directionOfPredecessor === "north" && directionOfSuccessor === "west") newX = originalPosition.x + 0.3;
+                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "south") newX = originalPosition.x - 0.3;
+                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "south") newX = originalPosition.x - 0.3;
+                        else newX = originalPosition.x;
                         newZ = originalPosition.z - baseOffset;
                         break;
                     case "east":
@@ -162,59 +165,94 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                         newZ = originalPosition.z + baseOffset;
                         break;
                     case "south":
+                        if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newZ = originalPosition.z - 0.3
+                        else if (directionOfPredecessor === "west" && directionOfSuccessor === null) newZ = originalPosition.z - 0.3;
+                        else newZ = originalPosition.z;
                         newX = originalPosition.x - baseOffset;
-                        newZ = originalPosition.z;
                         break;
                     case "north":
                         newX = originalPosition.x + baseOffset;
-                        newZ = originalPosition.z;
+                        if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newZ = originalPosition.z - 0.3;
+                        else newZ = originalPosition.z
                         break;
                 }
-                
+
             }
 
             return { newX, newY, newZ }
         }
 
-        function getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth) {
+        function getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, laneSide) {
             const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
 
             const { direction, directionOfPredecessor, directionOfSuccessor } = propertiesObj
             let newWidth, newDepth;
-            switch (direction) {
-                case "west": {
-                    if (directionOfPredecessor === "south" && directionOfSuccessor === "west") newWidth = originalWidth - 0.6;
-                    else if (directionOfPredecessor === "south" && directionOfSuccessor === "south") newWidth = originalWidth - 0.8;
-                    else if (directionOfPredecessor === "west" && directionOfSuccessor === "north") newWidth = originalWidth - 0.6;
-                    else newWidth = originalWidth - 0.2;
-                    newDepth = originalDepth * (1 - globalStripeShrinkPct);
-                    break;
+            if (laneSide === "right") {
+                switch (direction) {
+                    case "west": {
+                        if (directionOfPredecessor === "south" && directionOfSuccessor === "west") newWidth = originalWidth - 0.6;
+                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "south") newWidth = originalWidth - 0.8;
+                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "north") newWidth = originalWidth - 0.6;
+                        else newWidth = originalWidth - 0.2;
+                        newDepth = originalDepth * (1 - globalStripeShrinkPct);
+                        break;
+                    }
+                    case "east": {
+                        if (directionOfPredecessor === "east" && directionOfSuccessor === "south") newWidth = originalWidth - 0.6;
+                        else if (directionOfPredecessor === "north" && directionOfSuccessor === "north") newWidth = originalWidth - 0.8;
+                        else if (directionOfPredecessor === "north" && directionOfSuccessor === "east") newWidth = originalWidth - 0.6;
+                        else newWidth = originalWidth - 0.2;
+                        newDepth = originalDepth * (1 - globalStripeShrinkPct);
+                        break;
+                    }
+                    case "south": {
+                        newWidth = originalWidth * (1 - globalStripeShrinkPct);
+                        if (directionOfPredecessor === "east" && directionOfSuccessor === null) newDepth = originalDepth - 0.6;
+                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "east") newDepth = originalDepth - 0.8;
+                        else if (directionOfPredecessor === null && directionOfSuccessor === "west") newDepth = originalDepth - 0.6;
+                        else newDepth = originalDepth - 0.2;
+                        break;
+                    }
+                    case "north": {
+                        newWidth = originalWidth * (1 - globalStripeShrinkPct);
+                        if (directionOfPredecessor === null && directionOfSuccessor === "east") newDepth = originalDepth - 0.6
+                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "east") newDepth = originalDepth - 0.8
+                        else if (directionOfPredecessor === "west" && directionOfSuccessor === null) newDepth = originalDepth - 0.6
+                        else newDepth = originalDepth - 0.2;
+                        break;
+                    }
                 }
-                case "east": {
-                    if (directionOfPredecessor === "east" && directionOfSuccessor === "south") newWidth = originalWidth - 0.6;
-                    else if (directionOfPredecessor === "north" && directionOfSuccessor === "north") newWidth = originalWidth - 0.8;
-                    else if (directionOfPredecessor === "north" && directionOfSuccessor === "east") newWidth = originalWidth - 0.6;
-                    else newWidth = originalWidth - 0.2;
-                    newDepth = originalDepth * (1 - globalStripeShrinkPct);
-                    break;
-                }
-                case "south": {
-                    newWidth = originalWidth * (1 - globalStripeShrinkPct);
-                    if (directionOfPredecessor === "east" && directionOfSuccessor === null) newDepth = originalDepth - 0.6;
-                    else if (directionOfPredecessor === "east" && directionOfSuccessor === "east") newDepth = originalDepth - 0.8;
-                    else if (directionOfPredecessor === null && directionOfSuccessor === "west") newDepth = originalDepth - 0.6;
-                    else newDepth = originalDepth - 0.2;
-                    break;
-                }
-                case "north": {
-                    newWidth = originalWidth * (1 - globalStripeShrinkPct);
-                    if (directionOfPredecessor === null && directionOfSuccessor === "east") newDepth = originalDepth - 0.6
-                    else if (directionOfPredecessor === "east" && directionOfSuccessor === "east") newDepth = originalDepth - 0.8
-                    else if (directionOfPredecessor === "west" && directionOfSuccessor === null) newDepth = originalDepth - 0.6
-                    else newDepth = originalDepth - 0.2;
-                    break;
+            } else {
+                switch (direction) {
+                    case "west": {
+                        if (directionOfPredecessor === "north" && directionOfSuccessor === "west") newWidth = originalWidth - 0.6
+                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "south") newWidth = originalWidth - 0.6
+                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "south") newWidth = originalWidth - 0.8
+                        else newWidth = originalWidth - 0.2;
+                        newDepth = originalDepth * (1 - globalStripeShrinkPct);
+                        break;
+                    }
+                    case "east": {
+                        newWidth = originalWidth - 0.2;
+                        newDepth = originalDepth * (1 - globalStripeShrinkPct);
+                        break;
+                    }
+                    case "south": {
+                        if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newDepth = originalDepth - 0.8;
+                        else if (directionOfPredecessor === "west" && directionOfSuccessor === null) newDepth = originalDepth - 0.6;
+                        else newDepth = originalDepth - 0.2;
+                        newWidth = originalWidth * (1 - globalStripeShrinkPct);
+                        break;
+                    }
+                    case "north": {
+                        if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newDepth = originalDepth - 0.8;
+                        else newDepth = originalDepth - 0.2;
+                        newWidth = originalWidth * (1 - globalStripeShrinkPct);
+                        break;
+                    }
                 }
             }
+
 
             return {
                 newWidth,
