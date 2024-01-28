@@ -166,6 +166,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                         break;
                     case "south":
                         if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newZ = originalPosition.z - 0.3
+                        else if (directionOfPredecessor === null && directionOfSuccessor === "west") newZ = originalPosition.z - 0.3
                         else if (directionOfPredecessor === "west" && directionOfSuccessor === null) newZ = originalPosition.z - 0.3;
                         else newZ = originalPosition.z;
                         newX = originalPosition.x - baseOffset;
@@ -173,6 +174,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     case "north":
                         newX = originalPosition.x + baseOffset;
                         if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newZ = originalPosition.z - 0.3;
+                        else if (directionOfPredecessor === "east" && directionOfSuccessor === null) newZ = originalPosition.z + 0.3;
+                        else if (directionOfPredecessor === null && directionOfSuccessor === "west") newZ = originalPosition.z - 0.3;
                         else newZ = originalPosition.z
                         break;
                 }
@@ -227,7 +230,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     case "west": {
                         if (directionOfPredecessor === "north" && directionOfSuccessor === "west") newWidth = originalWidth - 0.6
                         else if (directionOfPredecessor === "west" && directionOfSuccessor === "south") newWidth = originalWidth - 0.6
-                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "south") newWidth = originalWidth - 0.8
+                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "south") newWidth = originalWidth - 0.6
                         else newWidth = originalWidth - 0.2;
                         newDepth = originalDepth * (1 - globalStripeShrinkPct);
                         break;
@@ -239,6 +242,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     }
                     case "south": {
                         if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newDepth = originalDepth - 0.8;
+                        else if (directionOfPredecessor === null && directionOfSuccessor === "west") newDepth = originalDepth - 0.8;
                         else if (directionOfPredecessor === "west" && directionOfSuccessor === null) newDepth = originalDepth - 0.6;
                         else newDepth = originalDepth - 0.2;
                         newWidth = originalWidth * (1 - globalStripeShrinkPct);
@@ -246,6 +250,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     }
                     case "north": {
                         if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newDepth = originalDepth - 0.8;
+                        else if (directionOfPredecessor === "east" && directionOfSuccessor === null) newDepth = originalDepth - 0.6;
+                        else if (directionOfPredecessor === null && directionOfSuccessor === "west") newDepth = originalDepth - 0.6
                         else newDepth = originalDepth - 0.2;
                         newWidth = originalWidth * (1 - globalStripeShrinkPct);
                         break;
