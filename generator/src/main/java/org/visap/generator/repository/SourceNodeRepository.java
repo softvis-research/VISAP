@@ -203,40 +203,6 @@ public class SourceNodeRepository {
         return nodeCellsByProperty;
     }
 
-    // Laden Property
-    public Collection<NodeCell> getNodesByIdenticalPropertyValuesNodes(SAPNodeProperties property, String value) {
-
-        Collection<NodeCell> nodesByLabelAndProperty = new ArrayList<>();
-
-        List<Record> records = connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n");
-        for (Record r : records) {
-            NodeCell propertyValue = new NodeCell(r.get("n").asNode());
-            nodesByLabelAndProperty.add(propertyValue);
-        }
-
-        return nodesByLabelAndProperty;
-    }
-
-    public Collection<NodeCell> getNodesByLabelAndProperty(SAPNodeLabels label, String property, String value) {
-        Collection<NodeCell> nodeCellsByLabel = getNodeCellsByLabel(label);
-        List<NodeCell> nodeCellsByLabelAndProperty = new ArrayList<>();
-
-        for (NodeCell nodeCell : nodeCellsByLabel) {
-            Value propertyValue = nodeCell.get(property);
-            if (propertyValue == null) {
-                nodeCellsByLabel.remove(nodeCell);
-            }
-
-            if (propertyValue.asString() != value) {
-                nodeCellsByLabel.remove(nodeCell);
-            }
-
-            nodeCellsByLabelAndProperty.add(nodeCell);
-        }
-
-        return nodeCellsByLabelAndProperty;
-    }
-
     private boolean nodeCellExists(NodeCell nodeCell) {
         Long nodeID = nodeCell.id();
         if (nodeCellById.containsKey(nodeID)) {
