@@ -195,7 +195,7 @@ public class MetaDataExporter {
 
     private List<String> getQualifiedNameAsList(NodeCell nodeCell) {
         List<String> qualifiedNameAsList = new ArrayList<>();
-        Collection<NodeCell> parentNodeCells = nodeRepository.getRelatedNodeCells(nodeCell.node, SAPRelationLabels.CONTAINS, false);
+        Collection<NodeCell> parentNodeCells = nodeRepository.getRelatedNodeCells(nodeCell, SAPRelationLabels.CONTAINS, false);
         if (!parentNodeCells.isEmpty()) {
             qualifiedNameAsList.addAll(getQualifiedNameAsList(parentNodeCells.iterator().next()));
         }
@@ -206,7 +206,7 @@ public class MetaDataExporter {
     }
 
     private String getRelations(NodeCell nodeCell, SAPRelationLabels label, Boolean direction) {
-        Collection<NodeCell> nodeCells = nodeRepository.getRelatedNodeCells(nodeCell.node, label, direction);
+        Collection<NodeCell> nodeCells = nodeRepository.getRelatedNodeCells(nodeCell, label, direction);
         if (nodeCells.isEmpty()) {
             return "";
         }

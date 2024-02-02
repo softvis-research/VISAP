@@ -156,7 +156,7 @@ public class MetropolisCreator {
     }
 
     private Collection<CityElement> getChildElementsBySourceNode(SourceNodeRepository nodeRepository, NodeCell nodeCell) {
-        Collection<NodeCell> childNodeCells = nodeRepository.getRelatedNodeCells(nodeCell.node, SAPRelationLabels.CONTAINS, true);
+        Collection<NodeCell> childNodeCells = nodeRepository.getRelatedNodeCells(nodeCell, SAPRelationLabels.CONTAINS, true);
         if (childNodeCells.isEmpty()) {
             return new TreeSet<>();
         }
@@ -174,7 +174,7 @@ public class MetropolisCreator {
     }
 
     private CityElement getParentElementBySourceNode(SourceNodeRepository nodeRepository, NodeCell nodeCell) {
-        Collection<NodeCell> parentNodeCells = nodeRepository.getRelatedNodeCells(nodeCell.node, SAPRelationLabels.CONTAINS, false);
+        Collection<NodeCell> parentNodeCells = nodeRepository.getRelatedNodeCells(nodeCell, SAPRelationLabels.CONTAINS, false);
         if (parentNodeCells.isEmpty()) {
             return null;
         }

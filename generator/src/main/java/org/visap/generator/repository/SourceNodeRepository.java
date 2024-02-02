@@ -10,7 +10,6 @@ import org.visap.generator.database.DatabaseConnector;
 import org.visap.generator.database.NodeCell;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Value;
-import org.neo4j.driver.types.Node;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,16 +24,16 @@ public class SourceNodeRepository {
      * -> use Maps with ID to Node
      */
 
-    private Map<Long, Node> nodeById;
+    private Map<Long, NodeCell> nodeCellById;
 
-    private Map<String, Map<Long, Node>> nodesByLabel;
+    private Map<String, Map<Long, NodeCell>> nodeCellsByLabel;
 
-    private Map<String, Map<Boolean, Map<Long, Map<Long, Node>>>> nodesByRelation;
+    private Map<String, Map<Boolean, Map<Long, Map<Long, NodeCell>>>> nodeCellsByRelation;
 
     public SourceNodeRepository() {
-        nodeById = new HashMap<>();
-        nodesByLabel = new HashMap<>();
-        nodesByRelation = new HashMap<>();
+        nodeCellById = new HashMap<>();
+        nodeCellsByLabel = new HashMap<>();
+        nodeCellsByRelation = new HashMap<>();
 
         log.info("Created");
     }
@@ -45,10 +44,10 @@ public class SourceNodeRepository {
 
         List<Record> records = connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n");
         for (Record result : records) {
-            Node sourceNode = result.get("n").asNode();
+            NodeCell sourceNode = new NodeCell(result.get("n").asNode());
 
-            addNodeByID(sourceNode);
-            addNodesByProperty(sourceNode);
+            addNodeCellByID(sourceNode);
+            addNodeCellsByProperty(sourceNode);
 
             counter.addAndGet(1);
         }
@@ -67,9 +66,9 @@ public class SourceNodeRepository {
 
     public void loadNodesByRelation(SAPRelationLabels relationType, boolean recursive, boolean forward) {
 
-        Set<Long> nodeIds = nodeById.keySet();
+        Set<Long> nodeCellIds = this.nodeCellById.keySet();
 
-        loadNodesByRelation(nodeIds, relationType, recursive, forward);
+        loadNodesByRelation(nodeCellIds, relationType, recursive, forward);
     }
 
     public void loadNodesByRelation(Set<Long> nodeIds, SAPRelationLabels relationType, boolean recursive,
@@ -86,44 +85,44 @@ public class SourceNodeRepository {
                     + " RETURN m, n";
         }
 
-        AtomicInteger nodeCounter = new AtomicInteger(0);
+        AtomicInteger nodeCellCounter = new AtomicInteger(0);
         AtomicInteger relationCounter = new AtomicInteger(0);
 
-        Set<Long> newNodeIds = new TreeSet<>();
+        Set<Long> newNodeCellIds = new TreeSet<>();
 
-        int nodesBefore = nodeById.size();
+        int nodeCellsBefore = this.nodeCellById.size();
 
         List<Record> records = connector.executeRead(relatedNodesStatement);
         for (Record result : records) {
-            Node nNode = result.get("n").asNode();
+            NodeCell nNodeCell = new NodeCell(result.get("n").asNode());
 
-            if (!nodeExist(nNode)) {
-                addNodeByID(nNode);
-                addNodesByProperty(nNode);
+            if (!nodeCellExists(nNodeCell)) {
+                addNodeCellByID(nNodeCell);
+                addNodeCellsByProperty(nNodeCell);
 
-                newNodeIds.add(nNode.id());
-                nodeCounter.addAndGet(1);
+                newNodeCellIds.add(nNodeCell.id());
+                nodeCellCounter.addAndGet(1);
             }
 
-            Node mNode = result.get("m").asNode();
-            mNode = nodeById.get(mNode.id());
+            NodeCell mNodeCell = new NodeCell(result.get("m").asNode());
+            mNodeCell = nodeCellById.get(mNodeCell.id());
 
-            addNodesByRelation(mNode, nNode, relationType.name());
+            addNodeCellsByRelation(mNodeCell, nNodeCell, relationType.name());
             relationCounter.addAndGet(1);
         }
         ;
 
-        int nodesAfter = nodeById.size();
+        int nodeCellsAfter = nodeCellById.size();
 
-        log.info(nodeCounter.get() + " nodes added with relation \"" + relationType + "\" loaded");
+        log.info(nodeCellCounter.get() + " nodes added with relation \"" + relationType + "\" loaded");
         log.info(relationCounter.get() + " relations of type \"" + relationType + "\" loaded");
 
-        if (nodesAfter - nodesBefore != newNodeIds.size()) {
-            log.warn(newNodeIds.size() - nodesAfter - nodesBefore + " nodes reloaded!");
+        if (nodeCellsAfter - nodeCellsBefore != newNodeCellIds.size()) {
+            log.warn(newNodeCellIds.size() - nodeCellsAfter - nodeCellsBefore + " nodes reloaded!");
         }
 
-        if (recursive && !newNodeIds.isEmpty()) {
-            loadNodesByRelation(newNodeIds, relationType, true, forward);
+        if (recursive && !newNodeCellIds.isEmpty()) {
+            loadNodesByRelation(newNodeCellIds, relationType, true, forward);
         }
     }
 
@@ -143,41 +142,31 @@ public class SourceNodeRepository {
 
         List<Record> records = connector.executeRead(" MATCH (m)-[:" + relationLabel.name() + "]->(n) RETURN m, n");
         for (Record result : records) {
-            Node mNode = result.get("m").asNode();
-            Node nNode = result.get("n").asNode();
+            NodeCell mNodeCell = new NodeCell(result.get("m").asNode());
+            NodeCell nNodeCell = new NodeCell(result.get("n").asNode());
 
-            addNodeByID(mNode);
-            addNodeByID(nNode);
+            addNodeCellByID(mNodeCell);
+            addNodeCellByID(nNodeCell);
 
-            addNodesByProperty(mNode);
-            addNodesByProperty(nNode);
+            addNodeCellsByProperty(mNodeCell);
+            addNodeCellsByProperty(nNodeCell);
 
-            addNodesByRelation(mNode, nNode, relationLabel.name());
+            addNodeCellsByRelation(mNodeCell, nNodeCell, relationLabel.name());
         }
     }
 
-    public Collection<Node> getNodes() {
-        return nodeById.values();
+    public Collection<NodeCell> getNodes() {
+        return nodeCellById.values();
     }
 
-    public Collection<NodeCell> getRelatedNodeCells(Node node, SAPRelationLabels relationLabel, Boolean direction) {
-        Collection<Node> relatedNodes = this.getRelatedNodes(node, relationLabel, direction);
-        Collection<NodeCell> nodeCells = new ArrayList<NodeCell>();
-
-        for (Node relatedNode : relatedNodes) {
-            nodeCells.add(new NodeCell(relatedNode));
-        }
-        return nodeCells;
-    }
-
-    public Collection<Node> getRelatedNodes(Node node, SAPRelationLabels relationLabel, Boolean direction) {
-        if (!nodesByRelation.containsKey(relationLabel.name())) {
+    public Collection<NodeCell> getRelatedNodeCells(NodeCell node, SAPRelationLabels relationLabel, Boolean direction) {
+        if (!nodeCellsByRelation.containsKey(relationLabel.name())) {
             return new TreeSet<>();
         }
 
-        Map<Boolean, Map<Long, Map<Long, Node>>> relationMap = nodesByRelation.get(relationLabel.name());
+        Map<Boolean, Map<Long, Map<Long, NodeCell>>> relationMap = nodeCellsByRelation.get(relationLabel.name());
 
-        Map<Long, Map<Long, Node>> directedRelationMap = relationMap.get(direction);
+        Map<Long, Map<Long, NodeCell>> directedRelationMap = relationMap.get(direction);
 
         Long nodeID = node.id();
         if (!directedRelationMap.containsKey(nodeID)) {
@@ -187,29 +176,19 @@ public class SourceNodeRepository {
         return directedRelationMap.get(nodeID).values();
     }
 
-    public Collection<Node> getNodesByLabel(SAPNodeLabels label) {
-        if (!nodesByLabel.containsKey(label.name())) {
+    public Collection<NodeCell> getNodeCellsByLabel(SAPNodeLabels label) {
+        if (!nodeCellsByLabel.containsKey(label.name())) {
             return new TreeSet<>();
         }
-        return nodesByLabel.get(label.name()).values();
+        return nodeCellsByLabel.get(label.name()).values();
     }
 
     public Collection<NodeCell> getNodeCellsByProperty(SAPNodeProperties property, String value) {
-        Collection<Node> relatedNodes = this.getNodesByProperty(property, value);
-        Collection<NodeCell> nodeCells = new ArrayList<NodeCell>();
+        Collection<NodeCell> nodeCellsByID = getNodes();
+        List<NodeCell> nodeCellsByProperty = new ArrayList<>();
 
-        for (Node relatedNode : relatedNodes) {
-            nodeCells.add(new NodeCell(relatedNode));
-        }
-        return nodeCells;
-    }
-
-    public Collection<Node> getNodesByProperty(SAPNodeProperties property, String value) {
-        Collection<Node> nodesByID = getNodes();
-        List<Node> nodesByProperty = new ArrayList<>();
-
-        for (Node node : nodesByID) {
-            Value propertyValue = node.get(property.toString());
+        for (NodeCell nodeCell : nodeCellsByID) {
+            Value propertyValue = nodeCell.get(property.toString());
             if (propertyValue == null) {
                 continue;
             }
@@ -218,107 +197,107 @@ public class SourceNodeRepository {
                 continue;
             }
 
-            nodesByProperty.add(node);
+            nodeCellsByProperty.add(nodeCell);
         }
 
-        return nodesByProperty;
+        return nodeCellsByProperty;
     }
 
     // Laden Property
-    public Collection<Node> getNodesByIdenticalPropertyValuesNodes(SAPNodeProperties property, String value) {
+    public Collection<NodeCell> getNodesByIdenticalPropertyValuesNodes(SAPNodeProperties property, String value) {
 
-        Collection<Node> nodesByLabelAndProperty = new ArrayList<>();
+        Collection<NodeCell> nodesByLabelAndProperty = new ArrayList<>();
 
         List<Record> records = connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n");
         for (Record r : records) {
-            Node propertyValue = r.get("n").asNode();
+            NodeCell propertyValue = new NodeCell(r.get("n").asNode());
             nodesByLabelAndProperty.add(propertyValue);
         }
 
         return nodesByLabelAndProperty;
     }
 
-    public Collection<Node> getNodesByLabelAndProperty(SAPNodeLabels label, String property, String value) {
-        Collection<Node> nodesByLabel = getNodesByLabel(label);
-        List<Node> nodesByLabelAndProperty = new ArrayList<>();
+    public Collection<NodeCell> getNodesByLabelAndProperty(SAPNodeLabels label, String property, String value) {
+        Collection<NodeCell> nodeCellsByLabel = getNodeCellsByLabel(label);
+        List<NodeCell> nodeCellsByLabelAndProperty = new ArrayList<>();
 
-        for (Node node : nodesByLabel) {
-            Value propertyValue = node.get(property);
+        for (NodeCell nodeCell : nodeCellsByLabel) {
+            Value propertyValue = nodeCell.get(property);
             if (propertyValue == null) {
-                nodesByLabel.remove(node);
+                nodeCellsByLabel.remove(nodeCell);
             }
 
             if (propertyValue.asString() != value) {
-                nodesByLabel.remove(node);
+                nodeCellsByLabel.remove(nodeCell);
             }
 
-            nodesByLabelAndProperty.add(node);
+            nodeCellsByLabelAndProperty.add(nodeCell);
         }
 
-        return nodesByLabelAndProperty;
+        return nodeCellsByLabelAndProperty;
     }
 
-    private boolean nodeExist(Node node) {
-        Long nodeID = node.id();
-        if (nodeById.containsKey(nodeID)) {
+    private boolean nodeCellExists(NodeCell nodeCell) {
+        Long nodeID = nodeCell.id();
+        if (nodeCellById.containsKey(nodeID)) {
             return true;
         }
         return false;
     }
 
-    private void addNodeByID(Node node) {
-        if (!nodeExist(node)) {
-            nodeById.put(node.id(), node);
+    private void addNodeCellByID(NodeCell nodeCell) {
+        if (!nodeCellExists(nodeCell)) {
+            nodeCellById.put(nodeCell.id(), nodeCell);
         }
     }
 
-    private void addNodesByProperty(Node node) {
-        node.labels().forEach((label) -> {
-            if (!nodesByLabel.containsKey(label)) {
-                Map<Long, Node> nodeIDMap = new HashMap<>();
-                nodesByLabel.put(label, nodeIDMap);
+    private void addNodeCellsByProperty(NodeCell nodeCell) {
+        nodeCell.labels().forEach((label) -> {
+            if (!nodeCellsByLabel.containsKey(label)) {
+                Map<Long, NodeCell> nodeIDMap = new HashMap<>();
+                nodeCellsByLabel.put(label, nodeIDMap);
             }
-            Map<Long, Node> nodeIDMap = nodesByLabel.get(label);
+            Map<Long, NodeCell> nodeIDMap = nodeCellsByLabel.get(label);
 
-            Long nodeID = node.id();
-            nodeIDMap.putIfAbsent(nodeID, node);
+            Long nodeID = nodeCell.id();
+            nodeIDMap.putIfAbsent(nodeID, nodeCell);
         });
     }
 
-    private void addNodesByRelation(Node mNode, Node nNode, String relationName) {
+    private void addNodeCellsByRelation(NodeCell mNodeCell, NodeCell nNodeCell, String relationName) {
 
-        if (!nodesByRelation.containsKey(relationName)) {
+        if (!nodeCellsByRelation.containsKey(relationName)) {
             createRelationMaps(relationName);
         }
-        Map<Boolean, Map<Long, Map<Long, Node>>> relationMap = nodesByRelation.get(relationName);
+        Map<Boolean, Map<Long, Map<Long, NodeCell>>> relationMap = nodeCellsByRelation.get(relationName);
 
-        Map<Long, Map<Long, Node>> forwardRelationMap = relationMap.get(true);
-        addNodeToRelationMap(forwardRelationMap, mNode, nNode);
+        Map<Long, Map<Long, NodeCell>> forwardRelationMap = relationMap.get(true);
+        addNodeCellToRelationMap(forwardRelationMap, mNodeCell, nNodeCell);
 
-        Map<Long, Map<Long, Node>> backwardRelationMap = relationMap.get(false);
-        addNodeToRelationMap(backwardRelationMap, nNode, mNode);
+        Map<Long, Map<Long, NodeCell>> backwardRelationMap = relationMap.get(false);
+        addNodeCellToRelationMap(backwardRelationMap, nNodeCell, mNodeCell);
     }
 
     private void createRelationMaps(String relationName) {
-        Map<Boolean, Map<Long, Map<Long, Node>>> relationMap = new HashMap<>();
-        Map<Long, Map<Long, Node>> forwardRelationMap = new HashMap<>();
-        Map<Long, Map<Long, Node>> backwardRelationMap = new HashMap<>();
+        Map<Boolean, Map<Long, Map<Long, NodeCell>>> relationMap = new HashMap<>();
+        Map<Long, Map<Long, NodeCell>> forwardRelationMap = new HashMap<>();
+        Map<Long, Map<Long, NodeCell>> backwardRelationMap = new HashMap<>();
         relationMap.put(true, forwardRelationMap);
         relationMap.put(false, backwardRelationMap);
-        nodesByRelation.put(relationName, relationMap);
+        nodeCellsByRelation.put(relationName, relationMap);
     }
 
-    private void addNodeToRelationMap(Map<Long, Map<Long, Node>> relationMap, Node mNode, Node nNode) {
-        Long mNodeID = mNode.id();
+    private void addNodeCellToRelationMap(Map<Long, Map<Long, NodeCell>> relationMap, NodeCell mNodeCell, NodeCell nNodeCell) {
+        Long mNodeID = mNodeCell.id();
         if (!relationMap.containsKey(mNodeID)) {
-            Map<Long, Node> nodeIDMap = new HashMap<>();
+            Map<Long, NodeCell> nodeIDMap = new HashMap<>();
             relationMap.put(mNodeID, nodeIDMap);
         }
-        Map<Long, Node> nodeIDMap = relationMap.get(mNodeID);
+        Map<Long, NodeCell> nodeIDMap = relationMap.get(mNodeID);
 
-        Long nNodeID = nNode.id();
+        Long nNodeID = nNodeCell.id();
         if (!nodeIDMap.containsKey(nNodeID)) {
-            nodeIDMap.put(nNodeID, nNode);
+            nodeIDMap.put(nNodeID, nNodeCell);
         }
     }
 
