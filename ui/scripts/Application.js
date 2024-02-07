@@ -48,7 +48,6 @@ async function initializeApplication() {
 }
 
 controllers.application = (function () {
-
 	const defaultModelName = 'example';
 	const defaultModelDir = 'model';
 	const defaultSetupName = 'minimal';
@@ -58,8 +57,6 @@ controllers.application = (function () {
 
 	// reference to model top element
 	let canvasElement;
-
-	// initialize application
 
 	function initialize() {
 		if (!setup.ui) {
@@ -137,7 +134,7 @@ controllers.application = (function () {
 	async function startLoadingMetadata(metadataPath, defaultMetadataPath) {
 		return fetch(encodeURI(metadataPath))
 			.then((response) => {
-				if (!response.ok) throw new Error(response);
+				if (!response.ok) throw response;
 				return response;
 			}).catch(response => {
 				const errorMessage = "Failed to load metadata: " + mapResponseToErrorMessage(response, metadataPath) + "\n" + "Loading default metadata instead.";
@@ -155,7 +152,7 @@ controllers.application = (function () {
 	async function startLoadingRoadsData(roadsDataPath, defaultRoadsDataPath) {
     		return fetch(encodeURI(roadsDataPath))
     			.then((response) => {
-    				if (!response.ok) throw new Error(response);
+    				if (!response.ok) throw response;
     				return response.json();
     			}).then(roadsDTO => {
 					roadModel.createRoadObjsFromData(roadsDTO);
@@ -169,7 +166,7 @@ controllers.application = (function () {
 	async function startLoadingModel(modelPath, defaultModelPath) {
 		return fetch(encodeURI(modelPath))
 			.then((response) => {
-				if (!response.ok) throw new Error(response);
+				if (!response.ok) throw response;
 				return response;
 			}).catch(response => {
 				const errorMessage = "Failed to load model: " + mapResponseToErrorMessage(response, modelPath) + "\n" + "Loading default model instead.";
