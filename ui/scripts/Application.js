@@ -15,16 +15,26 @@ async function initializeApplication() {
 	// parsing the setup happens later, since it requires controllers to be running
 	const setupLoaded = application.startLoadingSetup(paths.setupPath, paths.defaultSetupPath);
 	const metadataLoaded = application.startLoadingMetadata(paths.metadataPath, paths.defaultMetadataPath);
-	const roadsDataLoaded = application.startLoadingRoadsData(paths.roadsDataPath, paths.defaultRoadsDataPath);
 	const modelLoaded = application.startLoadingModel(paths.modelPath, paths.defaultModelPath);
 
 	try {
-		await Promise.all([setupLoaded, metadataLoaded, roadsDataLoaded, modelLoaded]);
+		await Promise.all([setupLoaded, metadataLoaded, modelLoaded]);
 	} catch (error) {
 		alert(error);
 		return;
 	}
 	// from here on, setup/metadata/model are sure to have been loaded
+	// roads data should only be loaded if it is required by the current setup
+	const isRoadControllerIncluded = setup.controllers.some(controller => controller.name === 'roadController');
+	if (isRoadControllerIncluded) {
+		const roadsDataLoaded = application.startLoadingRoadsData(paths.roadsDataPath, paths.defaultRoadsDataPath);
+		try {
+			await Promise.all([roadsDataLoaded]);
+		} catch (error) {
+			alert(error);
+			return;
+		}
+	}
 
 	defaultLogger.initialize();
 	defaultLogger.activate();
@@ -146,17 +156,14 @@ controllers.application = (function () {
     		return fetch(encodeURI(roadsDataPath))
     			.then((response) => {
     				if (!response.ok) throw new Error(response);
-    				return response;
-    			}).catch(response => {
-    				const errorMessage = "Failed to load roads data: " + mapResponseToErrorMessage(response, roadsDataPath) + "\n" + "Loading default roads instead.";
-    				alert(errorMessage);
-    				return fetch(encodeURI(defaultRoadsDataPath));
-    			}).then(response => {
-    				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultRoadsDataPath));
-    				else return response.json();
+    				return response.json();
     			}).then(roadsDTO => {
-    				roadModel.createRoadObjsFromData(roadsDTO);
-    		});
+					roadModel.createRoadObjsFromData(roadsDTO);
+    			})
+				.catch(response => {
+    				const errorMessage = "Failed to load roads data: " + mapResponseToErrorMessage(response, roadsDataPath);
+    				alert(errorMessage);
+    			});
     	}
 
 	async function startLoadingModel(modelPath, defaultModelPath) {
