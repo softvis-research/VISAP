@@ -16,7 +16,7 @@ async function initializeApplication() {
 	const setupLoaded = application.startLoadingSetup(paths.setupPath, paths.defaultSetupPath);
 	const metadataLoaded = application.startLoadingMetadata(paths.metadataPath, paths.defaultMetadataPath);
 	const roadsDataLoaded = application.startLoadingRoadsData(paths.roadsDataPath, paths.defaultRoadsDataPath);
-	const modelLoaded = application.startLoadingModel(paths.modelPath, paths.defaultModeLPath);
+	const modelLoaded = application.startLoadingModel(paths.modelPath, paths.defaultModelPath);
 
 	try {
 		await Promise.all([setupLoaded, metadataLoaded, roadsDataLoaded, modelLoaded]);
@@ -99,7 +99,7 @@ controllers.application = (function () {
 			roadsDataPath: `${modelDir}/${modelName}/roads.json`,
 			setupPath: `setups/${setupName}.js`,
 
-			defaultModeLPath: `${defaultModelDir}/${defaultModelName}/model.html`, // LD: TODO: Fix typo (ModelL)
+			defaultModelPath: `${defaultModelDir}/${defaultModelName}/model.html`, // LD: TODO: Fix typo (ModelL)
 			defaultMetadataPath: `${defaultModelDir}/${defaultModelName}/metaData.json`,
 			defaultRoadsDataPath: `${defaultModelDir}/${defaultModelName}/roads.json`,
 			defaultSetupPath: `setups/${defaultSetupName}.js`,
@@ -159,7 +159,7 @@ controllers.application = (function () {
     		});
     	}
 
-	async function startLoadingModel(modelPath, defaultModeLPath) {
+	async function startLoadingModel(modelPath, defaultModelPath) {
 		return fetch(encodeURI(modelPath))
 			.then((response) => {
 				if (!response.ok) throw new Error(response);
@@ -167,9 +167,9 @@ controllers.application = (function () {
 			}).catch(response => {
 				const errorMessage = "Failed to load model: " + mapResponseToErrorMessage(response, modelPath) + "\n" + "Loading default model instead.";
 				alert(errorMessage);
-				return fetch(encodeURI(defaultModeLPath));
+				return fetch(encodeURI(defaultModelPath));
 			}).then(response => {
-				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultModeLPath));
+				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultModelPath));
 				else return response.text();
 			}).then(modelHtml => {
 				// load model into a separate, temporary document until UI initialization
