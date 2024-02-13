@@ -119,6 +119,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     case "west": {
                         if (directionOfPredecessor === "south" && directionOfSuccessor === "west") newX = originalPosition.x + 0.3
                         else if (directionOfPredecessor === "west" && directionOfSuccessor === "north") newX = originalPosition.x - 0.3
+                        else if (directionOfPredecessor === "north" && directionOfSuccessor === "north") newX = originalPosition.x - 0.3
                         else if (directionOfPredecessor === "south" && directionOfSuccessor === "south") newX = originalPosition.x + 0.3
                         else newX = originalPosition.x
                         newZ = originalPosition.z + baseOffset;
@@ -149,6 +150,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                         newX = originalPosition.x - baseOffset;
                         if (directionOfPredecessor === null && directionOfSuccessor === "east") newZ = originalPosition.z - 0.3;
                         else if (directionOfPredecessor === "east" && directionOfSuccessor === "east") newZ = originalPosition.z - 0.3;
+                        else if (directionOfPredecessor === "north" && directionOfSuccessor === "east") newZ = originalPosition.z - 0.3;
                         else if (directionOfPredecessor === "west" && directionOfSuccessor === null) newZ = originalPosition.z + 0.3;
                         else newZ = originalPosition.z;
                         break;
@@ -181,7 +183,9 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     case "north":
                         newX = originalPosition.x + baseOffset;
                         if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newZ = originalPosition.z - 0.3;
+                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "north") newZ = originalPosition.z + 0.3;
                         else if (directionOfPredecessor === "east" && directionOfSuccessor === null) newZ = originalPosition.z + 0.3;
+                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "east") newZ = originalPosition.z + 0.3;
                         // else if (directionOfPredecessor === null && directionOfSuccessor === "west") newZ = originalPosition.z - 0.3;
                         else newZ = originalPosition.z
                         break;
@@ -231,6 +235,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                         newWidth = originalWidth * (1 - globalStripeShrinkPct);
                         if (directionOfPredecessor === null && directionOfSuccessor === "east") newDepth = originalDepth - 0.6
                         else if (directionOfPredecessor === "east" && directionOfSuccessor === "east") newDepth = originalDepth - 0.8
+                        else if (directionOfPredecessor === "north" && directionOfSuccessor === "east") newDepth = newDepth = originalDepth - 0.6
                         else if (directionOfPredecessor === "west" && directionOfSuccessor === null) newDepth = originalDepth - 0.6
                         else newDepth = originalDepth - 0.2;
                         break;
@@ -266,7 +271,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     case "north": {
                         if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newDepth = originalDepth - 0.8;
                         else if (directionOfPredecessor === "east" && directionOfSuccessor === null) newDepth = originalDepth - 0.6;
-                        // else if (directionOfPredecessor === null && directionOfSuccessor === "west") newDepth = originalDepth - 0.6
+                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "north") newDepth = originalDepth - 0.6;
+                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "east") newDepth = originalDepth - 0.8;
                         else newDepth = originalDepth - 0.2;
                         newWidth = originalWidth * (1 - globalStripeShrinkPct);
                         break;

@@ -71,6 +71,7 @@ controllers.roadController = function () {
 		const appEventEntity = applicationEvent.entities[0];
 		if (controllerConfig.supportedEntityTypes.includes(appEventEntity.type)) {
 			globalStartElementComponent = document.getElementById(appEventEntity.id);
+			console.log("START ELEMENT ID: " + globalStartElementComponent.id)
 			highlightStartElement();
 			handleRoadsHighlightForStartElement();
 		}
