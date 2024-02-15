@@ -9,14 +9,33 @@ const createLegendHelper = function (controllerConfig) {
             const canvas = document.getElementById("canvas");
             let legendDivElement = application.createDiv("legend");
 
+            createLegendHeader(legendDivElement, "RELATIONS", "red")
+
+
             legendItems.forEach(item => {
                 createLegendItem(legendDivElement, item.text, item.color);
             });
+
 
             canvas.appendChild(legendDivElement);
             const legendElement = document.getElementById("legend");
             legendElement.style.display = 'none';
             legendVisible = false;
+        }
+
+        function createLegendHeader(parentElement, text, color) {
+            const legendItem = document.createElement("DIV");
+            legendItem.classList.add("legend-header");
+
+            const textBox = document.createElement("DIV");
+            textBox.classList.add("text-box-header");
+
+            const legendText = document.createElement("SPAN");
+            legendText.textContent = text;
+
+            textBox.appendChild(legendText);
+            legendItem.appendChild(textBox);
+            parentElement.appendChild(legendItem);
         }
 
         function createLegendItem(parentElement, text, color) {
