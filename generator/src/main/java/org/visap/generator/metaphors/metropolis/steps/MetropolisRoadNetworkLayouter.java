@@ -46,17 +46,18 @@ public class MetropolisRoadNetworkLayouter {
         DistrictRoadNetwork rootRoadNetwork = new DistrictRoadNetwork(virtualRootDistrict, new HashMap<>(), this.referenceMapper);
         this.mainRoads.addAll(rootRoadNetwork.calculate());
 
-        for (CityElement roadElement : extractRoads(mainRoads, virtualRootDistrict)) {
-            repository.addElement(roadElement);
+        for (CityElement roadSection : extractRoadSections(mainRoads, virtualRootDistrict)) {
+            repository.addElement(roadSection);
         }
 
         for (CityElement namespaceDistrict : repository.getNamespaceDistrictsOfOriginSet()) {
             System.err.println(namespaceDistrict.getHash());
             DistrictRoadNetwork roadNetwork = new DistrictRoadNetwork(namespaceDistrict, rootRoadNetwork.getSubElementConnectors(namespaceDistrict), this.referenceMapper);
-            this.subRoads.addAll(roadNetwork.calculate());
+            List<Road> roadSectionsOnDistrict = roadNetwork.calculate();
+            this.subRoads.addAll(roadSectionsOnDistrict);
 
-            for (CityElement road : extractRoads(subRoads, virtualRootDistrict)) {
-                repository.addElement(road);
+            for (CityElement roadSection : extractRoadSections(roadSectionsOnDistrict, virtualRootDistrict)) {
+                repository.addElement(roadSection);
             }
         }
     }
@@ -116,7 +117,7 @@ public class MetropolisRoadNetworkLayouter {
         return virtualRootDistrict;
     }
 
-    private List<CityElement> extractRoads(List<Road> roads, CityElement district) {
+    private List<CityElement> extractRoadSections(List<Road> roads, CityElement district) {
         List<CityElement> roadElementsUnfiltered = new ArrayList<CityElement>();
         List<CityElement> roadElements = new ArrayList<CityElement>();
 
