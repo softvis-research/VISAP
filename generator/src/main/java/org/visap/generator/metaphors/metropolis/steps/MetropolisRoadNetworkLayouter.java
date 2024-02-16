@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.visap.generator.configuration.Config;
@@ -51,7 +50,6 @@ public class MetropolisRoadNetworkLayouter {
         }
 
         for (CityElement namespaceDistrict : repository.getNamespaceDistrictsOfOriginSet()) {
-            System.err.println(namespaceDistrict.getHash());
             DistrictRoadNetwork roadNetwork = new DistrictRoadNetwork(namespaceDistrict, rootRoadNetwork.getSubElementConnectors(namespaceDistrict), this.referenceMapper);
             List<Road> roadSectionsOnDistrict = roadNetwork.calculate();
             this.subRoads.addAll(roadSectionsOnDistrict);
@@ -122,17 +120,13 @@ public class MetropolisRoadNetworkLayouter {
         List<CityElement> roadElements = new ArrayList<CityElement>();
 
         for (Road road : roads) {
-            int amountOfRelations = this.referenceMapper.getAmountOfRelationsToACityElement(road.getStartElement(),
-                    road.getDestinationElement(), false);
+            int amountOfRelations = this.referenceMapper.getAmountOfRelationsToACityElement(road.getStartElement(), road.getDestinationElement(), false);
             for (int i = 0; i < road.getPath().size() - 1; i++) {
-                CityElement roadSection = createRoadSectionACityElement(road.getPath().get(i),
-                        road.getPath().get(i + 1), district, amountOfRelations);
+                CityElement roadSection = createRoadSectionACityElement(road.getPath().get(i), road.getPath().get(i + 1), district, amountOfRelations);
                 roadElementsUnfiltered.add(roadSection);
                 road.addRoadSectionId(roadSection.getHash());
             }
         }
-
-        System.err.println(roadElementsUnfiltered.size());
 
         Collections.sort(roadElementsUnfiltered, (elem1, elem2) -> {
             if (elem1.getXPosition() == elem2.getXPosition()) {
@@ -151,17 +145,13 @@ public class MetropolisRoadNetworkLayouter {
         });
 
         for (int i = 0; i < roadElementsUnfiltered.size() - 1; i++) {
-            if (roadElementsUnfiltered.get(i).getXPosition() != roadElementsUnfiltered.get(i + 1).getXPosition()
-                    || roadElementsUnfiltered.get(i).getZPosition() != roadElementsUnfiltered.get(i + 1)
-                            .getZPosition()) {
+            if (roadElementsUnfiltered.get(i).getXPosition() != roadElementsUnfiltered.get(i + 1).getXPosition() || roadElementsUnfiltered.get(i).getZPosition() != roadElementsUnfiltered.get(i + 1).getZPosition()) {
                 roadElements.add(roadElementsUnfiltered.get(i));
             } else {
-                // This is a duplicate of the next road section. Find the road it belongs to and
-                // substitute the ID of the road section it will be filtered in favor of.
+                // This is a duplicate of the next road section. Find the road it belongs to and substitute the ID of the road section it will be filtered in favor of.
                 for (Road road : roads) {
                     if (road.getRoadSectionIds().contains(roadElementsUnfiltered.get(i).getHash())) {
-                        road.substituteRoadSectionId(roadElementsUnfiltered.get(i).getHash(),
-                                roadElementsUnfiltered.get(i + 1).getHash());
+                        road.substituteRoadSectionId(roadElementsUnfiltered.get(i).getHash(), roadElementsUnfiltered.get(i + 1).getHash());
                     }
                 }
             }
@@ -170,14 +160,9 @@ public class MetropolisRoadNetworkLayouter {
                 roadElements.add(roadElementsUnfiltered.get(i + 1));
             }
         }
-        System.err.println(roadElements.size());
-        for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-            System.out.println(ste + "\n");
-        }
-        System.out.println("-----------------------------------");
+
         return roadElements;
     }
-
 
     private CityElement createRoadSectionACityElement(RoadNode start, RoadNode end, CityElement district, int amountOfRelations) {
         CityElement roadSection = new CityElement(CityType.Road);
