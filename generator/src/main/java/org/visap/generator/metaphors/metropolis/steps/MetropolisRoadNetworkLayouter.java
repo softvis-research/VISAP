@@ -51,10 +51,10 @@ public class MetropolisRoadNetworkLayouter {
 
         for (CityElement namespaceDistrict : repository.getNamespaceDistrictsOfOriginSet()) {
             DistrictRoadNetwork roadNetwork = new DistrictRoadNetwork(namespaceDistrict, rootRoadNetwork.getSubElementConnectors(namespaceDistrict), this.referenceMapper);
-            List<Road> roadSectionsOnDistrict = roadNetwork.calculate();
-            this.subRoads.addAll(roadSectionsOnDistrict);
+            List<Road> roadsOnDistrict = roadNetwork.calculate();
+            this.subRoads.addAll(roadsOnDistrict);
 
-            for (CityElement roadSection : extractRoadSections(roadSectionsOnDistrict, virtualRootDistrict)) {
+            for (CityElement roadSection : extractRoadSections(roadsOnDistrict, virtualRootDistrict)) {
                 repository.addElement(roadSection);
             }
         }
