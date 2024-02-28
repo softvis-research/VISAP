@@ -64,7 +64,7 @@ public class MetropolisRoadNetworkLayouter {
             for (Road road : roadsOnDistrict) {
                 String startElementContainerId = road.getStartElement().getSourceNodeProperty(SAPNodeProperties.container_id);
                 String destinationElementContainerId = road.getDestinationElement().getSourceNodeProperty(SAPNodeProperties.container_id);
-                if (startElementContainerId != destinationElementContainerId) {
+                if (!startElementContainerId.equals(destinationElementContainerId)) {
                     Optional<Road> connectingRoad = this.mainRoads
                         .stream()
                         .filter(
@@ -79,7 +79,7 @@ public class MetropolisRoadNetworkLayouter {
                     connectingRoad.ifPresentOrElse(connector ->
                         road.addRoadSectionIds(connector.getRoadSectionIds()),
                         () -> {
-                            throw new RuntimeException("There is no mainRoad connecting the subRoad from start container" + startElementContainerId + "to destination container " + destinationElementContainerId);
+                            System.out.println("There is no mainRoad connecting the subRoad from start container " + startElementContainerId + " to destination container " + destinationElementContainerId);
                         }
                     );
                 }
