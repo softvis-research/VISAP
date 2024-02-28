@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.metaphors.metropolis.layouts.DistrictRoadNetwork;
 import org.visap.generator.metaphors.metropolis.layouts.road.network.Road;
@@ -45,7 +48,7 @@ public class MetropolisRoadNetworkLayouter {
         DistrictRoadNetwork rootRoadNetwork = new DistrictRoadNetwork(virtualRootDistrict, new HashMap<>(), this.referenceMapper);
         this.mainRoads.addAll(rootRoadNetwork.calculate());
 
-        for (CityElement roadSection : extractRoadSections(mainRoads, virtualRootDistrict)) {
+        for (CityElement roadSection : createRoadSections(this.mainRoads, virtualRootDistrict)) {
             repository.addElement(roadSection);
         }
 
@@ -54,10 +57,35 @@ public class MetropolisRoadNetworkLayouter {
             List<Road> roadsOnDistrict = roadNetwork.calculate();
             this.subRoads.addAll(roadsOnDistrict);
 
-            for (CityElement roadSection : extractRoadSections(roadsOnDistrict, virtualRootDistrict)) {
+            for (CityElement roadSection : createRoadSections(roadsOnDistrict, virtualRootDistrict)) {
                 repository.addElement(roadSection);
             }
+
+            for (Road road : roadsOnDistrict) {
+                String startElementContainerId = road.getStartElement().getSourceNodeProperty(SAPNodeProperties.container_id);
+                String destinationElementContainerId = road.getDestinationElement().getSourceNodeProperty(SAPNodeProperties.container_id);
+                if (startElementContainerId != destinationElementContainerId) {
+                    Optional<Road> connectingRoad = this.mainRoads
+                        .stream()
+                        .filter(
+                            mainRoad
+                                -> mainRoad.getStartElementId().equals(startElementContainerId)
+                                || mainRoad.getStartElementId().equals(destinationElementContainerId)
+                                && (mainRoad.getDestinationElementId().equals(startElementContainerId)
+                                || mainRoad.getDestinationElementId().equals(destinationElementContainerId))
+                        )
+                        .findFirst();
+
+                    connectingRoad.ifPresentOrElse(connector ->
+                        road.addRoadSectionIds(connector.getRoadSectionIds()),
+                        () -> {
+                            throw new RuntimeException("There is no mainRoad connecting the subRoad from start container" + startElementContainerId + "to destination container " + destinationElementContainerId);
+                        }
+                    );
+                }
+            }
         }
+
     }
 
     public List<Road> getMainRoads() {
@@ -115,7 +143,7 @@ public class MetropolisRoadNetworkLayouter {
         return virtualRootDistrict;
     }
 
-    private List<CityElement> extractRoadSections(List<Road> roads, CityElement district) {
+    private List<CityElement> createRoadSections(List<Road> roads, CityElement district) {
         List<CityElement> roadElementsUnfiltered = new ArrayList<CityElement>();
         List<CityElement> roadElements = new ArrayList<CityElement>();
 
