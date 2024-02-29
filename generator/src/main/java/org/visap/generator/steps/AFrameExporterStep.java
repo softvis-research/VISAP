@@ -56,7 +56,7 @@ public class AFrameExporterStep {
             MetropolisRoadNetworkLayouter roadNetworkLayouter = new MetropolisRoadNetworkLayouter(cityRepository, nodeRepository);
             roadNetworkLayouter.createRoadNetworks();
 
-            RoadExporter roadExporter = new RoadExporter(roadNetworkLayouter.getMainRoads(), roadNetworkLayouter.getSubRoads());
+            RoadExporter roadExporter = new RoadExporter(roadNetworkLayouter.getInterdistrictRoads());
             roadExporter.exportRoads();
         }
 

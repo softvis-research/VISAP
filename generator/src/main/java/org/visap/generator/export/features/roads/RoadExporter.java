@@ -17,9 +17,8 @@ import org.visap.generator.configuration.Config;
 public class RoadExporter {
     private List<Road> roads = new ArrayList<Road>();
 
-    public RoadExporter(List<Road> mainRoads, List<Road> subRoads) {
-        this.roads.addAll(mainRoads);
-        this.roads.addAll(subRoads);
+    public RoadExporter(List<Road> roads) {
+        this.roads = roads;
     }
 
     private FileWriter constructFileWriter() throws IOException {

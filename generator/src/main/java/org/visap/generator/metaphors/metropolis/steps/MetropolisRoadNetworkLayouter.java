@@ -31,6 +31,7 @@ public class MetropolisRoadNetworkLayouter {
     public List<Road> mainRoads = new ArrayList<Road>();
     public List<Road> subRoads = new ArrayList<Road>();
     public List<Road> roadsOnDistricts = new ArrayList<Road>();
+    public List<Road> interdistrictRoads = new ArrayList<Road>();
 
     private static final double districtHeight = Config.Visualization.Metropolis.district.districtHeight();
     private static final double roadHeight = Config.Visualization.Metropolis.roadNetwork.roadHeight();
@@ -68,6 +69,7 @@ public class MetropolisRoadNetworkLayouter {
         for (Road road : this.roadsOnDistricts) {
             CityElement startParent = road.getStartElement().getParentElement();
             CityElement destinationParent = road.getDestinationElement().getParentElement();
+            if (Objects.equals(startParent, destinationParent)) this.interdistrictRoads.add(road);
             if (!Objects.equals(startParent, destinationParent)) {
                 Optional<Road> connectingRoad = this.mainRoads
                     .stream()
@@ -82,6 +84,7 @@ public class MetropolisRoadNetworkLayouter {
 
                 connectingRoad.ifPresentOrElse(
                     connector -> {
+                        this.interdistrictRoads.add(road);
                         road.addRoadSectionIds(connector.getRoadSectionIds());
                         Optional<Road> endOfRoad = this.roadsOnDistricts
                             .stream()
@@ -104,6 +107,10 @@ public class MetropolisRoadNetworkLayouter {
                 );
             }
         }
+    }
+
+    public List<Road> getInterdistrictRoads() {
+        return this.interdistrictRoads;
     }
 
     public List<Road> getMainRoads() {
