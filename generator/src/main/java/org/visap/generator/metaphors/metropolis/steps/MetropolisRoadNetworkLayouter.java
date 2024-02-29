@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.logging.Log;
@@ -29,6 +30,7 @@ public class MetropolisRoadNetworkLayouter {
 
     public List<Road> mainRoads = new ArrayList<Road>();
     public List<Road> subRoads = new ArrayList<Road>();
+    public List<Road> roadsOnDistricts = new ArrayList<Road>();
 
     private static final double districtHeight = Config.Visualization.Metropolis.district.districtHeight();
     private static final double roadHeight = Config.Visualization.Metropolis.roadNetwork.roadHeight();
@@ -56,36 +58,52 @@ public class MetropolisRoadNetworkLayouter {
             DistrictRoadNetwork roadNetwork = new DistrictRoadNetwork(namespaceDistrict, rootRoadNetwork.getSubElementConnectors(namespaceDistrict), this.referenceMapper);
             List<Road> roadsOnDistrict = roadNetwork.calculate();
             this.subRoads.addAll(roadsOnDistrict);
+            this.roadsOnDistricts.addAll(roadsOnDistrict);
 
             for (CityElement roadSection : createRoadSections(roadsOnDistrict, virtualRootDistrict)) {
                 repository.addElement(roadSection);
             }
-
-            for (Road road : roadsOnDistrict) {
-                String startElementContainerId = road.getStartElement().getSourceNodeProperty(SAPNodeProperties.container_id);
-                String destinationElementContainerId = road.getDestinationElement().getSourceNodeProperty(SAPNodeProperties.container_id);
-                if (!startElementContainerId.equals(destinationElementContainerId)) {
-                    Optional<Road> connectingRoad = this.mainRoads
-                        .stream()
-                        .filter(
-                            mainRoad
-                                -> mainRoad.getStartElementId().equals(startElementContainerId)
-                                || mainRoad.getStartElementId().equals(destinationElementContainerId)
-                                && (mainRoad.getDestinationElementId().equals(startElementContainerId)
-                                || mainRoad.getDestinationElementId().equals(destinationElementContainerId))
-                        )
-                        .findFirst();
-
-                    connectingRoad.ifPresentOrElse(connector ->
-                        road.addRoadSectionIds(connector.getRoadSectionIds()),
-                        () -> {
-                            System.out.println("There is no mainRoad connecting the subRoad from start container " + startElementContainerId + " to destination container " + destinationElementContainerId);
-                        }
-                    );
-                }
-            }
         }
 
+        for (Road road : this.roadsOnDistricts) {
+            CityElement startParent = road.getStartElement().getParentElement();
+            CityElement destinationParent = road.getDestinationElement().getParentElement();
+            if (!Objects.equals(startParent, destinationParent)) {
+                Optional<Road> connectingRoad = this.mainRoads
+                    .stream()
+                    .filter(
+                        mainRoad
+                            -> (mainRoad.getStartElement().equals(startParent)
+                                || mainRoad.getStartElement().equals(destinationParent))
+                            && (mainRoad.getDestinationElement().equals(startParent)
+                                || mainRoad.getDestinationElement().equals(destinationParent))
+                    )
+                    .findAny();
+
+                connectingRoad.ifPresentOrElse(
+                    connector -> {
+                        road.addRoadSectionIds(connector.getRoadSectionIds());
+                        Optional<Road> endOfRoad = this.roadsOnDistricts
+                            .stream()
+                            .filter(
+                                subMainRoadConnector
+                                    -> subMainRoadConnector.getStartElement().getParentElement() == null
+                                    && subMainRoadConnector.getDestinationElement().equals(road.getDestinationElement())
+                            )
+                            .findAny();
+                        endOfRoad.ifPresentOrElse(
+                            end -> road.addRoadSectionIds(end.getRoadSectionIds().reversed()),
+                            () -> {
+                                System.out.println("The road between " + road.getStartElement().getSourceNodeProperty(SAPNodeProperties.object_name) + " and " + road.getDestinationElement().getSourceNodeProperty(SAPNodeProperties.object_name) + " has no end.");
+                            }
+                        );
+                    },
+                    () -> {
+                        System.out.println("There is no mainRoad connecting the subRoad from start district " + startParent + " to destination district " + destinationParent);
+                    }
+                );
+            }
+        }
     }
 
     public List<Road> getMainRoads() {
