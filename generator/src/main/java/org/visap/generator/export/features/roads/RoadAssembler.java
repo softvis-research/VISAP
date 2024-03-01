@@ -43,38 +43,41 @@ public class RoadAssembler {
 
         connectingRoad.ifPresentOrElse(
                 connector -> processConnectingRoad(road, connector),
-                () -> logNoConnectingMainRoad(startParent, destinationParent)
-        );
+                () -> logNoConnectingMainRoad(startParent, destinationParent));
 
         return connectingRoad.map(connector -> road);
     }
 
     private Optional<Road> findConnectingRoad(CityElement startParent, CityElement destinationParent) {
-        return mainRoads.stream().filter(mainRoad ->
-                (mainRoad.getStartElement().equals(startParent) || mainRoad.getStartElement().equals(destinationParent))
-                        && (mainRoad.getDestinationElement().equals(startParent) || mainRoad.getDestinationElement().equals(destinationParent))
-        ).findAny();
+        return mainRoads.stream()
+                .filter(mainRoad
+                        -> (mainRoad.getStartElement().equals(startParent)
+                            || mainRoad.getStartElement().equals(destinationParent))
+                        && (mainRoad.getDestinationElement().equals(startParent)
+                            || mainRoad.getDestinationElement().equals(destinationParent)))
+                .findAny();
     }
 
     private void processConnectingRoad(Road road, Road connector) {
         road.addRoadSectionIds(connector.getRoadSectionIds());
         findEndOfRoad(road).ifPresentOrElse(
                 end -> road.addRoadSectionIds(end.getRoadSectionIds().reversed()),
-                () -> logNoEndOfRoad(road)
-        );
+                () -> logNoEndOfRoad(road));
     }
 
     private Optional<Road> findEndOfRoad(Road road) {
-        return subRoads.stream().filter(subRoad ->
-                subRoad.getStartElement().getParentElement() == null && subRoad.getDestinationElement().equals(road.getDestinationElement())
-        ).findAny();
+        return subRoads.stream().filter(subRoad -> subRoad.getStartElement().getParentElement() == null
+                && subRoad.getDestinationElement().equals(road.getDestinationElement())).findAny();
     }
 
     private void logNoConnectingMainRoad(CityElement startParent, CityElement destinationParent) {
-        System.out.println("There is no mainRoad connecting the subRoad from start district " + startParent + " to destination district " + destinationParent);
+        System.out.println("There is no mainRoad connecting the subRoad from start district " + startParent
+                + " to destination district " + destinationParent);
     }
 
     private void logNoEndOfRoad(Road road) {
-        System.out.println("The road between " + road.getStartElement().getSourceNodeProperty(SAPNodeProperties.object_name) + " and " + road.getDestinationElement().getSourceNodeProperty(SAPNodeProperties.object_name) + " has no end.");
+        System.out.println("The road between "
+                + road.getStartElement().getSourceNodeProperty(SAPNodeProperties.object_name) + " and "
+                + road.getDestinationElement().getSourceNodeProperty(SAPNodeProperties.object_name) + " has no end.");
     }
 }
