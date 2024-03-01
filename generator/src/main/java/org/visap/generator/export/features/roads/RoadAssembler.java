@@ -19,49 +19,62 @@ public class RoadAssembler {
     }
 
     public List<Road> assembleRoads() {
-        List<Road> assembledRoads = new ArrayList<Road>();
-        for (Road road : this.subRoads) {
-            CityElement startParent = road.getStartElement().getParentElement();
-            CityElement destinationParent = road.getDestinationElement().getParentElement();
-            if (Objects.equals(startParent, destinationParent)) assembledRoads.add(road);
-            if (!Objects.equals(startParent, destinationParent)) {
-                Optional<Road> connectingRoad = this.mainRoads
-                    .stream()
-                    .filter(
-                        mainRoad
-                            -> (mainRoad.getStartElement().equals(startParent)
-                                || mainRoad.getStartElement().equals(destinationParent))
-                            && (mainRoad.getDestinationElement().equals(startParent)
-                                || mainRoad.getDestinationElement().equals(destinationParent))
-                    )
-                    .findAny();
-
-                connectingRoad.ifPresentOrElse(
-                    connector -> {
-                        assembledRoads.add(road);
-                        road.addRoadSectionIds(connector.getRoadSectionIds());
-                        Optional<Road> endOfRoad = this.subRoads
-                            .stream()
-                            .filter(
-                                subMainRoadConnector
-                                    -> subMainRoadConnector.getStartElement().getParentElement() == null
-                                    && subMainRoadConnector.getDestinationElement().equals(road.getDestinationElement())
-                            )
-                            .findAny();
-                        endOfRoad.ifPresentOrElse(
-                            end -> road.addRoadSectionIds(end.getRoadSectionIds().reversed()),
-                            () -> {
-                                System.out.println("The road between " + road.getStartElement().getSourceNodeProperty(SAPNodeProperties.object_name) + " and " + road.getDestinationElement().getSourceNodeProperty(SAPNodeProperties.object_name) + " has no end.");
-                            }
-                        );
-                    },
-                    () -> {
-                        System.out.println("There is no mainRoad connecting the subRoad from start district " + startParent + " to destination district " + destinationParent);
-                    }
-                );
+        List<Road> assembledRoads = new ArrayList<>();
+        for (Road road : subRoads) {
+            if (isSameDistrict(road)) {
+                assembledRoads.add(road);
+            } else {
+                connectRoads(road).ifPresent(assembledRoads::add);
             }
         }
-
         return assembledRoads;
+    }
+
+    private boolean isSameDistrict(Road road) {
+        CityElement startParent = road.getStartElement().getParentElement();
+        CityElement destinationParent = road.getDestinationElement().getParentElement();
+        return Objects.equals(startParent, destinationParent);
+    }
+
+    private Optional<Road> connectRoads(Road road) {
+        CityElement startParent = road.getStartElement().getParentElement();
+        CityElement destinationParent = road.getDestinationElement().getParentElement();
+        Optional<Road> connectingRoad = findConnectingRoad(startParent, destinationParent);
+
+        connectingRoad.ifPresentOrElse(
+                connector -> processConnectingRoad(road, connector),
+                () -> logNoConnectingMainRoad(startParent, destinationParent)
+        );
+
+        return connectingRoad.map(connector -> road);
+    }
+
+    private Optional<Road> findConnectingRoad(CityElement startParent, CityElement destinationParent) {
+        return mainRoads.stream().filter(mainRoad ->
+                (mainRoad.getStartElement().equals(startParent) || mainRoad.getStartElement().equals(destinationParent))
+                        && (mainRoad.getDestinationElement().equals(startParent) || mainRoad.getDestinationElement().equals(destinationParent))
+        ).findAny();
+    }
+
+    private void processConnectingRoad(Road road, Road connector) {
+        road.addRoadSectionIds(connector.getRoadSectionIds());
+        findEndOfRoad(road).ifPresentOrElse(
+                end -> road.addRoadSectionIds(end.getRoadSectionIds().reversed()),
+                () -> logNoEndOfRoad(road)
+        );
+    }
+
+    private Optional<Road> findEndOfRoad(Road road) {
+        return subRoads.stream().filter(subRoad ->
+                subRoad.getStartElement().getParentElement() == null && subRoad.getDestinationElement().equals(road.getDestinationElement())
+        ).findAny();
+    }
+
+    private void logNoConnectingMainRoad(CityElement startParent, CityElement destinationParent) {
+        System.out.println("There is no mainRoad connecting the subRoad from start district " + startParent + " to destination district " + destinationParent);
+    }
+
+    private void logNoEndOfRoad(Road road) {
+        System.out.println("The road between " + road.getStartElement().getSourceNodeProperty(SAPNodeProperties.object_name) + " and " + road.getDestinationElement().getSourceNodeProperty(SAPNodeProperties.object_name) + " has no end.");
     }
 }
