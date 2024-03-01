@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.metaphors.metropolis.layouts.DistrictRoadNetwork;
 import org.visap.generator.metaphors.metropolis.layouts.road.network.Road;
@@ -63,48 +60,6 @@ public class MetropolisRoadNetworkLayouter {
 
             for (CityElement roadSection : createRoadSections(roadsOnDistrict, virtualRootDistrict)) {
                 repository.addElement(roadSection);
-            }
-        }
-
-        for (Road road : this.roadsOnDistricts) {
-            CityElement startParent = road.getStartElement().getParentElement();
-            CityElement destinationParent = road.getDestinationElement().getParentElement();
-            if (Objects.equals(startParent, destinationParent)) this.interdistrictRoads.add(road);
-            if (!Objects.equals(startParent, destinationParent)) {
-                Optional<Road> connectingRoad = this.mainRoads
-                    .stream()
-                    .filter(
-                        mainRoad
-                            -> (mainRoad.getStartElement().equals(startParent)
-                                || mainRoad.getStartElement().equals(destinationParent))
-                            && (mainRoad.getDestinationElement().equals(startParent)
-                                || mainRoad.getDestinationElement().equals(destinationParent))
-                    )
-                    .findAny();
-
-                connectingRoad.ifPresentOrElse(
-                    connector -> {
-                        this.interdistrictRoads.add(road);
-                        road.addRoadSectionIds(connector.getRoadSectionIds());
-                        Optional<Road> endOfRoad = this.roadsOnDistricts
-                            .stream()
-                            .filter(
-                                subMainRoadConnector
-                                    -> subMainRoadConnector.getStartElement().getParentElement() == null
-                                    && subMainRoadConnector.getDestinationElement().equals(road.getDestinationElement())
-                            )
-                            .findAny();
-                        endOfRoad.ifPresentOrElse(
-                            end -> road.addRoadSectionIds(end.getRoadSectionIds().reversed()),
-                            () -> {
-                                System.out.println("The road between " + road.getStartElement().getSourceNodeProperty(SAPNodeProperties.object_name) + " and " + road.getDestinationElement().getSourceNodeProperty(SAPNodeProperties.object_name) + " has no end.");
-                            }
-                        );
-                    },
-                    () -> {
-                        System.out.println("There is no mainRoad connecting the subRoad from start district " + startParent + " to destination district " + destinationParent);
-                    }
-                );
             }
         }
     }

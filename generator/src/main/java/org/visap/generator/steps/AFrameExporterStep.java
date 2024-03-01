@@ -4,13 +4,17 @@ import org.visap.generator.configuration.Config;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.visap.generator.abap.enums.SAPRelationLabels;
+import org.visap.generator.metaphors.metropolis.layouts.road.network.Road;
 import org.visap.generator.metaphors.metropolis.steps.*;
 import org.visap.generator.repository.CityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
 import org.visap.generator.database.DatabaseConnector;
 import org.visap.generator.export.core.AFrameExporter;
 import org.visap.generator.export.core.MetaDataOutput;
+import org.visap.generator.export.features.roads.RoadAssembler;
 import org.visap.generator.export.features.roads.RoadExporter;
+
+import java.util.List;
 import java.util.Scanner;
 
 public class AFrameExporterStep {
@@ -56,7 +60,10 @@ public class AFrameExporterStep {
             MetropolisRoadNetworkLayouter roadNetworkLayouter = new MetropolisRoadNetworkLayouter(cityRepository, nodeRepository);
             roadNetworkLayouter.createRoadNetworks();
 
-            RoadExporter roadExporter = new RoadExporter(roadNetworkLayouter.getInterdistrictRoads());
+            RoadAssembler assembler = new RoadAssembler(roadNetworkLayouter.getMainRoads(), roadNetworkLayouter.getSubRoads());
+            List<Road> assembledRoads = assembler.assembleRoads();
+
+            RoadExporter roadExporter = new RoadExporter(assembledRoads);
             roadExporter.exportRoads();
         }
 
