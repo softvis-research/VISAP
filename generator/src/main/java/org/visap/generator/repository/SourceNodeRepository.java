@@ -122,6 +122,10 @@ public class SourceNodeRepository {
             Node mNode = result.get("m").asNode();
             mNode = nodeById.get(mNode.id());
 
+            // TODO: Figure out when this can happen
+            if (mNode == null)
+                continue;
+
             addNodesByRelation(mNode, nNode, relationType.name());
             relationCounter.addAndGet(1);
         }
