@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.visap.generator.configuration.Config;
@@ -26,6 +27,8 @@ public class MetropolisRoadNetworkLayouter {
 
     public List<Road> mainRoads = new ArrayList<Road>();
     public List<Road> subRoads = new ArrayList<Road>();
+    public List<Road> roadsOnDistricts = new ArrayList<Road>();
+    public List<Road> interdistrictRoads = new ArrayList<Road>();
 
     private static final double districtHeight = Config.Visualization.Metropolis.district.districtHeight();
     private static final double roadHeight = Config.Visualization.Metropolis.roadNetwork.roadHeight();
@@ -45,18 +48,24 @@ public class MetropolisRoadNetworkLayouter {
         DistrictRoadNetwork rootRoadNetwork = new DistrictRoadNetwork(virtualRootDistrict, new HashMap<>(), this.referenceMapper);
         this.mainRoads.addAll(rootRoadNetwork.calculate());
 
-        for (CityElement roadElement : extractRoads(mainRoads, virtualRootDistrict)) {
-            repository.addElement(roadElement);
+        for (CityElement roadSection : createRoadSections(this.mainRoads, virtualRootDistrict)) {
+            repository.addElement(roadSection);
         }
 
         for (CityElement namespaceDistrict : repository.getNamespaceDistrictsOfOriginSet()) {
             DistrictRoadNetwork roadNetwork = new DistrictRoadNetwork(namespaceDistrict, rootRoadNetwork.getSubElementConnectors(namespaceDistrict), this.referenceMapper);
-            this.subRoads.addAll(roadNetwork.calculate());
+            List<Road> roadsOnDistrict = roadNetwork.calculate();
+            this.subRoads.addAll(roadsOnDistrict);
+            this.roadsOnDistricts.addAll(roadsOnDistrict);
 
-            for (CityElement road : extractRoads(subRoads, virtualRootDistrict)) {
-                repository.addElement(road);
+            for (CityElement roadSection : createRoadSections(roadsOnDistrict, virtualRootDistrict)) {
+                repository.addElement(roadSection);
             }
         }
+    }
+
+    public List<Road> getInterdistrictRoads() {
+        return this.interdistrictRoads;
     }
 
     public List<Road> getMainRoads() {
@@ -114,7 +123,7 @@ public class MetropolisRoadNetworkLayouter {
         return virtualRootDistrict;
     }
 
-    private List<CityElement> extractRoads(List<Road> roads, CityElement district) {
+    private List<CityElement> createRoadSections(List<Road> roads, CityElement district) {
         List<CityElement> roadElementsUnfiltered = new ArrayList<CityElement>();
         List<CityElement> roadElements = new ArrayList<CityElement>();
 

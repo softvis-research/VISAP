@@ -3,6 +3,7 @@ package org.visap.generator.metaphors.metropolis.layouts.road.network;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.repository.CityElement;
 
 public class Road {
@@ -54,6 +55,14 @@ public class Road {
 
     public CityElement getDestinationElement() {
         return this.destinationElement;
+    }
+
+    public String getStartElementId() {
+        return this.startElement.getSourceNodeProperty(SAPNodeProperties.element_id);
+    }
+
+    public String getDestinationElementId() {
+        return this.destinationElement.getSourceNodeProperty(SAPNodeProperties.element_id);
     }
 
     public List<RoadNode> getPath() {
