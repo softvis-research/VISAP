@@ -27,8 +27,6 @@ public class MetropolisRoadNetworkLayouter {
 
     public List<Road> mainRoads = new ArrayList<Road>();
     public List<Road> subRoads = new ArrayList<Road>();
-    public List<Road> roadsOnDistricts = new ArrayList<Road>();
-    public List<Road> interdistrictRoads = new ArrayList<Road>();
 
     private static final double districtHeight = Config.Visualization.Metropolis.district.districtHeight();
     private static final double roadHeight = Config.Visualization.Metropolis.roadNetwork.roadHeight();
@@ -56,16 +54,11 @@ public class MetropolisRoadNetworkLayouter {
             DistrictRoadNetwork roadNetwork = new DistrictRoadNetwork(namespaceDistrict, rootRoadNetwork.getSubElementConnectors(namespaceDistrict), this.referenceMapper);
             List<Road> roadsOnDistrict = roadNetwork.calculate();
             this.subRoads.addAll(roadsOnDistrict);
-            this.roadsOnDistricts.addAll(roadsOnDistrict);
 
             for (CityElement roadSection : createRoadSections(roadsOnDistrict, virtualRootDistrict)) {
                 repository.addElement(roadSection);
             }
         }
-    }
-
-    public List<Road> getInterdistrictRoads() {
-        return this.interdistrictRoads;
     }
 
     public List<Road> getMainRoads() {
