@@ -43,7 +43,8 @@ public class RoadAssembler {
 
         connectingRoad.ifPresentOrElse(
                 connector -> processConnectingRoad(road, connector),
-                () -> logNoConnectingMainRoad(startParent, destinationParent));
+                () -> logNoConnectingMainRoad(startParent, destinationParent)
+        );
 
         return connectingRoad.map(connector -> road);
     }
@@ -51,10 +52,9 @@ public class RoadAssembler {
     private Optional<Road> findConnectingRoad(CityElement startParent, CityElement destinationParent) {
         return mainRoads.stream()
                 .filter(mainRoad
-                        -> (mainRoad.getStartElement().equals(startParent)
-                            || mainRoad.getStartElement().equals(destinationParent))
-                        && (mainRoad.getDestinationElement().equals(startParent)
-                            || mainRoad.getDestinationElement().equals(destinationParent)))
+                        -> mainRoad.getStartElement().equals(startParent)
+                        && mainRoad.getDestinationElement().equals(destinationParent)
+                )
                 .findAny();
     }
 
@@ -67,7 +67,7 @@ public class RoadAssembler {
 
     private Optional<Road> findEndOfRoad(Road road) {
         return subRoads.stream().filter(subRoad -> subRoad.getStartElement().getParentElement() == null
-                && subRoad.getDestinationElement().equals(road.getDestinationElement())).findAny();
+                && subRoad.getDestinationElement().equals(road.getDestinationElement())).findFirst();
     }
 
     private void logNoConnectingMainRoad(CityElement startParent, CityElement destinationParent) {
