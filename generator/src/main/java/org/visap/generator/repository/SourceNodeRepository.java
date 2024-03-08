@@ -26,14 +26,14 @@ public class SourceNodeRepository {
     private Map<String, Map<Long, Node>> nodesByLabel;
     private Map<String, Map<Boolean, Map<Long, Map<Long, Node>>>> nodesByRelation;
 
-    private String packageWhitelistQuery;
+    private String packageWhitelist;
 
     public SourceNodeRepository() {
         this.nodeById = new HashMap<>();
         this.nodesByLabel = new HashMap<>();
         this.nodesByRelation = new HashMap<>();
 
-        this.packageWhitelistQuery = "n.PACKAGE =~ '.*'";
+        this.packageWhitelist = "'.*'";
         log.info("Created");
     }
 
@@ -41,24 +41,28 @@ public class SourceNodeRepository {
         if (whitelist.isEmpty()) {
             return;
         }
-        this.packageWhitelistQuery = constructWhereClause(whitelist);
+        this.packageWhitelist = constructWhitelistRegex(whitelist);
     }
 
-    private String constructWhereClause(List<String> whitelist) {
+    private String constructWhitelistRegex(List<String> whitelist) {
         StringBuilder query = new StringBuilder();
+        query.append("'");
         for (String entry : whitelist) {
-            query.append("n.PACKAGE =~ '" + entry + "'").append(" OR ");
+            query.append(entry).append("|");
         }
-        // Remove the extra OR at the end, see https://stackoverflow.com/a/3395329
-        query.setLength(query.length() - 4);
+        // Remove the extra | at the end, see https://stackoverflow.com/a/3395329
+        query.setLength(query.length() - 1);
+        query.append("'");
         return query.toString();
     }
 
     public void loadNodesByPropertyValue(SAPNodeProperties property, String value) {
         AtomicInteger counter = new AtomicInteger(0);
 
-        String query = "MATCH (n:Elements {" + property + ": '" + value + "'}) RETURN n";
+        String query = "MATCH (n:Elements {" + property + ": '" + value + "'}) WHERE n.object_name =~ " + this.packageWhitelist + " RETURN n";
         List<Record> records = connector.executeRead(query);
+        if (records.isEmpty())
+            return;
         for (Record result : records) {
             Node sourceNode = result.get("n").asNode();
 
@@ -94,10 +98,10 @@ public class SourceNodeRepository {
         String relatedNodesStatement = "";
         if (forward) {
             relatedNodesStatement = "MATCH (m)-[:" + relationType.name() + "]->(n) WHERE ID(m) IN " + nodeIDString
-                    + "AND " + this.packageWhitelistQuery + " RETURN m, n";
+                    + "AND n.PACKAGE =~ " + this.packageWhitelist + " RETURN m, n";
         } else {
             relatedNodesStatement = "MATCH (m)<-[:" + relationType.name() + "]-(n) WHERE ID(m) IN " + nodeIDString
-                    + "AND " + this.packageWhitelistQuery + " RETURN m, n";
+                    + "AND n.PACKAGE =~ " + this.packageWhitelist + " RETURN m, n";
         }
 
         AtomicInteger nodeCounter = new AtomicInteger(0);
@@ -121,15 +125,10 @@ public class SourceNodeRepository {
 
             Node mNode = result.get("m").asNode();
             mNode = nodeById.get(mNode.id());
-
-            // TODO: Figure out when this can happen
-            if (mNode == null)
-                continue;
-
+            
             addNodesByRelation(mNode, nNode, relationType.name());
             relationCounter.addAndGet(1);
         }
-        ;
 
         int nodesAfter = nodeById.size();
 
@@ -159,7 +158,7 @@ public class SourceNodeRepository {
 
     public void loadNodesWithRelation(SAPRelationLabels relationLabel) {
 
-        List<Record> records = connector.executeRead(" MATCH (m)-[:" + relationLabel.name() + "]->(n) WHERE + " + this.packageWhitelistQuery + " RETURN m, n");
+        List<Record> records = connector.executeRead(" MATCH (m)-[:" + relationLabel.name() + "]->(n) WHERE n.PACKAGE =~ " + this.packageWhitelist + " RETURN m, n");
         for (Record result : records) {
             Node mNode = result.get("m").asNode();
             Node nNode = result.get("n").asNode();
@@ -226,7 +225,7 @@ public class SourceNodeRepository {
 
         Collection<Node> nodesByLabelAndProperty = new ArrayList<>();
 
-        List<Record> records = connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) WHERE + " + this.packageWhitelistQuery + " RETURN n");
+        List<Record> records = connector.executeRead("MATCH (n:Elements {" + property + ": '" + value + "'}) WHERE n.PACKAGE =~ " + this.packageWhitelist + " RETURN n");
         for (Record r : records) {
             Node propertyValue = r.get("n").asNode();
             nodesByLabelAndProperty.add(propertyValue);
