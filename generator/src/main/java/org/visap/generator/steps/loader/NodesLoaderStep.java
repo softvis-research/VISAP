@@ -38,7 +38,7 @@ public class NodesLoaderStep {
             log.info("SAPExportCreateNodes: "+p);
             createNodes(p);
         }
-
+        log.info("Nodes created");
         // add attributes to all nodes
         createNameAndTypeAttributes();
 
@@ -47,12 +47,13 @@ public class NodesLoaderStep {
 
         //add local_class attribute
         createLocalClassAttribute();
-
+        log.info("Nodes Attributes updated");
         // 2. Apply contains relations
         if (!isSilentMode) {
             log.info("Creating 'CONTAINS' relationships. Press any key to continue...");
             userInput.nextLine();
         }
+        log.info("creating CONTAINS relations...");
         createContainsRelations();
 
         userInput.close();
@@ -62,21 +63,18 @@ public class NodesLoaderStep {
     private static void createContainsRelations() {
         //2.1 Between main elements and sub elements
         connector.executeWrite("MATCH (n:Elements) WHERE n.SUB_OBJ_NAME IS NOT NULL AND n.SUB_SUB_OBJ_NAME IS NULL\n" +
-                "UNWIND n AS sub_element\n" +
-                "MATCH (p:Elements {MAIN_OBJ_NAME: sub_element.MAIN_OBJ_NAME, MAIN_OBJ_TYPE: sub_element.MAIN_OBJ_TYPE }) WHERE p.SUB_OBJ_NAME IS NULL AND p.SUB_SUB_OBJ_NAME IS NULL\n"+
-                "CREATE (p)-[r:" + SAPRelationLabels.CONTAINS + "]->(sub_element)");
+                "MATCH (p:Elements {MAIN_OBJ_NAME: n.MAIN_OBJ_NAME, MAIN_OBJ_TYPE: n.MAIN_OBJ_TYPE }) WHERE p.SUB_OBJ_NAME IS NULL AND p.SUB_SUB_OBJ_NAME IS NULL\n"+
+                "CREATE (p)-[r:" + SAPRelationLabels.CONTAINS + "]->(n)");
 
         //2.2 Between sub elements ans sub sub elements
         connector.executeWrite("MATCH (n:Elements) WHERE n.SUB_SUB_OBJ_NAME IS NOT NULL\n" +
-                "UNWIND n AS sub_element\n" +
-                "MATCH (p:Elements {MAIN_OBJ_NAME: sub_element.MAIN_OBJ_NAME, MAIN_OBJ_TYPE: sub_element.MAIN_OBJ_TYPE ,SUB_OBJ_NAME: sub_element.SUB_OBJ_NAME, SUB_OBJ_TYPE: sub_element.SUB_OBJ_TYPE}) WHERE p.SUB_SUB_OBJ_NAME IS NULL\n"+
-                "CREATE (p)-[r:" + SAPRelationLabels.CONTAINS + "]->(sub_element)");
+                "MATCH (p:Elements {MAIN_OBJ_NAME: n.MAIN_OBJ_NAME, MAIN_OBJ_TYPE: n.MAIN_OBJ_TYPE ,SUB_OBJ_NAME: n.SUB_OBJ_NAME, SUB_OBJ_TYPE: n.SUB_OBJ_TYPE}) WHERE p.SUB_SUB_OBJ_NAME IS NULL\n"+
+                "CREATE (p)-[r:" + SAPRelationLabels.CONTAINS + "]->(n)");
 
         //2.3 Between main elements and Packages
         connector.executeWrite("MATCH (n:Elements) WHERE n.SUB_SUB_OBJ_NAME IS NULL AND n.SUB_OBJ_NAME IS NULL\n" +
-                "UNWIND n AS main_element\n" +
-                "MATCH (p:Elements {MAIN_OBJ_NAME: main_element.PACKAGE, MAIN_OBJ_TYPE: 'DEVC'}) WHERE p.MAIN_OBJ_NAME <> main_element.MAIN_OBJ_NAME\n"+
-                "CREATE (p)-[r:" + SAPRelationLabels.CONTAINS + "]->(main_element)");
+                "MATCH (p:Elements {MAIN_OBJ_NAME: n.PACKAGE, MAIN_OBJ_TYPE: 'DEVC'}) WHERE p.MAIN_OBJ_NAME <> n.MAIN_OBJ_NAME\n"+
+                "CREATE (p)-[r:" + SAPRelationLabels.CONTAINS + "]->(n)");
     }
 
     private static void createNodes(Path p) {
@@ -84,11 +82,13 @@ public class NodesLoaderStep {
         pathToNodesCsv = p.toString().replace("\\", "/");
         pathToNodesCsv = pathToNodesCsv.replace(" ", "%20");
 
-        connector.executeWrite(
+
+        connector.executeImplicit(
                 "LOAD CSV WITH HEADERS FROM \"file:///" + pathToNodesCsv + "\"\n" +
-                        "AS row FIELDTERMINATOR ';' WITH row WHERE row.MAIN_OBJ_NAME IS NOT NULL\n" +
+                        "AS row FIELDTERMINATOR ';' WITH row WHERE row.MAIN_OBJ_NAME IS NOT NULL\n"+
+                        "CALL { WITH row \n" +
                         "CREATE (n:Elements)\n" +
-                        "SET n = row");
+                        "SET n = row } IN TRANSACTIONS OF 10000 ROWS");
     }
 
     private static void createLocalClassAttribute() { //in LoaderStep ...

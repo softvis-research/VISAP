@@ -70,6 +70,12 @@ public class DatabaseConnector implements AutoCloseable {
         return executeRead("MATCH (n)-[:HAS]->(p:Position) WHERE ID(n) = " + id + " RETURN p").get(0).get("p").asNode();
     }
 
+    public List<Record> executeImplicit(String statement) {
+        try (Session session = driver.session()) {
+            return session.run(statement).list();
+        }
+    }
+
     @Override
     public void close() {
         driver.close();

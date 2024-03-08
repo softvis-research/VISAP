@@ -31,32 +31,54 @@ public class MetaDataLoaderStep {
             log.info("Adding 'Meta' to nodes. Press any key to continue...");
             userInput.nextLine();
         }
-
+        log.info("creating Meta Nodes...");
         for (Path p : files) {
             log.info("Path to Meta CSV: "+p);
-            mappingMetaDataToAttributes(p);
+            createMetaDataNodes(p);
         }
+        log.info("creating Meta Attributes...");
 
+        mappingMetaDataToAttributes();
+        //Meta Nodes no more needed
+        connector.executeWrite("MATCH (n:Meta) DETACH DELETE n");
         userInput.close();
         log.info("MetaDataLoader step was completed");
     }
 
-    private static void mappingMetaDataToAttributes(Path p) {
+    private static void mappingMetaDataToAttributes() {
+
+        //1. main elements
+        connector.executeWrite(
+                "match (m:Meta), (n:Elements)\n" +
+                        "WHERE n.SUB_OBJ_NAME IS NULL AND m.SUB_OBJ_NAME IS NULL AND  n.MAIN_OBJ_NAME = m.MAIN_OBJ_NAME AND n.MAIN_OBJ_TYPE = m.MAIN_OBJ_TYPE \n" +
+                        "SET n.creator = m.CREATOR , n.created = m.CREATED , n.progname = m.PROGNAME, n.changed_by = m.CHANGED_BY, n.changed = m.CHANGED"
+        );
+
+        //2. sub elements
+        connector.executeWrite(
+                "match (m:Meta), (n:Elements)\n" +
+                        "WHERE n.SUB_SUB_OBJ_NAME IS NULL AND m.SUB_SUB_OBJ_NAME IS NULL AND n.SUB_OBJ_NAME = m.SUB_OBJ_NAME AND  n.MAIN_OBJ_NAME = m.MAIN_OBJ_NAME AND n.MAIN_OBJ_TYPE = m.MAIN_OBJ_TYPE \n" +
+                        "SET n.creator = m.CREATOR , n.created = m.CREATED , n.progname = m.PROGNAME, n.changed_by = m.CHANGED_BY, n.changed = m.CHANGED"
+        );
+
+        //3. sub sub elements
+        connector.executeWrite(
+                "match (m:Meta), (n:Elements)\n" +
+                        "WHERE n.SUB_SUB_OBJ_NAME = m.SUB_SUB_OBJ_NAME  AND n.SUB_OBJ_NAME = m.SUB_OBJ_NAME AND  n.MAIN_OBJ_NAME = m.MAIN_OBJ_NAME AND n.MAIN_OBJ_TYPE = m.MAIN_OBJ_TYPE \n" +
+                        "SET n.creator = m.CREATOR , n.created = m.CREATED , n.progname = m.PROGNAME, n.changed_by = m.CHANGED_BY, n.changed = m.CHANGED"
+        );
+    }
+
+    private static void createMetaDataNodes(Path p) {
         String pathToMetasCsv = p.toString().replace("\\", "/");
         pathToMetasCsv = pathToMetasCsv.replace(" ", "%20");
 
-        connector.executeWrite(
+        connector.executeImplicit(
                 "LOAD CSV WITH HEADERS FROM \"file:///" + pathToMetasCsv + "\"\n" +
                         "AS row FIELDTERMINATOR ';' WITH row WHERE row.MAIN_OBJ_NAME IS NOT NULL\n" +
-                        "OPTIONAL MATCH (m:Elements {MAIN_OBJ_NAME : row.MAIN_OBJ_NAME, MAIN_OBJ_TYPE : row.MAIN_OBJ_TYPE})\n" +
-                        "WHERE m.SUB_OBJ_NAME IS NULL AND  row.SUB_OBJ_NAME IS NULL\n" +
-                        "OPTIONAL MATCH (s:Elements {MAIN_OBJ_NAME : row.MAIN_OBJ_NAME, MAIN_OBJ_TYPE : row.MAIN_OBJ_TYPE, SUB_OBJ_NAME: row.SUB_OBJ_NAME, SUB_OBJ_TYPE: row.SUB_OBJ_TYPE})\n" +
-                        "WHERE s.SUB_SUB_OBJ_NAME IS NULL AND row.SUB_SUB_OBJ_NAME IS NULL\n"+
-                        "OPTIONAL MATCH (ss:Elements {MAIN_OBJ_NAME : row.MAIN_OBJ_NAME, MAIN_OBJ_TYPE : row.MAIN_OBJ_TYPE, SUB_OBJ_NAME: row.SUB_OBJ_NAME, SUB_OBJ_TYPE: row.SUB_OBJ_TYPE, SUB_SUB_OBJ_NAME: row.SUB_SUB_OBJ_NAME, SUB_SUB_OBJ_TYPE: row.SUB_SUB_OBJ_TYPE})\n" +
-                        "WHERE row.SUB_SUB_OBJ_NAME IS NOT NULL AND row.SUB_OBJ_NAME IS NOT NULL\n"+
-                        "SET m.creator = row.CREATOR , m.created = row.CREATED , m.progname = row.PROGNAME, m.changed_by = row.CHANGED_BY, m.changed = row.CHANGED\n" +
-                        "SET s.creator = row.CREATOR , s.created = row.CREATED , s.progname = row.PROGNAME, s.changed_by = row.CHANGED_BY, s.changed = row.CHANGED\n" +
-                        "SET ss.creator = row.CREATOR , ss.created = row.CREATED , ss.progname = row.PROGNAME, ss.changed_by = row.CHANGED_BY, ss.changed = row.CHANGED"
+                        "CALL { WITH row \n"+
+                        "CREATE (n:Meta)\n" +
+                        "SET n = row } IN TRANSACTIONS OF 10000 ROWS"
         );
     }
 }
