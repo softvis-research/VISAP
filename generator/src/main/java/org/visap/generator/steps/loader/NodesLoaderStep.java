@@ -35,19 +35,22 @@ public class NodesLoaderStep {
         }
 
         for (Path p : files) {
-            log.info("SAPExportCreateNodes: "+p);
+            log.info("Path to Meta CSV: "+p);
+            log.info("creating Elements Nodes...");
             createNodes(p);
+            // add attributes to all nodes
+            log.info("update Nodes Attributes...");
+            createNameAndTypeAttributes();
+            log.info("1. Object_name and type attribute created...");
+            //add type_name attribute
+            addTypeNameAttributes();
+            log.info("2. type_name attribute created...");
+            //add local_class attribute
+            createLocalClassAttribute();
+            log.info("3. local_class attribute created...");
+            log.info("Nodes Attributes updated");
         }
-        log.info("Nodes created");
-        // add attributes to all nodes
-        createNameAndTypeAttributes();
 
-        //add type_name attribute
-        addTypeNameAttributes();
-
-        //add local_class attribute
-        createLocalClassAttribute();
-        log.info("Nodes Attributes updated");
         // 2. Apply contains relations
         if (!isSilentMode) {
             log.info("Creating 'CONTAINS' relationships. Press any key to continue...");

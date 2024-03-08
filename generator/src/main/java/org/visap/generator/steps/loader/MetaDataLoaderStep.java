@@ -31,16 +31,20 @@ public class MetaDataLoaderStep {
             log.info("Adding 'Meta' to nodes. Press any key to continue...");
             userInput.nextLine();
         }
-        log.info("creating Meta Nodes...");
+
         for (Path p : files) {
             log.info("Path to Meta CSV: "+p);
+            log.info("creating Meta Nodes...");
             createMetaDataNodes(p);
-        }
-        log.info("creating Meta Attributes...");
 
-        mappingMetaDataToAttributes();
-        //Meta Nodes no more needed
-        connector.executeWrite("MATCH (n:Meta) DETACH DELETE n");
+            log.info("creating Meta Attributes...");
+            mappingMetaDataToAttributes();
+
+            //Meta Nodes for this file no more needed
+            log.info("delete unnecessary meta nodes...");
+            connector.executeWrite("MATCH (n:Meta) DETACH DELETE n");
+        }
+
         userInput.close();
         log.info("MetaDataLoader step was completed");
     }
