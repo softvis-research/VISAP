@@ -57,9 +57,11 @@ public interface Color extends Config {
 
      @DefaultValue("#FFFFFF")
      String defaultBuildingValue();
+     
+     @DefaultValue("#000000")
+     String road();
 
-
-     // Test
+     // DDIC
      @DefaultValue("#229954")
      String ddicDistrict();
      @DefaultValue("#1A5276")
@@ -74,7 +76,4 @@ public interface Color extends Config {
      String structBuilding();
      @DefaultValue("#1E8449")
      String dataelementBuilding();
-     @DefaultValue("#000000")
-     String road();
-
 }
