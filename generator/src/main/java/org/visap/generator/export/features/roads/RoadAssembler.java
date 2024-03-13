@@ -1,6 +1,7 @@
 package org.visap.generator.export.features.roads;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -61,7 +62,11 @@ public class RoadAssembler {
     private void processConnectingRoad(Road road, Road connector) {
         road.addRoadSectionIds(connector.getRoadSectionIds());
         findEndOfRoad(road).ifPresentOrElse(
-                end -> road.addRoadSectionIds(end.getRoadSectionIds().reversed()),
+                end -> {
+                    List<String> reversedEnd = new ArrayList<>(end.getRoadSectionIds());
+                    Collections.reverse(reversedEnd);
+                    road.addRoadSectionIds(reversedEnd);
+                },
                 () -> logNoEndOfRoad(road));
     }
 
