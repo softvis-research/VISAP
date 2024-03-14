@@ -9,10 +9,6 @@ import org.aeonbits.owner.Config;
     Sources.CONFIG_PATH + "metropolis/RoadNetwork.properties",
 })
 public interface RoadNetwork extends Config {
-
-    @DefaultValue("false")
-    boolean completeRoadNetwork();
-
     @DefaultValue("0.4")
     double roadHeight();
 
