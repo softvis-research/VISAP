@@ -9,7 +9,10 @@ import org.visap.generator.database.DatabaseConnector;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+
+import static java.util.Map.entry;
 
 public class ReferencesLoaderStep {
 
@@ -17,6 +20,11 @@ public class ReferencesLoaderStep {
     private static final Log log = LogFactory.getLog(ReferencesLoaderStep.class);
     private static final String folderName = "References";
     private static final String fileSuffix = "Reference.csv";
+    private static final String labelName = "Refs";
+    private static final Map<String, String> indexes= Map.ofEntries(
+            entry("Refs_SRC", "combinedKeySrc"),
+            entry("Refs_DST", "combinedKeyDst")
+    );
 
     private enum ReferenceRelationType{
         SOURCE("SRC"),
@@ -45,89 +53,67 @@ public class ReferencesLoaderStep {
             log.info("Creating 'REFERENCE' relationships. Press any key to continue...");
             userInput.nextLine();
         }
-
+        log.info("creating Indexes...");
+        createIndexes();
         for (Path p : files) {
             log.info("Path to Reference CSV: "+p);
+            log.info("creating Reference nodes...");
+            createReferenceNodes(p);
+            log.info("creating Reference relations...");
             createReferenceRelations(p);
+            log.info("delete unnecessary reference nodes...");
+            connector.executeWrite("MATCH (n:"+labelName+") DETACH DELETE n");
         }
+        dropIndexes();
         userInput.close();
         log.info("ReferencesLoader step was completed");
     }
-
-    private static void createReferenceRelations(Path p) {
+    private static void createReferenceNodes(Path p){
         String pathToReferenceCsv;
-        pathToReferenceCsv = p.toString().replace("\\", "/");
-        pathToReferenceCsv = pathToReferenceCsv.replace(" ", "%20");
-
-        String  mainDst = "md" , subDst = "sd", subSubDst = "ssd",
-                mainSrc = "ms" , subSrc = "ss", subSubSrc = "sss" , row= "row";
-        String queryForAllMatches = getOptionalMainMatch(mainDst, row, ReferenceRelationType.DESTINATION) +
-                getOptionalSubMatch(subDst, row, ReferenceRelationType.DESTINATION) +
-                getOptionalSubSubMatch(subSubDst, row, ReferenceRelationType.DESTINATION) +
-                getOptionalMainMatch(mainSrc, row, ReferenceRelationType.SOURCE) +
-                getOptionalSubMatch(subSrc, row, ReferenceRelationType.SOURCE) +
-                getOptionalSubSubMatch(subSubSrc, row, ReferenceRelationType.SOURCE);
-        connector.executeWrite( //bessere bezeichner md-> , Query in strings splitten..
+        pathToReferenceCsv = p.toString().replace("\\", "/")
+                                         .replace(" ", "%20");
+        connector.executeImplicit(
                 "LOAD CSV WITH HEADERS FROM \"file:///" + pathToReferenceCsv + "\"\n" +
-                        "AS row FIELDTERMINATOR ';' WITH row WHERE row.MAIN_OBJ_NAME_SRC IS NOT NULL\n" +
-                        queryForAllMatches +
-                        "UNWIND [" + mainSrc + "," + subSrc + "," + subSubSrc + "] as src\n" +
-                        "UNWIND [" + mainDst + "," + subDst + "," + subSubDst + "] as dst\n" +
-                        "FOREACH (i in CASE WHEN src IS NOT NULL and dst IS NOT NULL THEN [1] ELSE [] END |\n" +
-                        "CREATE (src)-[:"+ SAPRelationLabels.REFERENCES +"]->(dst) )\n"
+                        "AS row FIELDTERMINATOR ';' WITH row WHERE row.MAIN_OBJ_NAME_SRC IS NOT NULL AND row.MAIN_OBJ_NAME_DST IS NOT NULL\n" +
+                        "CALL { WITH row \n"+
+                        "CREATE (n:"+labelName+")\n" +
+                        "SET n = row," +
+                        "n.combinedKeySrc = row.MAIN_OBJ_NAME_SRC + row.MAIN_OBJ_TYPE_SRC + COALESCE(row.SUB_OBJ_NAME_SRC, 'NONE') + COALESCE(row.SUB_OBJ_TYPE_SRC, 'NONE') + COALESCE(row.SUB_SUB_OBJ_NAME_SRC, 'NONE')  + COALESCE(row.SUB_SUB_OBJ_TYPE_SRC, 'NONE')," +
+                        "n.combinedKeyDst = row.MAIN_OBJ_NAME_DST + row.MAIN_OBJ_TYPE_DST + COALESCE(row.SUB_OBJ_NAME_DST, 'NONE') + COALESCE(row.SUB_OBJ_TYPE_DST, 'NONE') + COALESCE(row.SUB_SUB_OBJ_NAME_DST, 'NONE')  + COALESCE(row.SUB_SUB_OBJ_TYPE_DST, 'NONE') " +
+                        "} IN TRANSACTIONS OF 10000 ROWS"
+        );
+    }
+    private static void createReferenceRelations(Path p) {
+        connector.executeWrite(
+                "MATCH (n:Refs),(e1:Elements),(e2:Elements)\n" +
+                        "WHERE n.combinedKeySrc = e1.combinedKey AND n.combinedKeyDst = e2.combinedKey\n" +
+                        "CREATE (e1)-[:"+SAPRelationLabels.REFERENCES +"]->(e2)"
         );
     }
 
-    private static String getOptionalMainMatch(String node, String csvEntry, ReferenceRelationType type) {
-
-        return "OPTIONAL MATCH (" + node +
-                ":Elements {MAIN_OBJ_NAME : " +
-                csvEntry + ".MAIN_OBJ_NAME_" + type.getType() + ", " +
-                "MAIN_OBJ_TYPE: " +
-                csvEntry + ".MAIN_OBJ_TYPE_" + type.getType() +
-                " })\n" +
-                "WHERE " +
-                node +
-                ".SUB_OBJ_NAME IS NULL AND " +
-                csvEntry +
-                ".SUB_OBJ_NAME_" + type.getType() +
-                " IS NULL\n";
+    private static void dropIndexes() {
+        StringBuilder dropIndexesQuery = new StringBuilder();
+        for (Map.Entry<String, String> entry : indexes.entrySet()) {
+            dropIndexesQuery.append("DROP INDEX ")
+                    .append(entry.getKey())
+                    .append(" IF EXISTS;");
+            connector.executeWrite(dropIndexesQuery.toString());
+            dropIndexesQuery.setLength(0);
+        }
     }
 
-    private static String getOptionalSubMatch(String node, String csvEntry, ReferenceRelationType type) {
-        return  new StringBuilder().append("OPTIONAL MATCH (")
-                .append(node)
-                .append(":Elements {MAIN_OBJ_NAME : ")
-                .append(csvEntry).append(".MAIN_OBJ_NAME_").append(type.getType()).append(", ")
-                .append("MAIN_OBJ_TYPE: ")
-                .append(csvEntry).append(".MAIN_OBJ_TYPE_").append(type.getType()).append(", ")
-                .append("SUB_OBJ_NAME: ")
-                .append(csvEntry).append(".SUB_OBJ_NAME_").append(type.getType()).append(", ")
-                .append("SUB_OBJ_TYPE: ")
-                .append(csvEntry).append(".SUB_OBJ_TYPE_").append(type.getType())
-                .append(" })\n")
-                .append("WHERE ")
-                .append(node).append(".SUB_SUB_OBJ_NAME IS NULL AND ")
-                .append(csvEntry).append(".SUB_SUB_OBJ_NAME_").append(type.getType())
-                .append(" IS NULL\n").toString();
-    }
-
-    private static String getOptionalSubSubMatch(String node, String csvEntry, ReferenceRelationType type) {
-        StringBuilder query = new StringBuilder("OPTIONAL MATCH (");
-        query.append(node)
-                .append(":Elements {MAIN_OBJ_NAME : ").append(csvEntry).append(".MAIN_OBJ_NAME_").append(type.getType()).append(", ")
-                .append("MAIN_OBJ_TYPE: ")
-                .append(csvEntry + ".MAIN_OBJ_TYPE_" + type.getType() + ", ")
-                .append("SUB_OBJ_NAME: ").append(csvEntry).append(".SUB_OBJ_NAME_").append(type.getType()).append(", ")
-                .append("SUB_OBJ_TYPE: ").append(csvEntry).append(".SUB_OBJ_TYPE_").append(type.getType()).append(" ,")
-                .append("SUB_SUB_OBJ_NAME: ").append(csvEntry).append(".SUB_SUB_OBJ_NAME_").append(type.getType()).append(", ")
-                .append("SUB_SUB_OBJ_TYPE: ").append(csvEntry).append(".SUB_SUB_OBJ_TYPE_").append(type.getType())
-                .append(" })\n");
-        query.append("WHERE ")
-                .append(csvEntry).append(".SUB_SUB_OBJ_NAME_").append(type.getType())
-                .append(" IS NOT NULL AND  ")
-                .append(csvEntry).append(".SUB_OBJ_NAME_").append(type.getType())
-                .append(" IS NOT NULL\n");
-        return query.toString();
+    private static void createIndexes() {
+        StringBuilder createIndexesQuery = new StringBuilder();
+        for (Map.Entry<String, String> entry : indexes.entrySet()) {
+            createIndexesQuery.append("CREATE INDEX ")
+                    .append(entry.getKey())
+                    .append(" FOR (n:")
+                    .append(labelName)
+                    .append(") ON (n.")
+                    .append(entry.getValue())
+                    .append(");");
+            connector.executeWrite(createIndexesQuery.toString());
+            createIndexesQuery.setLength(0);
+        }
     }
 }

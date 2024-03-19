@@ -7,14 +7,25 @@ import org.visap.generator.configuration.Config;
 import org.visap.generator.database.DatabaseConnector;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+
+import static java.util.Map.entry;
 
 public class NodesLoaderStep {
     private static final DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
     private static final Log log = LogFactory.getLog(NodesLoaderStep.class);
     private static final String folderName = "Nodes";
     private static final String fileSuffix = "Nodes.csv";
-
+    private static final Map<String, String> indexes= Map.ofEntries(
+            entry("Element_mainobj", "MAIN_OBJ_NAME"),
+            entry("Element_maintype", "MAIN_OBJ_TYPE"),
+            entry("Element_subobj","SUB_OBJ_NAME"),
+            entry("Element_subtype", "SUB_OBJ_TYPE"),
+            entry("Element_subsubobj", "SUB_SUB_OBJ_NAME"),
+            entry("Element_subsubtype", "SUB_SUB_OBJ_TYPE"),
+            entry("ElementCombinedKey","combinedKey")
+    );
     public static void main(String[] args) {
 
         boolean isSilentMode = Config.setup.silentMode();
@@ -28,6 +39,8 @@ public class NodesLoaderStep {
 
         // Make sure the graph is empty
         connector.executeWrite("MATCH (n) DETACH DELETE n;");
+        //delete indexes if exists
+        dropIndexes();
 
         if (!isSilentMode) {
             log.info("Loading nodes in Neo4j. Press any key to continue...");
@@ -56,11 +69,37 @@ public class NodesLoaderStep {
             log.info("Creating 'CONTAINS' relationships. Press any key to continue...");
             userInput.nextLine();
         }
+        log.info("creating Indexes...");
+        createIndexes();
         log.info("creating CONTAINS relations...");
         createContainsRelations();
 
         userInput.close();
         log.info("NodesLoader step was completed");
+    }
+
+    private static void dropIndexes() {
+        StringBuilder dropIndexesQuery = new StringBuilder();
+        for (Map.Entry<String, String> entry : indexes.entrySet()) {
+            dropIndexesQuery.append("DROP INDEX ")
+                    .append(entry.getKey())
+                    .append(" IF EXISTS;");
+            connector.executeWrite(dropIndexesQuery.toString());
+            dropIndexesQuery.setLength(0);
+        }
+    }
+
+    private static void createIndexes() {
+        StringBuilder createIndexesQuery = new StringBuilder();
+        for (Map.Entry<String, String> entry : indexes.entrySet()) {
+            createIndexesQuery.append("CREATE INDEX ")
+                    .append(entry.getKey())
+                    .append(" FOR (n:Elements) ON (n.")
+                    .append(entry.getValue())
+                    .append(");");
+            connector.executeWrite(createIndexesQuery.toString());
+            createIndexesQuery.setLength(0);
+        }
     }
 
     private static void createContainsRelations() {
@@ -91,7 +130,7 @@ public class NodesLoaderStep {
                         "AS row FIELDTERMINATOR ';' WITH row WHERE row.MAIN_OBJ_NAME IS NOT NULL\n"+
                         "CALL { WITH row \n" +
                         "CREATE (n:Elements)\n" +
-                        "SET n = row } IN TRANSACTIONS OF 10000 ROWS");
+                        "SET n = row, n.combinedKey = row.MAIN_OBJ_NAME + row.MAIN_OBJ_TYPE + COALESCE(row.SUB_OBJ_NAME, 'NONE') + COALESCE(row.SUB_OBJ_TYPE, 'NONE') + COALESCE(row.SUB_SUB_OBJ_NAME, 'NONE')  + COALESCE(row.SUB_SUB_OBJ_TYPE, 'NONE') } IN TRANSACTIONS OF 10000 ROWS");
     }
 
     private static void createLocalClassAttribute() { //in LoaderStep ...
