@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.visap.generator.configuration.Config;
-import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.visap.generator.repository.CityElement;
 
 public class RoadNodeBuilder {
