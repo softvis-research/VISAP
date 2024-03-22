@@ -12,12 +12,6 @@ public interface RoadNetwork extends Config {
     @DefaultValue("0.4")
     double roadHeight();
 
-    @DefaultValue("3.0")
-    double roadWidthFreeway();
-
-    @DefaultValue("2.0")
-    double roadWidthStreet();
-
     @DefaultValue("1.0")
-    double roadWidthLane();
+    double roadWidth();
 }

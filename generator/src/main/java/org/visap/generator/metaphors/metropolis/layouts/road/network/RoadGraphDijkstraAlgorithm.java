@@ -86,62 +86,6 @@ public class RoadGraphDijkstraAlgorithm {
         return shortestPaths.get(destinationNode);
     }
 
-    public List<RoadNode> calculateShortestPath(RoadNode startNode, RoadNode destinationNode) {
-        Map<RoadNode, Double> distanceMap = new HashMap<RoadNode, Double>();
-        Map<RoadNode, List<RoadNode>> shortestPaths = new HashMap<RoadNode, List<RoadNode>>();
-        Set<RoadNode> visitedNodes = new HashSet<RoadNode>();
-
-        // initialize distanceMap
-        for (RoadNode node : this.adjacencyList.keySet()) {
-            if (node.equals(startNode)) {
-                distanceMap.put(node, 0.0);
-            } else {
-                distanceMap.put(node, Double.MAX_VALUE);
-            }
-        }
-
-        shortestPaths.put(startNode, new ArrayList<RoadNode>());
-
-        while (!distanceMap.isEmpty()) {
-            RoadNode nearestNode = getNearestNode(distanceMap);
-
-            // mark current node as visited
-            visitedNodes.add(nearestNode);
-
-            // add current node to his shortest path
-            // so that the path is complete
-            shortestPaths.get(nearestNode).add(nearestNode);
-
-            if (nearestNode.equals(destinationNode)) {
-                return shortestPaths.get(destinationNode);
-            }
-
-            // distance from current node to start node
-            double currentDistance = distanceMap.remove(nearestNode);
-
-            for (RoadNode neighbourNode : this.adjacencyList.get(nearestNode)) {
-
-                // shortest path to visited nodes was already calculated
-                if (visitedNodes.contains(neighbourNode)) {
-                    continue;
-                }
-
-                double newDistance = currentDistance + distance(nearestNode, neighbourNode);
-                double previousDistance = distanceMap.get(neighbourNode);
-
-                if (newDistance < previousDistance) {
-                    distanceMap.put(neighbourNode, newDistance);
-
-                    // shortest path to current node plus path to nearby node is
-                    // shorter than the previous calculated shortest path to nearby node
-                    // so we have to save the shortest path to current node
-                    shortestPaths.put(neighbourNode, new ArrayList<RoadNode>(shortestPaths.get(nearestNode)));
-                }
-            }
-        }
-        return shortestPaths.get(destinationNode);
-    }
-
     private RoadNode getNearestNode(Map<RoadNode, Double> distanceMap) {
         Double minDistance = Double.MAX_VALUE;
         RoadNode nearestNode = null;

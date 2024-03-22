@@ -131,14 +131,7 @@ public class RoadNodeBuilder {
 
     public RoadNode calculateDistrictSlipRoadNode(CityElement district, RoadNode slipNode) {
         double x, y;
-        double roadWidth;
-
-        if (district.getSourceNodeType() == SAPNodeTypes.Namespace) {
-            roadWidth = Config.Visualization.Metropolis.roadNetwork.roadWidthFreeway();
-        } else {
-            roadWidth = Config.Visualization.Metropolis.roadNetwork.roadWidthStreet();
-        }
-
+        double roadWidth = Config.Visualization.Metropolis.roadNetwork.roadWidth();
 
         if (district.getXPosition() == slipNode.getX()) {
             x = district.getXPosition();
