@@ -25,7 +25,7 @@ public class RoadAssembler {
             if (isSameDistrict(road)) {
                 assembledRoads.add(road);
             } else {
-                connectRoads(road).ifPresent(assembledRoads::add);
+                connectRoadParts(road).ifPresent(assembledRoads::add);
             }
         }
         return assembledRoads;
@@ -37,20 +37,20 @@ public class RoadAssembler {
         return Objects.equals(startParent, destinationParent);
     }
 
-    private Optional<Road> connectRoads(Road road) {
+    private Optional<Road> connectRoadParts(Road road) {
         CityElement startParent = road.getStartElement().getParentElement();
         CityElement destinationParent = road.getDestinationElement().getParentElement();
-        Optional<Road> connectingRoad = findConnectingRoad(startParent, destinationParent);
+        Optional<Road> connectingMainRoad = findConnectingMainRoad(startParent, destinationParent);
 
-        connectingRoad.ifPresentOrElse(
+        connectingMainRoad.ifPresentOrElse(
                 connector -> processConnectingRoad(road, connector),
                 () -> logNoConnectingMainRoad(startParent, destinationParent)
         );
 
-        return connectingRoad.map(connector -> road);
+        return connectingMainRoad.map(connector -> road);
     }
 
-    private Optional<Road> findConnectingRoad(CityElement startParent, CityElement destinationParent) {
+    private Optional<Road> findConnectingMainRoad(CityElement startParent, CityElement destinationParent) {
         return mainRoads.stream()
                 .filter(mainRoad
                         -> mainRoad.getStartElement().equals(startParent)
