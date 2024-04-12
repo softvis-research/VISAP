@@ -1,7 +1,7 @@
 package org.visap.generator.metaphors.metropolis.steps;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.visap.generator.abap.AMetaDataMap;
+import org.visap.generator.abap.PropertyMetadata;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPRelationLabels;
@@ -111,12 +111,13 @@ public class MetaDataExporter {
     }
 
     private String getNodeMetaInfo(CityElement element) {
-        StringBuilder builder = new StringBuilder();
         Node node = element.getSourceNode();
         // For some accessory elements there is no source node
         if (node == null) {
             return "";
         }
+
+        StringBuilder builder = new StringBuilder();
         Arrays.asList(SAPNodeProperties.values()).forEach(prop -> {
             if (prop == SAPNodeProperties.element_id) {
                 return; // already added as first prop by toMetaData()
@@ -130,16 +131,33 @@ public class MetaDataExporter {
             // Remove extra "" (written by Neo4j)
             String propValue = node.get(prop.toString()).toString().replaceAll("\"", "");
 
-            // Write strings with quotation marks and numbers without
-            if (NumberUtils.isCreatable(propValue)) {
-                builder.append(
-                        "\"" + AMetaDataMap.getMetaDataProperty(prop.toString()) + "\": " + propValue + "," + "\n");
-            } else {
-                builder.append(
-                        "\"" + AMetaDataMap.getMetaDataProperty(prop.toString()) + "\": \"" + propValue + "\"," + "\n");
-            }
+            builder.append(createNodeMetaDataInfoEntry(prop.toString(), propValue));
         });
 
+        return builder.toString();
+    }
+
+    private String createNodeMetaDataInfoEntry(String prop, String propValue) {
+        StringBuilder builder = new StringBuilder();
+
+        PropertyMetadata metadata = AMetaDataMap.getMetaDataProperty(prop);
+        String propName;
+        Class<?> outputType;
+
+        if (metadata == null) {
+            propName = prop;
+            outputType = String.class;
+        } else {
+            propName = AMetaDataMap.getMetaDataProperty(prop).getName();
+            outputType = metadata.getOutputType();
+        }
+        builder.append("\"" + propName + "\": ");
+
+        if (outputType == int.class) {
+            builder.append(propValue + "," + "\n");
+        } else {
+            builder.append("\"" + propValue + "\"," + "\n");
+        }
         return builder.toString();
     }
 
