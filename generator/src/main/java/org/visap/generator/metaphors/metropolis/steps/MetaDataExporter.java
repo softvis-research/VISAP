@@ -85,7 +85,7 @@ public class MetaDataExporter {
         StringBuilder builder = new StringBuilder();
 
         // Add element hash
-        builder.append("\"" + AMetaDataMap.getMetaDataProperty(SAPNodeProperties.element_id.name()) + "\": \""
+        builder.append("\"" + AMetaDataMap.getMetaDataProperty(SAPNodeProperties.element_id.name()).getName() + "\": \""
                 + element.getHash() + "\"," + "\n");
         // Add qualifiedName
         builder.append("\"qualifiedName\": \"" + getQualifiedName(element) + "\",\n");

@@ -19,9 +19,9 @@ public class AMetaDataMap {
         metaDataProperties.put(SAPNodeProperties.type_name.name(), new PropertyMetadata("type", String.class));
         metaDataProperties.put(SAPNodeProperties.type.name(), new PropertyMetadata("abap_type", String.class));
         metaDataProperties.put(SAPNodeProperties.creator.name(), new PropertyMetadata("creator", String.class));
-        metaDataProperties.put(SAPNodeProperties.created.name(), new PropertyMetadata("created", String.class));
+        metaDataProperties.put(SAPNodeProperties.created.name(), new PropertyMetadata("created", int.class));
         metaDataProperties.put(SAPNodeProperties.changed_by.name(), new PropertyMetadata("changed_by", String.class));
-        metaDataProperties.put(SAPNodeProperties.changed.name(), new PropertyMetadata("changed", String.class));
+        metaDataProperties.put(SAPNodeProperties.changed.name(), new PropertyMetadata("changed", int.class));
         metaDataProperties.put(SAPNodeProperties.iteration.name(), new PropertyMetadata("iteration", int.class));
         metaDataProperties.put(SAPNodeProperties.number_of_statements.name(), new PropertyMetadata("number_of_statements", int.class));
         metaDataProperties.put(SAPNodeProperties.amount_of_results.name(), new PropertyMetadata("amount_of_results", int.class));
