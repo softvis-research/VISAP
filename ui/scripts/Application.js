@@ -15,7 +15,7 @@ async function initializeApplication() {
 	// parsing the setup happens later, since it requires controllers to be running
 	const setupLoaded = application.startLoadingSetup(paths.setupPath, paths.defaultSetupPath);
 	const metadataLoaded = application.startLoadingMetadata(paths.metadataPath, paths.defaultMetadataPath);
-	const modelLoaded = application.startLoadingModel(paths.modelPath, paths.defaultModeLPath);
+	const modelLoaded = application.startLoadingModel(paths.modelPath, paths.defaultModelPath);
 
 	try {
 		await Promise.all([setupLoaded, metadataLoaded, modelLoaded]);
@@ -24,6 +24,17 @@ async function initializeApplication() {
 		return;
 	}
 	// from here on, setup/metadata/model are sure to have been loaded
+	// roads data should only be loaded if it is required by the current setup
+	const isRoadControllerIncluded = setup.controllers.some(controller => controller.name === 'roadController');
+	if (isRoadControllerIncluded) {
+		const roadsDataLoaded = application.startLoadingRoadsData(paths.roadsDataPath, paths.defaultRoadsDataPath);
+		try {
+			await Promise.all([roadsDataLoaded]);
+		} catch (error) {
+			alert(error);
+			return;
+		}
+	}
 
 	defaultLogger.initialize();
 	defaultLogger.activate();
@@ -88,17 +99,19 @@ controllers.application = (function () {
 	function getResourcePaths() {
 		// parse URL arguments
 		const searchParams = new URLSearchParams(window.location.search);
-		const modelName = searchParams.get('model') || defaultModelName;
-		const modelDir = searchParams.get('srcDir') || defaultModelDir;
-		const setupName = searchParams.get('setup') || defaultSetupName;
+		const modelName = searchParams.get('model') || defaultModelName
+        const modelDir = searchParams.get('srcDir') || defaultModelDir
+        const setupName = searchParams.get('setup') || defaultSetupName
 
 		return {
 			modelPath: `${modelDir}/${modelName}/model.html`,
 			metadataPath: `${modelDir}/${modelName}/metaData.json`,
+			roadsDataPath: `${modelDir}/${modelName}/roads.json`,
 			setupPath: `setups/${setupName}.js`,
 
-			defaultModeLPath: `${defaultModelDir}/${defaultModelName}/model.html`,
+			defaultModelPath: `${defaultModelDir}/${defaultModelName}/model.html`, // LD: TODO: Fix typo (ModelL)
 			defaultMetadataPath: `${defaultModelDir}/${defaultModelName}/metaData.json`,
+			defaultRoadsDataPath: `${defaultModelDir}/${defaultModelName}/roads.json`,
 			defaultSetupPath: `setups/${defaultSetupName}.js`,
 		};
 	}
@@ -139,7 +152,21 @@ controllers.application = (function () {
 		});
 	}
 
-	async function startLoadingModel(modelPath, defaultModeLPath) {
+	async function startLoadingRoadsData(roadsDataPath, defaultRoadsDataPath) {
+    		return fetch(encodeURI(roadsDataPath))
+    			.then((response) => {
+    				if (!response.ok) throw new Error(response);
+    				return response.json();
+    			}).then(roadsDTO => {
+					roadModel.createRoadObjsFromData(roadsDTO);
+    			})
+				.catch(response => {
+    				const errorMessage = "Failed to load roads data: " + mapResponseToErrorMessage(response, roadsDataPath);
+    				alert(errorMessage);
+    			});
+    	}
+
+	async function startLoadingModel(modelPath, defaultModelPath) {
 		return fetch(encodeURI(modelPath))
 			.then((response) => {
 				if (!response.ok) throw new Error(response);
@@ -147,9 +174,9 @@ controllers.application = (function () {
 			}).catch(response => {
 				const errorMessage = "Failed to load model: " + mapResponseToErrorMessage(response, modelPath) + "\n" + "Loading default model instead.";
 				alert(errorMessage);
-				return fetch(encodeURI(defaultModeLPath));
+				return fetch(encodeURI(defaultModelPath));
 			}).then(response => {
-				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultModeLPath));
+				if (!response.ok) throw new Error(mapResponseToErrorMessage(response, defaultModelPath));
 				else return response.text();
 			}).then(modelHtml => {
 				// load model into a separate, temporary document until UI initialization
@@ -333,6 +360,7 @@ controllers.application = (function () {
 
 		startLoadingSetup: startLoadingSetup,
 		startLoadingMetadata: startLoadingMetadata,
+		startLoadingRoadsData: startLoadingRoadsData,
 		startLoadingModel: startLoadingModel
 	};
 })();

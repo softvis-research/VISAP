@@ -14,6 +14,7 @@ public class Config {
         public static class Metropolis {
             public static Building building = ConfigFactory.create(Building.class);
             public static District district = ConfigFactory.create(District.class);
+            public static RoadNetwork roadNetwork = ConfigFactory.create(RoadNetwork.class);
 
             public static Color color = ConfigFactory.create(Color.class);
             public static Shape shape = ConfigFactory.create(Shape.class);

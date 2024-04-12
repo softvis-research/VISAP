@@ -105,7 +105,7 @@ controllers.model = (function () {
 					});
 
 					entity.qualifiedName = entity.qualifiedName.trim();
-					if (entity.qualifiedName.slice(-1) == "." ) {
+					if (entity.qualifiedName.slice(-1) == ".") {
 						entity.qualifiedName = element.qualifiedName;
 					}
 
@@ -340,7 +340,7 @@ controllers.model = (function () {
 			const entitiesReferencingThis = entitiesByContainedUnloadedProperty.get(entity.id);
 			if (entitiesReferencingThis) {
 				entitiesReferencingThis.forEach(referenceReminder => {
-					const {entity: refEntity, property: refProperty} = referenceReminder;
+					const { entity: refEntity, property: refProperty } = referenceReminder;
 					// add newly loaded element to property lists it's supposed to be on
 					refEntity[refProperty].push(entity);
 					// remove it from the list of properties that haven't been loaded yet
@@ -409,7 +409,7 @@ controllers.model = (function () {
 	function getAllChildrenOfEntity(entity) {
 		let children = [];
 
-		entity.children.forEach(function(child) {
+		entity.children.forEach(function (child) {
 			children.push(child);
 			const grandChildren = getAllChildrenOfEntity(child);
 			children = children.concat(grandChildren);

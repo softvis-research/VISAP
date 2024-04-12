@@ -1,7 +1,7 @@
 package org.visap.generator.configuration.interfaces;
 
 import org.visap.generator.configuration.Sources;
-import org.visap.generator.model.MetaDataOutput;
+import org.visap.generator.export.core.MetaDataOutput;
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;
 

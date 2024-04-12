@@ -1,4 +1,4 @@
-package org.visap.generator.model;
+package org.visap.generator.export.core;
 
 import org.visap.generator.configuration.Config;
 import org.visap.generator.repository.CityElement;
@@ -119,6 +119,9 @@ public class AFrameExporter {
         Collection<CityElement> buildings = repository.getElementsByType(CityElement.CityType.Building);
         builder.append(createElementsExport(buildings));
 
+        Collection<CityElement> roads = repository.getElementsByType(CityElement.CityType.Road);
+        builder.append(createElementsExport(roads));
+
         Collection<CityElement> districts = repository.getElementsByType(CityElement.CityType.District);
         builder.append(createElementsExport(districts));
 
@@ -172,6 +175,7 @@ public class AFrameExporter {
         }
         if (element.getModelScale() != null) {
             builder.append("\"scale\": " + "\"" + element.getModelScale() + "\",");
+            builder.append("\n");
             builder.append("\n");
         }
         builder.append("\"shadow\": true");

@@ -2,7 +2,7 @@ package org.visap.generator.metaphors.metropolis.layouts;
 
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.configuration.Config;
-import org.visap.generator.helper.NumericChecker;
+import org.visap.generator.helpers.NumericChecker;
 import org.visap.generator.repository.CityElement;
 
 public class BuildingLayout {

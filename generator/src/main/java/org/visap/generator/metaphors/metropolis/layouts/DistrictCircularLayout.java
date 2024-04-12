@@ -18,6 +18,10 @@ public class DistrictCircularLayout {
 
     private final Map<CityRectangle, CityElement> rectangleElementsMap;
 
+    private static final double districtGap = Config.Visualization.Metropolis.district.horizontalDistrictGap();
+    private static final double districtMargin = Config.Visualization.Metropolis.district.horizontalDistrictMargin();
+    private static final double buildingGap = Config.Visualization.Metropolis.district.horizontalBuildingGap();
+
     public DistrictCircularLayout(CityElement district, Collection<CityElement> subElements, List<CityElement> originSet, List<List<CityElement>> additionalCodeSets) {
         this.district = district;
         this.subElements = subElements;
@@ -35,9 +39,8 @@ public class DistrictCircularLayout {
     }
 
     private void setSizeOfDistrict(CityRectangle coveringCityRectangle) {
-
-        district.setWidth(coveringCityRectangle.getWidth());
-        district.setLength(coveringCityRectangle.getLength());
+        district.setWidth(coveringCityRectangle.getWidth() + 2 * districtMargin);
+        district.setLength(coveringCityRectangle.getLength() + 2 * districtMargin);
         district.setHeight(Config.Visualization.Metropolis.district.districtHeight());
     }
 
@@ -70,10 +73,8 @@ public class DistrictCircularLayout {
             double centerX = element.getXPosition();
             double centerZ = element.getZPosition();
 
-            double newXPosition = centerX + parentX
-                    + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
-            double newZPosition = centerZ + parentZ
-                    + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
+            double newXPosition = centerX + parentX + districtMargin;
+            double newZPosition = centerZ + parentZ + districtMargin;
 
             element.setXPosition(newXPosition);
             element.setZPosition(newZPosition);
@@ -97,6 +98,8 @@ public class DistrictCircularLayout {
         CityRectangle covrec = new CityRectangle();
 
         List<CityRectangle> originRectangles = createCityRectanglesOfElements(originSet);
+        Collections.sort(originRectangles);
+        Collections.reverse(originRectangles);
 
         // Light Map algorithm for the origin set
         for (CityRectangle el : originRectangles) {
@@ -156,8 +159,7 @@ public class DistrictCircularLayout {
         Collections.sort(elements);
         Collections.reverse(elements);
         
-        double covrecRadius = covrec.getPerimeterRadius()
-                + Config.Visualization.Metropolis.district.horizontalBuildingGap();
+        double covrecRadius = covrec.getPerimeterRadius() + buildingGap;
         LayoutVersion version = Config.Visualization.Metropolis.district.layoutVersion();
 
         if (elements.size() == 0)
@@ -168,8 +170,7 @@ public class DistrictCircularLayout {
             double sumOfPerimeterRadius = 0;
 
             for (CityRectangle element : elements) {
-                sumOfPerimeterRadius += element.getPerimeterRadius()
-                        + Config.Visualization.Metropolis.district.horizontalBuildingGap();
+                sumOfPerimeterRadius += element.getPerimeterRadius() + buildingGap;
 
                 if (element.getPerimeterRadius() > maxOuterRadius) {
                     maxOuterRadius = element.getPerimeterRadius();
@@ -181,14 +182,14 @@ public class DistrictCircularLayout {
 
             double minRadius = maxOuterRadius
                     + covrecRadius
-                    + Config.Visualization.Metropolis.district.horizontalBuildingGap();
+                    + buildingGap;
 
             double maxRadius = 0;
 
             // new estimation of the radius
             if (elements.size() > 1)
                 maxRadius = (sumOfPerimeterRadius / elements.size()) / Math.sin(Math.PI / elements.size())
-                        + Config.Visualization.Metropolis.district.horizontalBuildingGap();
+                        + buildingGap;
 
             double radius = Math.max(minRadius, maxRadius);
 
@@ -277,9 +278,14 @@ public class DistrictCircularLayout {
             double width = element.getWidth();
             double length = element.getLength();
 
-            CityRectangle rectangle = new CityRectangle(0, 0,
-                    width + Config.Visualization.Metropolis.district.horizontalBuildingGap(),
-                    length + Config.Visualization.Metropolis.district.horizontalBuildingGap(), 1);
+            CityRectangle rectangle;
+
+            if (element.getType().equals(CityElement.CityType.District) || element.getType().equals(CityElement.CityType.Reference)) {
+                rectangle = new CityRectangle(0, 0, width + districtGap,length + districtGap, 1);
+            } else {
+                rectangle = new CityRectangle(0, 0, width + buildingGap,length + buildingGap, 1);
+            }
+
             rectangles.add(rectangle);
             rectangleElementsMap.put(rectangle, element);
         }
@@ -290,8 +296,13 @@ public class DistrictCircularLayout {
         double sum_width = 0;
         double sum_length = 0;
         for (CityElement element : elements) {
-            sum_width += element.getWidth() + Config.Visualization.Metropolis.district.horizontalBuildingGap();
-            sum_length += element.getLength() + Config.Visualization.Metropolis.district.horizontalBuildingGap();
+            if (element.getType().equals(CityElement.CityType.District) || element.getType().equals(CityElement.CityType.Reference)) {
+                sum_width += element.getWidth() + districtGap;
+                sum_length += element.getLength() + districtGap;
+            } else {
+                sum_width += element.getWidth() + buildingGap;
+                sum_length += element.getLength() + buildingGap;
+            }
         }
         return new CityRectangle(0, 0, sum_width, sum_length, 1);
     }

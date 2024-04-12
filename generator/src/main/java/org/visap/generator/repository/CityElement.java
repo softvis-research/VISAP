@@ -33,7 +33,7 @@ public class CityElement {
     }
 
     public enum CityType {
-        District, Building,
+        District, Building, Road, Reference
     }
 
     public enum CitySubType {
@@ -41,6 +41,8 @@ public class CityElement {
 
         // additional subTypes for metropolis
         Interface,
+
+        Freeway, Street, Lane
     }
 
     public enum CityShape {
@@ -87,7 +89,7 @@ public class CityElement {
         subElements = new ArrayList<>();
 
         UUID uuid = UUID.randomUUID();
-        hash = "ID_" + uuid.toString();
+        this.hash = "ID_" + uuid.toString();
     }
 
     public Long getSourceNodeID() {
@@ -227,6 +229,18 @@ public class CityElement {
         return subElementsOfType;
     }
 
+    public Collection<CityElement> getSubElementsOfSourceNodeType(SAPNodeTypes sourceNodeType) {
+        List<CityElement> subElements = new ArrayList<CityElement>();
+
+        for (CityElement subElement : this.getSubElements()) {
+            if (subElement.getSourceNodeType() == sourceNodeType) {
+                subElements.add(subElement);
+            }
+        }
+
+        return subElements;
+    }
+
     public String getSourceNodeProperty(SAPNodeProperties sapNodeProperties) {
 
         Node sourceNode = getSourceNode();
@@ -263,7 +277,7 @@ public class CityElement {
     }
 
     public String getHash() {
-        return hash;
+        return this.hash;
     }
 
     public CityType getType() {

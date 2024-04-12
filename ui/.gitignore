@@ -1,5 +1,6 @@
 model/*
 !model/example/
+!model/mock
 node_modules/
 setups/local/*
 !setups/local/README.md

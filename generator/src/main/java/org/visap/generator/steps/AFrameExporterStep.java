@@ -4,15 +4,15 @@ import org.visap.generator.configuration.Config;
 import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.visap.generator.abap.enums.SAPRelationLabels;
+import org.visap.generator.metaphors.metropolis.layouts.road.network.Road;
+import org.visap.generator.metaphors.metropolis.steps.*;
 import org.visap.generator.repository.CityRepository;
 import org.visap.generator.repository.SourceNodeRepository;
 import org.visap.generator.database.DatabaseConnector;
-import org.visap.generator.metaphors.metropolis.steps.MetaDataExporter;
-import org.visap.generator.metaphors.metropolis.steps.MetropolisCreator;
-import org.visap.generator.metaphors.metropolis.steps.MetropolisDesigner;
-import org.visap.generator.metaphors.metropolis.steps.MetropolisLayouter;
-import org.visap.generator.model.AFrameExporter;
-import org.visap.generator.model.MetaDataOutput;
+import org.visap.generator.export.core.AFrameExporter;
+import org.visap.generator.export.core.MetaDataOutput;
+import org.visap.generator.export.features.roads.RoadAssembler;
+import org.visap.generator.export.features.roads.RoadExporter;
 
 import java.util.List;
 import java.util.Scanner;
@@ -55,6 +55,21 @@ public class AFrameExporterStep {
         MetropolisLayouter layouter = new MetropolisLayouter(cityRepository, nodeRepository);
         layouter.layoutRepository();
 
+        if (Config.features.roads()) {
+            if (!isSilentMode) {
+                System.out.print("RoadNetworkLayouter step to be processed. Press any key to continue...");
+                userInput.nextLine();
+            }
+            MetropolisRoadNetworkLayouter roadNetworkLayouter = new MetropolisRoadNetworkLayouter(cityRepository, nodeRepository);
+            roadNetworkLayouter.createRoadNetworks();
+
+            RoadAssembler assembler = new RoadAssembler(roadNetworkLayouter.getMainRoads(), roadNetworkLayouter.getSubRoads());
+            List<Road> assembledRoads = assembler.assembleRoads();
+
+            RoadExporter roadExporter = new RoadExporter(assembledRoads);
+            roadExporter.exportRoads();
+        }
+
         if (!isSilentMode) {
             System.out.print("\nDesigner step to be processed. Press any key to continue...");
             userInput.nextLine();
@@ -79,8 +94,7 @@ public class AFrameExporterStep {
             metaDataExporter.setMetaDataPropToCityElements();
         }
 
-        // Create A-Frame
-        // Create metaData.json
+        // Create A-Frame model
         if (!isSilentMode) {
             System.out.println("Writing A-Frame. Press any key to continue...");
             userInput.nextLine();
@@ -102,6 +116,7 @@ public class AFrameExporterStep {
         }
 
         System.out.println("\nA-Frame Exporter step was completed");
+        System.out.println("Model files were written to " + Config.output.mapPath());
         userInput.close();
         connector.close();
     }

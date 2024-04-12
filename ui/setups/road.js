@@ -13,13 +13,24 @@ const setup = {
 			name: "canvasSelectController",
 		},
 		{
-			name: "relationController",
-			sourceStartAtBorder: false,
-			targetEndAtBorder: false,
-			showInnerRelations: true,
-			curvedConnectors: false,
+			name: "roadController",
+			supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
+			roadHighlightVariant: "ParallelColorStripes", // choose MultiColorStripes, ParallelColorStripes, ...
+			
+			colorsMultiColorStripes: {
+				undecided: "silver",
+				calls: "turquoise",
+				isCalled: "orange",
+				bidirectionalCall: "magenta",
+			},
 
-			connectorColor: { r: 0, g: 0, b: 1 },
+			colorsParallelColorStripes: {
+				calls: "lime",
+				isCalled: "magenta",
+			},
+
+			showLegendOnSelect: true,
+			enableMonochromeForUnrelatedEntities: false,
 		},
 	],
 
@@ -40,7 +51,7 @@ const setup = {
 					{ name: "defaultLogger" },
 					{ name: "canvasHoverController" },
 					{ name: "canvasSelectController" },
-					{ name: "relationController" },
+					{ name: "roadController" },
 				],
 			}
 		}

@@ -15,8 +15,11 @@ public class DistrictLightMapLayout {
 
     private CityElement district;
     private Collection<CityElement> subElements;
-
     private Map<CityRectangle, CityElement> rectangleElementsMap;
+
+    private static final double districtGap = Config.Visualization.Metropolis.district.horizontalDistrictGap();
+    private static final double districtMargin = Config.Visualization.Metropolis.district.horizontalDistrictMargin();
+    private static final double buildingGap = Config.Visualization.Metropolis.district.horizontalBuildingGap();
 
     public DistrictLightMapLayout(CityElement district, Collection<CityElement> subElements) {
         this.district = district;
@@ -40,9 +43,9 @@ public class DistrictLightMapLayout {
     }
 
     private void setPositionOfDistrict(CityRectangle coveringCityRectangle) {
-        district.setXPosition(coveringCityRectangle.getCenterX());
+        district.setXPosition(coveringCityRectangle.getCenterX() + 2 * districtMargin);
         district.setYPosition(district.getHeight() / 2);
-        district.setZPosition(coveringCityRectangle.getCenterY());
+        district.setZPosition(coveringCityRectangle.getCenterY() + 2 * districtMargin);
     }
 
     private void setNewPositionFromNode(CityRectangle rectangle, CityKDTreeNode fitNode) {
@@ -66,13 +69,11 @@ public class DistrictLightMapLayout {
         for (CityElement element : elements) {
 
             double centerX = element.getXPosition();
-            double newXPosition = centerX + parentX
-                    + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
+            double newXPosition = centerX + parentX + districtMargin;
             element.setXPosition(newXPosition);
 
             double centerZ = element.getZPosition();
-            double newZPosition = centerZ + parentZ
-                    + Config.Visualization.Metropolis.district.horizontalDistrictMargin();
+            double newZPosition = centerZ + parentZ + districtMargin;
             element.setZPosition(newZPosition);
 
             Collection<CityElement> subElements = element.getSubElements();
@@ -151,13 +152,17 @@ public class DistrictLightMapLayout {
         List<CityRectangle> rectangles = new ArrayList<>();
 
         for (CityElement element : elements) {
-
             double width = element.getWidth();
             double length = element.getLength();
 
-            CityRectangle rectangle = new CityRectangle(0, 0,
-                    width + Config.Visualization.Metropolis.district.horizontalBuildingGap(),
-                    length + Config.Visualization.Metropolis.district.horizontalBuildingGap(), 1);
+            CityRectangle rectangle;
+
+            if (element.getType().equals(CityElement.CityType.District) || element.getType().equals(CityElement.CityType.Reference)) {
+                rectangle = new CityRectangle(0, 0, width + districtGap,length + districtGap, 1);
+            } else {
+                rectangle = new CityRectangle(0, 0, width + buildingGap,length + buildingGap, 1);
+            }
+
             rectangles.add(rectangle);
             rectangleElementsMap.put(rectangle, element);
         }
@@ -168,8 +173,13 @@ public class DistrictLightMapLayout {
         double sum_width = 0;
         double sum_length = 0;
         for (CityElement element : elements) {
-            sum_width += element.getWidth() + Config.Visualization.Metropolis.district.horizontalBuildingGap();
-            sum_length += element.getLength() + Config.Visualization.Metropolis.district.horizontalBuildingGap();
+            if (element.getType().equals(CityElement.CityType.District) || element.getType().equals(CityElement.CityType.Reference)) {
+                sum_width += element.getWidth() + districtGap;
+                sum_length += element.getLength() + districtGap;
+            } else {
+                sum_width += element.getWidth() + buildingGap;
+                sum_length += element.getLength() + buildingGap;
+            }
         }
         return new CityRectangle(0, 0, sum_width, sum_length, 1);
     }
