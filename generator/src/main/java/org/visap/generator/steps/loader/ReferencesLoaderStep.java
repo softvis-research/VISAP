@@ -87,7 +87,7 @@ public class ReferencesLoaderStep {
         connector.executeWrite(
                 "MATCH (n:Refs),(e1:Elements),(e2:Elements)\n" +
                         "WHERE n.combinedKeySrc = e1.combinedKey AND n.combinedKeyDst = e2.combinedKey\n" +
-                        "CREATE (e1)-[:"+SAPRelationLabels.REFERENCES +"]->(e2)"
+                        "MERGE (e1)-[:"+SAPRelationLabels.REFERENCES +"]->(e2)"
         );
     }
 
