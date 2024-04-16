@@ -1,5 +1,7 @@
 package org.visap.generator.configuration.interfaces;
 
+import java.util.List;
+
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.LoadPolicy;
 import org.visap.generator.configuration.Sources;
@@ -19,9 +21,13 @@ public interface Setup extends Config {
     @DefaultValue("123")
     String password();
 
-    @DefaultValue("input/example/")
+    @DefaultValue("generator/input/example/")
     String inputCSVFilePath();
 
     @Config.DefaultValue("true")
     boolean silentMode();
+
+    // Cypher RegEx, separate multiple entries with commas
+    @Config.DefaultValue(".*")
+    List<String> packageWhitelist();
 }

@@ -12,7 +12,7 @@ The project is currently in a pre-development phase. Porting of functionality fr
 
 This project requires a JDK version of 12 or higher.
 
-The generator project is built using Maven. Open the project in your IDE of choice by importing the pom.xml file in the generator/ directory and then building the project.
+The generator project is built using Maven. Open the project in your IDE of choice by importing the pom.xml file in the VISAP/ directory and then building the project.
 
 ### Initializing the Graph Database
 
@@ -62,16 +62,16 @@ Save the config, close it, and start the Apache Module.
 
 Install [NPM](https://www.npmjs.com/) and run the command
 ```bash
-npm install -g live-server && live-server
+npx http-server
 ```
-inside the UI folder.
+inside the VISAP folder. Click on one of the links the output of the command displays in the terminal and go the ``ui`` folder.
 
 ### Final Steps
 
 Whichever approach for setting up a local server you used, if things went well, you should now be able to view the visualization in the browser.
-Enter the URL ``{localhost}/index.html?setup={setupPath}&model={folderName}``, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder that holds the model files (which is going to be yourOutput if you made no changes to the configuration). You can also use ``example`` as the folderName to use an example model. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder. For now, the only available setup is ``minimal``.
+Enter the URL ``{localhost}/index.html?setup={setupPath}&model={folderName}``, where ``{localhost}`` is the URL to the webserver, and ``{folderName}`` is the name of the folder that holds the model files (which is going to be yourOutput if you made no changes to the configuration). You can also use ``example`` as the folderName to use an example model. ``{setupPath}`` is where the setup lives inside the ``ui/setups/`` folder.
 
-When using NPM live-server, our complete URL might be http://127.0.0.1:8080/?setup=minimal&model=Example. When using XAMPP, it might be http://localhost/index.html?setup=minimal&model=Example instead.
+When using http-server, our complete URL will look something like http://127.0.0.1:8080/?setup=minimal&model=Example. When using XAMPP, it might be http://localhost/index.html?setup=minimal&model=Example instead.
 
 The visualization will look similar to this:
 

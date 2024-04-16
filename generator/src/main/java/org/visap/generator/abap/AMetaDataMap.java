@@ -5,7 +5,7 @@ import org.visap.generator.abap.enums.SAPNodeProperties;
 import java.util.*;
 
 public class AMetaDataMap {
-    private static final Map<String, String> metaDataProperties;
+    private static final Map<String, PropertyMetadata> metaDataProperties;
     private static final List<String> nodesWithReferencesRelationByType;
     private static final List<String> nodesWithInheritRelationByType;
     private static final List<String> nodesWithMigrationRelationByType;
@@ -14,31 +14,32 @@ public class AMetaDataMap {
     static {
         // Change property names for metaData-output
         metaDataProperties = new HashMap<>();
-        metaDataProperties.put(SAPNodeProperties.element_id.name(), "id");
-        metaDataProperties.put(SAPNodeProperties.object_name.name(), "name");
-        metaDataProperties.put(SAPNodeProperties.type_name.name(), "type");
-        metaDataProperties.put(SAPNodeProperties.type.name(), "abap_type");
-        metaDataProperties.put(SAPNodeProperties.creator.name(), "creator");
-        metaDataProperties.put(SAPNodeProperties.created.name(), "created");
-        metaDataProperties.put(SAPNodeProperties.changed_by.name(), "changed_by");
-        metaDataProperties.put(SAPNodeProperties.changed.name(), "changed");
-        metaDataProperties.put(SAPNodeProperties.number_of_statements.name(), "number_of_statements");
-        metaDataProperties.put(SAPNodeProperties.amount_of_results.name(), "amount_of_results");
-        metaDataProperties.put(SAPNodeProperties.amount_of_namspa.name(), "amount_of_namspa");
-        metaDataProperties.put(SAPNodeProperties.amount_of_chnhis.name(), "amount_of_chnhis");
-        metaDataProperties.put(SAPNodeProperties.amount_of_codlen.name(), "amount_of_codlen");
-        metaDataProperties.put(SAPNodeProperties.amount_of_commam.name(), "amount_of_commam");
-        metaDataProperties.put(SAPNodeProperties.amount_of_dynsta.name(), "amount_of_dynsta");
-        metaDataProperties.put(SAPNodeProperties.amount_of_enhmod.name(), "amount_of_enhmod");
-        metaDataProperties.put(SAPNodeProperties.amount_of_formty.name(), "amount_of_formty");
-        metaDataProperties.put(SAPNodeProperties.amount_of_nomac.name(), "amount_of_nomac");
-        metaDataProperties.put(SAPNodeProperties.amount_of_objnam.name(), "amount_of_objnam");
-        metaDataProperties.put(SAPNodeProperties.amount_of_praefi.name(), "amount_of_praefi");
-        metaDataProperties.put(SAPNodeProperties.amount_of_slin.name(), "amount_of_slin");
-        metaDataProperties.put(SAPNodeProperties.amount_of_sql.name(), "amount_of_sql");
-        metaDataProperties.put(SAPNodeProperties.amount_of_todo.name(), "amount_of_todo");
-        metaDataProperties.put(SAPNodeProperties.number_of_fields.name(),"number_of_fields");
-        metaDataProperties.put(SAPNodeProperties.local_class.name(), "local_class");
+        metaDataProperties.put(SAPNodeProperties.element_id.name(), new PropertyMetadata("id", String.class));
+        metaDataProperties.put(SAPNodeProperties.object_name.name(), new PropertyMetadata("name", String.class));
+        metaDataProperties.put(SAPNodeProperties.type_name.name(), new PropertyMetadata("type", String.class));
+        metaDataProperties.put(SAPNodeProperties.type.name(), new PropertyMetadata("abap_type", String.class));
+        metaDataProperties.put(SAPNodeProperties.creator.name(), new PropertyMetadata("creator", String.class));
+        metaDataProperties.put(SAPNodeProperties.created.name(), new PropertyMetadata("created", int.class));
+        metaDataProperties.put(SAPNodeProperties.changed_by.name(), new PropertyMetadata("changed_by", String.class));
+        metaDataProperties.put(SAPNodeProperties.changed.name(), new PropertyMetadata("changed", int.class));
+        metaDataProperties.put(SAPNodeProperties.iteration.name(), new PropertyMetadata("iteration", int.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_statements.name(), new PropertyMetadata("number_of_statements", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_results.name(), new PropertyMetadata("amount_of_results", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_namspa.name(), new PropertyMetadata("amount_of_namspa", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_chnhis.name(), new PropertyMetadata("amount_of_chnhis", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_codlen.name(), new PropertyMetadata("amount_of_codlen", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_commam.name(), new PropertyMetadata("amount_of_commam", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_dynsta.name(), new PropertyMetadata("amount_of_dynsta", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_enhmod.name(), new PropertyMetadata("amount_of_enhmod", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_formty.name(), new PropertyMetadata("amount_of_formty", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_nomac.name(), new PropertyMetadata("amount_of_nomac", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_objnam.name(), new PropertyMetadata("amount_of_objnam", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_praefi.name(), new PropertyMetadata("amount_of_praefi", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_slin.name(), new PropertyMetadata("amount_of_slin", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_sql.name(), new PropertyMetadata("amount_of_sql", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_todo.name(), new PropertyMetadata("amount_of_todo", int.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_fields.name(), new PropertyMetadata("number_of_fields", int.class));
+        metaDataProperties.put(SAPNodeProperties.local_class.name(), new PropertyMetadata("local_class", String.class));
 
         // Elements, for which we want to show REFERENCES relation
         nodesWithReferencesRelationByType = Arrays.asList(
@@ -66,16 +67,12 @@ public class AMetaDataMap {
                 "INTF");
     }
 
-    public static Map<String, String> getMetaDataProperties() {
+    public static Map<String, PropertyMetadata> getMetaDataProperties() {
         return metaDataProperties;
     }
 
-    public static String getMetaDataProperty(String key) {
-        String propertyName = metaDataProperties.get(key);
-        if (propertyName == null) {
-            propertyName = key;
-        }
-        return propertyName;
+    public static PropertyMetadata getMetaDataProperty(String key) {
+        return metaDataProperties.get(key);
     }
 
     public static List<String> getNodesWithMigrationRelationByType() {

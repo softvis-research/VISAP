@@ -10,8 +10,8 @@ import org.aeonbits.owner.Config.LoadPolicy;
 
 @LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
-    Sources.CONFIG_LOCAL_PATH + "District.properties",
-    Sources.CONFIG_PATH + "District.properties",
+    Sources.CONFIG_LOCAL_PATH + "metropolis/District.properties",
+    Sources.CONFIG_PATH + "metropolis/District.properties",
 })
 public interface District extends Config {
     @DefaultValue("3.0")
@@ -20,7 +20,7 @@ public interface District extends Config {
     @DefaultValue("0.0")
     double horizontalDistrictMargin();
 
-    @DefaultValue("0.0")
+    @DefaultValue("3.0")
     double horizontalDistrictGap();
 
     @DefaultValue("0.2")
