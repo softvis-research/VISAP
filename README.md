@@ -19,6 +19,9 @@ VISAP uses a local Neo4J graph database to generate its model. Download a curren
 Make the following changes to the configuration of that database (… > Settings):
 - Comment out ``dbms.directories.import=import`` by prepending #
 - De-comment ``dbms.security.allow_csv_import_from_file_urls=true`` by removing the leading #
+- ``dbms.memory.heap.initial_size=1G``
+- ``dbms.memory.heap.max_size=4G``
+- ``dbms.memory.pagecache.size=1512m``
 
 Then, start the database. The authorization being disabled may cause warnings on start-up, which can be dismissed.
 
