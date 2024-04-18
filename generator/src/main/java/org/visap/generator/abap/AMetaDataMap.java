@@ -24,7 +24,9 @@ public class AMetaDataMap {
         metaDataProperties.put(SAPNodeProperties.changed.name(), new PropertyMetadata("changed", int.class));
         metaDataProperties.put(SAPNodeProperties.iteration.name(), new PropertyMetadata("iteration", int.class));
         metaDataProperties.put(SAPNodeProperties.number_of_statements.name(), new PropertyMetadata("number_of_statements", int.class));
-        metaDataProperties.put(SAPNodeProperties.amount_of_results.name(), new PropertyMetadata("amount_of_results", int.class));
+        metaDataProperties.put(SAPNodeProperties.amount_of_slin_findings.name(), new PropertyMetadata("amount_of_slin", int.class));
+        metaDataProperties.put(SAPNodeProperties.local_class.name(), new PropertyMetadata("local_class", String.class));
+        /* metaDataProperties.put(SAPNodeProperties.amount_of_results.name(), new PropertyMetadata("amount_of_results", int.class));
         metaDataProperties.put(SAPNodeProperties.amount_of_namspa.name(), new PropertyMetadata("amount_of_namspa", int.class));
         metaDataProperties.put(SAPNodeProperties.amount_of_chnhis.name(), new PropertyMetadata("amount_of_chnhis", int.class));
         metaDataProperties.put(SAPNodeProperties.amount_of_codlen.name(), new PropertyMetadata("amount_of_codlen", int.class));
@@ -35,11 +37,30 @@ public class AMetaDataMap {
         metaDataProperties.put(SAPNodeProperties.amount_of_nomac.name(), new PropertyMetadata("amount_of_nomac", int.class));
         metaDataProperties.put(SAPNodeProperties.amount_of_objnam.name(), new PropertyMetadata("amount_of_objnam", int.class));
         metaDataProperties.put(SAPNodeProperties.amount_of_praefi.name(), new PropertyMetadata("amount_of_praefi", int.class));
-        metaDataProperties.put(SAPNodeProperties.amount_of_slin.name(), new PropertyMetadata("amount_of_slin", int.class));
         metaDataProperties.put(SAPNodeProperties.amount_of_sql.name(), new PropertyMetadata("amount_of_sql", int.class));
         metaDataProperties.put(SAPNodeProperties.amount_of_todo.name(), new PropertyMetadata("amount_of_todo", int.class));
-        metaDataProperties.put(SAPNodeProperties.number_of_fields.name(), new PropertyMetadata("number_of_fields", int.class));
-        metaDataProperties.put(SAPNodeProperties.local_class.name(), new PropertyMetadata("local_class", String.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_fields.name(), new PropertyMetadata("number_of_fields", int.class)); */
+
+        //new Metrics Mapping...
+        metaDataProperties.put(SAPNodeProperties.number_of_object_references.name(), new PropertyMetadata("number_of_object_references", int.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_exec_statements.name(), new PropertyMetadata("number_of_exec_statements", int.class));
+        metaDataProperties.put(SAPNodeProperties.maximum_nesting_depth.name(), new PropertyMetadata("maximum_nesting_depth", int.class));
+        metaDataProperties.put(SAPNodeProperties.cyclomatic_complexity.name(), new PropertyMetadata("cyclomatic_complexity", int.class));
+        metaDataProperties.put(SAPNodeProperties.keyword_named_variables.name(), new PropertyMetadata("keyword_named_variables", int.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_comments.name(), new PropertyMetadata("number_of_comments", int.class));
+        metaDataProperties.put(SAPNodeProperties.halstead_difficulty.name(), new PropertyMetadata("halstead_difficulty", int.class));
+        metaDataProperties.put(SAPNodeProperties.halstead_volume.name(), new PropertyMetadata("halstead_volume", int.class));
+        metaDataProperties.put(SAPNodeProperties.halstead_effort.name(), new PropertyMetadata("halstead_effort", int.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_methods.name(), new PropertyMetadata("number_of_methods", int.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_interfaces.name(), new PropertyMetadata("number_of_interfaces", int.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_attributes.name(), new PropertyMetadata("number_of_attributes", int.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_events.name(), new PropertyMetadata("number_of_events", int.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_redefined_methods.name(), new PropertyMetadata("number_of_redefined_methods", int.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_protected_methods.name(), new PropertyMetadata("number_of_protected_methods", int.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_public_methods.name(), new PropertyMetadata("number_of_public_methods", int.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_private_attributes.name(), new PropertyMetadata("number_of_private_attributes", int.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_protected_attributes.name(), new PropertyMetadata("number_of_protected_attributes", int.class));
+        metaDataProperties.put(SAPNodeProperties.number_of_public_attributes.name(), new PropertyMetadata("number_of_public_attributes", int.class));
 
         // Elements, for which we want to show REFERENCES relation
         nodesWithReferencesRelationByType = Arrays.asList(
