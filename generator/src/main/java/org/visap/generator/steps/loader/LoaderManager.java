@@ -11,7 +11,6 @@ public class LoaderManager {
             {NodesLoaderStep.class,
             ReferencesLoaderStep.class,
             MetaDataLoaderStep.class,
-            //NoesLoaderStep.class,
             MetricsLoaderStep.class};
 
     public static void main(String[] args) {
