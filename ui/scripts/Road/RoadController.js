@@ -9,13 +9,6 @@ controllers.roadController = function () {
 
 		supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
 
-		colorsMultiColorStripes: {
-			undecided: "silver",
-			calls: "turquoise",
-			isCalled: "orange",
-			bidirectionalCall: "magenta",
-		},
-
 		colorsParallelColorStripes: {
 			calls: "orange",
 			isCalled: "magenta",
@@ -26,6 +19,10 @@ controllers.roadController = function () {
 	let globalStartElementComponent;
 	let globalRelatedRoadObjsMap = new Map();
 
+	let globalLegendHelper = {};
+
+	let globalLegendPopupElement;
+
 	/************************
 		Initialization
 	************************/
@@ -35,6 +32,8 @@ controllers.roadController = function () {
 		events.selected.on.subscribe(onEntitySelected);
 		events.selected.off.subscribe(onEntityUnselected);
 		initializeHelpers();
+		globalLegendHelper = createLegendHtmlHelper(controllerConfig)
+		globalLegendHelper.initialize()
 	}
 
 	// intitialize roadHighlightHelpers based on variant defined in config, making respective helpers a generic global
@@ -74,12 +73,15 @@ controllers.roadController = function () {
 			console.log("START ELEMENT ID: " + globalStartElementComponent.id)
 			highlightStartElement();
 			handleRoadsHighlightForStartElement();
-			application.createModalPopup("hi","hi","1", false)
+			globalLegendPopupElement = application.createCustomPopupContainer(`Relations`, globalLegendHelper.getLegendInnerHtml(), { width: 150, height: 145 }, "1",)
 		}
 	}
 
 	function onEntityUnselected(applicationEvent) {
 		const appEventEntity = applicationEvent.entities[0];
+
+		canvasManipulator.removeElement(globalLegendPopupElement)
+
 		if (controllerConfig.supportedEntityTypes.includes(appEventEntity.type)) {
 			unhighlightStartElement();
 			handleRoadsHighlightsReset();
@@ -121,6 +123,7 @@ controllers.roadController = function () {
 		if (globalRelatedRoadObjsMap.size != 0) {
 			globalRoadHighlightHelper[variant].resetRoadsHighlight();
 			globalRelatedRoadObjsMap.clear();
+			canvasManipulator.removeElement(globalLegendPopupElement)
 		}
 	}
 

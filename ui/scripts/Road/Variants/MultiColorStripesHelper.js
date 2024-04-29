@@ -15,17 +15,6 @@ const createMultiColorStripesHelper = function (controllerConfig) {
         ************************/
 
         function initialize() {
-            if (controllerConfig.showLegendOnSelect) {
-                globalDomHelper = createDomHelper(controllerConfig);
-                globalDomHelper.initialize();
-                globalDomHelper.createLegend(
-                    [
-                        { text: "calls", color: controllerConfig.colorsMultiColorStripes.calls },
-                        { text: "isCalled", color: controllerConfig.colorsMultiColorStripes.isCalled },
-                        { text: "bidirectionalCall", color: controllerConfig.colorsMultiColorStripes.bidirectionalCall },
-                        { text: "undecided", color: controllerConfig.colorsMultiColorStripes.undecided },
-                    ]);
-            }
         }
 
         // entry for all logical actions leading to the offered visualization by this variant in GUI
@@ -33,13 +22,11 @@ const createMultiColorStripesHelper = function (controllerConfig) {
             globalStartElementComponent = startElementComponent;
             globalRelatedRoadObjsMap = relatedObjsMap;
 
-            globalDomHelper.handleLegendForAction("select");
             globalDomHelper.handleUnrelatedEntityMonochromacyForAction("select", globalRelatedRoadObjsMap)
             handleRoadStripsCreation();
         }
 
         function resetRoadsHighlight() {
-            globalDomHelper.handleLegendForAction("unselect");
             globalDomHelper.handleUnrelatedEntityMonochromacyForAction("unselect", globalRelatedRoadObjsMap)
             globalDomHelper.removeComponentByIdMarking("_stripe");
         }

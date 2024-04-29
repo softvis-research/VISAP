@@ -286,7 +286,7 @@ controllers.application = (function () {
 		};
 	}
 
-	function createModalPopup(title, text, popupId, modal = true) {
+	function createModalPopup(title, text, popupId) {
 		const popupWindow = createDiv(popupId);
 		popupWindow.innerHTML = text;
 		document.body.appendChild(popupWindow);
@@ -295,11 +295,32 @@ controllers.application = (function () {
 			width: 300,
 			height: 200,
 			headerText: title,
-			modal,
+			modal: true,
 			state: "open",
 			resizable: true,
 			draggable: true
 		});
+	}
+
+	function createCustomPopupContainer(title, text, dimProps, popupId) {
+		const popupWindow = createDiv(popupId);
+		popupWindow.innerHTML = text;
+		document.body.appendChild(popupWindow);
+
+		$("#" + popupId).igDialog({
+			width: dimProps.width || 300 ,
+			height: dimProps. height || 200,
+			headerText: title,
+			modal: false,
+			state: "open",
+			resizable: true,
+			draggable: true,
+			position: {
+				left: dimProps.left || 10, 
+				top: dimProps.top || 10 
+			}
+		});
+		return popupWindow;
 	}
 
 	function createDivAsChildOf(parent, newDivId) {
@@ -351,6 +372,7 @@ controllers.application = (function () {
 		transferConfigParams: transferConfigParams,
 		loadCSS: loadCSS,
 		createModalPopup: createModalPopup,
+		createCustomPopupContainer: createCustomPopupContainer,
 		createDiv: createDiv,
 		createDivAsChildOf: createDivAsChildOf,
 		getCanvas: getCanvas,
