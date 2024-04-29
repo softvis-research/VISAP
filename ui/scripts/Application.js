@@ -286,7 +286,7 @@ controllers.application = (function () {
 		};
 	}
 
-	function createModalPopup(title, text, popupId) {
+	function createModalPopup(title, text, popupId, modal = true) {
 		const popupWindow = createDiv(popupId);
 		popupWindow.innerHTML = text;
 		document.body.appendChild(popupWindow);
@@ -295,7 +295,7 @@ controllers.application = (function () {
 			width: 300,
 			height: 200,
 			headerText: title,
-			modal: true,
+			modal,
 			state: "open",
 			resizable: true,
 			draggable: true

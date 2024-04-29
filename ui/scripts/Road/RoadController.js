@@ -74,6 +74,7 @@ controllers.roadController = function () {
 			console.log("START ELEMENT ID: " + globalStartElementComponent.id)
 			highlightStartElement();
 			handleRoadsHighlightForStartElement();
+			application.createModalPopup("hi","hi","1", false)
 		}
 	}
 
