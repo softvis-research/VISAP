@@ -2,280 +2,305 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
     return (function () {
 
         let globalStartElementComponent;
-        let globalRelatedRoadObjsMap;
-        let globalRoadSectionPropsMap = new Map();
+        let globalStripesOffset;
+        let globalShrinkPct;
 
         /************************
             Public Functions
         ************************/
 
         // returns a props map for individual roadSections where startElement serves as reference for every attribute
-        function getPropsMapForRelatedRoadsStartElementPOV(startElementComponent, relatedRoadObjsMap) {
+        function getRoadObjSectionPropertiesArr(startElementComponent, relatedRoadObjsMap, stripesOffset = 0.25, shrinkPct = 0.7) {
             globalStartElementComponent = startElementComponent;
-            globalRelatedRoadObjsMap = relatedRoadObjsMap;
-            setRoadSectionPropertiesMap();
-            console.log(globalRoadSectionPropsMap)
-            return globalRoadSectionPropsMap;
+            globalShrinkPct = shrinkPct;
+            globalStripesOffset = stripesOffset;
+            const roadObjAdjustedArr = getRoadObjAdjustedArr(relatedRoadObjsMap);
+            console.log(roadObjAdjustedArr)
+            return roadObjAdjustedArr;
         }
 
         /************************
-             Enriching Props
-        ************************/
+               Adjusting
+       ************************/
 
-        function createRoadSectionPropertiesObj(p = {}) {
-            // augment as needed and set values in 'setRoadSectionPropertiesMap'
-            const roadSectionPropsObj = {
-                elementOrigin: p.elementOrigin || null,
-                isInitialElement: p.isStartRamp || false,
-                isFinalElement: p.isEndRamp || false,
-                direction: p.direction || null,
-                directionOfSuccessor: p.directionOfSuccessor || null,
-                directionOfPredecessor: p.directionOfPredecessor || null,
-            };
-            return roadSectionPropsObj;
+        function getRoadObjAdjustedArr(relatedRoadObjsMap) {
+            let roadObjAdjustedArr = getRoadObjsWithAdjustedRoadSectionOrder(relatedRoadObjsMap);
+            addDirectionOfRoadSectionsRelativeToStartElement(roadObjAdjustedArr);
+            addRoadSectionAdjustedIntersections(roadObjAdjustedArr);
+            addDistrictIntersections(roadObjAdjustedArr);
+            console.log(roadObjAdjustedArr)
+            return roadObjAdjustedArr;
         }
 
-        function setRoadSectionPropertiesMap() {
-            //basic ops
-            resetCurrentRoadSectionPropsMap();
-            addAllRelevantRoadSectionsToMapWithEmptyProps();
-            // calls
-            setPropsForInitialRoadSectionsInCallsRelation();
-            setDirectionsForSubsequentRoadSectionsInCallsRelation();
-            // isCalled
-            setPropsForInitialRoadSectionsInIsCalledRelation()
-            setDirectionsForSubsequentRoadSectionsInIsCalledRelation();
-            // further props
-            setIsFinalElementForAllRoadSections();
-            setCurvePropsForAllRoadSections();
+        function addDirectionOfRoadSectionsRelativeToStartElement(roadObjAdjustedArr) {
+            roadObjAdjustedArr.forEach(roadObj => {
+                const refRoadSectionObj = roadObj.roadSectionObjArr[0];
+                const refDirection = getDirectionForInitialRoadSection(refRoadSectionObj);
+                roadObj.roadSectionObjArr[0].direction = refDirection;
+                for (let i = 1; i < roadObj.roadSectionObjArr.length; i++) {
+                    const currentRoadSectionObj = roadObj.roadSectionObjArr[i];
+                    const refRoadSectionObj = roadObj.roadSectionObjArr[i - 1];
+                    const currentDirection = getDirectionOfAdjacentRoadSections(currentRoadSectionObj, refRoadSectionObj);
+                    roadObj.roadSectionObjArr[i].direction = currentDirection;
+                }
+            })
         }
 
-        function resetCurrentRoadSectionPropsMap() {
-            globalRoadSectionPropsMap.clear();
+        function addRoadSectionAdjustedIntersections(roadObjAdjustedArr) {
+            roadObjAdjustedArr.forEach(roadObj => {
+                for (let i = 1; i < roadObj.roadSectionObjArr.length; i++) {
+                    const currentRoadSectionObj = roadObj.roadSectionObjArr[i];
+                    const refRoadSectionObj = roadObj.roadSectionObjArr[i - 1];
+                    // a curve
+                    if (currentRoadSectionObj.direction != refRoadSectionObj.direction) {
+                        currentRoadSectionObj.intersection, refRoadSectionObj.intersection
+                            = getRoadSectionIntersection(currentRoadSectionObj, refRoadSectionObj)
+                    } else refRoadSectionObj.intersection = null;
+                }
+                const lastRoadSection = roadObj.roadSectionObjArr[roadObj.roadSectionObjArr.length - 1];
+                lastRoadSection.intersection = null;
+            })
         }
 
-        function addAllRelevantRoadSectionsToMapWithEmptyProps() {
-            const allRoadObjs = [...getRoadObjsInCallsRelation(), ...getRoadObjsInIsCalledRelation()];
+        function addDistrictIntersections(roadObjAdjustedArr) {
+            roadObjAdjustedArr.forEach(roadObj => {
+                const length = roadObj.roadSectionObjArr.length;
+                for (let i = 0; i < length; i++) {
+                    let intersectionWithStartBorder = null;
+                    let intersectionWithEndBorder = null;
+                    if (i === 0) intersectionWithStartBorder = getDistrictIntersection(roadObj.roadSectionObjArr[i], isFinal = false);
+                    if (i === length - 1) intersectionWithEndBorder = getDistrictIntersection(roadObj.roadSectionObjArr[i], isFinal = true);
 
-            allRoadObjs.forEach(roadObj => {
-                roadObj.roadSectionArr.forEach(roadSectionId => {
-                    const defaultPropertiesObj = createRoadSectionPropertiesObj({});
-                    addToMapIfKeyOrValueNotExists(roadSectionId, defaultPropertiesObj, globalRoadSectionPropsMap);
-                });
+                    roadObj.roadSectionObjArr[i].intersectionWithStartBorder = intersectionWithStartBorder;
+                    roadObj.roadSectionObjArr[i].intersectionWithEndBorder = intersectionWithEndBorder;
+                }
             });
         }
 
         /************************
-                Calls
+         Virtual Helper Stripes
         ************************/
 
-        function setPropsForInitialRoadSectionsInCallsRelation() {
-            const roadObjsInCallsRelation = getRoadObjsInCallsRelation();
-            roadObjsInCallsRelation.forEach(roadObj => {
-                const initialRoadSectionId = roadObj.roadSectionArr[0];
-                const direction = getDirectionForInitialRoadSection(initialRoadSectionId);
-                addToMapIfKeyOrValueNotExists(initialRoadSectionId, {
-                    elementOrigin: roadObj.startElementId,
-                    direction,
-                    isInitialElement: true,
-                }, globalRoadSectionPropsMap)
-            })
+        function constructVirtualHelperStripe(roadSectionObj) {
+            const component = document.getElementById(roadSectionObj.id);
+            const width = component.getAttribute("width");
+            const depth = component.getAttribute("depth");
+            const position = component.getAttribute("position");
+
+            let virtualHelperStripe = {
+                width, depth, position
+            }
+
+            let clone = adjustDimensionsAndPosition(roadSectionObj, virtualHelperStripe);
+            // give the clone a direction to place his ramp to district
+            clone.direction = roadSectionObj.direction;
+            return clone;
         }
 
-        function setDirectionsForSubsequentRoadSectionsInCallsRelation() {
-            const roadObjsInCallsRelation = getRoadObjsInCallsRelation();
-            roadObjsInCallsRelation.forEach(roadObj => {
-                const directions = getDirectionsForOrderedRoadSections(roadObj.roadSectionArr);
-                for (let i = 1; i < roadObj.roadSectionArr.length; i++) {
-                    addToMapIfKeyOrValueNotExists(roadObj.roadSectionArr[i], {
-                        elementOrigin: roadObj.startElementId,
-                        direction: directions[i]
-                    }, globalRoadSectionPropsMap)
+        function adjustDimensionsAndPosition(roadSectionObj, virtualHelperStripe) {
+            let clone = {}; // Initialize clone as an empty object
+            switch (roadSectionObj.direction) {
+                case "up": {
+                    clone.width = virtualHelperStripe.width * (1 - globalShrinkPct);
+                    clone.depth = virtualHelperStripe.depth;
+                    clone.position = { ...virtualHelperStripe.position }; // clone position object
+                    clone.position.x -= globalStripesOffset;
+                    break;
                 }
-            })
+                case "down": {
+                    clone.width = virtualHelperStripe.width * (1 - globalShrinkPct);
+                    clone.depth = virtualHelperStripe.depth;
+                    clone.position = { ...virtualHelperStripe.position };
+                    clone.position.x += globalStripesOffset;
+                    break;
+                }
+                case "left": {
+                    clone.width = virtualHelperStripe.width;
+                    clone.depth = virtualHelperStripe.depth * (1 - globalShrinkPct);
+                    clone.position = { ...virtualHelperStripe.position }; 
+                    clone.position.z += globalStripesOffset;
+                    break;
+                }
+                case "right": {
+                    clone.width = virtualHelperStripe.width;
+                    clone.depth = virtualHelperStripe.depth * (1 - globalShrinkPct);
+                    clone.position = { ...virtualHelperStripe.position }; 
+                    clone.position.z -= globalStripesOffset;
+                    break;
+                }
+            }
+            return clone;
         }
+        
 
         /************************
-                isCalled
+            Direction Helper
         ************************/
 
-        function setPropsForInitialRoadSectionsInIsCalledRelation() {
-            const roadObjsInIsCalledRelation = getRoadObjsInIsCalledRelation();
-
-            roadObjsInIsCalledRelation.forEach(roadObj => {
-                // last roadSection serves as initialElement – as in isCalled-relations, roads get flipped to keep startElement as reference
-                const lastIdx = roadObj.roadSectionArr.length - 1;
-                const initialRoadSectionId = roadObj.roadSectionArr[lastIdx];
-                const direction = getDirectionForInitialRoadSection(initialRoadSectionId);
-                addToMapIfKeyOrValueNotExists(initialRoadSectionId, {
-                    elementOrigin: roadObj.startElementId,
-                    direction,
-                    isInitialElement: true,
-                }, globalRoadSectionPropsMap)
-            })
-        }
-
-        function setDirectionsForSubsequentRoadSectionsInIsCalledRelation() {
-            const roadObjsInIsCalledRelation = getRoadObjsInIsCalledRelation();
-            roadObjsInIsCalledRelation.forEach(roadObj => {
-                // reversing road – as in isCalled-relations, roads get flipped to keep startElement as reference
-                const reverseOrderedArr = [...roadObj.roadSectionArr].reverse();
-                const directions = getDirectionsForOrderedRoadSections(reverseOrderedArr);
-                for (let i = 1; i < roadObj.roadSectionArr.length; i++) {
-                    addToMapIfKeyOrValueNotExists(reverseOrderedArr[i], {
-                        elementOrigin: roadObj.startElementId,
-                        direction: directions[i]
-                    }, globalRoadSectionPropsMap)
-                }
-            })
-        }
-
-        /************************
-             Directions Ops
-        ************************/
-
-        function getDirectionForInitialRoadSection(initialRoadSectionId) {
+        function getDirectionForInitialRoadSection(initialRoadSectionObj) {
             // initial roadSections direction is based on startElement position
             // this also included isCalled roads, as their order gets reversed to keep startElement as reference
-            const midPointOfInitialRoadSection = document.getElementById(initialRoadSectionId).getAttribute("position");
+            const initialRoadSectionMidPoint = document.getElementById(initialRoadSectionObj.id).getAttribute("position");
             const startElementMidPoint = globalStartElementComponent.getAttribute("position");
             const directionMap = {
-                east: midPointOfInitialRoadSection.x < startElementMidPoint.x,
-                west: midPointOfInitialRoadSection.x > startElementMidPoint.x,
-                north: midPointOfInitialRoadSection.z > startElementMidPoint.z,
-                south: midPointOfInitialRoadSection.z < startElementMidPoint.z,
+                right: initialRoadSectionMidPoint.x < startElementMidPoint.x,
+                left: initialRoadSectionMidPoint.x > startElementMidPoint.x,
+                up: initialRoadSectionMidPoint.z > startElementMidPoint.z,
+                down: initialRoadSectionMidPoint.z < startElementMidPoint.z,
             };
             const direction = Object.keys(directionMap).find(key => directionMap[key]);
             return direction;
         }
 
-        function getDirectionsForOrderedRoadSections(roadSectionOrderedArr) {
-            let directionsArr = [];
-            directionsArr.push(globalRoadSectionPropsMap.get(roadSectionOrderedArr[0]).direction)
-            for (let i = 1; i < roadSectionOrderedArr.length; i++) {
-                const midPoint = document.getElementById(roadSectionOrderedArr[i]).getAttribute("position");
-                const refMidPoint = document.getElementById(roadSectionOrderedArr[i - 1]).getAttribute("position");
-                const refDirection = directionsArr[i - 1];
-                const direction = getDirectionOfAdjacentRoadSection(midPoint, refMidPoint, refDirection);
-                directionsArr.push(direction);
-            }
-            return directionsArr;
-        }
-
-        function getDirectionOfAdjacentRoadSection(midPoint, refMidPoint, refDirection) {
+        function getDirectionOfAdjacentRoadSections(currentRoadSectionObj, refRoadSectionObj) {
+            const refDirection = refRoadSectionObj.direction;
+            const currentMidPoint = document.getElementById(currentRoadSectionObj.id).getAttribute("position");
+            const refMidPoint = document.getElementById(refRoadSectionObj.id).getAttribute("position");
             // imagine a compass turning its needle based on your direction: here, assigned directions depend on reference directions
             switch (refDirection) {
-                case "west":
-                    if (midPoint.x > refMidPoint.x && midPoint.z === refMidPoint.z) return "west";
-                    if (midPoint.x > refMidPoint.x && midPoint.z > refMidPoint.z) return "north";
-                    if (midPoint.x > refMidPoint.x && midPoint.z < refMidPoint.z) return "south";
+                case "left":
+                    if (currentMidPoint.x > refMidPoint.x && currentMidPoint.z === refMidPoint.z) return "left";
+                    if (currentMidPoint.x > refMidPoint.x && currentMidPoint.z > refMidPoint.z) return "up";
+                    if (currentMidPoint.x > refMidPoint.x && currentMidPoint.z < refMidPoint.z) return "down";
                     break;
 
-                case "east":
-                    if (midPoint.x < refMidPoint.x && midPoint.z === refMidPoint.z) return "east";
-                    if (midPoint.x < refMidPoint.x && midPoint.z > refMidPoint.z) return "north";
-                    if (midPoint.x < refMidPoint.x && midPoint.z < refMidPoint.z) return "south";
+                case "right":
+                    if (currentMidPoint.x < refMidPoint.x && currentMidPoint.z === refMidPoint.z) return "right";
+                    if (currentMidPoint.x < refMidPoint.x && currentMidPoint.z > refMidPoint.z) return "up";
+                    if (currentMidPoint.x < refMidPoint.x && currentMidPoint.z < refMidPoint.z) return "down";
                     break;
 
-                case "south":
-                    if (midPoint.x === refMidPoint.x && midPoint.z < refMidPoint.z) return "south";
-                    if (midPoint.x > refMidPoint.x && midPoint.z < refMidPoint.z) return "west";
-                    if (midPoint.x < refMidPoint.x && midPoint.z < refMidPoint.z) return "east";
+                case "down":
+                    if (currentMidPoint.x === refMidPoint.x && currentMidPoint.z < refMidPoint.z) return "down";
+                    if (currentMidPoint.x > refMidPoint.x && currentMidPoint.z < refMidPoint.z) return "left";
+                    if (currentMidPoint.x < refMidPoint.x && currentMidPoint.z < refMidPoint.z) return "right";
                     break;
 
-                case "north":
-                    if (midPoint.x === refMidPoint.x && midPoint.z > refMidPoint.z) return "north";
-                    if (midPoint.x > refMidPoint.x && midPoint.z > refMidPoint.z) return "west";
-                    if (midPoint.x < refMidPoint.x && midPoint.z > refMidPoint.z) return "east";
+                case "up":
+                    if (currentMidPoint.x === refMidPoint.x && currentMidPoint.z > refMidPoint.z) return "up";
+                    if (currentMidPoint.x > refMidPoint.x && currentMidPoint.z > refMidPoint.z) return "left";
+                    if (currentMidPoint.x < refMidPoint.x && currentMidPoint.z > refMidPoint.z) return "right";
                     break;
             }
         }
 
         /************************
-               Other Ops
+           Intersection Helper
         ************************/
 
-        function setCurvePropsForAllRoadSections() {
-            globalRelatedRoadObjsMap.forEach(roadObj => {
-                let roadSectionArr = roadObj.startElementId != globalStartElementComponent.id
-                    ? [...roadObj.roadSectionArr].reverse()
-                    : roadObj.roadSectionArr;
+        function getRoadSectionIntersection(currentRoadSectionObj, refRoadSectionObj) {
+            const virtualHelperStripeOfCurrent = constructVirtualHelperStripe(currentRoadSectionObj);
+            const virtualHelperStripeOfRef = constructVirtualHelperStripe(refRoadSectionObj);
+            const virtualRoadSectionIntersection = calculateRoadSectionIntersectionMidpoint(virtualHelperStripeOfCurrent, virtualHelperStripeOfRef)
+            return virtualRoadSectionIntersection;
+        }
 
-                for (let i = 0; i < roadSectionArr.length; i++) {
-                    const directionOfCurrent = globalRoadSectionPropsMap.get(roadSectionArr[i]).direction;
-                    // intermediate sections
-                    if (i != 0 && i < roadSectionArr.length - 1) {
-                        const directionOfPredecessor = globalRoadSectionPropsMap.get(roadSectionArr[i - 1]).direction;
-                        const directionOfSuccessor = globalRoadSectionPropsMap.get(roadSectionArr[i + 1]).direction;
-                        const isStartingInCurve = directionOfCurrent != directionOfPredecessor;
-                        const isEndingInCurve = directionOfCurrent != directionOfSuccessor;
-                        addToMapIfKeyOrValueNotExists(roadSectionArr[i], {
-                            directionOfPredecessor,
-                            directionOfSuccessor
-                        }, globalRoadSectionPropsMap)
-                        // initial section
-                    } else if (i === 0) {
-                        const directionOfSuccessor = globalRoadSectionPropsMap.get(roadSectionArr[i + 1]).direction;
-                        const isEndingInCurve = directionOfCurrent != directionOfSuccessor;
-                        addToMapIfKeyOrValueNotExists(roadSectionArr[i], {
-                            directionOfSuccessor,
-                        }, globalRoadSectionPropsMap)
-                        // final section
-                    } else {
-                        const directionOfPredecessor = globalRoadSectionPropsMap.get(roadSectionArr[i - 1]).direction;
-                        const isStartingInCurve = directionOfCurrent != directionOfPredecessor;
-                        addToMapIfKeyOrValueNotExists(roadSectionArr[i], {
-                            directionOfPredecessor
-                        }, globalRoadSectionPropsMap)
+        function calculateRoadSectionIntersectionMidpoint(virtualHelperStripeOfCurrent, virtualHelperStripeOfRef) {
+            const currentPos = virtualHelperStripeOfCurrent.position
+            const currentWidth = virtualHelperStripeOfCurrent.width
+            const currentDepth = virtualHelperStripeOfCurrent.depth
+
+            const refPos = virtualHelperStripeOfRef.position
+            const refWidth = virtualHelperStripeOfRef.width
+            const refDepth = virtualHelperStripeOfRef.depth
+
+            // calculate extents of rectangles in both directions
+            const currentLeftX = currentPos.x - currentWidth / 2;
+            const currentRightX = currentPos.x + currentWidth / 2;
+            const currentTopZ = currentPos.z - currentDepth / 2;
+            const currentBottomZ = currentPos.z + currentDepth / 2;
+
+            const refLeftX = refPos.x - refWidth / 2;
+            const refRightX = refPos.x + refWidth / 2;
+            const refTopZ = refPos.z - refDepth / 2;
+            const refBottomZ = refPos.z + refDepth / 2;
+
+            // calculate intersection region
+            const intersectionLeftX = Math.max(currentLeftX, refLeftX);
+            const intersectionRightX = Math.min(currentRightX, refRightX);
+            const intersectionTopZ = Math.max(currentTopZ, refTopZ);
+            const intersectionBottomZ = Math.min(currentBottomZ, refBottomZ);
+
+            // Calculate midpoint of intersection region
+            const intersectionMidpointX = (intersectionLeftX + intersectionRightX) / 2;
+            const intersectionMidpointZ = (intersectionTopZ + intersectionBottomZ) / 2;
+            const intersectionMidpoint = { x: intersectionMidpointX, z: intersectionMidpointZ };
+
+            return intersectionMidpoint;
+        }
+
+        function getDistrictIntersection(roadSectionObj, isFinal) {
+            const virtualHelperStripe = constructVirtualHelperStripe(roadSectionObj);
+            const virtualDistrictIntersection = calculateDistrictIntersection(virtualHelperStripe, isFinal)
+            return virtualDistrictIntersection;
+        }
+
+        function calculateDistrictIntersection(virtualHelperStripe, isFinal) {
+            const direction = virtualHelperStripe.direction;
+            const width = virtualHelperStripe.width;
+            const depth = virtualHelperStripe.depth;
+            const position = virtualHelperStripe.position;
+            let delta;
+
+            switch (direction) {
+                case "left": {
+                    isFinal ? delta = width / 2 : delta = - width / 2
+                    return {
+                        x: position.x + delta,
+                        z: position.z,
                     }
                 }
-            });
+                case "right": {
+                    isFinal ? delta = width / 2 : delta = - width / 2
+                    return {
+                        x: position.x - delta,
+                        z: position.z,
+                    }
+                }
+                case "down": {
+                    isFinal ? delta = depth / 2 : delta = - depth / 2
+                    return {
+                        x: position.x,
+                        z: position.z - delta,
+                    }
+                }
+                case "up": {
+                    isFinal ? delta = depth / 2 : delta = - depth / 2
+                    return {
+                        x: position.x,
+                        z: position.z + delta,
+                    }
+                }
+            }
         }
 
-        function setIsFinalElementForAllRoadSections() {
-            globalRelatedRoadObjsMap.forEach(roadObj => {
-                let lastIdx;
-                // fixing startElement as reference means that roadObjs' roadSectionArrs that lead towards startElement (isCalled) are reversed
-                roadObj.startElementId === globalStartElementComponent.id ?
-                    lastIdx = roadObj.roadSectionArr.length - 1
-                    : lastIdx = 0
-                const finalRoadSectionId = roadObj.roadSectionArr[lastIdx];
-                addToMapIfKeyOrValueNotExists(finalRoadSectionId, {
-                    isFinalElement: true,
-                }, globalRoadSectionPropsMap)
-            })
+        /************************
+              Other Helper
+        ************************/
+
+        function getRoadObjsWithAdjustedRoadSectionOrder(relatedRoadObjsMap) {
+            const roadObjsInCallsRelation = getRoadObjsInCallsRelation(relatedRoadObjsMap);
+            const roadObjsInIsCalledRelation = getRoadObjsInIsCalledRelation(relatedRoadObjsMap);
+            const reversedIsCalledRoadObjs = roadObjsInIsCalledRelation.map(roadObj => ({
+                ...roadObj,
+                roadSectionObjArr: [...roadObj.roadSectionObjArr].reverse(),
+            }));
+            const roadObjAdjustedArr = [...roadObjsInCallsRelation, ...reversedIsCalledRoadObjs];
+            return roadObjAdjustedArr;
         }
 
-        function getRoadObjsInCallsRelation() {
-            return Array.from(globalRelatedRoadObjsMap.values())
+        function getRoadObjsInCallsRelation(relatedRoadObjsMap) {
+            return Array.from(relatedRoadObjsMap.values())
                 .filter(roadObj => roadObj.startElementId === globalStartElementComponent.id); // startElement calls other elements
         }
 
-        function getRoadObjsInIsCalledRelation() {
-            return Array.from(globalRelatedRoadObjsMap.values())
+        function getRoadObjsInIsCalledRelation(relatedRoadObjsMap) {
+            return Array.from(relatedRoadObjsMap.values())
                 .filter(roadObj => roadObj.startElementId != globalStartElementComponent.id); // startElement is called by other elements
         }
 
-        /************************
-                 Helper
-        ************************/
-
-        function addToMapIfKeyOrValueNotExists(key, value, map) {
-            const existingValue = map.get(key);
-
-            if (!existingValue) {
-                map.set(key, value);
-            } else if (typeof existingValue === 'object' && typeof value === 'object') {
-                Object.entries(value).forEach(([objKey, objValue]) => {
-                    if (!existingValue.hasOwnProperty(objKey) || !existingValue[objKey]) {
-                        existingValue[objKey] = objValue;
-                    }
-                });
-            }
-        }
-
         return {
-            getPropsMapForRelatedRoadsStartElementPOV,
+            getRoadObjSectionPropertiesArr,
         };
     })();
 };

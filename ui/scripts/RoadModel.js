@@ -3,10 +3,11 @@ controllers.roadModel = (function () {
 
 	function createRoadObjsFromData(roadsDTO) {
 		roadsDTO.forEach(roadDTO => {
+			const roadSectionObjArr = roadDTO.road_sections.map(roadSectionId => ({ id: roadSectionId }));
 			const roadObjProperty = {
 				startElementId: roadDTO.start_element,
 				destinationElementId: roadDTO.destination_element,
-				roadSectionArr: roadDTO.road_sections,
+				roadSectionObjArr: roadSectionObjArr,
 			};
 			globalRoadObjMap.set(roadDTO.id, roadObjProperty);
 		});
@@ -27,13 +28,13 @@ controllers.roadModel = (function () {
 	function getRoadSectionIdsForStartElementId(startElementId) {
 		return Array.from(getRoadObjsByPredicate(roadObj =>
 			roadObj.startElementId === startElementId
-		).values()).flatMap(roadObj => roadObj.roadSectionArr);
+		).values()).flatMap(roadObj => roadObj.roadSectionObjArr);
 	}
 
 	function getRoadSectionIdsForDestinationElementId(destinationElementId) {
 		return Array.from(getRoadObjsByPredicate(roadObj =>
 			roadObj.destinationElementId === destinationElementId
-		).values()).flatMap(roadObj => roadObj.roadSectionArr);
+		).values()).flatMap(roadObj => roadObj.roadSectionObjArr);
 	}
 
 	function getRoadSectionIdsForUniqueElementIdRelation(elementIdA, elementIdB) {
@@ -45,7 +46,7 @@ controllers.roadModel = (function () {
 			roadObj.startElementId === elementIdB && roadObj.destinationElementId === elementIdA
 		).values();
 
-		return [].concat(...roadSectionsMatchingAtoB, ...roadSectionsMatchingBtoA).flatMap(roadObj => roadObj.roadSectionArr);
+		return [].concat(...roadSectionsMatchingAtoB, ...roadSectionsMatchingBtoA).flatMap(roadObj => roadObj.roadSectionObjArr);
 	}
 
 	/************************

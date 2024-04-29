@@ -15,22 +15,12 @@ const setup = {
 		{
 			name: "roadController",
 			supportedEntityTypes: ["Class", "Report", "FunctionGroup", "Interface"],
-			roadHighlightVariant: "ParallelColorStripes", // choose MultiColorStripes, ParallelColorStripes, ...
-			
-			colorsMultiColorStripes: {
-				undecided: "silver",
-				calls: "turquoise",
-				isCalled: "orange",
-				bidirectionalCall: "magenta",
-			},
+			roadHighlightVariant: "ParallelColorStripes",
 
 			colorsParallelColorStripes: {
 				calls: "lime",
 				isCalled: "magenta",
 			},
-
-			showLegendOnSelect: true,
-			enableMonochromeForUnrelatedEntities: false,
 		},
 	],
 

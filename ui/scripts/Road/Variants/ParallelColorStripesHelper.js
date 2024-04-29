@@ -1,31 +1,22 @@
 const createParallelColorStripesHelper = function (controllerConfig) {
     return (function () {
 
-        let globalDomHelper;
         let globalRoadSectionPropertiesHelper;
         let globalStartElementComponent;
         let globalRelatedRoadObjsMap = new Map();
         let globalRoadSectionPropsMap = new Map();
         let globalScene;
 
-        // TODO: Create more globals to adjust base props of stripe component in spot
-        const globalStripeShrinkPct = 0.70
+        const globalStripeOffsetRoadCenter = 0.25;
+        const globalStripeSizePct = 0.3;
+
 
         /************************
             Public Functions
         ************************/
 
         function initialize() {
-            if (controllerConfig.showLegendOnSelect) {
-                globalScene = document.querySelector("a-scene");
-                globalDomHelper = createDomHelper(controllerConfig);
-                globalDomHelper.initialize();
-                globalDomHelper.createLegend(
-                    [
-                        { text: "calls", color: controllerConfig.colorsParallelColorStripes.calls },
-                        { text: "isCalled", color: controllerConfig.colorsParallelColorStripes.isCalled },
-                    ]);
-            }
+            if (controllerConfig.showLegendOnSelect) globalLegendHtmlHelper = createLegendHtmlHelper(controllerConfig)
             globalRoadSectionPropertiesHelper = createRoadSectionPropertiesHelper();
         }
 
@@ -33,16 +24,15 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         function startRoadHighlightActionsForStartElement(startElementComponent, relatedRoadObjsMap) {
             globalStartElementComponent = startElementComponent;
             globalRelatedRoadObjsMap = relatedRoadObjsMap;
-
-            globalDomHelper.handleLegendForAction("select");
-            globalDomHelper.handleUnrelatedEntityMonochromacyForAction("select", globalRelatedRoadObjsMap);
             handleParallelStripsCreation();
         }
 
         function resetRoadsHighlight() {
-            globalDomHelper.handleLegendForAction("unselect");
-            globalDomHelper.handleUnrelatedEntityMonochromacyForAction("unselect", globalRelatedRoadObjsMap)
-            globalDomHelper.removeComponentByIdMarking("_stripe");
+            const scene = document.querySelector('a-scene');
+            scene.object3D.remove(...scene.object3D.children.filter(child => child instanceof THREE.Mesh));
+
+            // Remove tubes
+            scene.object3D.remove(...scene.object3D.children.filter(child => child instanceof THREE.Mesh && child.geometry instanceof THREE.TubeGeometry));
         }
 
         /************************
@@ -50,261 +40,138 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         ************************/
 
         function handleParallelStripsCreation() {
-            globalRoadSectionPropsMap = globalRoadSectionPropertiesHelper
-                .getPropsMapForRelatedRoadsStartElementPOV(globalStartElementComponent, globalRelatedRoadObjsMap);
-            globalRelatedRoadObjsMap.forEach(roadObj => {
-                spawnParallelStripesForRoadSection(roadObj);
+            roadObjSectionPropertiesArr = globalRoadSectionPropertiesHelper
+                .getRoadObjSectionPropertiesArr(globalStartElementComponent, globalRelatedRoadObjsMap);
+            roadObjSectionPropertiesArr.forEach(roadObj => {
+                const laneSide = getLaneSideForRoadObj(roadObj);
+                console.log(laneSide)
+
+                if (laneSide === "right") {
+                    drawSpheresOnMidpoints(roadObj, laneSide);
+                    drawTubesBetweenIntersections(roadObj, laneSide);
+                    drawSpheresOnRamps(roadObj, laneSide);
+                    drawTubesToStartEndElement(roadObj, laneSide)
+                } else {
+                    drawSpheresOnMidpoints(roadObj, laneSide);
+                    drawTubesBetweenIntersections(roadObj, laneSide);
+                    drawSpheresOnRamps(roadObj, laneSide);
+                    drawTubesToStartEndElement(roadObj, laneSide)
+                }
+
             })
         }
 
-        function spawnParallelStripesForRoadSection(roadObj) {
-            const stripeComponentArr = createStripeComponentsForRoadObj(roadObj);
-            stripeComponentArr.forEach(stripeComponent => {
-                const stripeComponentId = stripeComponent.id
-                const roadSectionId = stripeComponentId.replace(/_stripe$/, '');
+        function drawSpheresOnMidpoints(roadObj, laneSide) {
+            const scene = document.querySelector('a-scene');
+            const sphereRadius = 0.2;
 
-                // stripe props depending on clone roadSection and its place in roadObj
-                setStripeComponentProps(stripeComponent, roadSectionId, roadObj);
-                globalScene = document.querySelector("a-scene");
-                globalScene.appendChild(stripeComponent);
+            roadObj.roadSectionObjArr.forEach(roadSectionObj => {
+                if (roadSectionObj.intersection != null) {
+                    const geometry = new THREE.SphereGeometry(sphereRadius, 32, 32);
+                    const material = new THREE.MeshBasicMaterial({ color: "lime" });
+                    const sphere = new THREE.Mesh(geometry, material);
+
+                    const offset = getOffsetMapping(laneSide, roadSectionObj);
+                    sphere.position.set(roadSectionObj.intersection.x + offset.x, 1, roadSectionObj.intersection.z + offset.z)
+                    scene.object3D.add(sphere);
+                }
             })
         }
 
-        // HTML-Component
-        function createStripeComponentsForRoadObj(roadObj) {
-            const stripeComponentArr = [];
-            roadObj.roadSectionArr.forEach(roadSectionId => {
-                const roadSectionComponent = document.getElementById(roadSectionId);
-                const stripeComponent = roadSectionComponent.cloneNode(true); // clone keeps original props for new component
-                const stripeId = `${roadSectionId}_stripe`;
-                stripeComponent.setAttribute("id", stripeId);
-                // check if necessary properties are set correctly before pushing
-                if (hasValidRoadSectionProps(roadSectionId)) stripeComponentArr.push(stripeComponent);
+        function drawSpheresOnRamps(roadObj, laneSide) {
+            const scene = document.querySelector('a-scene');
+            const sphereRadius = 0.2;
+            roadObj.roadSectionObjArr.forEach(roadSectionObj => {
+                const offset = getOffsetMapping(laneSide, roadSectionObj);
+
+                if (roadSectionObj.intersectionWithStartBorder != null) {
+                    const geometry = new THREE.SphereGeometry(sphereRadius, 32, 32);
+                    const material = new THREE.MeshBasicMaterial({ color: "cyan" });
+                    const sphere = new THREE.Mesh(geometry, material);
+                    sphere.position.set(roadSectionObj.intersectionWithStartBorder.x + offset.x, 1, roadSectionObj.intersectionWithStartBorder.z + offset.z);
+                    scene.object3D.add(sphere);
+                }
+
+                if (roadSectionObj.intersectionWithEndBorder != null) {
+                    const geometry = new THREE.SphereGeometry(sphereRadius, 32, 32);
+                    const material = new THREE.MeshBasicMaterial({ color: "green" });
+                    const sphere = new THREE.Mesh(geometry, material);
+                    sphere.position.set(roadSectionObj.intersectionWithEndBorder.x + offset.x, 1, roadSectionObj.intersectionWithEndBorder.z + offset.z);
+                    scene.object3D.add(sphere);
+                }
             })
-            return stripeComponentArr;
         }
 
-        function setStripeComponentProps(stripeComponent, roadSectionId, roadObj) {
-            const roadSectionComponent = document.getElementById(roadSectionId);
+        function drawTubesBetweenIntersections(roadObj, laneSide) {
+            const scene = document.querySelector('a-scene');
+            const tubeRadius = 0.2;
+            const tubeMaterial = new THREE.MeshBasicMaterial({ color: "red" });
 
-            const laneSide = getLaneSideForRoadObj(roadObj); // stripes on left or right lane
+            const intersections = roadObj.roadSectionObjArr.filter(roadSectionObj => roadSectionObj.intersection != null)
 
-            // position
-            const originalPosition = roadSectionComponent.getAttribute("position");
-            const { newX, newY, newZ } = getNewPositionForLane(roadSectionId, originalPosition, laneSide,)
-            const stripePosition = { x: newX, y: newY, z: newZ };
-            stripeComponent.setAttribute("position", stripePosition);
+            for (let i = 1; i < intersections.length; i++) {
+                const startIntersection = intersections[i - 1].intersection;
+                const endIntersection = intersections[i].intersection;
 
-            // geometry
-            const originalWidth = roadSectionComponent.getAttribute("width");
-            const originalDepth = roadSectionComponent.getAttribute("depth");
-            const { newWidth, newDepth } = getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, laneSide)
-            stripeComponent.setAttribute("geometry", `primitive: box; width: ${newWidth}; height: 0.05; depth: ${newDepth}`);
+                const offsetStart = getOffsetMapping(laneSide, intersections[i - 1]);
+                const offsetEnd = getOffsetMapping(laneSide, intersections[i]);
 
-            // color
-            const color = getColorForLane(laneSide)
-            stripeComponent.setAttribute("color", color);
-        }
+                const lineCurve = new THREE.LineCurve3(
+                    new THREE.Vector3(startIntersection.x + offsetStart.x, 1, startIntersection.z + offsetStart.z),
+                    new THREE.Vector3(endIntersection.x + offsetEnd.x, 1, endIntersection.z + offsetEnd.z)
+                );
 
-        function getNewPositionForLane(roadSectionId, originalPosition, laneSide) {
-            const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
-            const { direction, isEndingInCurve, directionOfPredecessor, directionOfSuccessor } = propertiesObj
-
-            let newX, newY, newZ;
-            const baseOffset = 0.25
-
-            if (laneSide === "right") {
-                newY = 0.7;
-                switch (direction) {
-                    case "west": {
-                        if (directionOfPredecessor === "south" && directionOfSuccessor === "west") newX = originalPosition.x + 0.3
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "north") newX = originalPosition.x - 0.3
-                        else if (directionOfPredecessor === "north" && directionOfSuccessor === "north") newX = originalPosition.x - 0.3
-                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "south") newX = originalPosition.x + 0.3
-                        else newX = originalPosition.x
-                        newZ = originalPosition.z + baseOffset;
-                        break;
-                    }
-                    case "east": {
-                        if (directionOfPredecessor === "east" && directionOfSuccessor === "south") newX = originalPosition.x + 0.3
-                        else if (directionOfPredecessor === "north" && directionOfSuccessor === "north") newX = originalPosition.x - 0.3
-                        else if (directionOfPredecessor === "north" && directionOfSuccessor === "east") newX = originalPosition.x - 0.3
-                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "south") newX = originalPosition.x + 0.3
-                        else newX = originalPosition.x
-                        newZ = originalPosition.z - baseOffset;
-                        break;
-                    }
-                    case "south": {
-                        if (directionOfPredecessor === "east" && directionOfSuccessor === null) newZ = originalPosition.z - 0.3;
-                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "east") newZ = originalPosition.z - 0.3;
-                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "south") newZ = originalPosition.z - 0.3;
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newZ = originalPosition.z +0.1
-                        else if (directionOfPredecessor === null && directionOfSuccessor === "west") newZ = originalPosition.z + 0.3;
-                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "west") newZ = originalPosition.z + 0.3;
-                        else newZ = originalPosition.z;
-                        newX = originalPosition.x + baseOffset;
-
-                        break;
-                    }
-                    case "north": {
-                        newX = originalPosition.x - baseOffset;
-                        if (directionOfPredecessor === null && directionOfSuccessor === "east") newZ = originalPosition.z - 0.3;
-                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "east") newZ = originalPosition.z - 0.3;
-                        else if (directionOfPredecessor === "north" && directionOfSuccessor === "east") newZ = originalPosition.z - 0.3;
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === null) newZ = originalPosition.z + 0.3;
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "north") newZ = originalPosition.z + 0.3;
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "east") newZ = originalPosition.z
-
-                        else newZ = originalPosition.z;
-                        break;
-                    }
-                }
-            } else {
-                newY = 0.6;
-                switch (direction) {
-                    case "west":
-                        if (directionOfPredecessor === "north" && directionOfSuccessor === "west") newX = originalPosition.x + 0.3;
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "south") newX = originalPosition.x - 0.3;
-                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "south") newX = originalPosition.x - 0.2;
-                        else newX = originalPosition.x;
-                        newZ = originalPosition.z - baseOffset;
-                        break;
-                    case "east":
-                        if (directionOfPredecessor === "north" && directionOfSuccessor === "north") newX = originalPosition.x + 0.3;
-                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "north") newX = originalPosition.x + 0.3;
-                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "east") newX = originalPosition.x - 0.3;
-                        else newX = originalPosition.x;
-                        newZ = originalPosition.z + baseOffset;
-                        break;
-                    case "south":
-                        if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newZ = originalPosition.z - 0.4
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === null) newZ = originalPosition.z - 0.3;
-                        else if (directionOfPredecessor === null && directionOfSuccessor === "east") newZ = originalPosition.z + 0.3;
-                        else newZ = originalPosition.z;
-                        newX = originalPosition.x - baseOffset;
-                        break;
-                    case "north":
-                        newX = originalPosition.x + baseOffset;
-                        if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newZ = originalPosition.z - 0.3;
-                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "north") newZ = originalPosition.z + 0.3;
-                        else if (directionOfPredecessor === "east" && directionOfSuccessor === null) newZ = originalPosition.z + 0.3;
-                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "east") newZ = originalPosition.z + 0.3;
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "east") newZ = originalPosition.z - 0.2;
-                        else if (directionOfPredecessor === null && directionOfSuccessor === "west") newZ = originalPosition.z - 0.3;
-                        else newZ = originalPosition.z
-                        break;
-                }
-
-            }
-
-            return { newX, newY, newZ }
-        }
-
-        function getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, laneSide) {
-            const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
-
-            const { direction, directionOfPredecessor, directionOfSuccessor } = propertiesObj
-            let newWidth, newDepth;
-            if (laneSide === "right") {
-                switch (direction) {
-                    case "west": {
-                        if (directionOfPredecessor === "south" && directionOfSuccessor === "west") newWidth = originalWidth - 0.6;
-                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "south") newWidth = originalWidth - 0.8;
-                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "north") newWidth = originalWidth - 1.2;
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "north") newWidth = originalWidth - 0.6;
-                        else newWidth = originalWidth - 0.2;
-                        newDepth = originalDepth * (1 - globalStripeShrinkPct);
-                        break;
-                    }
-                    case "east": {
-                        if (directionOfPredecessor === "east" && directionOfSuccessor === "south") newWidth = originalWidth - 0.6;
-                        else if (directionOfPredecessor === "north" && directionOfSuccessor === "north") newWidth = originalWidth - 0.8;
-                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "south") newWidth = originalWidth - 0.8;
-                        else if (directionOfPredecessor === "north" && directionOfSuccessor === "east") newWidth = originalWidth - 0.6;
-                        else newWidth = originalWidth - 0.2;
-                        newDepth = originalDepth * (1 - globalStripeShrinkPct);
-                        break;
-                    }
-                    case "south": {
-                        newWidth = originalWidth * (1 - globalStripeShrinkPct);
-                        if (directionOfPredecessor === "east" && directionOfSuccessor === null) newDepth = originalDepth - 0.6;
-                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "east") newDepth = originalDepth - 0.8;
-                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "south") newDepth = originalDepth - 0.6;
-                        else if (directionOfPredecessor === null && directionOfSuccessor === "west") newDepth = originalDepth - 0.6;
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newDepth = originalDepth + 0.6
-                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "west") newDepth = originalDepth - 0.6;
-                        else newDepth = originalDepth - 0.2;
-                        break;
-                    }
-                    case "north": {
-                        newWidth = originalWidth * (1 - globalStripeShrinkPct);
-                        if (directionOfPredecessor === null && directionOfSuccessor === "east") newDepth = originalDepth - 0.6
-                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "east") newDepth = originalDepth - 0.1
-                        else if (directionOfPredecessor === "north" && directionOfSuccessor === "east") newDepth = originalDepth - 0.6
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === null) newDepth = originalDepth - 0.6
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "north") newDepth = originalDepth - 1.2
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "east") newDepth = originalDepth - 0.9
-            
-
-
-                        else newDepth = originalDepth - 0.2;
-                        break;
-                    }
-                }
-            } else {
-                switch (direction) {
-                    case "west": {
-                        if (directionOfPredecessor === "north" && directionOfSuccessor === "west") newWidth = originalWidth - 0.6
-                        else if (directionOfPredecessor === "north" && directionOfSuccessor === "north") newWidth = originalWidth - 0.8;
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "south") newWidth = originalWidth - 0.6
-                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "south") newWidth = originalWidth - 0.8
-                        else newWidth = originalWidth - 0.2;
-                        newDepth = originalDepth * (1 - globalStripeShrinkPct);
-                        break;
-                    }
-                    case "east": {
-                        if (directionOfPredecessor === "north" && directionOfSuccessor === "north") newWidth = originalWidth - 0.8;
-                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "north") newWidth = originalWidth - 0.6;
-                        else if (directionOfPredecessor === "south" && directionOfSuccessor === "east") newWidth = originalWidth - 0.6;
-                        else newWidth = originalWidth - 0.2;
-                        newDepth = originalDepth * (1 - globalStripeShrinkPct);
-                        break;
-                    }
-                    case "south": {
-                        if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newDepth = originalDepth;
-                        else if (directionOfPredecessor === null && directionOfSuccessor === "east") newDepth = originalDepth - 0.6;
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === null) newDepth = originalDepth - 0.6;
-                        else newDepth = originalDepth - 0.2;
-                        newWidth = originalWidth * (1 - globalStripeShrinkPct);
-                        break;
-                    }
-                    case "north": {
-                        if (directionOfPredecessor === "west" && directionOfSuccessor === "west") newDepth = originalDepth - 0.8;
-                        else if (directionOfPredecessor === "east" && directionOfSuccessor === null) newDepth = originalDepth - 0.6;
-                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "north") newDepth = originalDepth - 0.6;
-                        else if (directionOfPredecessor === "east" && directionOfSuccessor === "east") newDepth = originalDepth - 0.8;
-                        else if (directionOfPredecessor === null && directionOfSuccessor === "west") newDepth = originalDepth - 0.6;
-                        else if (directionOfPredecessor === "west" && directionOfSuccessor === "east") newDepth = originalDepth;
-                        else newDepth = originalDepth - 0.2;
-                        newWidth = originalWidth * (1 - globalStripeShrinkPct);
-                        break;
-                    }
-                }
-            }
-
-
-            return {
-                newWidth,
-                newDepth
+                const tubeGeometry = new THREE.TubeGeometry(lineCurve, 64, tubeRadius, 8, false);
+                const tubeMesh = new THREE.Mesh(tubeGeometry, tubeMaterial);
+                scene.object3D.add(tubeMesh);
             }
         }
 
-        function hasValidRoadSectionProps(roadSectionId) {
-            const propertiesObj = globalRoadSectionPropsMap.get(roadSectionId);
-            const { direction } = propertiesObj;
-            if (!direction) return false;
-            return true;
+        function drawTubesToStartEndElement(roadObj, laneSide) {
+            const scene = document.querySelector('a-scene');
+            const tubeRadius = 0.2;
+            const tubeMaterial = new THREE.MeshBasicMaterial({ color: "red" });
+
+            const lastElement = roadObj.roadSectionObjArr[roadObj.roadSectionObjArr.length - 1];
+            const startElement = roadObj.roadSectionObjArr[0];
+
+            const offsetStart = getOffsetMapping(laneSide, startElement);
+            const offsetEnd = getOffsetMapping(laneSide, lastElement);
+
+
+            if (startElement.intersection && startElement.intersectionWithStartBorder) {
+                const startLineCurve = new THREE.LineCurve3(
+                    new THREE.Vector3(startElement.intersectionWithStartBorder.x + offsetStart.x, 1, startElement.intersectionWithStartBorder.z + offsetStart.z),
+                    new THREE.Vector3(startElement.intersection.x + offsetStart.x, 1, startElement.intersection.z + offsetStart.z)
+                );
+
+                const startTubeGeometry = new THREE.TubeGeometry(startLineCurve, 64, tubeRadius, 8, false);
+                const startTubeMesh = new THREE.Mesh(startTubeGeometry, tubeMaterial);
+                scene.object3D.add(startTubeMesh);
+            }
+            if (lastElement.intersectionWithEndBorder) {
+                predecessorOfLastElement = roadObj.roadSectionObjArr[roadObj.roadSectionObjArr.length - 2]
+                const endLineCurve = new THREE.LineCurve3(
+                    new THREE.Vector3(lastElement.intersectionWithEndBorder.x + offsetEnd.x, 1, lastElement.intersectionWithEndBorder.z + offsetEnd.z),
+                    new THREE.Vector3(predecessorOfLastElement.intersection.x + offsetEnd.x, 1, predecessorOfLastElement.intersection.z + offsetEnd.z)
+                );
+                const endTubeGeometry = new THREE.TubeGeometry(endLineCurve, 64, tubeRadius, 8, false);
+                const endTubeMesh = new THREE.Mesh(endTubeGeometry, tubeMaterial);
+                scene.object3D.add(endTubeMesh);
+            }
         }
+
+
+        function getOffsetMapping(laneSide, roadSectionObj) {
+            const direction = roadSectionObj.direction;
+            const predecessorDirection = roadSectionObj.predecessorDirection;
+            const successorDirection = roadSectionObj.successorDirection;
+            let x = 0;
+            let z = 0;
+
+            return { x, z };
+        }
+        
 
         function getLaneSideForRoadObj(roadObj) {
             if (roadObj.startElementId === globalStartElementComponent.id) return "right";
