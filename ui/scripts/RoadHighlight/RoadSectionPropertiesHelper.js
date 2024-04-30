@@ -1,19 +1,19 @@
 const createRoadSectionPropertiesHelper = function (controllerConfig) {
     return (function () {
 
-        let globalStartElementComponent;
-        let globalStripesOffset;
-        let globalShrinkPct;
+        let glbStartElementComponent;
+        let glbStripesOffset;
+        let glbShrinkPct;
 
         /************************
             Public Functions
         ************************/
 
         // returns a props map for individual roadSections where startElement serves as reference for every attribute
-        function getRoadObjSectionPropertiesArr(startElementComponent, relatedRoadObjsMap, stripesOffset = 0.25, shrinkPct = 0.7) {
-            globalStartElementComponent = startElementComponent;
-            globalShrinkPct = shrinkPct;
-            globalStripesOffset = stripesOffset;
+        function getRoadObjSectionPropsArr(startElementComponent, relatedRoadObjsMap, stripesOffset = 0.25, shrinkPct = 0.7) {
+            glbStartElementComponent = startElementComponent;
+            glbShrinkPct = shrinkPct;
+            glbStripesOffset = stripesOffset;
             const roadObjAdjustedArr = getRoadObjAdjustedArr(relatedRoadObjsMap);
             console.log(roadObjAdjustedArr)
             return roadObjAdjustedArr;
@@ -101,31 +101,31 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
             let clone = {}; // Initialize clone as an empty object
             switch (roadSectionObj.direction) {
                 case "up": {
-                    clone.width = virtualHelperStripe.width * (1 - globalShrinkPct);
+                    clone.width = virtualHelperStripe.width * (1 - glbShrinkPct);
                     clone.depth = virtualHelperStripe.depth;
                     clone.position = { ...virtualHelperStripe.position }; // clone position object
-                    clone.position.x -= globalStripesOffset;
+                    clone.position.x -= glbStripesOffset;
                     break;
                 }
                 case "down": {
-                    clone.width = virtualHelperStripe.width * (1 - globalShrinkPct);
+                    clone.width = virtualHelperStripe.width * (1 - glbShrinkPct);
                     clone.depth = virtualHelperStripe.depth;
                     clone.position = { ...virtualHelperStripe.position };
-                    clone.position.x += globalStripesOffset;
+                    clone.position.x += glbStripesOffset;
                     break;
                 }
                 case "left": {
                     clone.width = virtualHelperStripe.width;
-                    clone.depth = virtualHelperStripe.depth * (1 - globalShrinkPct);
+                    clone.depth = virtualHelperStripe.depth * (1 - glbShrinkPct);
                     clone.position = { ...virtualHelperStripe.position }; 
-                    clone.position.z += globalStripesOffset;
+                    clone.position.z += glbStripesOffset;
                     break;
                 }
                 case "right": {
                     clone.width = virtualHelperStripe.width;
-                    clone.depth = virtualHelperStripe.depth * (1 - globalShrinkPct);
+                    clone.depth = virtualHelperStripe.depth * (1 - glbShrinkPct);
                     clone.position = { ...virtualHelperStripe.position }; 
-                    clone.position.z -= globalStripesOffset;
+                    clone.position.z -= glbStripesOffset;
                     break;
                 }
             }
@@ -141,7 +141,7 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
             // initial roadSections direction is based on startElement position
             // this also included isCalled roads, as their order gets reversed to keep startElement as reference
             const initialRoadSectionMidPoint = document.getElementById(initialRoadSectionObj.id).getAttribute("position");
-            const startElementMidPoint = globalStartElementComponent.getAttribute("position");
+            const startElementMidPoint = glbStartElementComponent.getAttribute("position");
             const directionMap = {
                 right: initialRoadSectionMidPoint.x < startElementMidPoint.x,
                 left: initialRoadSectionMidPoint.x > startElementMidPoint.x,
@@ -291,16 +291,16 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
 
         function getRoadObjsInCallsRelation(relatedRoadObjsMap) {
             return Array.from(relatedRoadObjsMap.values())
-                .filter(roadObj => roadObj.startElementId === globalStartElementComponent.id); // startElement calls other elements
+                .filter(roadObj => roadObj.startElementId === glbStartElementComponent.id); // startElement calls other elements
         }
 
         function getRoadObjsInIsCalledRelation(relatedRoadObjsMap) {
             return Array.from(relatedRoadObjsMap.values())
-                .filter(roadObj => roadObj.startElementId != globalStartElementComponent.id); // startElement is called by other elements
+                .filter(roadObj => roadObj.startElementId != glbStartElementComponent.id); // startElement is called by other elements
         }
 
         return {
-            getRoadObjSectionPropertiesArr,
+            getRoadObjSectionPropsArr,
         };
     })();
 };

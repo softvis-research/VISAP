@@ -1,14 +1,12 @@
 const createParallelColorStripesHelper = function (controllerConfig) {
     return (function () {
 
-        let globalRoadSectionPropertiesHelper;
-        let globalStartElementComponent;
-        let globalRelatedRoadObjsMap = new Map();
-        let globalRoadSectionPropsMap = new Map();
-        let globalScene;
+        let glbRoadSectionPropertiesHelper;
+        let glbstartDistrictComponent;
+        let glbRelatedRoadObjsMap = new Map();
 
-        const globalStripeOffsetRoadCenter = 0.25;
-        const globalStripeSizePct = 0.3;
+        // storing UUIDs from spawned Three Meshes to remove them when district is unselected
+        let glbMeshIdArr = [];
 
 
         /************************
@@ -16,23 +14,21 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         ************************/
 
         function initialize() {
-            if (controllerConfig.showLegendOnSelect) globalLegendHtmlHelper = createLegendHtmlHelper(controllerConfig)
-            globalRoadSectionPropertiesHelper = createRoadSectionPropertiesHelper();
+            if (controllerConfig.showLegendOnSelect) glbLegendHtmlHelper = createLegendHtmlHelper(controllerConfig)
+            glbRoadSectionPropertiesHelper = createRoadSectionPropertiesHelper();
         }
 
         // entry for all logical actions leading to the offered visualization by this variant in GUI
-        function startRoadHighlightActionsForStartElement(startElementComponent, relatedRoadObjsMap) {
-            globalStartElementComponent = startElementComponent;
-            globalRelatedRoadObjsMap = relatedRoadObjsMap;
+        function startRoadHighlightActionsForStartDistrict(startDistrictComponent, relatedRoadObjsMap) {
+            glbstartDistrictComponent = startDistrictComponent;
+            glbRelatedRoadObjsMap = relatedRoadObjsMap;
             handleParallelStripsCreation();
         }
 
         function resetRoadsHighlight() {
             const scene = document.querySelector('a-scene');
-            scene.object3D.remove(...scene.object3D.children.filter(child => child instanceof THREE.Mesh));
-
-            // Remove tubes
-            scene.object3D.remove(...scene.object3D.children.filter(child => child instanceof THREE.Mesh && child.geometry instanceof THREE.TubeGeometry));
+            scene.object3D.remove(...scene.object3D.children.filter(child => glbMeshIdArr.includes(child.uuid)));
+            glbMeshIdArr = [];
         }
 
         /************************
@@ -40,11 +36,11 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         ************************/
 
         function handleParallelStripsCreation() {
-            roadObjSectionPropertiesArr = globalRoadSectionPropertiesHelper
-                .getRoadObjSectionPropertiesArr(globalStartElementComponent, globalRelatedRoadObjsMap);
+            roadObjSectionPropertiesArr = glbRoadSectionPropertiesHelper
+                .getRoadObjSectionPropsArr(glbstartDistrictComponent, glbRelatedRoadObjsMap);
             roadObjSectionPropertiesArr.forEach(roadObj => {
                 const laneSide = getLaneSideForRoadObj(roadObj);
-                console.log(laneSide)
+
 
                 if (laneSide === "right") {
                     drawSpheresOnMidpoints(roadObj, laneSide);
@@ -73,6 +69,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
                     const offset = getOffsetMapping(laneSide, roadSectionObj);
                     sphere.position.set(roadSectionObj.intersection.x + offset.x, 1, roadSectionObj.intersection.z + offset.z)
+                    glbMeshIdArr.push(sphere.uuid)
                     scene.object3D.add(sphere);
                 }
             })
@@ -81,25 +78,27 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         function drawSpheresOnRamps(roadObj, laneSide) {
             const scene = document.querySelector('a-scene');
             const sphereRadius = 0.2;
+        
             roadObj.roadSectionObjArr.forEach(roadSectionObj => {
                 const offset = getOffsetMapping(laneSide, roadSectionObj);
-
+        
+                function drawSphere(intersection, color) {
+                    const geometry = new THREE.SphereGeometry(sphereRadius, 32, 32);
+                    const material = new THREE.MeshBasicMaterial({ color });
+                    const sphere = new THREE.Mesh(geometry, material);
+                    sphere.position.set(intersection.x + offset.x, 1, intersection.z + offset.z);
+                    glbMeshIdArr.push(sphere.uuid);
+                    scene.object3D.add(sphere);
+                }
+        
                 if (roadSectionObj.intersectionWithStartBorder != null) {
-                    const geometry = new THREE.SphereGeometry(sphereRadius, 32, 32);
-                    const material = new THREE.MeshBasicMaterial({ color: "cyan" });
-                    const sphere = new THREE.Mesh(geometry, material);
-                    sphere.position.set(roadSectionObj.intersectionWithStartBorder.x + offset.x, 1, roadSectionObj.intersectionWithStartBorder.z + offset.z);
-                    scene.object3D.add(sphere);
+                    drawSphere(roadSectionObj.intersectionWithStartBorder, "cyan");
                 }
-
+        
                 if (roadSectionObj.intersectionWithEndBorder != null) {
-                    const geometry = new THREE.SphereGeometry(sphereRadius, 32, 32);
-                    const material = new THREE.MeshBasicMaterial({ color: "green" });
-                    const sphere = new THREE.Mesh(geometry, material);
-                    sphere.position.set(roadSectionObj.intersectionWithEndBorder.x + offset.x, 1, roadSectionObj.intersectionWithEndBorder.z + offset.z);
-                    scene.object3D.add(sphere);
+                    drawSphere(roadSectionObj.intersectionWithEndBorder, "green");
                 }
-            })
+            });
         }
 
         function drawTubesBetweenIntersections(roadObj, laneSide) {
@@ -123,6 +122,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
                 const tubeGeometry = new THREE.TubeGeometry(lineCurve, 64, tubeRadius, 8, false);
                 const tubeMesh = new THREE.Mesh(tubeGeometry, tubeMaterial);
+                glbMeshIdArr.push(tubeMesh.uuid)
                 scene.object3D.add(tubeMesh);
             }
         }
@@ -147,6 +147,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
                 const startTubeGeometry = new THREE.TubeGeometry(startLineCurve, 64, tubeRadius, 8, false);
                 const startTubeMesh = new THREE.Mesh(startTubeGeometry, tubeMaterial);
+                glbMeshIdArr.push(startTubeMesh.uuid)
                 scene.object3D.add(startTubeMesh);
             }
             if (lastElement.intersectionWithEndBorder) {
@@ -157,6 +158,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 );
                 const endTubeGeometry = new THREE.TubeGeometry(endLineCurve, 64, tubeRadius, 8, false);
                 const endTubeMesh = new THREE.Mesh(endTubeGeometry, tubeMaterial);
+                glbMeshIdArr.push(endTubeMesh.uuid)
                 scene.object3D.add(endTubeMesh);
             }
         }
@@ -174,7 +176,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         
 
         function getLaneSideForRoadObj(roadObj) {
-            if (roadObj.startElementId === globalStartElementComponent.id) return "right";
+            if (roadObj.startElementId === glbstartDistrictComponent.id) return "right";
             return "left"
         }
 
@@ -185,7 +187,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
         return {
             initialize,
-            startRoadHighlightActionsForStartElement,
+            startRoadHighlightActionsForStartDistrict,
             resetRoadsHighlight,
         };
     })();
