@@ -19,7 +19,7 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
             return roadObjAdjustedArr;
         }
 
-        /************************
+       /************************
                Adjusting
        ************************/
 
