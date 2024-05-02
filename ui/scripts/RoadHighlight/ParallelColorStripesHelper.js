@@ -7,6 +7,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         let glbStartDistrictComponent;
         let glbStripesOffset = 0.2;
         let glbShrinkPct = 0.7;
+        const glbSphereRadius = 0.2;
 
 
         // storing UUIDs from spawned Three Meshes to remove them when district is unselected
@@ -66,7 +67,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 roadObj.roadSectionObjArr[0].direction = refDirection;
 
                 // traverse the road from start to dest district
-                for (let i = 1; i < roadObj.roadSectionObjArr.length; i++) {
+                const arrLen = roadObj.roadSectionObjArr.length;
+                for (let i = 1; i < arrLen; i++) {
                     const currentRoadSectionObj = roadObj.roadSectionObjArr[i];
                     const refRoadSectionObj = roadObj.roadSectionObjArr[i - 1];
                     const currentDirection = getDirectionOfAdjacentRoadSections(currentRoadSectionObj, refRoadSectionObj);
@@ -123,19 +125,24 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         function addSectionCurveIntersections() {
             glbRelatedRoadObjsMap.forEach((roadObj, _) => {
                 arrLen = roadObj.roadSectionObjArr.length;
-                if (arrLen = 1) roadObj.roadSectionObjArr[0].intersection = null;
+                if (arrLen === 1) roadObj.roadSectionObjArr[0].intersection = null;
                 else {
                     for (let i = 1; i < arrLen; i++) {
                         const currentRoadSectionObj = roadObj.roadSectionObjArr[i];
-                        const refRoadSectionObj = roadObj.roadSectionObjArr[i - 1];
+                        const refRoadSectionObj = roadObj.roadSectionObjArr[i-1];
         
                         if (currentRoadSectionObj.direction != refRoadSectionObj.direction) {
                             // a curve, adding intersection coordinates
                             currentRoadSectionObj.intersection, refRoadSectionObj.intersection
                                 = getRoadSectionIntersection(roadObj, currentRoadSectionObj, refRoadSectionObj)
-                        } else refRoadSectionObj.intersection = null;
+                        } else {
+                            refRoadSectionObj.intersection = null;
+                        }
                         const lastRoadSection = roadObj.roadSectionObjArr[arrLen - 1];
                         lastRoadSection.intersection = null;
+
+                        roadObj.roadSectionObjArr[i] = currentRoadSectionObj;
+                        roadObj.roadSectionObjArr[i-1] = refRoadSectionObj;
                     }
                 }
             });
@@ -153,8 +160,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
         function constructVirtualStripe(roadObj, roadSectionObj) {
             // set pos flag for called/isCalled (left/right stripe)
-            let isRight = true
-            if(roadObj.startDistrictId != glbStartDistrictComponent.id) isRight = false;
+            let isRight = checkIfSideIsRight(roadObj)
 
             const component = document.getElementById(roadSectionObj.id);
             const width = component.getAttribute("width");
@@ -162,27 +168,37 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             const position = component.getAttribute("position");
             const direction = roadSectionObj.direction;
 
-            let virtualStripe = { width, depth, position, direction }
-
-            // shrink and offset virtual stripe
-            switch (virtualStripe.direction) {
+            let clone = { width, depth, position, direction }
+            
+            // storing clone values in new obj to avoid aframe bug*
+            // *it appears that the framework alters the position of the original if its props are duplicated
+            let virtualStripe = {}; 
+            switch (roadSectionObj.direction) {
                 case "up": {
-                    virtualStripe.width = virtualStripe.width * (1 - glbShrinkPct);
+                    virtualStripe.width = clone.width * (1 - glbShrinkPct);
+                    virtualStripe.depth = clone.depth;
+                    virtualStripe.position = { ...clone.position }; // clone position object
                     isRight ? virtualStripe.position.x -= glbStripesOffset : virtualStripe.position.x += glbStripesOffset
                     break;
                 }
                 case "down": {
-                    virtualStripe.width = virtualStripe.width * (1 - glbShrinkPct);
+                    virtualStripe.width = clone.width * (1 - glbShrinkPct);
+                    virtualStripe.depth = clone.depth;
+                    virtualStripe.position = { ...clone.position };
                     isRight ? virtualStripe.position.x += glbStripesOffset : virtualStripe.position.x -= glbStripesOffset
                     break;
                 }
                 case "left": {
-                    virtualStripe.depth = virtualStripe.depth * (1 - glbShrinkPct);
+                    virtualStripe.width = clone.width;
+                    virtualStripe.depth = clone.depth * (1 - glbShrinkPct);
+                    virtualStripe.position = { ...clone.position }; 
                     isRight ? virtualStripe.position.z += glbStripesOffset : virtualStripe.position.z -= glbStripesOffset;
                     break;
                 }
                 case "right": {
-                    virtualStripe.depth = virtualStripe.depth * (1 - glbShrinkPct);
+                    virtualStripe.width = clone.width;
+                    virtualStripe.depth = clone.depth * (1 - glbShrinkPct);
+                    virtualStripe.position = { ...clone.position }; 
                     isRight ? virtualStripe.position.z -= glbStripesOffset : virtualStripe.position.z += glbStripesOffset;
                     break;
                 }
@@ -288,12 +304,58 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         }
 
         function createMeshes() {
-
+            glbRelatedRoadObjsMap.forEach((roadObj, _) => {
+                createSpheresOnCurveIntersections(roadObj);
+                createSperesOnDistrictIntersections(roadObj);
+            })
         }
 
-        
+        function createSpheresOnCurveIntersections(roadObj) {
+            const isRight = checkIfSideIsRight(roadObj)
+            roadObj.roadSectionObjArr.forEach(roadSectionObj => {
+                if (roadSectionObj.intersection != null) {
+                    const x = roadSectionObj.intersection.x
+                    const z = roadSectionObj.intersection.z
+                    drawSphereAndStoreId(getColorForSide(isRight), x, z);
+                }
+            })
+        }
 
+        function createSperesOnDistrictIntersections(roadObj) {
+            const isRight = checkIfSideIsRight(roadObj)
+            roadObj.roadSectionObjArr.forEach(roadSectionObj => {
+                if (roadSectionObj.intersectionWithStartBorder != null) {
+                    const x = roadSectionObj.intersectionWithStartBorder.x
+                    const z = roadSectionObj.intersectionWithStartBorder.z
+                    drawSphereAndStoreId(getColorForSide(isRight), x, z);
+                }
+                if (roadSectionObj.intersectionWithEndBorder != null) {
+                    const x = roadSectionObj.intersectionWithEndBorder.x
+                    const z = roadSectionObj.intersectionWithEndBorder.z
+                    drawSphereAndStoreId(getColorForSide(isRight), x, z);
+                }
+            })
+        }
 
+        function drawSphereAndStoreId(color, x, z) {
+            const scene = document.querySelector('a-scene');
+            const material = new THREE.MeshBasicMaterial({ color });
+            const geometry = new THREE.SphereGeometry(glbSphereRadius, 32, 32);
+            const sphere = new THREE.Mesh(geometry, material);
+            sphere.position.set(x, 1, z)
+            glbMeshIdArr.push(sphere.uuid)
+            scene.object3D.add(sphere);
+        }
+
+        function checkIfSideIsRight(roadObj) {
+            if(roadObj.startDistrictId != glbStartDistrictComponent.id) return true;
+            return false;
+        }
+
+        function getColorForSide(isRight) {
+            if (isRight) return controllerConfig.colorsParallelColorStripes.calls;
+            return controllerConfig.colorsParallelColorStripes.isCalled;
+        }
 
 
         //     roadObjSectionPropsArr = glbRoadSectionPropertiesHelper.getRoadObjSectionPropsArr(glbStartDistrictComponent, glbRelatedRoadObjsMap);
