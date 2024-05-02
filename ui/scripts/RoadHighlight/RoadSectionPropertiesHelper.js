@@ -81,6 +81,8 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
         ************************/
 
         function constructVirtualStripe(roadSectionObj) {
+            console.log("the road Section Object in virtual stripes func")
+            console.log(roadSectionObj)
             const component = document.getElementById(roadSectionObj.id);
             const width = component.getAttribute("width");
             const depth = component.getAttribute("depth");
@@ -94,35 +96,35 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
             return clone;
         }
 
-        function adjustDimensionsAndPosition(roadSectionObj, virtualStripe) {
+        function adjustDimensionsAndPosition(roadSectionObj, virtualStripe, isRight = true) {
             let clone = {}; // Initialize clone as an empty object
             switch (roadSectionObj.direction) {
                 case "up": {
                     clone.width = virtualStripe.width * (1 - glbShrinkPct);
                     clone.depth = virtualStripe.depth;
                     clone.position = { ...virtualStripe.position }; // clone position object
-                    clone.position.x -= glbStripesOffset;
+                    isRight ? clone.position.x -= glbStripesOffset : clone.position.x += glbStripesOffset
                     break;
                 }
                 case "down": {
                     clone.width = virtualStripe.width * (1 - glbShrinkPct);
                     clone.depth = virtualStripe.depth;
                     clone.position = { ...virtualStripe.position };
-                    clone.position.x += glbStripesOffset;
+                    isRight ? clone.position.x += glbStripesOffset : clone.position.x -= glbStripesOffset
                     break;
                 }
                 case "left": {
                     clone.width = virtualStripe.width;
                     clone.depth = virtualStripe.depth * (1 - glbShrinkPct);
                     clone.position = { ...virtualStripe.position }; 
-                    clone.position.z += glbStripesOffset;
+                    isRight ? clone.position.z += glbStripesOffset : clone.position.z -= glbStripesOffset;
                     break;
                 }
                 case "right": {
                     clone.width = virtualStripe.width;
                     clone.depth = virtualStripe.depth * (1 - glbShrinkPct);
                     clone.position = { ...virtualStripe.position }; 
-                    clone.position.z -= glbStripesOffset;
+                    isRight ? clone.position.z -= glbStripesOffset : clone.position.z += glbStripesOffset;
                     break;
                 }
             }

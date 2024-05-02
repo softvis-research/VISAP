@@ -112,5 +112,27 @@
             "ID_2fdd3fc4-e4c6-4742-8ea7-a0f9907d18b0",
             "ID_997a84b5-31bb-48e4-a449-d4333c60c6f2"
         ]
+    },
+    {
+        "id": "road_5555",
+        "start_element": "ID_01dbaba7-6997-4b92-b196-4aa61b95ac09",
+        "destination_element": "ID_ac88ea6b-cce8-416e-8c4f-c91f5f5c20d7",
+        "road_sections": [
+            "ID_997a84b5-31bb-48e4-a449-d4333c60c6f2",
+            "ID_2fdd3fc4-e4c6-4742-8ea7-a0f9907d18b0",
+            "ID_6c5473a5-de94-48a2-a415-88729a1b6576",
+            "ID_c193cdd5-e590-41dd-8fa0-5b44683eb2ba",
+
+            "ID_53a07a6e-5cdf-475c-8948-eefe9b5fe8bf",
+            "ID_09996910-50a2-401a-b026-e97b0c67d40c",
+            "ID_b644460b-00ae-4c99-9deb-fa0c81e980e2",
+            "ID_00f2404d-deee-4dff-895e-b9469b63e375",
+            "ID_6b774592-666c-4153-8442-7c848e578b4e",
+            "ID_6bf90eec-a8ca-4093-b8b2-afb4ea437e5c",
+
+            "ID_b19f7bcd-36c4-4a5b-a6e4-c0c6da1089ee"
+            
+            
+        ]
     }
 ]

@@ -2,7 +2,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
     return (function () {
 
         let glbRoadSectionPropertiesHelper;
-        let glbstartDistrictComponent;
+        let glbStartDistrictComponent;
         let glbRelatedRoadObjsMap = new Map();
 
         // storing UUIDs from spawned Three Meshes to remove them when district is unselected
@@ -14,13 +14,12 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         ************************/
 
         function initialize() {
-            if (controllerConfig.showLegendOnSelect) glbLegendHtmlHelper = createLegendHtmlHelper(controllerConfig)
             glbRoadSectionPropertiesHelper = createRoadSectionPropertiesHelper();
         }
 
         // entry for all logical actions leading to the offered visualization by this variant in GUI
         function startRoadHighlightActionsForStartDistrict(startDistrictComponent, relatedRoadObjsMap) {
-            glbstartDistrictComponent = startDistrictComponent;
+            glbStartDistrictComponent = startDistrictComponent;
             glbRelatedRoadObjsMap = relatedRoadObjsMap;
             handleParallelStripsCreation();
         }
@@ -36,12 +35,13 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         ************************/
 
         function handleParallelStripsCreation() {
-            roadObjSectionPropertiesArr = glbRoadSectionPropertiesHelper
-                .getRoadObjSectionPropsArr(glbstartDistrictComponent, glbRelatedRoadObjsMap);
-            roadObjSectionPropertiesArr.forEach(roadObj => {
+            roadObjSectionPropsArr = glbRoadSectionPropertiesHelper.getRoadObjSectionPropsArr(glbStartDistrictComponent, glbRelatedRoadObjsMap);
+            console.log("the working obj")
+            console.log(roadObjSectionPropsArr)
+            roadObjSectionPropsArr.forEach(roadObj => {
                 const laneSide = getLaneSideForRoadObj(roadObj);
 
-                console.log("the")
+                
 
 
                 if (laneSide === "right") {
@@ -158,7 +158,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         }
 
         function getLaneSideForRoadObj(roadObj) {
-            if (roadObj.startElementId === glbstartDistrictComponent.id) return "right";
+            if (roadObj.startElementId === glbStartDistrictComponent.id) return "right";
             return "left"
         }
 
