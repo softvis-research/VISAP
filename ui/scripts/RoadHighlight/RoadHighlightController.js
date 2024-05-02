@@ -71,6 +71,9 @@ controllers.roadController = function () {
 		const tmpDestDistrictComponent = glbStartDistrictComponent;
 		const startIsCalledByOtherDistricts = roadModel.getRoadObjsForDestDistrictId(tmpDestDistrictComponent.id);
 		glbRelatedRoadObjsMap = new Map([...startCallsOtherDistricts, ...startIsCalledByOtherDistricts]);
+		console.log("start district: " + glbStartDistrictComponent.id)
+		console.log("roadObjsMap:")
+		console.log(glbRelatedRoadObjsMap)
 	}
 
 	function handleRoadsHighlightForStartDistrict() {
@@ -88,7 +91,7 @@ controllers.roadController = function () {
 	}
 
 	function handleLegendForAction(action) {
-		if(action === "unselect") canvasManipulator.removeDistrict(glbLegendDistrict)
+		if(action === "unselect") canvasManipulator.removeElement(glbLegendDistrict)
 		if(action === "select") {
 			const popupId = "legend_popup";
 			const title = "Relations";

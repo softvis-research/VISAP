@@ -2,38 +2,30 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
     return (function () {
 
         let glbStartDistrictComponent;
-        let glbStripesOffset;
-        let glbShrinkPct;
+        let glbStripesOffset = 0.2;
+        let glbShrinkPct = 0.7;
 
         /************************
             Public Functions
         ************************/
 
         // returns a props map for individual roadSections where startDistrict serves as reference for every attribute
-        function getRoadObjSectionPropsArr(startDistrictComponent, relatedRoadObjsMap, stripesOffset = 0.25, shrinkPct = 0.7) {
+        function getRoadObjSectionPropsArr(startDistrictComponent, relatedRoadObjsMap) {
             glbStartDistrictComponent = startDistrictComponent;
-            glbShrinkPct = shrinkPct;
-            glbStripesOffset = stripesOffset;
-            const roadObjAdjustedArr = getRoadObjAdjustedArr(relatedRoadObjsMap);
-            console.log(roadObjAdjustedArr)
-            return roadObjAdjustedArr;
+            const roadObjSectionPropsArr = getRoadObjsWithAdjustedRoadSectionOrder(relatedRoadObjsMap);
+            addDirectionOfRoadSectionsRelativeToStartDistrict(roadObjSectionPropsArr);
+            addRoadSectionAdjustedIntersections(roadObjSectionPropsArr);
+            addDistrictIntersections(roadObjSectionPropsArr);
+            console.log(roadObjSectionPropsArr)
+            return roadObjSectionPropsArr;
         }
 
        /************************
                Adjusting
        ************************/
 
-        function getRoadObjAdjustedArr(relatedRoadObjsMap) {
-            let roadObjAdjustedArr = getRoadObjsWithAdjustedRoadSectionOrder(relatedRoadObjsMap);
-            addDirectionOfRoadSectionsRelativeToStartDistrict(roadObjAdjustedArr);
-            addRoadSectionAdjustedIntersections(roadObjAdjustedArr);
-            addDistrictIntersections(roadObjAdjustedArr);
-            console.log(roadObjAdjustedArr)
-            return roadObjAdjustedArr;
-        }
-
-        function addDirectionOfRoadSectionsRelativeToStartDistrict(roadObjAdjustedArr) {
-            roadObjAdjustedArr.forEach(roadObj => {
+        function addDirectionOfRoadSectionsRelativeToStartDistrict(roadObjSectionPropsArr) {
+            roadObjSectionPropsArr.forEach(roadObj => {
                 const refRoadSectionObj = roadObj.roadSectionObjArr[0];
                 const refDirection = getDirectionForInitialRoadSection(refRoadSectionObj);
                 roadObj.roadSectionObjArr[0].direction = refDirection;
@@ -46,8 +38,8 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
             })
         }
 
-        function addRoadSectionAdjustedIntersections(roadObjAdjustedArr) {
-            roadObjAdjustedArr.forEach(roadObj => {
+        function addRoadSectionAdjustedIntersections(roadObjSectionPropsArr) {
+            roadObjSectionPropsArr.forEach(roadObj => {
                 for (let i = 1; i < roadObj.roadSectionObjArr.length; i++) {
                     const currentRoadSectionObj = roadObj.roadSectionObjArr[i];
                     const refRoadSectionObj = roadObj.roadSectionObjArr[i - 1];
@@ -62,15 +54,14 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
             })
         }
 
-        function addDistrictIntersections(roadObjAdjustedArr) {
-            roadObjAdjustedArr.forEach(roadObj => {
+        function addDistrictIntersections(roadObjSectionPropsArr) {
+            roadObjSectionPropsArr.forEach(roadObj => {
                 const length = roadObj.roadSectionObjArr.length;
                 for (let i = 0; i < length; i++) {
                     let intersectionWithStartBorder = null;
                     let intersectionWithEndBorder = null;
                     if (i === 0) intersectionWithStartBorder = getDistrictIntersection(roadObj.roadSectionObjArr[i], isFinal = false);
                     if (i === length - 1) intersectionWithEndBorder = getDistrictIntersection(roadObj.roadSectionObjArr[i], isFinal = true);
-
                     roadObj.roadSectionObjArr[i].intersectionWithStartBorder = intersectionWithStartBorder;
                     roadObj.roadSectionObjArr[i].intersectionWithEndBorder = intersectionWithEndBorder;
                 }
@@ -81,50 +72,48 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
          Virtual Helper Stripes
         ************************/
 
-        function constructVirtualHelperStripe(roadSectionObj) {
+        function constructVirtualStripe(roadSectionObj) {
             const component = document.getElementById(roadSectionObj.id);
             const width = component.getAttribute("width");
             const depth = component.getAttribute("depth");
             const position = component.getAttribute("position");
 
-            let virtualHelperStripe = {
-                width, depth, position
-            }
+            let virtualStripe = { width, depth, position }
 
-            let clone = adjustDimensionsAndPosition(roadSectionObj, virtualHelperStripe);
+            let clone = adjustDimensionsAndPosition(roadSectionObj, virtualStripe);
             // give the clone a direction to place his ramp to district
             clone.direction = roadSectionObj.direction;
             return clone;
         }
 
-        function adjustDimensionsAndPosition(roadSectionObj, virtualHelperStripe) {
+        function adjustDimensionsAndPosition(roadSectionObj, virtualStripe) {
             let clone = {}; // Initialize clone as an empty object
             switch (roadSectionObj.direction) {
                 case "up": {
-                    clone.width = virtualHelperStripe.width * (1 - glbShrinkPct);
-                    clone.depth = virtualHelperStripe.depth;
-                    clone.position = { ...virtualHelperStripe.position }; // clone position object
+                    clone.width = virtualStripe.width * (1 - glbShrinkPct);
+                    clone.depth = virtualStripe.depth;
+                    clone.position = { ...virtualStripe.position }; // clone position object
                     clone.position.x -= glbStripesOffset;
                     break;
                 }
                 case "down": {
-                    clone.width = virtualHelperStripe.width * (1 - glbShrinkPct);
-                    clone.depth = virtualHelperStripe.depth;
-                    clone.position = { ...virtualHelperStripe.position };
+                    clone.width = virtualStripe.width * (1 - glbShrinkPct);
+                    clone.depth = virtualStripe.depth;
+                    clone.position = { ...virtualStripe.position };
                     clone.position.x += glbStripesOffset;
                     break;
                 }
                 case "left": {
-                    clone.width = virtualHelperStripe.width;
-                    clone.depth = virtualHelperStripe.depth * (1 - glbShrinkPct);
-                    clone.position = { ...virtualHelperStripe.position }; 
+                    clone.width = virtualStripe.width;
+                    clone.depth = virtualStripe.depth * (1 - glbShrinkPct);
+                    clone.position = { ...virtualStripe.position }; 
                     clone.position.z += glbStripesOffset;
                     break;
                 }
                 case "right": {
-                    clone.width = virtualHelperStripe.width;
-                    clone.depth = virtualHelperStripe.depth * (1 - glbShrinkPct);
-                    clone.position = { ...virtualHelperStripe.position }; 
+                    clone.width = virtualStripe.width;
+                    clone.depth = virtualStripe.depth * (1 - glbShrinkPct);
+                    clone.position = { ...virtualStripe.position }; 
                     clone.position.z -= glbStripesOffset;
                     break;
                 }
@@ -189,20 +178,20 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
         ************************/
 
         function getRoadSectionIntersection(currentRoadSectionObj, refRoadSectionObj) {
-            const virtualHelperStripeOfCurrent = constructVirtualHelperStripe(currentRoadSectionObj);
-            const virtualHelperStripeOfRef = constructVirtualHelperStripe(refRoadSectionObj);
-            const virtualRoadSectionIntersection = calculateRoadSectionIntersectionMidpoint(virtualHelperStripeOfCurrent, virtualHelperStripeOfRef)
-            return virtualRoadSectionIntersection;
+            const virtualStripeOfCurrent = constructVirtualStripe(currentRoadSectionObj);
+            const virtualStripeOfRef = constructVirtualStripe(refRoadSectionObj);
+            const intersection = calculateRoadSectionIntersectionMidpoint(virtualStripeOfCurrent, virtualStripeOfRef)
+            return intersection;
         }
 
-        function calculateRoadSectionIntersectionMidpoint(virtualHelperStripeOfCurrent, virtualHelperStripeOfRef) {
-            const currentPos = virtualHelperStripeOfCurrent.position
-            const currentWidth = virtualHelperStripeOfCurrent.width
-            const currentDepth = virtualHelperStripeOfCurrent.depth
+        function calculateRoadSectionIntersectionMidpoint(virtualStripeOfCurrent, virtualStripeOfRef) {
+            const currentPos = virtualStripeOfCurrent.position
+            const currentWidth = virtualStripeOfCurrent.width
+            const currentDepth = virtualStripeOfCurrent.depth
 
-            const refPos = virtualHelperStripeOfRef.position
-            const refWidth = virtualHelperStripeOfRef.width
-            const refDepth = virtualHelperStripeOfRef.depth
+            const refPos = virtualStripeOfRef.position
+            const refWidth = virtualStripeOfRef.width
+            const refDepth = virtualStripeOfRef.depth
 
             // calculate extents of rectangles in both directions
             const currentLeftX = currentPos.x - currentWidth / 2;
@@ -230,16 +219,16 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
         }
 
         function getDistrictIntersection(roadSectionObj, isFinal) {
-            const virtualHelperStripe = constructVirtualHelperStripe(roadSectionObj);
-            const virtualDistrictIntersection = calculateDistrictIntersection(virtualHelperStripe, isFinal)
+            const virtualStripe = constructVirtualStripe(roadSectionObj);
+            const virtualDistrictIntersection = calculateDistrictIntersection(virtualStripe, isFinal)
             return virtualDistrictIntersection;
         }
 
-        function calculateDistrictIntersection(virtualHelperStripe, isFinal) {
-            const direction = virtualHelperStripe.direction;
-            const width = virtualHelperStripe.width;
-            const depth = virtualHelperStripe.depth;
-            const position = virtualHelperStripe.position;
+        function calculateDistrictIntersection(virtualStripe, isFinal) {
+            const direction = virtualStripe.direction;
+            const width = virtualStripe.width;
+            const depth = virtualStripe.depth;
+            const position = virtualStripe.position;
             let delta;
 
             switch (direction) {
@@ -285,8 +274,8 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
                 ...roadObj,
                 roadSectionObjArr: [...roadObj.roadSectionObjArr].reverse(),
             }));
-            const roadObjAdjustedArr = [...roadObjsInCallsRelation, ...reversedIsCalledRoadObjs];
-            return roadObjAdjustedArr;
+            const roadObjSectionPropsArr = [...roadObjsInCallsRelation, ...reversedIsCalledRoadObjs];
+            return roadObjSectionPropsArr;
         }
 
         function getRoadObjsInCallsRelation(relatedRoadObjsMap) {
