@@ -41,6 +41,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             roadObjSectionPropertiesArr.forEach(roadObj => {
                 const laneSide = getLaneSideForRoadObj(roadObj);
 
+                console.log("the")
+
 
                 if (laneSide === "right") {
                     drawSpheresOnMidpoints(roadObj, laneSide);

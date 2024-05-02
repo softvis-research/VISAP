@@ -15,8 +15,12 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
             const roadObjSectionPropsArr = getRoadObjsWithAdjustedRoadSectionOrder(relatedRoadObjsMap);
             addDirectionOfRoadSectionsRelativeToStartDistrict(roadObjSectionPropsArr);
             addRoadSectionAdjustedIntersections(roadObjSectionPropsArr);
-            addDistrictIntersections(roadObjSectionPropsArr);
+            console.log("props after step 2")
             console.log(roadObjSectionPropsArr)
+            addDistrictIntersections(roadObjSectionPropsArr);
+            console.log("props after step 3")
+            console.log(roadObjSectionPropsArr)
+            //console.log(roadObjSectionPropsArr)
             return roadObjSectionPropsArr;
         }
 
@@ -58,12 +62,16 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
             roadObjSectionPropsArr.forEach(roadObj => {
                 const length = roadObj.roadSectionObjArr.length;
                 for (let i = 0; i < length; i++) {
-                    let intersectionWithStartBorder = null;
-                    let intersectionWithEndBorder = null;
-                    if (i === 0) intersectionWithStartBorder = getDistrictIntersection(roadObj.roadSectionObjArr[i], isFinal = false);
-                    if (i === length - 1) intersectionWithEndBorder = getDistrictIntersection(roadObj.roadSectionObjArr[i], isFinal = true);
-                    roadObj.roadSectionObjArr[i].intersectionWithStartBorder = intersectionWithStartBorder;
-                    roadObj.roadSectionObjArr[i].intersectionWithEndBorder = intersectionWithEndBorder;
+                    roadObj.roadSectionObjArr[i].intersectionWithStartBorder = null;
+                    roadObj.roadSectionObjArr[i].intersectionWithEndBorder = null;
+                    if (i === 0) {
+                        intersectionWithStartBorder = getDistrictIntersection(roadObj.roadSectionObjArr[i], isEnd = false);
+                        roadObj.roadSectionObjArr[i].intersectionWithStartBorder = intersectionWithStartBorder;
+
+                    } else if (i === length - 1) {
+                        intersectionWithEndBorder = getDistrictIntersection(roadObj.roadSectionObjArr[i], isEnd = true);
+                        roadObj.roadSectionObjArr[i].intersectionWithEndBorder = intersectionWithEndBorder;
+                    }
                 }
             });
         }
@@ -218,13 +226,13 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
             return intersectionMidpoint;
         }
 
-        function getDistrictIntersection(roadSectionObj, isFinal) {
+        function getDistrictIntersection(roadSectionObj, isEnd) {
             const virtualStripe = constructVirtualStripe(roadSectionObj);
-            const virtualDistrictIntersection = calculateDistrictIntersection(virtualStripe, isFinal)
+            const virtualDistrictIntersection = calculateDistrictIntersection(virtualStripe, isEnd)
             return virtualDistrictIntersection;
         }
 
-        function calculateDistrictIntersection(virtualStripe, isFinal) {
+        function calculateDistrictIntersection(virtualStripe, isEnd) {
             const direction = virtualStripe.direction;
             const width = virtualStripe.width;
             const depth = virtualStripe.depth;
@@ -233,28 +241,28 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
 
             switch (direction) {
                 case "left": {
-                    isFinal ? delta = width / 2 : delta = - width / 2
+                    isEnd ? delta = width / 2 : delta = - width / 2
                     return {
                         x: position.x + delta,
                         z: position.z,
                     }
                 }
                 case "right": {
-                    isFinal ? delta = width / 2 : delta = - width / 2
+                    isEnd ? delta = width / 2 : delta = - width / 2
                     return {
                         x: position.x - delta,
                         z: position.z,
                     }
                 }
                 case "down": {
-                    isFinal ? delta = depth / 2 : delta = - depth / 2
+                    isEnd ? delta = depth / 2 : delta = - depth / 2
                     return {
                         x: position.x,
                         z: position.z - delta,
                     }
                 }
                 case "up": {
-                    isFinal ? delta = depth / 2 : delta = - depth / 2
+                    isEnd ? delta = depth / 2 : delta = - depth / 2
                     return {
                         x: position.x,
                         z: position.z + delta,
@@ -270,11 +278,11 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
         function getRoadObjsWithAdjustedRoadSectionOrder(relatedRoadObjsMap) {
             const roadObjsInCallsRelation = getRoadObjsInCallsRelation(relatedRoadObjsMap);
             const roadObjsInIsCalledRelation = getRoadObjsInIsCalledRelation(relatedRoadObjsMap);
-            const reversedIsCalledRoadObjs = roadObjsInIsCalledRelation.map(roadObj => ({
+            const reversedSectionsForIsCalledRoadObjs = roadObjsInIsCalledRelation.map(roadObj => ({
                 ...roadObj,
                 roadSectionObjArr: [...roadObj.roadSectionObjArr].reverse(),
             }));
-            const roadObjSectionPropsArr = [...roadObjsInCallsRelation, ...reversedIsCalledRoadObjs];
+            const roadObjSectionPropsArr = [...roadObjsInCallsRelation, ...reversedSectionsForIsCalledRoadObjs];
             return roadObjSectionPropsArr;
         }
 
