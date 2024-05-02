@@ -313,8 +313,8 @@ controllers.application = (function () {
 			headerText: title,
 			modal: false,
 			state: "open",
-			resizable: true,
-			draggable: true,
+			resizable: false,
+			draggable: false,
 			position: {
 				left: dimProps.left || 10, 
 				top: dimProps.top || 10 

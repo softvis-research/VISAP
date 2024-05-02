@@ -5,11 +5,11 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         let glbRelatedRoadObjsMap = new Map();
 
         let glbStartDistrictComponent;
-        let glbStripesOffset = 0.2;
+        let glbStripesOffset = 0.25;
         let glbShrinkPct = 0.7;
-        const glbSphereRadius = 0.2;
+        let glbPosY = 0.75;
+        const glbSphereRadius = 0.199;
         const glbTubeRadius = 0.2;
-
 
         // storing UUIDs from spawned Three Meshes to remove them when district is unselected
         let glbMeshIdArr = [];
@@ -349,7 +349,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             const material = new THREE.MeshBasicMaterial({ color });
             const geometry = new THREE.SphereGeometry(glbSphereRadius, 32, 32);
             const sphere = new THREE.Mesh(geometry, material);
-            sphere.position.set(x, 1, z)
+            sphere.position.set(x, glbPosY, z)
             glbMeshIdArr.push(sphere.uuid)
             scene.object3D.add(sphere);
         }
@@ -377,8 +377,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 const endIntersection = intersections[i].intersection;
 
                 const lineCurve = new THREE.LineCurve3(
-                    new THREE.Vector3(startIntersection.x, 1, startIntersection.z),
-                    new THREE.Vector3(endIntersection.x, 1, endIntersection.z)
+                    new THREE.Vector3(startIntersection.x, glbPosY, startIntersection.z),
+                    new THREE.Vector3(endIntersection.x, glbPosY, endIntersection.z)
                 );
 
                 const tubeGeometry = new THREE.TubeGeometry(lineCurve, 64, glbTubeRadius, 8, false);
@@ -399,8 +399,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
             if (startElement.intersection && startElement.intersectionWithStartBorder) {
                 const startLineCurve = new THREE.LineCurve3(
-                    new THREE.Vector3(startElement.intersectionWithStartBorder.x, 1, startElement.intersectionWithStartBorder.z),
-                    new THREE.Vector3(startElement.intersection.x, 1, startElement.intersection.z)
+                    new THREE.Vector3(startElement.intersectionWithStartBorder.x, glbPosY, startElement.intersectionWithStartBorder.z),
+                    new THREE.Vector3(startElement.intersection.x, glbPosY, startElement.intersection.z)
                 );
 
                 const startTubeGeometry = new THREE.TubeGeometry(startLineCurve, 64, glbTubeRadius, 8, false);
@@ -412,8 +412,8 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 if (roadObj.roadSectionObjArr.length === 1) predecessorOfLastElement = roadObj.roadSectionObjArr[0]
                 else predecessorOfLastElement = roadObj.roadSectionObjArr[roadObj.roadSectionObjArr.length - 2]
                 const endLineCurve = new THREE.LineCurve3(
-                    new THREE.Vector3(lastElement.intersectionWithEndBorder.x, 1, lastElement.intersectionWithEndBorder.z),
-                    new THREE.Vector3(predecessorOfLastElement.intersection.x, 1, predecessorOfLastElement.intersection.z)
+                    new THREE.Vector3(lastElement.intersectionWithEndBorder.x, glbPosY, lastElement.intersectionWithEndBorder.z),
+                    new THREE.Vector3(predecessorOfLastElement.intersection.x, glbPosY, predecessorOfLastElement.intersection.z)
                 );
                 const endTubeGeometry = new THREE.TubeGeometry(endLineCurve, 64, glbTubeRadius, 8, false);
                 const endTubeMesh = new THREE.Mesh(endTubeGeometry, tubeMaterial);
