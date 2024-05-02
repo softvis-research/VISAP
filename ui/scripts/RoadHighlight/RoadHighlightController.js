@@ -12,7 +12,7 @@ controllers.roadController = function () {
 	let glbParallelColorStripesHelper;
 	let glbStartDistrictComponent;
 	let glbRelatedRoadObjsMap = new Map();
-	let glbLegendDistrict;
+	let glbLegendComponent;
 
 	/************************
 		Initialization
@@ -81,14 +81,15 @@ controllers.roadController = function () {
 
 	function handleRoadsHighlightsReset() {
 		if (glbRelatedRoadObjsMap.size != 0) {
-			glbParallelColorStripesHelper.resetRoadsHighlight();
+			glbRelatedRoadObjsMap.clear();
+			glbParallelColorStripesHelper.resetRoadsHighlight(glbRelatedRoadObjsMap);
 			glbRelatedRoadObjsMap.clear();
 		}
 	}
 
 	function handleLegendForAction(action) {
-		if(action === "unselect") canvasManipulator.removeElement(glbLegendDistrict)
-		if(action === "select") {
+		if(action === "unselect") canvasManipulator.removeElement(glbLegendComponent)
+		if(action === "select" && glbRelatedRoadObjsMap.size != 0) {
 			const popupId = "legend_popup";
 			const title = "Relations";
 			const text = 
@@ -111,7 +112,7 @@ controllers.roadController = function () {
 				top: 10
 			}
 			// create a popup window leveraging the application functionality
-			glbLegendDistrict = application.createCustomPopupContainer(title, text, dimProps, popupId);
+			glbLegendComponent = application.createCustomPopupContainer(title, text, dimProps, popupId);
 		}	
 	}
 

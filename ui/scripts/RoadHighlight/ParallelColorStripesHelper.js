@@ -1,32 +1,34 @@
 const createParallelColorStripesHelper = function (controllerConfig) {
     return (function () {
 
-        let glbRoadSectionPropertiesHelper;
-        let glbRelatedRoadObjsMap = new Map();
-
+        let glbRelatedRoadObjsMap = new Map()
         let glbStartDistrictComponent;
-        let glbStripesOffset = 0.25;
-        let glbShrinkPct = 0.7;
-        let glbPosY = 0.75;
+        let glbMeshIdArr = []; // uuids for state management
+
+        /************************
+            Dimension Factors
+        ************************/
+
+        // adjust them to match street layouting
+        const glbStripesOffset = 0.25; // gap between stripes
+        const glbPosY = 0.75; // vertical distance between stripes and street
         const glbSphereRadius = 0.199;
         const glbTubeRadius = 0.2;
-
-        // storing UUIDs from spawned Three Meshes to remove them when district is unselected
-        let glbMeshIdArr = [];
+        const glbShrinkPct = 0.7;
 
 
         /************************
             Public Functions
         ************************/
 
-        // entry for all logical actions leading to the offered visualization by this variant in GUI
         function startRoadHighlightActionsForStartDistrict(startDistrictComponent, relatedRoadObjsMap) {
             glbStartDistrictComponent = startDistrictComponent;
             glbRelatedRoadObjsMap = relatedRoadObjsMap;
             handleParallelStripsCreation();
         }
 
-        function resetRoadsHighlight() {
+        function resetRoadsHighlight(relatedRoadObjsMap) {
+            glbRelatedRoadObjsMap = relatedRoadObjsMap;
             const scene = document.querySelector('a-scene');
             scene.object3D.remove(...scene.object3D.children.filter(child => glbMeshIdArr.includes(child.uuid)));
             glbMeshIdArr = [];
@@ -39,7 +41,6 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         function handleParallelStripsCreation() {
             adjustSectionOrderInRoadObjMap();
             addSectionPropsToRoadObjMap();
-            console.log(glbRelatedRoadObjsMap)
             createMeshes();
         }
 
@@ -53,9 +54,13 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         }
 
         function addSectionPropsToRoadObjMap() {
-            addSectionDirections();
-            addSectionCurveIntersections();
-            addSectionDistrictIntersections();
+            try {
+                addSectionDirections();
+                addSectionCurveIntersections();
+                addSectionDistrictIntersections();
+            } catch(e) {
+                // TODO: catch me if you can, Leonardo...
+            }
         }
 
         function addSectionDirections() {
@@ -327,8 +332,6 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         }
 
         function createSperesOnDistrictIntersections(roadObj) {
-            console.log("sphere")
-            console.log(roadObj)
             const isRight = checkIfSideIsRight(roadObj)
             roadObj.roadSectionObjArr.forEach(roadSectionObj => {
                 if (roadSectionObj.intersectionWithStartBorder != null) {
