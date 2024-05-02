@@ -13,10 +13,6 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             Public Functions
         ************************/
 
-        function initialize() {
-            glbRoadSectionPropertiesHelper = createRoadSectionPropertiesHelper();
-        }
-
         // entry for all logical actions leading to the offered visualization by this variant in GUI
         function startRoadHighlightActionsForStartDistrict(startDistrictComponent, relatedRoadObjsMap) {
             glbStartDistrictComponent = startDistrictComponent;
@@ -35,9 +31,277 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         ************************/
 
         function handleParallelStripsCreation() {
+            adjustSectionOrderInRoadObjMap();
+            addSectionPropsToRoadObjMap();
+            createMeshes();
+        }
+
+        function adjustSectionOrderInRoadObjMap() {
+            // reverse roadSection order to keep start district as POV
+            glbRelatedRoadObjsMap.forEach((roadObj, _) => {
+                if (roadObj.startDistrictId !== glbStartDistrictComponent.id) {
+                    roadObj.roadSectionObjArr.reverse();
+                }
+            });
+        }
+
+        function addSectionPropsToRoadObjMap() {
+            addSectionDirections();
+            addSectionCurveIntersections();
+            addSectionDistrictIntersections();
+        }
+
+        function addSectionDirections() {
+            glbRelatedRoadObjsMap.forEach((roadObj, _) => {
+                const roadSectionObjArr = roadObj.roadSectionObjArr;
+
+                // first sections direction is relativ to start district
+                const initialRoadSectionObject = roadSectionObjArr[0]; 
+                const refDirection = getDirectionForInitialRoadSection(initialRoadSectionObject)
+                roadObj.roadSectionObjArr[0].direction = refDirection;
+
+                // traverse the road from start to dest district
+                for (let i = 1; i < roadObj.roadSectionObjArr.length; i++) {
+                    const currentRoadSectionObj = roadObj.roadSectionObjArr[i];
+                    const refRoadSectionObj = roadObj.roadSectionObjArr[i - 1];
+                    const currentDirection = getDirectionOfAdjacentRoadSections(currentRoadSectionObj, refRoadSectionObj);
+                    roadObj.roadSectionObjArr[i].direction = currentDirection;
+                }
+            });
+        }
+
+        function getDirectionForInitialRoadSection(initialRoadSectionObject) {
+            const initialSectionMidPoint = document.getElementById(initialRoadSectionObject.id).getAttribute("position");
+            const startDistrictMidPoint = glbStartDistrictComponent.getAttribute("position");
+            const directionMap = {
+                right: initialSectionMidPoint.x < startDistrictMidPoint.x,
+                left: initialSectionMidPoint.x > startDistrictMidPoint.x,
+                up: initialSectionMidPoint.z > startDistrictMidPoint.z,
+                down: initialSectionMidPoint.z < startDistrictMidPoint.z,
+            };
+            const refDirection = Object.keys(directionMap).find(key => directionMap[key]);
+            return refDirection;
+        }
+
+        function getDirectionOfAdjacentRoadSections(currentRoadSectionObj, refRoadSectionObj) {
+            const refDirection = refRoadSectionObj.direction;
+            const currentMidPoint = document.getElementById(currentRoadSectionObj.id).getAttribute("position");
+            const refMidPoint = document.getElementById(refRoadSectionObj.id).getAttribute("position");
+            // imagine a compass turning its needle based on your direction: here, assigned directions depend on reference directions
+            switch (refDirection) {
+                case "left":
+                    if (currentMidPoint.x > refMidPoint.x && currentMidPoint.z === refMidPoint.z) return "left";
+                    if (currentMidPoint.x > refMidPoint.x && currentMidPoint.z > refMidPoint.z) return "up";
+                    if (currentMidPoint.x > refMidPoint.x && currentMidPoint.z < refMidPoint.z) return "down";
+                    break;
+
+                case "right":
+                    if (currentMidPoint.x < refMidPoint.x && currentMidPoint.z === refMidPoint.z) return "right";
+                    if (currentMidPoint.x < refMidPoint.x && currentMidPoint.z > refMidPoint.z) return "up";
+                    if (currentMidPoint.x < refMidPoint.x && currentMidPoint.z < refMidPoint.z) return "down";
+                    break;
+
+                case "down":
+                    if (currentMidPoint.x === refMidPoint.x && currentMidPoint.z < refMidPoint.z) return "down";
+                    if (currentMidPoint.x > refMidPoint.x && currentMidPoint.z < refMidPoint.z) return "left";
+                    if (currentMidPoint.x < refMidPoint.x && currentMidPoint.z < refMidPoint.z) return "right";
+                    break;
+
+                case "up":
+                    if (currentMidPoint.x === refMidPoint.x && currentMidPoint.z > refMidPoint.z) return "up";
+                    if (currentMidPoint.x > refMidPoint.x && currentMidPoint.z > refMidPoint.z) return "left";
+                    if (currentMidPoint.x < refMidPoint.x && currentMidPoint.z > refMidPoint.z) return "right";
+                    break;
+            }
+        }
+
+        function addSectionCurveIntersections() {
+            glbRelatedRoadObjsMap.forEach((roadObj, _) => {
+                arrLen = roadObj.roadSectionObjArr.length;
+                if (arrLen = 1) roadObj.roadSectionObjArr[0].intersection = null;
+                else {
+                    for (let i = 1; i < arrLen; i++) {
+                        const currentRoadSectionObj = roadObj.roadSectionObjArr[i];
+                        const refRoadSectionObj = roadObj.roadSectionObjArr[i - 1];
+        
+                        if (currentRoadSectionObj.direction != refRoadSectionObj.direction) {
+                            // a curve, adding intersection coordinates
+                            currentRoadSectionObj.intersection, refRoadSectionObj.intersection
+                                = getRoadSectionIntersection(roadObj, currentRoadSectionObj, refRoadSectionObj)
+                        } else refRoadSectionObj.intersection = null;
+                        const lastRoadSection = roadObj.roadSectionObjArr[arrLen - 1];
+                        lastRoadSection.intersection = null;
+                    }
+                }
+            });
+        }
+
+        function getRoadSectionIntersection(roadObj, currentRoadSectionObj, refRoadSectionObj) {
+            // construct two virtual stripes adjusted proportions
+            const virtualStripeOfCurrent = constructVirtualStripe(roadObj, currentRoadSectionObj);
+            const virtualStripeOfRef = constructVirtualStripe(roadObj, refRoadSectionObj);
+
+            // intersect these stripes to get curve midpoints 
+            const intersection = calculateIntersectionMidpointOfTwoStripes(virtualStripeOfCurrent, virtualStripeOfRef)
+            return intersection;
+        }
+
+        function constructVirtualStripe(roadObj, roadSectionObj) {
+            // set pos flag for called/isCalled (left/right stripe)
+            let isRight = true
+            if(roadObj.startDistrictId != glbStartDistrictComponent.id) isRight = false;
+
+            const component = document.getElementById(roadSectionObj.id);
+            const width = component.getAttribute("width");
+            const depth = component.getAttribute("depth");
+            const position = component.getAttribute("position");
+            const direction = roadSectionObj.direction;
+
+            let virtualStripe = { width, depth, position, direction }
+
+            // shrink and offset virtual stripe
+            switch (virtualStripe.direction) {
+                case "up": {
+                    virtualStripe.width = virtualStripe.width * (1 - glbShrinkPct);
+                    isRight ? virtualStripe.position.x -= glbStripesOffset : virtualStripe.position.x += glbStripesOffset
+                    break;
+                }
+                case "down": {
+                    virtualStripe.width = virtualStripe.width * (1 - glbShrinkPct);
+                    isRight ? virtualStripe.position.x += glbStripesOffset : virtualStripe.position.x -= glbStripesOffset
+                    break;
+                }
+                case "left": {
+                    virtualStripe.depth = virtualStripe.depth * (1 - glbShrinkPct);
+                    isRight ? virtualStripe.position.z += glbStripesOffset : virtualStripe.position.z -= glbStripesOffset;
+                    break;
+                }
+                case "right": {
+                    virtualStripe.depth = virtualStripe.depth * (1 - glbShrinkPct);
+                    isRight ? virtualStripe.position.z -= glbStripesOffset : virtualStripe.position.z += glbStripesOffset;
+                    break;
+                }
+            }
+            return virtualStripe;
+        }
+
+        function calculateIntersectionMidpointOfTwoStripes(virtualStripeOfCurrent, virtualStripeOfRef) {
+            const currentPos = virtualStripeOfCurrent.position
+            const currentWidth = virtualStripeOfCurrent.width
+            const currentDepth = virtualStripeOfCurrent.depth
+
+            const refPos = virtualStripeOfRef.position
+            const refWidth = virtualStripeOfRef.width
+            const refDepth = virtualStripeOfRef.depth
+
+            // calculate extents of rectangles in both directions
+            const currentLeftX = currentPos.x - currentWidth / 2;
+            const currentRightX = currentPos.x + currentWidth / 2;
+            const currentTopZ = currentPos.z - currentDepth / 2;
+            const currentBottomZ = currentPos.z + currentDepth / 2;
+
+            const refLeftX = refPos.x - refWidth / 2;
+            const refRightX = refPos.x + refWidth / 2;
+            const refTopZ = refPos.z - refDepth / 2;
+            const refBottomZ = refPos.z + refDepth / 2;
+
+            // calculate intersection region
+            const intersectionLeftX = Math.max(currentLeftX, refLeftX);
+            const intersectionRightX = Math.min(currentRightX, refRightX);
+            const intersectionTopZ = Math.max(currentTopZ, refTopZ);
+            const intersectionBottomZ = Math.min(currentBottomZ, refBottomZ);
+
+            // calculate midpoint of intersection region
+            const intersectionMidpointX = (intersectionLeftX + intersectionRightX) / 2;
+            const intersectionMidpointZ = (intersectionTopZ + intersectionBottomZ) / 2;
+            const intersectionMidpoint = { x: intersectionMidpointX, z: intersectionMidpointZ };
+
+            return intersectionMidpoint;
+        }
+
+        function addSectionDistrictIntersections() {
+            glbRelatedRoadObjsMap.forEach((roadObj, _) => {
+                const arrLen = roadObj.roadSectionObjArr.length;
+                for (let i = 0; i < arrLen; i++) {
+                    roadObj.roadSectionObjArr[i].intersectionWithStartBorder = null;
+                    roadObj.roadSectionObjArr[i].intersectionWithEndBorder = null;
+                    if (i === 0) {
+                        intersectionWithStartBorder = getDistrictIntersection(roadObj, roadObj.roadSectionObjArr[i], isEnd = false);
+                        roadObj.roadSectionObjArr[i].intersectionWithStartBorder = intersectionWithStartBorder;
+
+                    } else if (i === arrLen - 1) {
+                        intersectionWithEndBorder = getDistrictIntersection(roadObj, roadObj.roadSectionObjArr[i], isEnd = true);
+                        roadObj.roadSectionObjArr[i].intersectionWithEndBorder = intersectionWithEndBorder;
+                    }
+                }
+            });
+        }
+
+        function getDistrictIntersection(roadObj, roadSectionObj, isEnd) {
+            const virtualStripe = constructVirtualStripe(roadObj, roadSectionObj);
+            const virtualDistrictIntersection = calculateDistrictIntersection(virtualStripe, isEnd)
+            return virtualDistrictIntersection;
+        }
+
+        function calculateDistrictIntersection(virtualStripe, isEnd) {
+            const direction = virtualStripe.direction;
+            const width = virtualStripe.width;
+            const depth = virtualStripe.depth;
+            const position = virtualStripe.position;
+            let delta;
+
+            switch (direction) {
+                case "left": {
+                    isEnd ? delta = width / 2 : delta = - width / 2
+                    return {
+                        x: position.x + delta,
+                        z: position.z,
+                    }
+                }
+                case "right": {
+                    isEnd ? delta = width / 2 : delta = - width / 2
+                    return {
+                        x: position.x - delta,
+                        z: position.z,
+                    }
+                }
+                case "down": {
+                    isEnd ? delta = depth / 2 : delta = - depth / 2
+                    return {
+                        x: position.x,
+                        z: position.z - delta,
+                    }
+                }
+                case "up": {
+                    isEnd ? delta = depth / 2 : delta = - depth / 2
+                    return {
+                        x: position.x,
+                        z: position.z + delta,
+                    }
+                }
+            }
+        }
+
+
+        
+
+
+
+
+
+
+
+
+        function createMeshes() {
+
+        }
+
+        
+
+
+
+
             roadObjSectionPropsArr = glbRoadSectionPropertiesHelper.getRoadObjSectionPropsArr(glbStartDistrictComponent, glbRelatedRoadObjsMap);
-            console.log("the working obj")
-            console.log(roadObjSectionPropsArr)
             roadObjSectionPropsArr.forEach(roadObj => {
                 const laneSide = getLaneSideForRoadObj(roadObj);
 

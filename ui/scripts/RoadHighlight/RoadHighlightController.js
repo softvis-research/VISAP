@@ -23,7 +23,6 @@ controllers.roadController = function () {
 		events.selected.on.subscribe(onEntitySelect);
 		events.selected.off.subscribe(onEntityDeselect);
 		glbParallelColorStripesHelper = createParallelColorStripesHelper(controllerConfig);
-		glbParallelColorStripesHelper.initialize()
 	}
 
 	/************************
@@ -71,9 +70,6 @@ controllers.roadController = function () {
 		const tmpDestDistrictComponent = glbStartDistrictComponent;
 		const startIsCalledByOtherDistricts = roadModel.getRoadObjsForDestDistrictId(tmpDestDistrictComponent.id);
 		glbRelatedRoadObjsMap = new Map([...startCallsOtherDistricts, ...startIsCalledByOtherDistricts]);
-		console.log("start district: " + glbStartDistrictComponent.id)
-		console.log("roadObjsMap:")
-		console.log(glbRelatedRoadObjsMap)
 	}
 
 	function handleRoadsHighlightForStartDistrict() {
