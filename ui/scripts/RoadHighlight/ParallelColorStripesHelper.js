@@ -2,8 +2,12 @@ const createParallelColorStripesHelper = function (controllerConfig) {
     return (function () {
 
         let glbRoadSectionPropertiesHelper;
-        let glbStartDistrictComponent;
         let glbRelatedRoadObjsMap = new Map();
+
+        let glbStartDistrictComponent;
+        let glbStripesOffset = 0.2;
+        let glbShrinkPct = 0.7;
+
 
         // storing UUIDs from spawned Three Meshes to remove them when district is unselected
         let glbMeshIdArr = [];
@@ -33,6 +37,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         function handleParallelStripsCreation() {
             adjustSectionOrderInRoadObjMap();
             addSectionPropsToRoadObjMap();
+            console.log(glbRelatedRoadObjsMap)
             createMeshes();
         }
 
@@ -282,16 +287,6 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             }
         }
 
-
-        
-
-
-
-
-
-
-
-
         function createMeshes() {
 
         }
@@ -301,138 +296,137 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
 
 
-            roadObjSectionPropsArr = glbRoadSectionPropertiesHelper.getRoadObjSectionPropsArr(glbStartDistrictComponent, glbRelatedRoadObjsMap);
-            roadObjSectionPropsArr.forEach(roadObj => {
-                const laneSide = getLaneSideForRoadObj(roadObj);
+        //     roadObjSectionPropsArr = glbRoadSectionPropertiesHelper.getRoadObjSectionPropsArr(glbStartDistrictComponent, glbRelatedRoadObjsMap);
+        //     roadObjSectionPropsArr.forEach(roadObj => {
+        //         const laneSide = getLaneSideForRoadObj(roadObj);
 
                 
 
 
-                if (laneSide === "right") {
-                    drawSpheresOnMidpoints(roadObj, laneSide);
-                    drawTubesBetweenIntersections(roadObj, laneSide);
-                    drawSpheresOnRamps(roadObj, laneSide);
-                    drawTubesToStartEndElement(roadObj, laneSide)
-                } else {
-                    drawSpheresOnMidpoints(roadObj, laneSide);
-                    drawTubesBetweenIntersections(roadObj, laneSide);
-                    drawSpheresOnRamps(roadObj, laneSide);
-                    drawTubesToStartEndElement(roadObj, laneSide)
-                }
+        //         if (laneSide === "right") {
+        //             drawSpheresOnMidpoints(roadObj, laneSide);
+        //             drawTubesBetweenIntersections(roadObj, laneSide);
+        //             drawSpheresOnRamps(roadObj, laneSide);
+        //             drawTubesToStartEndElement(roadObj, laneSide)
+        //         } else {
+        //             drawSpheresOnMidpoints(roadObj, laneSide);
+        //             drawTubesBetweenIntersections(roadObj, laneSide);
+        //             drawSpheresOnRamps(roadObj, laneSide);
+        //             drawTubesToStartEndElement(roadObj, laneSide)
+        //         }
 
-            })
-        }
+        //     })
+        // }
 
-        function drawSpheresOnMidpoints(roadObj, laneSide) {
-            const scene = document.querySelector('a-scene');
-            const sphereRadius = 0.2;
+        // function drawSpheresOnMidpoints(roadObj, laneSide) {
+        //     const scene = document.querySelector('a-scene');
+        //     const sphereRadius = 0.2;
 
-            roadObj.roadSectionObjArr.forEach(roadSectionObj => {
-                if (roadSectionObj.intersection != null) {
-                    const geometry = new THREE.SphereGeometry(sphereRadius, 32, 32);
-                    const material = new THREE.MeshBasicMaterial({ color: "lime" });
-                    const sphere = new THREE.Mesh(geometry, material);
+        //     roadObj.roadSectionObjArr.forEach(roadSectionObj => {
+        //         if (roadSectionObj.intersection != null) {
+        //             const geometry = new THREE.SphereGeometry(sphereRadius, 32, 32);
+        //             const material = new THREE.MeshBasicMaterial({ color: "lime" });
+        //             const sphere = new THREE.Mesh(geometry, material);
 
-                    sphere.position.set(roadSectionObj.intersection.x, 1, roadSectionObj.intersection.z)
-                    glbMeshIdArr.push(sphere.uuid)
-                    scene.object3D.add(sphere);
-                }
-            })
-        }
+        //             sphere.position.set(roadSectionObj.intersection.x, 1, roadSectionObj.intersection.z)
+        //             glbMeshIdArr.push(sphere.uuid)
+        //             scene.object3D.add(sphere);
+        //         }
+        //     })
+        // }
 
-        function drawSpheresOnRamps(roadObj, laneSide) {
-            const scene = document.querySelector('a-scene');
-            const sphereRadius = 0.2;
+        // function drawSpheresOnRamps(roadObj, laneSide) {
+        //     const scene = document.querySelector('a-scene');
+        //     const sphereRadius = 0.2;
         
-            roadObj.roadSectionObjArr.forEach(roadSectionObj => {
+        //     roadObj.roadSectionObjArr.forEach(roadSectionObj => {
         
-                function drawSphere(intersection, color) {
-                    const geometry = new THREE.SphereGeometry(sphereRadius, 32, 32);
-                    const material = new THREE.MeshBasicMaterial({ color });
-                    const sphere = new THREE.Mesh(geometry, material);
-                    sphere.position.set(intersection.x, 1, intersection.z);
-                    glbMeshIdArr.push(sphere.uuid);
-                    scene.object3D.add(sphere);
-                }
+        //         function drawSphere(intersection, color) {
+        //             const geometry = new THREE.SphereGeometry(sphereRadius, 32, 32);
+        //             const material = new THREE.MeshBasicMaterial({ color });
+        //             const sphere = new THREE.Mesh(geometry, material);
+        //             sphere.position.set(intersection.x, 1, intersection.z);
+        //             glbMeshIdArr.push(sphere.uuid);
+        //             scene.object3D.add(sphere);
+        //         }
         
-                if (roadSectionObj.intersectionWithStartBorder != null) {
-                    drawSphere(roadSectionObj.intersectionWithStartBorder, "cyan");
-                }
+        //         if (roadSectionObj.intersectionWithStartBorder != null) {
+        //             drawSphere(roadSectionObj.intersectionWithStartBorder, "cyan");
+        //         }
         
-                if (roadSectionObj.intersectionWithEndBorder != null) {
-                    drawSphere(roadSectionObj.intersectionWithEndBorder, "green");
-                }
-            });
-        }
+        //         if (roadSectionObj.intersectionWithEndBorder != null) {
+        //             drawSphere(roadSectionObj.intersectionWithEndBorder, "green");
+        //         }
+        //     });
+        // }
 
-        function drawTubesBetweenIntersections(roadObj, laneSide) {
-            const scene = document.querySelector('a-scene');
-            const tubeRadius = 0.2;
-            const tubeMaterial = new THREE.MeshBasicMaterial({ color: "red" });
+        // function drawTubesBetweenIntersections(roadObj, laneSide) {
+        //     const scene = document.querySelector('a-scene');
+        //     const tubeRadius = 0.2;
+        //     const tubeMaterial = new THREE.MeshBasicMaterial({ color: "red" });
 
-            const intersections = roadObj.roadSectionObjArr.filter(roadSectionObj => roadSectionObj.intersection != null)
+        //     const intersections = roadObj.roadSectionObjArr.filter(roadSectionObj => roadSectionObj.intersection != null)
 
-            for (let i = 1; i < intersections.length; i++) {
-                const startIntersection = intersections[i - 1].intersection;
-                const endIntersection = intersections[i].intersection;
+        //     for (let i = 1; i < intersections.length; i++) {
+        //         const startIntersection = intersections[i - 1].intersection;
+        //         const endIntersection = intersections[i].intersection;
 
-                const lineCurve = new THREE.LineCurve3(
-                    new THREE.Vector3(startIntersection.x, 1, startIntersection.z),
-                    new THREE.Vector3(endIntersection.x, 1, endIntersection.z)
-                );
+        //         const lineCurve = new THREE.LineCurve3(
+        //             new THREE.Vector3(startIntersection.x, 1, startIntersection.z),
+        //             new THREE.Vector3(endIntersection.x, 1, endIntersection.z)
+        //         );
 
-                const tubeGeometry = new THREE.TubeGeometry(lineCurve, 64, tubeRadius, 8, false);
-                const tubeMesh = new THREE.Mesh(tubeGeometry, tubeMaterial);
-                glbMeshIdArr.push(tubeMesh.uuid)
-                scene.object3D.add(tubeMesh);
-            }
-        }
+        //         const tubeGeometry = new THREE.TubeGeometry(lineCurve, 64, tubeRadius, 8, false);
+        //         const tubeMesh = new THREE.Mesh(tubeGeometry, tubeMaterial);
+        //         glbMeshIdArr.push(tubeMesh.uuid)
+        //         scene.object3D.add(tubeMesh);
+        //     }
+        // }
 
-        function drawTubesToStartEndElement(roadObj, laneSide) {
-            const scene = document.querySelector('a-scene');
-            const tubeRadius = 0.2;
-            const tubeMaterial = new THREE.MeshBasicMaterial({ color: "red" });
+        // function drawTubesToStartEndElement(roadObj, laneSide) {
+        //     const scene = document.querySelector('a-scene');
+        //     const tubeRadius = 0.2;
+        //     const tubeMaterial = new THREE.MeshBasicMaterial({ color: "red" });
 
-            const lastElement = roadObj.roadSectionObjArr[roadObj.roadSectionObjArr.length - 1];
-            const startElement = roadObj.roadSectionObjArr[0];
+        //     const lastElement = roadObj.roadSectionObjArr[roadObj.roadSectionObjArr.length - 1];
+        //     const startElement = roadObj.roadSectionObjArr[0];
 
-            if (startElement.intersection && startElement.intersectionWithStartBorder) {
-                const startLineCurve = new THREE.LineCurve3(
-                    new THREE.Vector3(startElement.intersectionWithStartBorder.x, 1, startElement.intersectionWithStartBorder.z),
-                    new THREE.Vector3(startElement.intersection.x, 1, startElement.intersection.z)
-                );
+        //     if (startElement.intersection && startElement.intersectionWithStartBorder) {
+        //         const startLineCurve = new THREE.LineCurve3(
+        //             new THREE.Vector3(startElement.intersectionWithStartBorder.x, 1, startElement.intersectionWithStartBorder.z),
+        //             new THREE.Vector3(startElement.intersection.x, 1, startElement.intersection.z)
+        //         );
 
-                const startTubeGeometry = new THREE.TubeGeometry(startLineCurve, 64, tubeRadius, 8, false);
-                const startTubeMesh = new THREE.Mesh(startTubeGeometry, tubeMaterial);
-                glbMeshIdArr.push(startTubeMesh.uuid)
-                scene.object3D.add(startTubeMesh);
-            }
-            if (lastElement.intersectionWithEndBorder) {
-                if (roadObj.roadSectionObjArr.length === 1) predecessorOfLastElement = roadObj.roadSectionObjArr[0]
-                else predecessorOfLastElement = roadObj.roadSectionObjArr[roadObj.roadSectionObjArr.length - 2]
-                const endLineCurve = new THREE.LineCurve3(
-                    new THREE.Vector3(lastElement.intersectionWithEndBorder.x, 1, lastElement.intersectionWithEndBorder.z),
-                    new THREE.Vector3(predecessorOfLastElement.intersection.x, 1, predecessorOfLastElement.intersection.z)
-                );
-                const endTubeGeometry = new THREE.TubeGeometry(endLineCurve, 64, tubeRadius, 8, false);
-                const endTubeMesh = new THREE.Mesh(endTubeGeometry, tubeMaterial);
-                glbMeshIdArr.push(endTubeMesh.uuid)
-                scene.object3D.add(endTubeMesh);
-            }
-        }
+        //         const startTubeGeometry = new THREE.TubeGeometry(startLineCurve, 64, tubeRadius, 8, false);
+        //         const startTubeMesh = new THREE.Mesh(startTubeGeometry, tubeMaterial);
+        //         glbMeshIdArr.push(startTubeMesh.uuid)
+        //         scene.object3D.add(startTubeMesh);
+        //     }
+        //     if (lastElement.intersectionWithEndBorder) {
+        //         if (roadObj.roadSectionObjArr.length === 1) predecessorOfLastElement = roadObj.roadSectionObjArr[0]
+        //         else predecessorOfLastElement = roadObj.roadSectionObjArr[roadObj.roadSectionObjArr.length - 2]
+        //         const endLineCurve = new THREE.LineCurve3(
+        //             new THREE.Vector3(lastElement.intersectionWithEndBorder.x, 1, lastElement.intersectionWithEndBorder.z),
+        //             new THREE.Vector3(predecessorOfLastElement.intersection.x, 1, predecessorOfLastElement.intersection.z)
+        //         );
+        //         const endTubeGeometry = new THREE.TubeGeometry(endLineCurve, 64, tubeRadius, 8, false);
+        //         const endTubeMesh = new THREE.Mesh(endTubeGeometry, tubeMaterial);
+        //         glbMeshIdArr.push(endTubeMesh.uuid)
+        //         scene.object3D.add(endTubeMesh);
+        //     }
+        // }
 
-        function getLaneSideForRoadObj(roadObj) {
-            if (roadObj.startElementId === glbStartDistrictComponent.id) return "right";
-            return "left"
-        }
+        // function getLaneSideForRoadObj(roadObj) {
+        //     if (roadObj.startElementId === glbStartDistrictComponent.id) return "right";
+        //     return "left"
+        // }
 
-        function getColorForLane(laneSide) {
-            if (laneSide === "right") return controllerConfig.colorsParallelColorStripes.calls;
-            else return controllerConfig.colorsParallelColorStripes.isCalled;
-        }
+        // function getColorForLane(laneSide) {
+        //     if (laneSide === "right") return controllerConfig.colorsParallelColorStripes.calls;
+        //     else return controllerConfig.colorsParallelColorStripes.isCalled;
+        // }
 
         return {
-            initialize,
             startRoadHighlightActionsForStartDistrict,
             resetRoadsHighlight,
         };
