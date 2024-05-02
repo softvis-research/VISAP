@@ -12,7 +12,7 @@ controllers.roadController = function () {
 	let glbParallelColorStripesHelper;
 	let glbStartDistrictComponent;
 	let glbRelatedRoadObjsMap = new Map();
-	let glbLegendElement;
+	let glbLegendDistrict;
 
 	/************************
 		Initialization
@@ -67,9 +67,9 @@ controllers.roadController = function () {
 
 	// prepare a glb map of all related roadObjs as input for the variant helpers
 	function storeRelatedRoadObjsInMap() {
-		const startCallsOtherDistricts = roadModel.getRoadObjsForStartElementId(glbStartDistrictComponent.id);
-		const tmpDestinationElementComponent = glbStartDistrictComponent;
-		const startIsCalledByOtherDistricts = roadModel.getRoadObjsForDestinationElementId(tmpDestinationElementComponent.id);
+		const startCallsOtherDistricts = roadModel.getRoadObjsForStartDistrictId(glbStartDistrictComponent.id);
+		const tmpDestDistrictComponent = glbStartDistrictComponent;
+		const startIsCalledByOtherDistricts = roadModel.getRoadObjsForDestDistrictId(tmpDestDistrictComponent.id);
 		glbRelatedRoadObjsMap = new Map([...startCallsOtherDistricts, ...startIsCalledByOtherDistricts]);
 	}
 
@@ -88,7 +88,7 @@ controllers.roadController = function () {
 	}
 
 	function handleLegendForAction(action) {
-		if(action === "unselect") canvasManipulator.removeElement(glbLegendElement)
+		if(action === "unselect") canvasManipulator.removeDistrict(glbLegendDistrict)
 		if(action === "select") {
 			const popupId = "legend_popup";
 			const title = "Relations";
@@ -112,7 +112,7 @@ controllers.roadController = function () {
 				top: 10
 			}
 			// create a popup window leveraging the application functionality
-			glbLegendElement = application.createCustomPopupContainer(title, text, dimProps, popupId);
+			glbLegendDistrict = application.createCustomPopupContainer(title, text, dimProps, popupId);
 		}	
 	}
 

@@ -1,7 +1,7 @@
 const createRoadSectionPropertiesHelper = function (controllerConfig) {
     return (function () {
 
-        let glbStartElementComponent;
+        let glbStartDistrictComponent;
         let glbStripesOffset;
         let glbShrinkPct;
 
@@ -9,9 +9,9 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
             Public Functions
         ************************/
 
-        // returns a props map for individual roadSections where startElement serves as reference for every attribute
-        function getRoadObjSectionPropsArr(startElementComponent, relatedRoadObjsMap, stripesOffset = 0.25, shrinkPct = 0.7) {
-            glbStartElementComponent = startElementComponent;
+        // returns a props map for individual roadSections where startDistrict serves as reference for every attribute
+        function getRoadObjSectionPropsArr(startDistrictComponent, relatedRoadObjsMap, stripesOffset = 0.25, shrinkPct = 0.7) {
+            glbStartDistrictComponent = startDistrictComponent;
             glbShrinkPct = shrinkPct;
             glbStripesOffset = stripesOffset;
             const roadObjAdjustedArr = getRoadObjAdjustedArr(relatedRoadObjsMap);
@@ -25,14 +25,14 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
 
         function getRoadObjAdjustedArr(relatedRoadObjsMap) {
             let roadObjAdjustedArr = getRoadObjsWithAdjustedRoadSectionOrder(relatedRoadObjsMap);
-            addDirectionOfRoadSectionsRelativeToStartElement(roadObjAdjustedArr);
+            addDirectionOfRoadSectionsRelativeToStartDistrict(roadObjAdjustedArr);
             addRoadSectionAdjustedIntersections(roadObjAdjustedArr);
             addDistrictIntersections(roadObjAdjustedArr);
             console.log(roadObjAdjustedArr)
             return roadObjAdjustedArr;
         }
 
-        function addDirectionOfRoadSectionsRelativeToStartElement(roadObjAdjustedArr) {
+        function addDirectionOfRoadSectionsRelativeToStartDistrict(roadObjAdjustedArr) {
             roadObjAdjustedArr.forEach(roadObj => {
                 const refRoadSectionObj = roadObj.roadSectionObjArr[0];
                 const refDirection = getDirectionForInitialRoadSection(refRoadSectionObj);
@@ -138,15 +138,15 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
         ************************/
 
         function getDirectionForInitialRoadSection(initialRoadSectionObj) {
-            // initial roadSections direction is based on startElement position
-            // this also included isCalled roads, as their order gets reversed to keep startElement as reference
+            // initial roadSections direction is based on startDistrict position
+            // this also included isCalled roads, as their order gets reversed to keep startDistrict as reference
             const initialRoadSectionMidPoint = document.getElementById(initialRoadSectionObj.id).getAttribute("position");
-            const startElementMidPoint = glbStartElementComponent.getAttribute("position");
+            const startDistrictMidPoint = glbStartDistrictComponent.getAttribute("position");
             const directionMap = {
-                right: initialRoadSectionMidPoint.x < startElementMidPoint.x,
-                left: initialRoadSectionMidPoint.x > startElementMidPoint.x,
-                up: initialRoadSectionMidPoint.z > startElementMidPoint.z,
-                down: initialRoadSectionMidPoint.z < startElementMidPoint.z,
+                right: initialRoadSectionMidPoint.x < startDistrictMidPoint.x,
+                left: initialRoadSectionMidPoint.x > startDistrictMidPoint.x,
+                up: initialRoadSectionMidPoint.z > startDistrictMidPoint.z,
+                down: initialRoadSectionMidPoint.z < startDistrictMidPoint.z,
             };
             const direction = Object.keys(directionMap).find(key => directionMap[key]);
             return direction;
@@ -291,12 +291,12 @@ const createRoadSectionPropertiesHelper = function (controllerConfig) {
 
         function getRoadObjsInCallsRelation(relatedRoadObjsMap) {
             return Array.from(relatedRoadObjsMap.values())
-                .filter(roadObj => roadObj.startElementId === glbStartElementComponent.id); // startElement calls other elements
+                .filter(roadObj => roadObj.startDistrictId === glbStartDistrictComponent.id); // startDistrict calls other districts
         }
 
         function getRoadObjsInIsCalledRelation(relatedRoadObjsMap) {
             return Array.from(relatedRoadObjsMap.values())
-                .filter(roadObj => roadObj.startElementId != glbStartElementComponent.id); // startElement is called by other elements
+                .filter(roadObj => roadObj.startDistrictId != glbStartDistrictComponent.id); // startDistrict is called by other districts
         }
 
         return {
