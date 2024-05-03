@@ -18,8 +18,6 @@ public class LoaderStep {
     private static final DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
 
     public static void main(String[] args) {
-        System.out.println("Current user.dir: " + System.getProperty("user.dir"));
-        System.out.println(Config.setup.password());
         boolean isSilentMode = Config.setup.silentMode();
         String pathToNodesCsv = "";
         String pathToReferenceCsv = "";
