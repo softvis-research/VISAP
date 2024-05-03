@@ -1,7 +1,7 @@
 const createParallelColorStripesHelper = function (controllerConfig) {
     return (function () {
 
-        let glbRelatedRoadObjsMap = new Map()
+        let glbRelatedRoadObjsMap;
         let glbStartDistrictComponent;
         let glbMeshIdArr = []; // uuids for state management
 
@@ -23,14 +23,15 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
         function startRoadHighlightActionsForStartDistrict(startDistrictComponent, relatedRoadObjsMap) {
             glbStartDistrictComponent = startDistrictComponent;
-            glbRelatedRoadObjsMap = relatedRoadObjsMap;
+            glbRelatedRoadObjsMap = new Map(relatedRoadObjsMap);
             handleParallelStripsCreation();
         }
 
-        function resetRoadsHighlight(relatedRoadObjsMap) {
-            glbRelatedRoadObjsMap = relatedRoadObjsMap;
+        function resetRoadsHighlight() {
+            glbStartDistrictComponent = {};
             const scene = document.querySelector('a-scene');
             scene.object3D.remove(...scene.object3D.children.filter(child => glbMeshIdArr.includes(child.uuid)));
+            glbRelatedRoadObjsMap = new Map();
             glbMeshIdArr = [];
         }
 
@@ -58,7 +59,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 addSectionDirections();
                 addSectionCurveIntersections();
                 addSectionDistrictIntersections();
-            } catch(e) {
+            } catch(err) {
                 // TODO: catch me if you can, Leonardo...
             }
         }
@@ -100,7 +101,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             const refDirection = refRoadSectionObj.direction;
             const currentMidPoint = document.getElementById(currentRoadSectionObj.id).getAttribute("position");
             const refMidPoint = document.getElementById(refRoadSectionObj.id).getAttribute("position");
-            // imagine a compass turning its needle based on your direction: here, assigned directions depend on reference directions
+            // imagine a compass turning its needle based on your direction: here, assigned directions depend on ref directions
             switch (refDirection) {
                 case "left":
                     if (currentMidPoint.x > refMidPoint.x && currentMidPoint.z === refMidPoint.z) return "left";
@@ -138,7 +139,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                         const refRoadSectionObj = roadObj.roadSectionObjArr[i-1];
         
                         if (currentRoadSectionObj.direction != refRoadSectionObj.direction) {
-                            // a curve, adding intersection coordinates
+                            // a curve; adding intersection coordinates
                             currentRoadSectionObj.intersection, refRoadSectionObj.intersection
                                 = getRoadSectionIntersection(roadObj, currentRoadSectionObj, refRoadSectionObj)
                         } else {
@@ -392,6 +393,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         }
 
         // TODO: Cleanup
+        // TODO: Intersect single sections start-end-intersection (district)
         function connectDistrictIntersections(roadObj) {
             const scene = document.querySelector('a-scene');
             const isRight = checkIfSideIsRight(roadObj)
@@ -412,8 +414,12 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 scene.object3D.add(startTubeMesh);
             }
             if (lastElement.intersectionWithEndBorder) {
-                if (roadObj.roadSectionObjArr.length === 1) predecessorOfLastElement = roadObj.roadSectionObjArr[0]
-                else predecessorOfLastElement = roadObj.roadSectionObjArr[roadObj.roadSectionObjArr.length - 2]
+                if (roadObj.roadSectionObjArr.length === 1) {
+                    predecessorOfLastElement = roadObj.roadSectionObjArr[0]
+                } else {
+                    predecessorOfLastElement = roadObj.roadSectionObjArr[roadObj.roadSectionObjArr.length - 2]
+                }
+
                 const endLineCurve = new THREE.LineCurve3(
                     new THREE.Vector3(lastElement.intersectionWithEndBorder.x, glbPosY, lastElement.intersectionWithEndBorder.z),
                     new THREE.Vector3(predecessorOfLastElement.intersection.x, glbPosY, predecessorOfLastElement.intersection.z)

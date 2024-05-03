@@ -21,7 +21,12 @@ controllers.roadModel = (function () {
 		const result = new Map();
 		globalRoadObjMap.forEach((roadObj, roadId) => {
 			if (roadObj.startDistrictId === startDistrictId) {
-				result.set(roadId, roadObj);
+				// filter-remove props values from road section arr to dodge chaching issues
+				const filteredRoadObj = {
+					...roadObj,
+					roadSectionObjArr: roadObj.roadSectionObjArr.filter(roadSection => roadSection.id)
+				};
+				result.set(roadId, filteredRoadObj);
 			}
 		});
 		return result;
@@ -31,12 +36,16 @@ controllers.roadModel = (function () {
 		const result = new Map();
 		globalRoadObjMap.forEach((roadObj, roadId) => {
 			if (roadObj.destDistrictId === destDistrictId) {
-				result.set(roadId, roadObj);
+				const filteredRoadObj = {
+					...roadObj,
+					roadSectionObjArr: roadObj.roadSectionObjArr.filter(roadSection => roadSection.id)
+				};
+				result.set(roadId, filteredRoadObj);
 			}
 		});
 		return result;
 	}
-
+	
 	return {
 		createRoadObjsFromData,
 		getRoadObjsForStartDistrictId,

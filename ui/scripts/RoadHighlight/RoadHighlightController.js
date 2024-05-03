@@ -44,7 +44,7 @@ controllers.roadController = function () {
 		if (controllerConfig.supportedEntityTypes.includes(appEventEntity.type)) {
 			unhighlightDistrict();
 			handleRoadsHighlightsReset();
-			handleLegendForAction("unselect");
+			handleLegendForAction("deselect");
 		}
 	}
 
@@ -81,14 +81,14 @@ controllers.roadController = function () {
 
 	function handleRoadsHighlightsReset() {
 		if (glbRelatedRoadObjsMap.size != 0) {
-			glbRelatedRoadObjsMap.clear();
-			glbParallelColorStripesHelper.resetRoadsHighlight(glbRelatedRoadObjsMap);
+			glbParallelColorStripesHelper.resetRoadsHighlight();
 			glbRelatedRoadObjsMap.clear();
 		}
 	}
 
+	// consider stuffing this anywhere else...
 	function handleLegendForAction(action) {
-		if(action === "unselect") canvasManipulator.removeElement(glbLegendComponent)
+		if(action === "deselect") canvasManipulator.removeElement(glbLegendComponent)
 		if(action === "select" && glbRelatedRoadObjsMap.size != 0) {
 			const popupId = "legend_popup";
 			const title = "Relations";
