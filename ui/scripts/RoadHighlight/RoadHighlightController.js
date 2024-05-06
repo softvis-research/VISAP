@@ -25,8 +25,6 @@ controllers.roadController = function () {
 		Initialization
 	************************/
 
-	//include in master setup
-
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
 		events.selected.on.subscribe(onEntitySelect);

@@ -48,7 +48,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 addSectionCurveIntersections();
                 addSectionDistrictIntersections();
             } catch(err) {
-                console.log(err)
+                // TODO: Catch me!
             }
         }
 
@@ -381,45 +381,63 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             }
         }
 
-        // TODO: Cleanup
-        // TODO: Intersect single sections start-end-intersection (district)
         function connectDistrictIntersections(roadObj) {
-            const scene = document.querySelector('a-scene');
-            const isRight = checkIfSideIsRight(roadObj)
-            const tubeMaterial = new THREE.MeshBasicMaterial({ color: getColorForSide(isRight) });
 
-            const lastElement = roadObj.roadSectionObjArr[roadObj.roadSectionObjArr.length - 1];
-            const startElement = roadObj.roadSectionObjArr[0];
-
-            if (startElement.intersection && startElement.intersectionWithStartBorder) {
-                const startLineCurve = new THREE.LineCurve3(
-                    new THREE.Vector3(startElement.intersectionWithStartBorder.x, controllerConfig.stripeProps.posY, startElement.intersectionWithStartBorder.z),
-                    new THREE.Vector3(startElement.intersection.x, controllerConfig.stripeProps.posY, startElement.intersection.z)
-                );
-
-                const startTubeGeometry = new THREE.TubeGeometry(startLineCurve, 64, controllerConfig.stripeProps.tubeRadius, 8, false);
-                const startTubeMesh = new THREE.Mesh(startTubeGeometry, tubeMaterial);
-                glbMeshIdArr.push(startTubeMesh.uuid)
-                scene.object3D.add(startTubeMesh);
+            function addTubeToScene(curve) {
+                const scene = document.querySelector('a-scene');
+                const isRight = checkIfSideIsRight(roadObj);
+                const tubeMaterial = new THREE.MeshBasicMaterial({ color: getColorForSide(isRight) });
+                const tubeGeometry = new THREE.TubeGeometry(curve, 64, controllerConfig.stripeProps.tubeRadius, 8, false);
+                const tubeMesh = new THREE.Mesh(tubeGeometry, tubeMaterial);
+                glbMeshIdArr.push(tubeMesh.uuid);
+                scene.object3D.add(tubeMesh);
             }
-            if (lastElement.intersectionWithEndBorder) {
-                if (roadObj.roadSectionObjArr.length === 1) {
-                    predecessorOfLastElement = roadObj.roadSectionObjArr[0]
-                } else {
-                    predecessorOfLastElement = roadObj.roadSectionObjArr[roadObj.roadSectionObjArr.length - 2]
+
+            const arrLen = roadObj.roadSectionObjArr.length
+
+            let ref1 = roadObj.roadSectionObjArr[0].intersectionWithStartBorder
+            let ref2 = roadObj.roadSectionObjArr[arrLen-1].intersectionWithEndBorder
+
+            let isStraightLine = true;
+            
+            for(let i = 0; i <= arrLen-1; i++) {
+                if(roadObj.roadSectionObjArr[i].intersection != null) {
+                    ref2 = roadObj.roadSectionObjArr[i].intersection
+                    const curve = new THREE.LineCurve3(
+                        new THREE.Vector3(ref1.x, controllerConfig.stripeProps.posY, ref1.z),
+                        new THREE.Vector3(ref2.x, controllerConfig.stripeProps.posY, ref2.z)
+                    );
+                    addTubeToScene(curve)
+                    isStraightLine = false; // flagging a curve
+                    ref1 = ref2;
                 }
-
-                const endLineCurve = new THREE.LineCurve3(
-                    new THREE.Vector3(lastElement.intersectionWithEndBorder.x, controllerConfig.stripeProps.posY, lastElement.intersectionWithEndBorder.z),
-                    new THREE.Vector3(predecessorOfLastElement.intersection.x, controllerConfig.stripeProps.posY, predecessorOfLastElement.intersection.z)
-                );
-                const endTubeGeometry = new THREE.TubeGeometry(endLineCurve, 64, controllerConfig.stripeProps.tubeRadius, 8, false);
-                const endTubeMesh = new THREE.Mesh(endTubeGeometry, tubeMaterial);
-                glbMeshIdArr.push(endTubeMesh.uuid)
-                scene.object3D.add(endTubeMesh);
+                // the last ramp connection
+                if(i === arrLen - 1) {
+                    if(roadObj.roadSectionObjArr[i-1].intersection != null) {
+                        let refa = roadObj.roadSectionObjArr[i-1].intersection
+                        let refb = roadObj.roadSectionObjArr[arrLen-1].intersectionWithEndBorder
+                        const curve = new THREE.LineCurve3(
+                            new THREE.Vector3(refa.x, controllerConfig.stripeProps.posY, refa.z),
+                            new THREE.Vector3(refb.x, controllerConfig.stripeProps.posY, refb.z)
+                        );
+                        addTubeToScene(curve)
+                    }
+                }
             }
-        }
 
+            // case when there is no curve on road but a straight connection
+             if (isStraightLine) {
+                    let a = roadObj.roadSectionObjArr[0].intersectionWithStartBorder
+                    let b = roadObj.roadSectionObjArr[arrLen-1].intersectionWithEndBorder
+                    const curve = new THREE.LineCurve3(
+                        
+                        new THREE.Vector3(a.x, controllerConfig.stripeProps.posY, a.z),
+                        new THREE.Vector3(b.x, controllerConfig.stripeProps.posY, b.z)
+                    );
+                    addTubeToScene(curve)
+                 }
+        }
+        
         return {
             startRoadHighlightActionsForStartDistrict,
             resetRoadsHighlight,
