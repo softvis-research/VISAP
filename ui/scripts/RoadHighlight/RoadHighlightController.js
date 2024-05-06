@@ -17,11 +17,7 @@ controllers.roadController = function () {
 		Initialization
 	************************/
 
-
-
 	//include in master setup
-
-	// wiki schreiben
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
@@ -38,7 +34,6 @@ controllers.roadController = function () {
 		const appEventEntity = applicationEvent.entities[0];
 		if (controllerConfig.supportedEntityTypes.includes(appEventEntity.type)) {
 			glbStartDistrictComponent = document.getElementById(appEventEntity.id);
-			highlightDistrict();
 			handleRoadsHighlightForStartDistrict();
 		}
 	}
@@ -46,22 +41,8 @@ controllers.roadController = function () {
 	function onEntityDeselect(applicationEvent) {
 		const appEventEntity = applicationEvent.entities[0];
 		if (controllerConfig.supportedEntityTypes.includes(appEventEntity.type)) {
-			unhighlightDistrict();
 			handleRoadsHighlightsReset();
 		}
-	}
-
-	/************************
-	  District Highlighting
-	************************/
-
-	// select controller
-	function highlightDistrict() {
-		canvasManipulator.highlightEntities([glbStartDistrictComponent], "red", { name: controllerConfig.name });
-	}
-
-	function unhighlightDistrict() {
-		canvasManipulator.unhighlightEntities([glbStartDistrictComponent], { name: controllerConfig.name });
 	}
 
 	/************************
