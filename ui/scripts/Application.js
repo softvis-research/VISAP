@@ -302,27 +302,6 @@ controllers.application = (function () {
 		});
 	}
 
-	function createCustomPopupContainer(title, text, dimProps, popupId) {
-		const popupWindow = createDiv(popupId);
-		popupWindow.innerHTML = text;
-		document.body.appendChild(popupWindow);
-
-		$("#" + popupId).igDialog({
-			width: dimProps.width || 300 ,
-			height: dimProps. height || 200,
-			headerText: title,
-			modal: false,
-			state: "open",
-			resizable: false,
-			draggable: false,
-			position: {
-				left: dimProps.left || 10, 
-				top: dimProps.top || 10 
-			}
-		});
-		return popupWindow;
-	}
-
 	function createDivAsChildOf(parent, newDivId) {
 		const div = createDiv(newDivId);
 		parent.appendChild(div);
@@ -372,7 +351,6 @@ controllers.application = (function () {
 		transferConfigParams: transferConfigParams,
 		loadCSS: loadCSS,
 		createModalPopup: createModalPopup,
-		createCustomPopupContainer: createCustomPopupContainer,
 		createDiv: createDiv,
 		createDivAsChildOf: createDivAsChildOf,
 		getCanvas: getCanvas,

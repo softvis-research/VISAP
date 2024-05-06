@@ -12,11 +12,16 @@ controllers.roadController = function () {
 	let glbParallelColorStripesHelper;
 	let glbStartDistrictComponent;
 	let glbRelatedRoadObjsMap = new Map();
-	let glbLegendComponent;
 
 	/************************
 		Initialization
 	************************/
+
+
+
+	//include in master setup
+
+	// wiki schreiben
 
 	function initialize(setupConfig) {
 		application.transferConfigParams(setupConfig, controllerConfig);
@@ -35,7 +40,6 @@ controllers.roadController = function () {
 			glbStartDistrictComponent = document.getElementById(appEventEntity.id);
 			highlightDistrict();
 			handleRoadsHighlightForStartDistrict();
-			handleLegendForAction("select");
 		}
 	}
 
@@ -44,7 +48,6 @@ controllers.roadController = function () {
 		if (controllerConfig.supportedEntityTypes.includes(appEventEntity.type)) {
 			unhighlightDistrict();
 			handleRoadsHighlightsReset();
-			handleLegendForAction("deselect");
 		}
 	}
 
@@ -52,6 +55,7 @@ controllers.roadController = function () {
 	  District Highlighting
 	************************/
 
+	// select controller
 	function highlightDistrict() {
 		canvasManipulator.highlightEntities([glbStartDistrictComponent], "red", { name: controllerConfig.name });
 	}
@@ -84,36 +88,6 @@ controllers.roadController = function () {
 			glbParallelColorStripesHelper.resetRoadsHighlight();
 			glbRelatedRoadObjsMap.clear();
 		}
-	}
-
-	// consider stuffing this anywhere else...
-	function handleLegendForAction(action) {
-		if(action === "deselect") canvasManipulator.removeElement(glbLegendComponent)
-		if(action === "select" && glbRelatedRoadObjsMap.size != 0) {
-			const popupId = "legend_popup";
-			const title = "Relations";
-			const text = 
-			`
-			<p>
-				<span style="display: inline-block; width: 20px; height: 20px; background-color: 
-				${controllerConfig.colorsParallelColorStripes.calls}; vertical-align: middle; border: 3px solid black;"></span>
-				<span style="color: black; padding: 5px;">calls</span>
-			</p>
-			<p>
-				<span style="display: inline-block; width: 20px; height: 20px; background-color: 
-				${controllerConfig.colorsParallelColorStripes.isCalled}; vertical-align: middle; border: 3px solid black;"></span>
-				<span style="color: black; padding: 5px;">isCalled</span>
-			</p>
-			`
-			const dimProps = {
-				width: 100,
-				height: 150,
-				left: 10,
-				top: 10
-			}
-			// create a popup window leveraging the application functionality
-			glbLegendComponent = application.createCustomPopupContainer(title, text, dimProps, popupId);
-		}	
 	}
 
 	return {
