@@ -6,18 +6,6 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         let glbMeshIdArr = []; // uuids for state management
 
         /************************
-            Dimension Factors
-        ************************/
-
-        // adjust them to match street layouting
-        const glbStripesOffset = 0.25; // gap between stripes
-        const glbPosY = 0.75; // vertical distance between stripes and street
-        const glbSphereRadius = 0.199;
-        const glbTubeRadius = 0.2;
-        const glbShrinkPct = 0.7;
-
-
-        /************************
             Public Functions
         ************************/
 
@@ -60,7 +48,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 addSectionCurveIntersections();
                 addSectionDistrictIntersections();
             } catch(err) {
-                // TODO: catch me if you can, Leonardo...
+                console.log(err)
             }
         }
 
@@ -165,6 +153,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             return intersection;
         }
 
+        // maybe parse to decouple
         function constructVirtualStripe(roadObj, roadSectionObj) {
             // set pos flag for called/isCalled (left/right stripe)
             let isRight = checkIfSideIsRight(roadObj)
@@ -182,31 +171,31 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             let virtualStripe = {}; 
             switch (roadSectionObj.direction) {
                 case "up": {
-                    virtualStripe.width = clone.width * (1 - glbShrinkPct);
+                    virtualStripe.width = clone.width * (1 - controllerConfig.stripeProps.shrinkPct);
                     virtualStripe.depth = clone.depth;
                     virtualStripe.position = { ...clone.position }; // clone position object
-                    isRight ? virtualStripe.position.x -= glbStripesOffset : virtualStripe.position.x += glbStripesOffset
+                    isRight ? virtualStripe.position.x -= controllerConfig.stripeProps.stripesOffset : virtualStripe.position.x += controllerConfig.stripeProps.stripesOffset
                     break;
                 }
                 case "down": {
-                    virtualStripe.width = clone.width * (1 - glbShrinkPct);
+                    virtualStripe.width = clone.width * (1 - controllerConfig.stripeProps.shrinkPct);
                     virtualStripe.depth = clone.depth;
                     virtualStripe.position = { ...clone.position };
-                    isRight ? virtualStripe.position.x += glbStripesOffset : virtualStripe.position.x -= glbStripesOffset
+                    isRight ? virtualStripe.position.x += controllerConfig.stripeProps.stripesOffset : virtualStripe.position.x -= controllerConfig.stripeProps.stripesOffset
                     break;
                 }
                 case "left": {
                     virtualStripe.width = clone.width;
-                    virtualStripe.depth = clone.depth * (1 - glbShrinkPct);
+                    virtualStripe.depth = clone.depth * (1 - controllerConfig.stripeProps.shrinkPct);
                     virtualStripe.position = { ...clone.position }; 
-                    isRight ? virtualStripe.position.z += glbStripesOffset : virtualStripe.position.z -= glbStripesOffset;
+                    isRight ? virtualStripe.position.z += controllerConfig.stripeProps.stripesOffset : virtualStripe.position.z -= controllerConfig.stripeProps.stripesOffset;
                     break;
                 }
                 case "right": {
                     virtualStripe.width = clone.width;
-                    virtualStripe.depth = clone.depth * (1 - glbShrinkPct);
+                    virtualStripe.depth = clone.depth * (1 - controllerConfig.stripeProps.shrinkPct);
                     virtualStripe.position = { ...clone.position }; 
-                    isRight ? virtualStripe.position.z -= glbStripesOffset : virtualStripe.position.z += glbStripesOffset;
+                    isRight ? virtualStripe.position.z -= controllerConfig.stripeProps.stripesOffset : virtualStripe.position.z += controllerConfig.stripeProps.stripesOffset;
                     break;
                 }
             }
@@ -351,9 +340,9 @@ const createParallelColorStripesHelper = function (controllerConfig) {
         function drawSphereAndStoreId(color, x, z) {
             const scene = document.querySelector('a-scene');
             const material = new THREE.MeshBasicMaterial({ color });
-            const geometry = new THREE.SphereGeometry(glbSphereRadius, 32, 32);
+            const geometry = new THREE.SphereGeometry(controllerConfig.stripeProps.sphereRadius, 32, 32);
             const sphere = new THREE.Mesh(geometry, material);
-            sphere.position.set(x, glbPosY, z)
+            sphere.position.set(x, controllerConfig.stripeProps.posY, z)
             glbMeshIdArr.push(sphere.uuid)
             scene.object3D.add(sphere);
         }
@@ -381,11 +370,11 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 const endIntersection = intersections[i].intersection;
 
                 const lineCurve = new THREE.LineCurve3(
-                    new THREE.Vector3(startIntersection.x, glbPosY, startIntersection.z),
-                    new THREE.Vector3(endIntersection.x, glbPosY, endIntersection.z)
+                    new THREE.Vector3(startIntersection.x, controllerConfig.stripeProps.posY, startIntersection.z),
+                    new THREE.Vector3(endIntersection.x, controllerConfig.stripeProps.posY, endIntersection.z)
                 );
 
-                const tubeGeometry = new THREE.TubeGeometry(lineCurve, 64, glbTubeRadius, 8, false);
+                const tubeGeometry = new THREE.TubeGeometry(lineCurve, 64, controllerConfig.stripeProps.tubeRadius, 8, false);
                 const tubeMesh = new THREE.Mesh(tubeGeometry, tubeMaterial);
                 glbMeshIdArr.push(tubeMesh.uuid)
                 scene.object3D.add(tubeMesh);
@@ -404,11 +393,11 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
             if (startElement.intersection && startElement.intersectionWithStartBorder) {
                 const startLineCurve = new THREE.LineCurve3(
-                    new THREE.Vector3(startElement.intersectionWithStartBorder.x, glbPosY, startElement.intersectionWithStartBorder.z),
-                    new THREE.Vector3(startElement.intersection.x, glbPosY, startElement.intersection.z)
+                    new THREE.Vector3(startElement.intersectionWithStartBorder.x, controllerConfig.stripeProps.posY, startElement.intersectionWithStartBorder.z),
+                    new THREE.Vector3(startElement.intersection.x, controllerConfig.stripeProps.posY, startElement.intersection.z)
                 );
 
-                const startTubeGeometry = new THREE.TubeGeometry(startLineCurve, 64, glbTubeRadius, 8, false);
+                const startTubeGeometry = new THREE.TubeGeometry(startLineCurve, 64, controllerConfig.stripeProps.tubeRadius, 8, false);
                 const startTubeMesh = new THREE.Mesh(startTubeGeometry, tubeMaterial);
                 glbMeshIdArr.push(startTubeMesh.uuid)
                 scene.object3D.add(startTubeMesh);
@@ -421,10 +410,10 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                 }
 
                 const endLineCurve = new THREE.LineCurve3(
-                    new THREE.Vector3(lastElement.intersectionWithEndBorder.x, glbPosY, lastElement.intersectionWithEndBorder.z),
-                    new THREE.Vector3(predecessorOfLastElement.intersection.x, glbPosY, predecessorOfLastElement.intersection.z)
+                    new THREE.Vector3(lastElement.intersectionWithEndBorder.x, controllerConfig.stripeProps.posY, lastElement.intersectionWithEndBorder.z),
+                    new THREE.Vector3(predecessorOfLastElement.intersection.x, controllerConfig.stripeProps.posY, predecessorOfLastElement.intersection.z)
                 );
-                const endTubeGeometry = new THREE.TubeGeometry(endLineCurve, 64, glbTubeRadius, 8, false);
+                const endTubeGeometry = new THREE.TubeGeometry(endLineCurve, 64, controllerConfig.stripeProps.tubeRadius, 8, false);
                 const endTubeMesh = new THREE.Mesh(endTubeGeometry, tubeMaterial);
                 glbMeshIdArr.push(endTubeMesh.uuid)
                 scene.object3D.add(endTubeMesh);

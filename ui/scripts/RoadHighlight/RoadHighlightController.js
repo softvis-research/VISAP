@@ -7,6 +7,14 @@ controllers.roadController = function () {
 			calls: "lime",
 			isCalled: "magenta",
 		},
+
+		stripeProps: {
+			stripesOffset: 0.25,
+			posY: 0.75,
+			sphereRadius: 0.19999,
+			tubeRadius: 0.2,
+			shrinkPct: 0.7
+		}
 	}
 
 	let glbParallelColorStripesHelper;
