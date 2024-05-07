@@ -270,6 +270,162 @@ public class DistrictRoadNetwork {
                 }
             }
         }
+        System.out.println("Graph is connected: "+ isGraphConnected());
+        if (!isGraphConnected())
+            connectDisconnectedGraph1();
+        System.out.println("Graph is connected: "+ isGraphConnected());
+    }
+
+    private boolean isGraphConnected() {
+        Map<RoadNode, ArrayList<RoadNode>> adjacencyList = roadGraph.getGraph();
+        if (adjacencyList.size() == 0) {
+            return true;
+        }
+
+        Set<RoadNode> visited = new HashSet<>();
+        Queue<RoadNode> queue = new LinkedList<>();
+
+        RoadNode startNode = roadGraph.getNodes().iterator().next();
+        queue.add(startNode);
+        visited.add(startNode);
+
+        while (!queue.isEmpty()) {
+            RoadNode currentNode = queue.poll();
+
+            for (RoadNode neighbor : adjacencyList.get(currentNode)) {
+                if (!visited.contains(neighbor)) {
+                    queue.add(neighbor);
+                    visited.add(neighbor);
+                }
+            }
+        }
+
+        return visited.size() == adjacencyList.size();
+    }
+
+    private void connectDisconnectedGraph() {
+        Map<RoadNode, ArrayList<RoadNode>> adjacencyList = roadGraph.getGraph();
+        List<Set<RoadNode>> connectedComponents = new ArrayList<>();
+        Set<RoadNode> visited = new HashSet<>();
+
+        // Find all connected components
+        for (RoadNode node : roadGraph.getNodes()) {
+            if (!visited.contains(node)) {
+                Set<RoadNode> component = new HashSet<>();
+                Queue<RoadNode> queue = new LinkedList<>();
+                queue.add(node);
+                visited.add(node);
+
+                while (!queue.isEmpty()) {
+                    RoadNode currentNode = queue.poll();
+                    component.add(currentNode);
+
+                    for (RoadNode neighbor : adjacencyList.get(currentNode)) {
+                        if (!visited.contains(neighbor)) {
+                            queue.add(neighbor);
+                            visited.add(neighbor);
+                        }
+                    }
+                }
+
+                connectedComponents.add(component);
+            }
+        }
+
+        // Connect disconnected components
+        if (connectedComponents.size() > 1) {
+            Set<RoadNode> firstComponent = connectedComponents.get(0);
+            for (int i = 1; i < connectedComponents.size(); i++) {
+                Set<RoadNode> nextComponent = connectedComponents.get(i);
+
+                // Find the closest pair of nodes between the components
+                RoadNode bestNode1 = null;
+                RoadNode bestNode2 = null;
+                double minDistance = Double.MAX_VALUE;
+
+                for (RoadNode node1 : firstComponent) {
+                    for (RoadNode node2 : nextComponent) {
+                        double distance = calculateDistance(node1, node2);
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            bestNode1 = node1;
+                            bestNode2 = node2;
+                        }
+                    }
+                }
+
+                // Connect the closest pair of nodes
+                roadGraph.insertEdge(bestNode1, bestNode2);
+
+                // Merge nextComponent into firstComponent
+                firstComponent.addAll(nextComponent);
+            }
+        }
+    }
+
+    private void connectDisconnectedGraph1() {
+        List<Set<RoadNode>> connectedComponents = new ArrayList<>();
+        Set<RoadNode> visited = new HashSet<>();
+
+        // Find all connected components
+        for (RoadNode node : roadGraph.getNodes()) {
+            if (!visited.contains(node)) {
+                Set<RoadNode> component = new HashSet<>();
+                Queue<RoadNode> queue = new LinkedList<>();
+                queue.add(node);
+                visited.add(node);
+
+                while (!queue.isEmpty()) {
+                    RoadNode currentNode = queue.poll();
+                    component.add(currentNode);
+
+                    for (RoadNode neighbor : roadGraph.getGraph().get(currentNode)) {
+                        if (!visited.contains(neighbor)) {
+                            queue.add(neighbor);
+                            visited.add(neighbor);
+                        }
+                    }
+                }
+
+                connectedComponents.add(component);
+            }
+        }
+
+        // While there are multiple components, connect the nearest
+        Set<RoadNode> firstComponent = connectedComponents.remove(0);
+        while (!connectedComponents.isEmpty()) {
+            RoadNode bestNode1 = null;
+            RoadNode bestNode2 = null;
+            double minDistance = Double.MAX_VALUE;
+            Set<RoadNode> closestComponent = null;
+
+            for (Set<RoadNode> nextComponent : connectedComponents) {
+                for (RoadNode node1 : firstComponent) {
+                    for (RoadNode node2 : nextComponent) {
+                        double distance = calculateDistance(node1, node2);
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            bestNode1 = node1;
+                            bestNode2 = node2;
+                            closestComponent = nextComponent;
+                        }
+                    }
+                }
+            }
+
+            // Connect the closest pair of nodes
+            roadGraph.insertEdge(bestNode1, bestNode2);
+
+            // Merge closestComponent into firstComponent
+            firstComponent.addAll(closestComponent);
+            connectedComponents.remove(closestComponent);
+        }
+    }
+
+    private double calculateDistance(RoadNode node1, RoadNode node2) {
+        double dx = node1.getX() - node2.getX();
+        double dy = node1.getY() - node2.getY();
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     private boolean checkIfElementBelongsToOriginSet(CityElement element) {
