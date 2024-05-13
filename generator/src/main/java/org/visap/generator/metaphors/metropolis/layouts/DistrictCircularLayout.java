@@ -39,15 +39,15 @@ public class DistrictCircularLayout {
     }
 
     private void setSizeOfDistrict(CityRectangle coveringCityRectangle) {
-        district.setWidth(coveringCityRectangle.getWidth() + 2 * districtMargin);
-        district.setLength(coveringCityRectangle.getLength() + 2 * districtMargin);
+        district.setWidth(coveringCityRectangle.getWidth());
+        district.setLength(coveringCityRectangle.getLength());
         district.setHeight(Config.Visualization.Metropolis.district.districtHeight());
     }
 
     private void setPositionOfDistrict(CityRectangle coveringCityRectangle) {
         district.setXPosition(coveringCityRectangle.getCenterX());
         district.setYPosition(district.getHeight() / 2);
-        district.setZPosition(coveringCityRectangle.getCenterY());
+        district.setZPosition(coveringCityRectangle.getCenterY()) ;
     }
 
     private void setNewPositionFromNode(CityRectangle rectangle, CityKDTreeNode fitNode) {
@@ -73,8 +73,8 @@ public class DistrictCircularLayout {
             double centerX = element.getXPosition();
             double centerZ = element.getZPosition();
 
-            double newXPosition = centerX + parentX + districtMargin;
-            double newZPosition = centerZ + parentZ + districtMargin;
+            double newXPosition = centerX + parentX -districtMargin/2;
+            double newZPosition = centerZ + parentZ -districtMargin/2;
 
             element.setXPosition(newXPosition);
             element.setZPosition(newZPosition);
@@ -151,7 +151,7 @@ public class DistrictCircularLayout {
             List<CityRectangle> additionalCodeRectangles = createCityRectanglesOfElements(set);
             arrangeDistrictsCircular(additionalCodeRectangles, covrec);
         }
-
+        covrec.changeRectangle(0,0, covrec.getBottomRightX() + districtMargin ,covrec.getBottomRightY() + districtMargin);
         return covrec; // used to adjust viewpoint in x3d
     }
 
