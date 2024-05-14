@@ -43,9 +43,9 @@ public class DistrictLightMapLayout {
     }
 
     private void setPositionOfDistrict(CityRectangle coveringCityRectangle) {
-        district.setXPosition(coveringCityRectangle.getCenterX() + 2 * districtMargin);
+        district.setXPosition(coveringCityRectangle.getCenterX() - districtMargin);
         district.setYPosition(district.getHeight() / 2);
-        district.setZPosition(coveringCityRectangle.getCenterY() + 2 * districtMargin);
+        district.setZPosition(coveringCityRectangle.getCenterY() - districtMargin);
     }
 
     private void setNewPositionFromNode(CityRectangle rectangle, CityKDTreeNode fitNode) {
@@ -69,11 +69,11 @@ public class DistrictLightMapLayout {
         for (CityElement element : elements) {
 
             double centerX = element.getXPosition();
-            double newXPosition = centerX + parentX + districtMargin;
+            double newXPosition = centerX + parentX - districtMargin/2;
             element.setXPosition(newXPosition);
 
             double centerZ = element.getZPosition();
-            double newZPosition = centerZ + parentZ + districtMargin;
+            double newZPosition = centerZ + parentZ - districtMargin/2;
             element.setZPosition(newZPosition);
 
             Collection<CityElement> subElements = element.getSubElements();
@@ -144,7 +144,7 @@ public class DistrictLightMapLayout {
                 updateCovrec(fitNode, covrec);
             }
         }
-
+        covrec.changeRectangle(0,0, covrec.getBottomRightX() + districtMargin ,covrec.getBottomRightY() + districtMargin);
         return covrec;
     }
 

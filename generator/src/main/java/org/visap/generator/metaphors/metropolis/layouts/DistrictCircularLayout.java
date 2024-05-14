@@ -39,8 +39,8 @@ public class DistrictCircularLayout {
     }
 
     private void setSizeOfDistrict(CityRectangle coveringCityRectangle) {
-        district.setWidth(coveringCityRectangle.getWidth() + 2 * districtMargin);
-        district.setLength(coveringCityRectangle.getLength() + 2 * districtMargin);
+        district.setWidth(coveringCityRectangle.getWidth());
+        district.setLength(coveringCityRectangle.getLength());
         district.setHeight(Config.Visualization.Metropolis.district.districtHeight());
     }
 
@@ -73,8 +73,8 @@ public class DistrictCircularLayout {
             double centerX = element.getXPosition();
             double centerZ = element.getZPosition();
 
-            double newXPosition = centerX + parentX + districtMargin;
-            double newZPosition = centerZ + parentZ + districtMargin;
+            double newXPosition = centerX + parentX - districtMargin/2;
+            double newZPosition = centerZ + parentZ - districtMargin/2;
 
             element.setXPosition(newXPosition);
             element.setZPosition(newZPosition);
