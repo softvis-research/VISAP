@@ -159,14 +159,15 @@ const createMultiColorStripesHelper = function (controllerConfig) {
             const originalPosition = roadSectionComponent.getAttribute("position");
             const originalWidth = roadSectionComponent.getAttribute("width");
             const originalDepth = roadSectionComponent.getAttribute("depth");
+            const originalHeight = roadSectionComponent.getAttribute("height");
 
             const isStartRamp = determineIfRoadSectionIsStartRamp(roadObj, roadSectionId)
             const isEndRamp = determineIfRoadSectionIsEndRamp(roadObj, roadSectionId)
 
-            isStartRamp || isEndRamp ? offsetY = 0.51 : offsetY = 0.50; // small offset for ramps so they lie above undecided colors
+            offsetY = 0.02;
             const stripePosition = { x: originalPosition.x, y: originalPosition.y + offsetY, z: originalPosition.z };
             stripeComponent.setAttribute("position", stripePosition);
-            stripeComponent.setAttribute("geometry", `primitive: box; width: ${originalWidth - 0.5}; height: 0.1; depth: ${originalDepth - 0.5}`);
+            stripeComponent.setAttribute("geometry", `primitive: box; width: ${originalWidth - 0.02}; height: ${originalHeight}; depth: ${originalDepth - 0.02}`);
             const color = determineColorOfRoadSectionIdByState(roadSectionId)
             stripeComponent.setAttribute("material", `color: ${color}`);
             return stripeComponent;

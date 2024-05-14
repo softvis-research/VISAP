@@ -98,8 +98,9 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             // geometry
             const originalWidth = roadSectionComponent.getAttribute("width");
             const originalDepth = roadSectionComponent.getAttribute("depth");
+            const originalHeight = roadSectionComponent.getAttribute("height");
             const { newWidth, newDepth } = getNewWidthDepthForLane(roadSectionId, originalWidth, originalDepth, laneSide)
-            stripeComponent.setAttribute("geometry", `primitive: box; width: ${newWidth}; height: 0.05; depth: ${newDepth}`);
+            stripeComponent.setAttribute("geometry", `primitive: box; width: ${newWidth}; height: ${originalHeight}; depth: ${newDepth}`);
 
             // color
             const color = getColorForLane(laneSide)
@@ -114,7 +115,6 @@ const createParallelColorStripesHelper = function (controllerConfig) {
             const baseOffset = 0.25
 
             if (laneSide === "right") {
-                newY = 0.7;
                 switch (direction) {
                     case "west": {
                         if (directionOfPredecessor === "south" && directionOfSuccessor === "west") newX = originalPosition.x + 0.3
@@ -160,7 +160,6 @@ const createParallelColorStripesHelper = function (controllerConfig) {
                     }
                 }
             } else {
-                newY = 0.6;
                 switch (direction) {
                     case "west":
                         if (directionOfPredecessor === "north" && directionOfSuccessor === "west") newX = originalPosition.x + 0.3;
@@ -197,6 +196,7 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 
             }
 
+            newY = originalPosition.y + 0.02;
             return { newX, newY, newZ }
         }
 
