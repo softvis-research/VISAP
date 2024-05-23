@@ -169,7 +169,7 @@ public class MetropolisRoadNetworkLayouter
     private CityElement createRoadSectionACityElement(RoadNode start, RoadNode end, CityElement district, int amountOfRelations)
     {
         CityElement roadSection = new CityElement(CityType.Road);
-        double roadWidth = Config.Visualization.Metropolis.roadNetwork.roadWidth();
+        double roadWidth = Math.min(Config.Visualization.Metropolis.roadNetwork.roadWidth(), Config.Visualization.Metropolis.district.horizontalBuildingGap());
 
         if (amountOfRelations < 5) {
             roadSection.setSubType(CitySubType.Lane);

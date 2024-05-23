@@ -130,7 +130,7 @@ public class RoadNodeBuilder {
 
     public RoadNode calculateDistrictSlipRoadNode(CityElement district, RoadNode slipNode) {
         double x, y;
-        double roadWidth = Config.Visualization.Metropolis.roadNetwork.roadWidth();
+        double roadWidth = Math.min(Config.Visualization.Metropolis.roadNetwork.roadWidth(), Config.Visualization.Metropolis.district.horizontalBuildingGap());
 
         if (district.getXPosition() == slipNode.getX()) {
             x = district.getXPosition();
