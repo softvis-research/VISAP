@@ -1,5 +1,7 @@
 package org.visap.generator.metaphors.metropolis.layouts;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.Map.Entry;
 import org.visap.generator.abap.enums.SAPNodeProperties;
@@ -207,7 +209,10 @@ public class DistrictRoadNetwork {
             double upperBound = districtElement.getZPosition() + districtElement.getLength() / 2.0 + horizontalDistrictGap / 2.0; // + roadWidth / 2.0;
 
             double lowerBound = districtElement.getZPosition() - districtElement.getLength() / 2.0 - horizontalDistrictGap / 2.0; // - roadWidth / 2.0;
-
+            rightBound = roundDoubleNumber(rightBound);
+            leftBound = roundDoubleNumber(leftBound);
+            upperBound = roundDoubleNumber(upperBound);
+            lowerBound = roundDoubleNumber(lowerBound);
             for (Double column : nodesPerColumns.keySet()) {
                 if (leftBound < column && column < rightBound) {
                     elementsPerColumns.putIfAbsent(column, new ArrayList<>());
@@ -296,5 +301,12 @@ public class DistrictRoadNetwork {
     private List<List<RoadNode>> getAllShortestPaths(RoadNode startNode, RoadNode destinationNode) {
         RoadGraphDijkstraAlgorithm dijkstra = new RoadGraphDijkstraAlgorithm(roadGraph.getGraph());
         return dijkstra.calculateAllShortestPaths(startNode, destinationNode);
+    }
+
+    private double roundDoubleNumber(double value) {
+        //return value;
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(4, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }

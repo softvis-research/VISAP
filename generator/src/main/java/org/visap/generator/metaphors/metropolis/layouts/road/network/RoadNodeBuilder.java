@@ -1,5 +1,7 @@
 package org.visap.generator.metaphors.metropolis.layouts.road.network;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,11 +25,14 @@ public class RoadNodeBuilder {
         double upperY = district.getZPosition() + district.getLength() / 2.0 - horizontalDistrictMargin;
 
         double lowerY = district.getZPosition() - district.getLength() / 2.0 + horizontalDistrictMargin;
-
-        RoadNode upperNode = new RoadNode(district.getXPosition(), upperY);
-        RoadNode rightNode = new RoadNode(rightX, district.getZPosition());
-        RoadNode lowerNode = new RoadNode(district.getXPosition(), lowerY);
-        RoadNode leftNode = new RoadNode(leftX, district.getZPosition());
+        rightX = roundDoubleNumber(rightX);
+        leftX = roundDoubleNumber(leftX);
+        upperY = roundDoubleNumber(upperY);
+        lowerY = roundDoubleNumber(lowerY);
+        RoadNode upperNode = new RoadNode(roundDoubleNumber(district.getXPosition()), upperY);
+        RoadNode rightNode = new RoadNode(rightX, roundDoubleNumber(district.getZPosition()));
+        RoadNode lowerNode = new RoadNode(roundDoubleNumber(district.getXPosition()), lowerY);
+        RoadNode leftNode = new RoadNode(leftX, roundDoubleNumber(district.getZPosition()));
 
         RoadNode upperLeftNode = new RoadNode(leftX, upperY);
         RoadNode upperRightNode = new RoadNode(rightX, upperY);
@@ -78,11 +83,14 @@ public class RoadNodeBuilder {
 
         double lowerY = element.getZPosition() - element.getLength() / 2.0
                 - horizontalDistrictGap / 2.0; // - roadWidth / 2.0;
-
-        RoadNode upperNode = new RoadNode(element.getXPosition(), upperY);
-        RoadNode rightNode = new RoadNode(rightX, element.getZPosition());
-        RoadNode lowerNode = new RoadNode(element.getXPosition(), lowerY);
-        RoadNode leftNode = new RoadNode(leftX, element.getZPosition());
+        rightX = roundDoubleNumber(rightX);
+        leftX = roundDoubleNumber(leftX);
+        upperY = roundDoubleNumber(upperY);
+        lowerY = roundDoubleNumber(lowerY);
+        RoadNode upperNode = new RoadNode(roundDoubleNumber(element.getXPosition()), upperY);
+        RoadNode rightNode = new RoadNode(rightX, roundDoubleNumber(element.getZPosition()));
+        RoadNode lowerNode = new RoadNode(roundDoubleNumber(element.getXPosition()), lowerY);
+        RoadNode leftNode = new RoadNode(leftX, roundDoubleNumber(element.getZPosition()));
 
         slipNodes.add(upperNode);
         slipNodes.add(rightNode);
@@ -113,6 +121,10 @@ public class RoadNodeBuilder {
 
         double lowerY = element.getZPosition() - element.getLength() / 2.0
                 - horizontalDistrictGap / 2.0; // - roadWidth / 2.0;
+        rightX = roundDoubleNumber(rightX);
+        leftX = roundDoubleNumber(leftX);
+        upperY = roundDoubleNumber(upperY);
+        lowerY = roundDoubleNumber(lowerY);
 
         RoadNode upperLeftNode = new RoadNode(leftX, upperY);
         RoadNode upperRightNode = new RoadNode(rightX, upperY);
@@ -151,14 +163,21 @@ public class RoadNodeBuilder {
         double x, y;
 
         if (district.getXPosition() == slipNode.getX()) {
-            x = district.getXPosition();
-            y = district.getZPosition() + Math.signum(slipNode.getY() - district.getZPosition()) * (district.getLength() / 2.0 - horizontalDistrictMargin);
+            x = roundDoubleNumber(district.getXPosition());
+            y = roundDoubleNumber(district.getZPosition()) + Math.signum(slipNode.getY() - district.getZPosition()) * (district.getLength() / 2.0 - horizontalDistrictMargin);
         } else {
-            x = district.getXPosition() + Math.signum(slipNode.getX() - district.getXPosition()) * (district.getWidth() / 2.0 - horizontalDistrictMargin);
-            y = district.getZPosition();
+            x = roundDoubleNumber(district.getXPosition()) + Math.signum(slipNode.getX() - district.getXPosition()) * (district.getWidth() / 2.0 - horizontalDistrictMargin);
+            y = roundDoubleNumber(district.getZPosition());
         }
 
         return new RoadNode(x, y);
+    }
+
+    private double roundDoubleNumber(double value) {
+        //return value;
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(4, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
 }

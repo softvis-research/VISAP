@@ -6,6 +6,9 @@ import org.visap.generator.abap.enums.SAPNodeProperties;
 import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.neo4j.driver.Value;
 import org.neo4j.driver.types.Node;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 public class CityElement {
@@ -141,7 +144,7 @@ public class CityElement {
     }
 
     public void setXPosition(double xPosition) {
-        this.xPosition = xPosition;
+        this.xPosition = roundDoubleNumber(xPosition);
     }
 
     public double getYPosition() {
@@ -149,7 +152,7 @@ public class CityElement {
     }
 
     public void setYPosition(double yPosition) {
-        this.yPosition = yPosition;
+        this.yPosition = roundDoubleNumber(yPosition);
     }
 
     public double getZPosition() {
@@ -157,7 +160,7 @@ public class CityElement {
     }
 
     public void setZPosition(double zPosition) {
-        this.zPosition = zPosition;
+        this.zPosition = roundDoubleNumber(zPosition);
     }
 
     public String getColor() {
@@ -306,5 +309,11 @@ public class CityElement {
 
     public String getAframeProperty() {
         return aframeProperty;
+    }
+
+    private double roundDoubleNumber(double value) {
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(4, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }
