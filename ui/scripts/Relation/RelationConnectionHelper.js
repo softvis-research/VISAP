@@ -24,11 +24,8 @@ const createRelationConnectionHelper = function (controllerConfig) {
 
 		function evaluatePositions(entity, relatedEntity) {
 			let sourcePosition = canvasManipulator.getCenterOfEntity(entity);
-			if (sourcePosition === null) {
-				return {};
-			}
 			let targetPosition = canvasManipulator.getCenterOfEntity(relatedEntity);
-			if (targetPosition === null) {
+			if (sourcePosition === null || targetPosition === null) {
 				return {};
 			}
 
@@ -96,7 +93,7 @@ const createRelationConnectionHelper = function (controllerConfig) {
 			return mergedObject;
 		}
 
-		function createConnector(entity, relatedEntity, relationId) {
+		function createConnector(entity, relatedEntity, relationId, options) {
 			const { sourcePosition, targetPosition } = evaluatePositions(entity, relatedEntity);
 			if (!sourcePosition || !targetPosition) {
 				return null;
@@ -110,7 +107,8 @@ const createRelationConnectionHelper = function (controllerConfig) {
 			const connector = document.createElement("a-cylinder");
 			const halfwayPoint = combineObjectProperties(sourcePosition, delta, (left, right) => left + right / 2);
 			setConnectorMeshProperties(connector, halfwayPoint, direction, connectorSize, distance);
-			setCommonConnectorHTMLProperties(connector, controllerConfig.connectorColor);
+			const connectorColor = options?.direction === 'incoming' ?  controllerConfig.incomingConnectorColor : controllerConfig.outgoingConnectorColor;
+			setCommonConnectorHTMLProperties(connector, connectorColor);
 			connector.setAttribute("radius", 5);
 			connector.setAttribute("id", relationId);
 

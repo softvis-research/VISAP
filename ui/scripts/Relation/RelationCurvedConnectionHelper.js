@@ -20,11 +20,8 @@ const createCurvedRelationConnectionHelper = function (controllerConfig) {
 
 		function evaluatePositions(entity, relatedEntity) {
 			let sourcePosition = canvasManipulator.getCenterOfEntity(entity);
-			if (sourcePosition === null) {
-				return {};
-			}
 			let targetPosition = canvasManipulator.getCenterOfEntity(relatedEntity);
-			if (targetPosition === null) {
+			if (sourcePosition === null || targetPosition === null) {
 				return {};
 			}
 
@@ -70,7 +67,7 @@ const createCurvedRelationConnectionHelper = function (controllerConfig) {
 				targetPosition.y = sourcePosition.y;
 			}
 
-			//new 'centralPosition' ist the center of the Ring elements
+			// new 'centralPosition' ist the center of the Ring elements
 			let centralPosition = sourcePosition;
 			centralPosition.x = ((sourcePosition.x + targetPosition.x) / 2);
 			centralPosition.z = ((sourcePosition.z + targetPosition.z) / 2);
@@ -98,7 +95,7 @@ const createCurvedRelationConnectionHelper = function (controllerConfig) {
 			return mergedObject;
 		}
 
-		function createConnector(entity, relatedEntity, relationId) {
+		function createConnector(entity, relatedEntity, relationId, options) {
 			const { sourcePosition, targetPosition, centralPosition } = evaluatePositions(entity, relatedEntity);
 			if (!sourcePosition || !targetPosition) {
 				return null;
@@ -119,7 +116,8 @@ const createCurvedRelationConnectionHelper = function (controllerConfig) {
 			// create connector
 			const connector = document.createElement("a-ring");
 			setConnectorMeshProperties(connector, direction);
-			setCommonConnectorHTMLProperties(connector, controllerConfig.connectorColor);
+			const connectorColor = options?.direction === 'incoming' ?  controllerConfig.incomingConnectorColor : controllerConfig.outgoingConnectorColor;
+			setCommonConnectorHTMLProperties(connector, connectorColor);
 
 			connector.setAttribute("position", centralPosition);
 			connector.setAttribute("radius-inner", distance);

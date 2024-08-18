@@ -17,9 +17,13 @@ const setup = {
 			sourceStartAtBorder: false,
 			targetEndAtBorder: false,
 			showInnerRelations: true,
-			curvedConnectors: false,
+			curvedConnectors: true,
+			crateEndpoints: true,
+			enableOutgoingConnectors: true,
+			enableIncomingConnectors: true,
 
-			outgoingConnectorColor: { r: 0, g: 0, b: 1 },
+			outgoingConnectorColor: { r: 0, g: 0.1, b: 1 },
+			incomingConnectorColor: { r: 1, g: 0, b: 0.1 },
 		},
 	],
 

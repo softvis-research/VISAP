@@ -1,7 +1,12 @@
 controllers.relationController = function () {
+	// for clarity and consistency in handling relation array tuples
+	// outgoing meaning a relation from this to something else, incoming meaning a relation from somewhere else to this
+	const OUTGOING = 0;
+	const INCOMING = 1;
+
 	// list of entities whose relations to others are being displayed (not including intermediate steps of recursive relations)
 	let sourceEntities = new Array();
-	// for every source entity (and intermediate of recursive relations), the list of entities it is related to
+	// for every source entity (and intermediate of recursive relations), the a tuple of lists with entities it is related to (separated by direction)
 	let relatedEntitiesMap = new Map();
 	// set of all entities that are related to sourceEntities overall, not including the source entities themselves
 	let relatedEntitiesSet = new Set();
@@ -30,24 +35,32 @@ controllers.relationController = function () {
 		sourceStartAtBorder: false,
 		targetEndAtBorder: false,
 		createEndpoints: false,
-		connectorColor: { r: 0, g: 0, b: 1 },
+		enableOutgoingConnectors: true,
+		enableIncomingConnectors: true,
+		outgoingConnectorColor: { r: 0, g: 0, b: 1 },
+		incomingConnectorColor: { r: 1, g: 0, b: 0},
 		endpointColor: { r: 0, g: 0, b: 0 },
 		curvedConnectors: false,
 
 		// highlight configs
 		highlightColor: "black",
 
+		// which fields to use for creating outgoing (first element) and incoming relations (second element)
+		relationClasses: {
+			calls: ["calls", "calledBy"],
+			uses: ["use", "usedBy"]
+		},
 		relationsByEntityType: {
-			"Method": ["calls"],
-			"Function": ["calls"],
-			"FunctionModule": ["calls"],
-			"Report": ["calls"],
-			"FormRoutine": ["calls"],
-			"View": ["use", "usedBy"],
-			"Struct": ["use", "usedBy"],
-			"Domain": ["use", "usedBy"],
-			"Dataelement": ["use", "usedBy"],
-			"Tablebuilding": ["use", "usedBy"],
+			"Method": "calls",
+			"Function": "calls",
+			"FunctionModule": "calls",
+			"Report": "calls",
+			"FormRoutine": "calls",
+			"View": "uses",
+			"Struct": "uses",
+			"Domain": "uses",
+			"Dataelement": "uses",
+			"Tablebuilding": "uses"
 		},
 	}
 
@@ -123,10 +136,9 @@ controllers.relationController = function () {
 
 		events.log.info.publish({ text: "connector - onRelationsChanged - selected Entity - " + applicationEvent.entities[0] });
 
-		loadAllRelationsOf(sourceEntities);
-
+		const newRelations = loadAllRelationsOf(sourceEntities);
 		if (controllerConfig.showRecursiveRelations) {
-			loadAllRecursiveRelationsOf(sourceEntities);
+			loadAllRecursiveRelationsOf(newRelations);
 		}
 
 		events.log.info.publish({ text: "connector - onRelationsChanged - related Entities - " + relatedEntitiesMap.size });
@@ -155,39 +167,53 @@ controllers.relationController = function () {
 		return relatedEntities;
 	}
 
+	function createRelation(sourceEntity, relatedEntity, direction) {
+		const relationIdConnector = direction === OUTGOING ? "--2--" : "--fr--";
+		const relation = model.createEntity(
+			"Relation",
+			sourceEntity.id + relationIdConnector + relatedEntity.id,
+			sourceEntity.name + " - " + relatedEntity.name,
+			sourceEntity.name + " - " + relatedEntity.name,
+			sourceEntity
+		);
+		relation.source = sourceEntity;
+		relation.target = relatedEntity;
+		relation.direction = direction;
+
+		return relation;
+	}
+
 	// add these new relations to the internal relation state - duplicates will be filtered
-	function loadRelations(newRelationMap) {
+	function loadRelations(newRelationMap, relationDirection) {
+		const filterOutgoing = relationDirection === INCOMING;
+		const filterIncoming = relationDirection === OUTGOING;
+
 		const newRelations = [];
-		for (const [sourceEntity, allRelatedEntitiesOfSourceEntity] of newRelationMap) {
+		for (const [sourceEntity, [relatedEntitiesOutgoing, relatedEntitiesIncoming]] of newRelationMap) {
+			// merge into one array for easier traversal
+			const newRelatedEntities = Array.prototype.concat(
+				filterOutgoing ? [] : relatedEntitiesOutgoing.map(entity => [entity, OUTGOING]),
+				filterIncoming ? [] : relatedEntitiesIncoming.map(entity => [entity, INCOMING])
+			);
 			const oldRelatedEntities = relatedEntitiesMap.get(sourceEntity);
 			const relatedEntitiesOfSourceEntity = new Set(oldRelatedEntities);
 
-			for (const relatedEntity of allRelatedEntitiesOfSourceEntity) {
+			for (const [relatedEntity, direction] of newRelatedEntities) {
 				if (relatedEntitiesOfSourceEntity.has(relatedEntity)) {
 					events.log.info.publish({ text: "connector - onRelationsChanged - multiple relation" });
-					break;
+					continue;
 				}
 				if (!controllerConfig.showInnerRelations) {
 					if (isTargetChildOfSourceParent(relatedEntity, sourceEntity)) {
 						events.log.info.publish({ text: "connector - onRelationsChanged - inner relation" });
-						break;
+						continue;
 					}
 				}
 
-				const relation = model.createEntity(
-					"Relation",
-					sourceEntity.id + "--2--" + relatedEntity.id,
-					sourceEntity.name + " - " + relatedEntity.name,
-					sourceEntity.name + " - " + relatedEntity.name,
-					sourceEntity
-				);
-
-				relation.source = sourceEntity;
-				relation.target = relatedEntity;
+				const relation = createRelation(sourceEntity, relatedEntity, direction);
 
 				relations.push(relation);
 				newRelations.push(relation);
-
 				relatedEntitiesOfSourceEntity.add(relatedEntity);
 				relatedEntitiesSet.add(relatedEntity);
 			}
@@ -198,42 +224,46 @@ controllers.relationController = function () {
 		return newRelations;
 	}
 
-	function loadAllRelationsOf(sourceEntitiesArray) {
+	function loadAllRelationsOf(sourceEntitiesArray, direction) {
 		const newRelatedEntities = getRelatedEntities(sourceEntitiesArray);
-		return loadRelations(newRelatedEntities);
+		return loadRelations(newRelatedEntities, direction);
 	}
 
 	function getRelatedEntitiesOfSourceEntity(sourceEntity, entityType) {
-		let relatedEntitiesOfSourceEntity = [];
+		let relatedEntitiesOfSourceEntity = [[], []];
 
-		const relationsForThisType = controllerConfig.relationsByEntityType[entityType];
-		if (relationsForThisType) {
-			for (const relation of relationsForThisType) {
-				if (sourceEntity[relation]) {
-					relatedEntitiesOfSourceEntity.push(...sourceEntity[relation]);
-				}
+		const relationsConfig = controllerConfig.relationsByEntityType[entityType];
+		const relationsProperties = typeof relationsConfig === 'string' ?
+			controllerConfig.relationClasses[relationsConfig] : relationsConfig;
+		if (!Array.isArray(relationsProperties)) return relatedEntitiesOfSourceEntity;
+
+		for (const direction of [OUTGOING, INCOMING]) {
+			const relationProperty = relationsProperties[direction];
+			if (relationProperty && typeof relationProperty === 'string' && sourceEntity[relationProperty]) {
+				const relatedEntities = sourceEntity[relationProperty];
+				relatedEntitiesOfSourceEntity[direction].push(...relatedEntities);
 			}
 		}
 
 		return relatedEntitiesOfSourceEntity;
 	}
 
-	function loadAllRecursiveRelationsOf(oldSourceEntities) {
-		for (const oldSourceEntity of oldSourceEntities) {
-			const relatedEntities = relatedEntitiesMap.get(oldSourceEntity);
-
-			if (relatedEntities.length == 0) {
-				return;
-			}
-
-			const newSourceEntities = relatedEntities.filter(relatedEntity => (!relatedEntitiesMap.has(relatedEntity)));
-
-			if (newSourceEntities.length == 0) {
-				return;
-			}
-
-			loadAllRelationsOf(newSourceEntities);
-			loadAllRecursiveRelationsOf(newSourceEntities);
+	function loadAllRecursiveRelationsOf(previouslyAddedRelations) {
+		// filter out relations which point at previously reached entities
+		const nonCyclicRelations = previouslyAddedRelations.filter(relation => !(relatedEntitiesMap.has(relation.target)));
+		// map out which entities those relations point to, separated by direction
+		const newRelatedEntitiesByDirection = nonCyclicRelations.reduce((acc, relation) => {
+			acc[relation.direction].push(relation.target);
+			return acc;
+		}, [[], []]);
+		// load relations separately for each set, filtered to match the same direction
+		const newRelations = Array.prototype.concat(
+			loadAllRelationsOf(newRelatedEntitiesByDirection[OUTGOING], OUTGOING),
+			loadAllRelationsOf(newRelatedEntitiesByDirection[INCOMING], INCOMING)
+		);
+		// recursively move through descendants
+		if (newRelations.length > 0) {
+			loadAllRecursiveRelationsOf(newRelations);
 		}
 	}
 
@@ -245,11 +275,16 @@ controllers.relationController = function () {
 	function createRelatedConnections(newRelations) {
 
 		newRelations.forEach(function (relation) {
+			if (!controllerConfig.enableOutgoingConnectors && relation.direction === OUTGOING) return;
+			if (!controllerConfig.enableIncomingConnectors && relation.direction === INCOMING) return;
+
 			const sourceEntity = relation.source;
 			const relatedEntity = relation.target;
-
+			const options = {
+				direction: relation.direction === INCOMING ? "incoming" : "outgoing"
+			};
 			//create scene element
-			const connectorElements = relationConnectionHelper.createConnector(sourceEntity, relatedEntity, relation.id);
+			const connectorElements = relationConnectionHelper.createConnector(sourceEntity, relatedEntity, relation.id, options);
 
 			//source or target not rendered -> no connector
 			if (!connectorElements) {
