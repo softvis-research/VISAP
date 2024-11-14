@@ -25,7 +25,7 @@ public class RoadAssembler {
       if (hasSameStartAndDestinationDistrict(road)) {
         assembledRoads.add(road);
       } else {
-        connectFittingMiddleAndEnd(road).ifPresent(assembledRoads::add);
+        findMiddleAndEnd(road).ifPresent(assembledRoads::add);
       }
     }
     return assembledRoads;
@@ -37,16 +37,17 @@ public class RoadAssembler {
     return Objects.equals(startParent, destinationParent);
   }
 
-  private Optional<Road> connectFittingMiddleAndEnd(Road road) {
+  private Optional<Road> findMiddleAndEnd(Road road) {
     CityElement startParent = road.getStartElement().getParentElement();
     CityElement destinationParent = road.getDestinationElement().getParentElement();
     Optional<Road> connectingMainRoad = findConnectingMainRoad(startParent, destinationParent);
 
-    connectingMainRoad.ifPresentOrElse(
-        connector -> processConnectingRoad(road, connector),
-        () -> logNoConnectingMainRoad(startParent, destinationParent));
-
-    return connectingMainRoad;
+    Optional<Road> middleAndEndOfRoad = connectingMainRoad.map(connector -> processConnectingRoad(road, connector))
+        .or(() -> {
+          logNoConnectingMainRoad(startParent, destinationParent);
+          return Optional.empty();
+        });
+    return middleAndEndOfRoad;
   }
 
   private Optional<Road> findConnectingMainRoad(CityElement startParent, CityElement destinationParent) {
@@ -56,15 +57,19 @@ public class RoadAssembler {
         .findFirst();
   }
 
-  private void processConnectingRoad(Road road, Road connector) {
+  private Road processConnectingRoad(Road road, Road connector) {
     road.addRoadSectionIds(connector.getRoadSectionIds());
-    findEndOfRoad(road).ifPresentOrElse(
-        end -> {
-          List<String> reversedEnd = new ArrayList<>(end.getRoadSectionIds());
-          Collections.reverse(reversedEnd);
-          road.addRoadSectionIds(reversedEnd);
-        },
-        () -> logNoEndOfRoad(road));
+    return findEndOfRoad(road)
+        .map(end -> {
+          List<String> endIds = new ArrayList<>(end.getRoadSectionIds());
+          Collections.reverse(endIds);
+          road.addRoadSectionIds(endIds);
+          return road;
+        })
+        .orElseGet(() -> {
+          logNoEndOfRoad(road);
+          return road;
+        });
   }
 
   private Optional<Road> findEndOfRoad(Road road) {
