@@ -1,12 +1,12 @@
 package org.visap.generator.repository;
 
+import java.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.visap.generator.abap.enums.SAPNodeProperties;
-import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.neo4j.driver.Value;
 import org.neo4j.driver.types.Node;
-import java.util.*;
+import org.visap.generator.abap.enums.SAPNodeProperties;
+import org.visap.generator.abap.enums.SAPNodeTypes;
 
 public class CityElement {
 
@@ -33,23 +33,37 @@ public class CityElement {
     }
 
     public enum CityType {
-        District, Building, Road, Reference
+        District,
+        Building,
+        Road,
+        Reference,
     }
 
     public enum CitySubType {
-        Class, Report, FunctionGroup,
+        Class,
+        Report,
+        FunctionGroup,
 
         // additional subTypes for metropolis
         Interface,
 
-        Freeway, Street, Lane
+        Freeway,
+        Street,
+        Lane,
     }
 
     public enum CityShape {
-        Box, Cylinder, Cone,
+        Box,
+        Cylinder,
+        Cone,
 
         // alternative shapes
-        Sphere, Ring, Plane, Circle, Tetrahedron, Entity,
+        Sphere,
+        Ring,
+        Plane,
+        Circle,
+        Tetrahedron,
+        Entity,
     }
 
     private String hash;
@@ -109,7 +123,9 @@ public class CityElement {
         if (sourceNode == null) {
             return null;
         }
-        return SAPNodeTypes.valueOf(sourceNode.get(SAPNodeProperties.type_name.name()).asString());
+        return SAPNodeTypes.valueOf(
+            sourceNode.get(SAPNodeProperties.type_name.name()).asString()
+        );
     }
 
     public double getHeight() {
@@ -204,6 +220,16 @@ public class CityElement {
         return parentElement;
     }
 
+    public String getParentName() {
+        if (parentElement == null) {
+            return null;
+        } else {
+            return parentElement.getSourceNodeProperty(
+                SAPNodeProperties.object_name
+            );
+        }
+    }
+
     public CityElement getRefBuildingData() {
         return refBuilding;
     }
@@ -221,7 +247,6 @@ public class CityElement {
 
         Collection<CityElement> subElements = getSubElements();
         for (CityElement element : subElements) {
-
             if (element.getType() == elementType) {
                 subElementsOfType.add(element);
             }
@@ -229,7 +254,9 @@ public class CityElement {
         return subElementsOfType;
     }
 
-    public Collection<CityElement> getSubElementsOfSourceNodeType(SAPNodeTypes sourceNodeType) {
+    public Collection<CityElement> getSubElementsOfSourceNodeType(
+        SAPNodeTypes sourceNodeType
+    ) {
         List<CityElement> subElements = new ArrayList<CityElement>();
 
         for (CityElement subElement : this.getSubElements()) {
@@ -242,7 +269,6 @@ public class CityElement {
     }
 
     public String getSourceNodeProperty(SAPNodeProperties sapNodeProperties) {
-
         Node sourceNode = getSourceNode();
 
         try {
