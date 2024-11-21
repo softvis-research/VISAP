@@ -26,19 +26,6 @@ public class ReferencesLoaderStep {
             entry("Refs_DST", "combinedKeyDst")
     );
 
-    private enum ReferenceRelationType{
-        SOURCE("SRC"),
-        DESTINATION("DST");
-
-        private final String type;
-        ReferenceRelationType(String type) {
-            this.type = type;
-        }
-        private String getType(){
-            return type;
-        }
-    }
-
     public static void main(String[] args) throws Exception {
 
         boolean isSilentMode = Config.setup.silentMode();

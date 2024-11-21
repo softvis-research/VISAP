@@ -351,7 +351,8 @@ controllers.canvasManipulator = (function () {
 	}
 
 	function removeElement(element) {
-		element.parentNode.removeChild(element);
+		if(element.parentNode)element.parentNode.removeChild(element);
+		else element.remove(element)
 	}
 
 	function getCenterOfEntity(entity) {

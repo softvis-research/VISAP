@@ -1,15 +1,14 @@
 package org.visap.generator.repository;
 
+import java.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.visap.generator.abap.enums.SAPNodeProperties;
-import org.visap.generator.abap.enums.SAPNodeTypes;
 import org.neo4j.driver.Value;
 import org.neo4j.driver.types.Node;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
+import org.visap.generator.helpers.Rounder;
+import org.visap.generator.abap.enums.SAPNodeProperties;
+import org.visap.generator.abap.enums.SAPNodeTypes;
 
 public class CityElement {
 
@@ -36,23 +35,37 @@ public class CityElement {
     }
 
     public enum CityType {
-        District, Building, Road, Reference
+        District,
+        Building,
+        Road,
+        Reference,
     }
 
     public enum CitySubType {
-        Class, Report, FunctionGroup,
+        Class,
+        Report,
+        FunctionGroup,
 
         // additional subTypes for metropolis
         Interface,
 
-        Freeway, Street, Lane
+        Freeway,
+        Street,
+        Lane,
     }
 
     public enum CityShape {
-        Box, Cylinder, Cone,
+        Box,
+        Cylinder,
+        Cone,
 
         // alternative shapes
-        Sphere, Ring, Plane, Circle, Tetrahedron, Entity,
+        Sphere,
+        Ring,
+        Plane,
+        Circle,
+        Tetrahedron,
+        Entity,
     }
 
     private String hash;
@@ -112,7 +125,8 @@ public class CityElement {
         if (sourceNode == null) {
             return null;
         }
-        return SAPNodeTypes.valueOf(sourceNode.get(SAPNodeProperties.type_name.name()).asString());
+        return SAPNodeTypes.valueOf(
+                sourceNode.get(SAPNodeProperties.type_name.name()).asString());
     }
 
     public double getHeight() {
@@ -144,7 +158,7 @@ public class CityElement {
     }
 
     public void setXPosition(double xPosition) {
-        this.xPosition = roundDoubleNumber(xPosition);
+        this.xPosition = Rounder.roundDoubleNumber(xPosition);
     }
 
     public double getYPosition() {
@@ -152,7 +166,7 @@ public class CityElement {
     }
 
     public void setYPosition(double yPosition) {
-        this.yPosition = roundDoubleNumber(yPosition);
+        this.yPosition = Rounder.roundDoubleNumber(yPosition);
     }
 
     public double getZPosition() {
@@ -160,7 +174,7 @@ public class CityElement {
     }
 
     public void setZPosition(double zPosition) {
-        this.zPosition = roundDoubleNumber(zPosition);
+        this.zPosition = Rounder.roundDoubleNumber(zPosition);
     }
 
     public String getColor() {
@@ -207,6 +221,15 @@ public class CityElement {
         return parentElement;
     }
 
+    public String getParentName() {
+        if (parentElement == null) {
+            return null;
+        } else {
+            return parentElement.getSourceNodeProperty(
+                    SAPNodeProperties.object_name);
+        }
+    }
+
     public CityElement getRefBuildingData() {
         return refBuilding;
     }
@@ -224,7 +247,6 @@ public class CityElement {
 
         Collection<CityElement> subElements = getSubElements();
         for (CityElement element : subElements) {
-
             if (element.getType() == elementType) {
                 subElementsOfType.add(element);
             }
@@ -232,7 +254,8 @@ public class CityElement {
         return subElementsOfType;
     }
 
-    public Collection<CityElement> getSubElementsOfSourceNodeType(SAPNodeTypes sourceNodeType) {
+    public Collection<CityElement> getSubElementsOfSourceNodeType(
+            SAPNodeTypes sourceNodeType) {
         List<CityElement> subElements = new ArrayList<CityElement>();
 
         for (CityElement subElement : this.getSubElements()) {
@@ -245,7 +268,6 @@ public class CityElement {
     }
 
     public String getSourceNodeProperty(SAPNodeProperties sapNodeProperties) {
-
         Node sourceNode = getSourceNode();
 
         try {
@@ -309,11 +331,5 @@ public class CityElement {
 
     public String getAframeProperty() {
         return aframeProperty;
-    }
-
-    private double roundDoubleNumber(double value) {
-        BigDecimal bd = BigDecimal.valueOf(value);
-        bd = bd.setScale(4, RoundingMode.HALF_UP);
-        return bd.doubleValue();
     }
 }

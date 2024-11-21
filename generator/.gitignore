@@ -3,6 +3,9 @@
 
 ### IDE ###
 .idea/
+.classpath
+.project
+.settings/
 
 ### Generator ###
 # Target folder
@@ -55,4 +58,3 @@ replay_pid*
 ### UI ###
 # Node
 node_modules/
-
