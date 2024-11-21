@@ -67,6 +67,7 @@ public class ReferencesLoaderStep {
         }
         dropIndexes();
         userInput.close();
+        connector.close();
         log.info("ReferencesLoader step was completed");
     }
     private static void createReferenceNodes(Path p){

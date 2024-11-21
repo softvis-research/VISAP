@@ -42,7 +42,7 @@ public class MetricsLoaderStep {
             connector.executeWrite("MATCH (n:"+labelName+") DETACH DELETE n");
         }
         userInput.close();
-        //connector.close();
+        connector.close();
         log.info("MetricsLoader step was completed");
     }
 

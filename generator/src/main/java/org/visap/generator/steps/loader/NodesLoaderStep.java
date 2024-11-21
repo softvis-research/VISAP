@@ -75,6 +75,7 @@ public class NodesLoaderStep {
         createContainsRelations();
 
         userInput.close();
+        connector.close();
         log.info("NodesLoader step was completed");
     }
 
@@ -190,4 +191,3 @@ public class NodesLoaderStep {
         );
     }
 }
-
