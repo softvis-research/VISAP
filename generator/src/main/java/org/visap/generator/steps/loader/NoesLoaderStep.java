@@ -25,6 +25,7 @@ public class NoesLoaderStep {
 
         List<Path> files = new CsvFilesInputFilter(FolderName, FileSuffix).getFiles();
         if (files.isEmpty()){
+            userInput.close();
             throw new InvocationTargetException(new Exception(),"Noes CSV file wasn't found");
         }
 

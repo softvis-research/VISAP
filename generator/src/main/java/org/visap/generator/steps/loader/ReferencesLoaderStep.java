@@ -46,6 +46,7 @@ public class ReferencesLoaderStep {
 
         List<Path> files = new CsvFilesInputFilter(folderName, fileSuffix).getFiles();
         if (files.isEmpty()){
+            userInput.close();
             throw new InvocationTargetException(new Exception(),"Reference CSV file wasn't found");
         }
 

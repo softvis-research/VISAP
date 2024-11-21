@@ -23,6 +23,7 @@ public class MetricsLoaderStep {
 
         List<Path> files = new CsvFilesInputFilter(FolderName, FileSuffix).getFiles();
         if (files.isEmpty()){
+            userInput.close();
             throw new InvocationTargetException(new Exception(),"Metrics CSV file wasn't found");
         }
 
