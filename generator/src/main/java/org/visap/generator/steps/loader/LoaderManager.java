@@ -9,13 +9,11 @@ import java.lang.reflect.InvocationTargetException;
 
 public class LoaderManager {
 
-    private static final Log log = LogFactory.getLog(LoaderManager.class);
-    private static final Class<?>[] classes = {
+    private static Class<?>[] classes = {
         NodesLoaderStep.class,
         ReferencesLoaderStep.class,
         MetaDataLoaderStep.class,
-        MetricsLoaderStep.class,
-        NoesLoaderStep.class,
+        MetricsLoaderStep.class
     };
 
     public static void main(String[] args) {
@@ -25,13 +23,12 @@ public class LoaderManager {
             for (Class<?> loaderClass : classes) {
                 try {
                     loaderClass
-                        .getMethod("main", String[].class)
-                        .invoke(null, new Object[] { args });
+                            .getMethod("main", String[].class)
+                            .invoke(null, new Object[] { args });
                 } catch (
-                    NoSuchMethodException
-                    | IllegalAccessException
-                    | InvocationTargetException e
-                ) {
+                        NoSuchMethodException
+                        | IllegalAccessException
+                        | InvocationTargetException e) {
                     Log log = LogFactory.getLog(loaderClass);
                     if (e.getCause() != null) {
                         log.warn(e.getCause().getMessage());
@@ -42,7 +39,6 @@ public class LoaderManager {
             }
         } finally {
             connector.close();
-            log.info("DatabaseConnector closed.");
         }
     }
 }

@@ -108,26 +108,6 @@ class DomHelper {
 		$(cssIDs.metricToText + layerID).show();
 
 		switch ($(cssIDs.metricSelectionDropDown + layerID).igCombo("value")) {
-			case metrics.numberOfStatements:
-			case metrics.amountOfResults:
-			case metrics.amountOfNamspa:
-			case metrics.amountOfChnhis:
-			case metrics.amountOfCodlen:
-			case metrics.amountOfCommam:
-			case metrics.amountOfDynsta:
-			case metrics.amountOfEnhmod:
-			case metrics.amountOfFormty:
-			case metrics.amountOfNomac:
-			case metrics.amountOfObjnam:
-			case metrics.amountOfPraefi:
-			case metrics.amountOfSlin:
-			case metrics.amountOfSql:
-			case metrics.amountOfTodo:
-				$(cssIDs.metricFromDateInput + layerID).igDatePicker("hide");
-				$(cssIDs.metricToDateInput + layerID).igDatePicker("hide");
-				$(cssIDs.metricFromInput + layerID).igNumericEditor("show");
-				$(cssIDs.metricToInput + layerID).igNumericEditor("show");
-				break;
 			case metrics.dateOfCreation:
 			case metrics.dateOfLastChange:
 				$(cssIDs.metricFromInput + layerID).igNumericEditor("hide");
@@ -135,6 +115,12 @@ class DomHelper {
 				$(cssIDs.metricFromDateInput + layerID).igDatePicker("show");
 				$(cssIDs.metricToDateInput + layerID).igDatePicker("show");
 				break;
+			default:
+			    $(cssIDs.metricFromDateInput + layerID).igDatePicker("hide");
+    			$(cssIDs.metricToDateInput + layerID).igDatePicker("hide");
+                $(cssIDs.metricFromInput + layerID).igNumericEditor("show");
+            	$(cssIDs.metricToInput + layerID).igNumericEditor("show");
+            	break;
 		}
 	}
 

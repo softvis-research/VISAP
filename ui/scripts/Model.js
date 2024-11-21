@@ -62,28 +62,15 @@ controllers.model = (function () {
 					entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
 					break;
 
-				case "Class":
-					entity.amountOfResults = element.amount_of_results;
-					entity.amountOfChnhis = element.amount_of_chnhis;
-					entity.amountOfCommam = element.amount_of_commam;
-					entity.amountOfDynsta = element.amount_of_dynsta;
-					entity.amountOfNomac = element.amount_of_nomac;
-					entity.amountOfSlin = element.amount_of_slin;
-					entity.amountOfTodo = element.amount_of_todo;
 				case "Interface":
 					entity.superTypes = splitByCommaIfNotEmpty(element.subClassOf);
 					entity.subTypes = splitByCommaIfNotEmpty(element.superClassOf);
 					entity.reaches = splitByCommaIfNotEmpty(element.reaches);
 					entity.reachedBy = [];
-					entity.amountOfResults = element.amount_of_results;
-					entity.amountOfCommam = element.amount_of_commam;
-					entity.amountOfSlin = element.amount_of_slin;
-					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
 				case "Attribute":
 					entity.accessedBy = splitByCommaIfNotEmpty(element.accessedBy);
-					entity.amountOfSlin = element.amount_of_slin;
 					break;
 
 				case "Method":
@@ -112,48 +99,11 @@ controllers.model = (function () {
 					entity.calls = splitByCommaIfNotEmpty(element.calls);
 					entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
 					entity.accesses = splitByCommaIfNotEmpty(element.accesses);
-					entity.numberOfStatements = element.number_of_statements;
-					entity.amountOfResults = element.amount_of_results;
-					entity.amountOfChnhis = element.amount_of_chnhis;
-					entity.amountOfCommam = element.amount_of_commam;
-					entity.amountOfDynsta = element.amount_of_dynsta;
-					entity.amountOfEnhmod = element.amount_of_enhmod;
-					entity.amountOfNomac = element.amount_of_nomac;
-					entity.amountOfSlin = element.amount_of_slin;
-					entity.amountOfSql = element.amount_of_sql;
-					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
-				case "FunctionModule":
-					entity.amountOfResults = element.amount_of_results;
-					entity.amountOfChnhis = element.amount_of_chnhis;
-					entity.amountOfCommam = element.amount_of_commam;
-					entity.amountOfDynsta = element.amount_of_dynsta;
-					entity.amountOfEnhmod = element.amount_of_enhmod;
-					entity.amountOfNomac = element.amount_of_nomac;
-					entity.amountOfSlin = element.amount_of_slin;
-					entity.amountOfSql = element.amount_of_sql;
-					entity.amountOfTodo = element.amount_of_todo;
-				case "Report":
-					entity.amountOfChnhis = element.amount_of_chnhis;
-					entity.amountOfCommam = element.amount_of_commam;
-					entity.amountOfDynsta = element.amount_of_dynsta;
-					entity.amountOfEnhmod = element.amount_of_enhmod;
-					entity.amountOfNomac = element.amount_of_nomac;
-					entity.amountOfSlin = element.amount_of_slin;
-					entity.amountOfSql = element.amount_of_sql;
-					entity.amountOfTodo = element.amount_of_todo;
 				case "FormRoutine":
 					entity.calls = splitByCommaIfNotEmpty(element.calls);
 					entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
-					entity.amountOfCommam = element.amount_of_commam;
-					entity.amountOfDynsta = element.amount_of_dynsta;
-					entity.amountOfEnhmod = element.amount_of_enhmod;
-					entity.amountOfFormty = element.amount_of_formty;
-					entity.amountOfNomac = element.amount_of_nomac;
-					entity.amountOfSlin = element.amount_of_slin;
-					entity.amountOfSql = element.amount_of_sql;
-					entity.amountOfTodo = element.amount_of_todo;
 					break;
 
 				case "Variable":
@@ -162,39 +112,38 @@ controllers.model = (function () {
 					entity.filename = element.filename;
 					break;
 				case "View":
-					entity.use = splitByCommaIfNotEmpty(element.use);
-					entity.used = splitByCommaIfNotEmpty(element.used);
-					entity.numberOfFields = element.number_of_fields;
-					break;
 				case "Struct":
-					entity.use = splitByCommaIfNotEmpty(element.use);
-					entity.used = splitByCommaIfNotEmpty(element.used);
-					entity.numberOfFields = element.number_of_fields;
-					break;
 				case "Domain":
-					entity.use = splitByCommaIfNotEmpty(element.use);
-					entity.used = splitByCommaIfNotEmpty(element.used);
-					break;
 				case "Dataelement":
-					entity.use = splitByCommaIfNotEmpty(element.use);
-					entity.used = splitByCommaIfNotEmpty(element.used);
-					break;
 				case "Tablebuildung":
 					entity.use = splitByCommaIfNotEmpty(element.use);
 					entity.used = splitByCommaIfNotEmpty(element.used);
-					entity.numberOfFields = element.number_of_fields;
 					break;
-
 				default:
 					break;
 			}
-
+			setMetrics(entity, element);
 			entitiesById.set(element.id, entity);
 			newElements.push(entity);
 		});
 
 		setReferencesToEntities(newElements);
 		return newElements;
+	}
+
+	function setMetrics(entity, element){
+	    const metrics = new Set([
+	    "number_of_statements","amount_of_slin","number_of_object_references","number_of_exec_statements",
+	    "maximum_nesting_depth","cyclomatic_complexity","keyword_named_variables",
+	    "number_of_comments","halstead_difficulty","halstead_volume","halstead_effort","number_of_methods",
+	    "number_of_interfaces","number_of_attributes","number_of_events","number_of_redefined_methods",
+	    "number_of_protected_methods","number_of_public_methods",
+	    "number_of_private_attributes","number_of_protected_attributes","number_of_public_attributes"
+	    ]);
+	    const filteredKeys = Object.keys(element).filter(key => metrics.has(key));
+	    filteredKeys.forEach( (key)=>{
+	    entity[key] = element[key];
+	    });
 	}
 
 	function splitByCommaIfNotEmpty(string) {

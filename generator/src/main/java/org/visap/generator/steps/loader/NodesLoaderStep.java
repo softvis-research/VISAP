@@ -114,8 +114,8 @@ public class NodesLoaderStep {
                 "CREATE (p)-[r:" + SAPRelationLabels.CONTAINS + "]->(n)");
 
         //2.3 Between main elements and Packages
-        connector.executeWrite("MATCH (n:Elements) WHERE n.SUB_SUB_OBJ_NAME IS NULL AND n.SUB_OBJ_NAME IS NULL\n" +
-                "MATCH (p:Elements {MAIN_OBJ_NAME: n.PACKAGE, MAIN_OBJ_TYPE: 'DEVC'}) WHERE p.MAIN_OBJ_NAME <> n.MAIN_OBJ_NAME\n"+
+        connector.executeWrite("MATCH (n:Elements) WHERE n.SUB_SUB_OBJ_NAME IS NULL AND n.SUB_OBJ_NAME IS NULL AND n.MAIN_OBJ_TYPE <>'DEVC'\n" +
+                "MATCH (p:Elements {MAIN_OBJ_NAME: n.PACKAGE, MAIN_OBJ_TYPE: 'DEVC'}) \n"+
                 "CREATE (p)-[r:" + SAPRelationLabels.CONTAINS + "]->(n)");
     }
 
