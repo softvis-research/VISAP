@@ -6,26 +6,26 @@
     <groupId>org.example</groupId>
     <artifactId>generator</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <name>VISAP Generator</name>
+    <url>https://github.com/softvis-research/VISAP</url>
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <neo4j-driver.version>4.4.9</neo4j-driver.version>
+    </properties>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>17</source>
-                    <target>17</target>
-                </configuration>
                 <version>3.13.0</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
-    <name>VISAP Generator</name>
-    <url>https://github.com/softvis-research/VISAP</url>
-    <properties>
-        <maven.compiler.source>18</maven.compiler.source>
-        <maven.compiler.target>18</maven.compiler.target>
-        <neo4j-driver.version>4.4.9</neo4j-driver.version>
-    </properties>
     <dependencies>
         <!-- neo4j -->
         <dependency>
