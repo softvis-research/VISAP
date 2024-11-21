@@ -10,7 +10,7 @@ The project is currently in a pre-development phase. Porting of functionality fr
 
 ### Compiling the Generator
 
-This project requires a JDK version of 12 or higher.
+This project requires a JDK version of 17 or higher.
 
 The generator project is built using Maven. Open the project in your IDE of choice by importing the ``pom.xml`` file in the ``VISAP/`` directory and then building the project. You can also build and run from the terminal like so:
 
