@@ -581,23 +581,23 @@ const createParallelColorStripesHelper = function (controllerConfig) {
 				// the last ramp connection
 				if (i === arrLen - 1) {
 					if (roadObj.roadSectionObjArr[i - 1].intersection != null) {
-						let refa = roadObj.roadSectionObjArr[i - 1].intersection;
-						let refb =
-							roadObj.roadSectionObjArr[arrLen - 1].intersectionWithEndBorder;
-						const curve = new THREE.LineCurve3(
-							new THREE.Vector3(
-								refa.x,
-								controllerConfig.stripeProps.posY,
-								refa.z,
-							),
-							new THREE.Vector3(
-								refb.x,
-								controllerConfig.stripeProps.posY,
-								refb.z,
-							),
-						);
-						addTubeToScene(curve);
+						ref1 = roadObj.roadSectionObjArr[i - 1].intersection;
 					}
+					ref2 =
+						roadObj.roadSectionObjArr[arrLen - 1].intersectionWithEndBorder;
+					const curve = new THREE.LineCurve3(
+						new THREE.Vector3(
+							ref1.x,
+							controllerConfig.stripeProps.posY,
+							ref1.z,
+						),
+						new THREE.Vector3(
+							ref2.x,
+							controllerConfig.stripeProps.posY,
+							ref2.z,
+						),
+					);
+					addTubeToScene(curve);
 				}
 			}
 
