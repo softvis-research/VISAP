@@ -54,7 +54,6 @@ public class MetaDataLoaderStep {
         }
 
         userInput.close();
-        connector.close();
         log.info("MetaDataLoader step was completed");
     }
 
