@@ -23,6 +23,7 @@ public class MetricsLoaderStep {
 
         List<Path> files = new CsvFilesInputFilter(FolderName, FileSuffix).getFiles();
         if (files.isEmpty()){
+            userInput.close();
             throw new InvocationTargetException(new Exception(),"Metrics CSV file wasn't found");
         }
 
@@ -41,7 +42,6 @@ public class MetricsLoaderStep {
             connector.executeWrite("MATCH (n:"+labelName+") DETACH DELETE n");
         }
         userInput.close();
-        //connector.close();
         log.info("MetricsLoader step was completed");
     }
 

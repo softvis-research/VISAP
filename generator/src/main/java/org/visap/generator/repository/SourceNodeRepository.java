@@ -127,7 +127,7 @@ public class SourceNodeRepository {
 
             Node mNode = result.get("m").asNode();
             mNode = nodeById.get(mNode.id());
-            
+
             addNodesByRelation(mNode, nNode, relationType.name());
             relationCounter.addAndGet(1);
         }
@@ -152,7 +152,8 @@ public class SourceNodeRepository {
         for (Long nodeId : nodeIds) {
             nodeIdString += nodeId + ", ";
         }
-        nodeIdString = nodeIdString.substring(0, nodeIdString.length() - 2);
+        if (nodeIds.size() > 0)
+            nodeIdString = nodeIdString.substring(0, nodeIdString.length() - 2);
         nodeIdString += "]";
 
         return nodeIdString;

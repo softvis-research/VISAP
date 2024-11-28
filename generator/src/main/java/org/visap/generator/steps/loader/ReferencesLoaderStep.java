@@ -26,19 +26,6 @@ public class ReferencesLoaderStep {
             entry("Refs_DST", "combinedKeyDst")
     );
 
-    private enum ReferenceRelationType{
-        SOURCE("SRC"),
-        DESTINATION("DST");
-
-        private final String type;
-        ReferenceRelationType(String type) {
-            this.type = type;
-        }
-        private String getType(){
-            return type;
-        }
-    }
-
     public static void main(String[] args) throws Exception {
 
         boolean isSilentMode = Config.setup.silentMode();
@@ -46,6 +33,7 @@ public class ReferencesLoaderStep {
 
         List<Path> files = new CsvFilesInputFilter(folderName, fileSuffix).getFiles();
         if (files.isEmpty()){
+            userInput.close();
             throw new InvocationTargetException(new Exception(),"Reference CSV file wasn't found");
         }
 
@@ -87,7 +75,7 @@ public class ReferencesLoaderStep {
         connector.executeWrite(
                 "MATCH (n:Refs),(e1:Elements),(e2:Elements)\n" +
                         "WHERE n.combinedKeySrc = e1.combinedKey AND n.combinedKeyDst = e2.combinedKey\n" +
-                        "CREATE (e1)-[:"+SAPRelationLabels.REFERENCES +"]->(e2)"
+                        "MERGE (e1)-[:"+SAPRelationLabels.REFERENCES +"]->(e2)"
         );
     }
 
