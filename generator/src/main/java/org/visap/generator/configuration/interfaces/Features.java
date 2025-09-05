@@ -21,4 +21,7 @@ public interface Features extends Config {
 
     @DefaultValue("false")
     Boolean showDDIC();
+
+    @DefaultValue("false")
+    Boolean railroad();
 }

@@ -70,6 +70,10 @@ public class AFrameExporterStep {
             roadExporter.exportRoads();
         }
 
+        if (Config.features.railroad()) {
+            // possible location for the railroad
+        }
+
         if (!isSilentMode) {
             System.out.print("\nDesigner step to be processed. Press any key to continue...");
             userInput.nextLine();

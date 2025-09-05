@@ -41,27 +41,32 @@ public class ReferencesLoaderStep {
             log.info("Creating 'REFERENCE' relationships. Press any key to continue...");
             userInput.nextLine();
         }
+
+        dropIndexes();
+
         log.info("creating Indexes...");
         createIndexes();
         for (Path p : files) {
             log.info("Path to Reference CSV: "+p);
             log.info("creating Reference nodes...");
             createReferenceNodes(p);
+
             log.info("creating Reference relations...");
             createReferenceRelations(p);
+
             log.info("delete unnecessary reference nodes...");
             connector.executeWrite("MATCH (n:"+labelName+") DETACH DELETE n");
         }
+
         dropIndexes();
         userInput.close();
         log.info("ReferencesLoader step was completed");
     }
     private static void createReferenceNodes(Path p){
-        String pathToReferenceCsv;
-        pathToReferenceCsv = p.toString().replace("\\", "/")
-                                         .replace(" ", "%20");
+        String pathToReferenceCsv = p.toUri().toString();
+
         connector.executeImplicit(
-                "LOAD CSV WITH HEADERS FROM \"file:///" + pathToReferenceCsv + "\"\n" +
+                "LOAD CSV WITH HEADERS FROM \"" + pathToReferenceCsv + "\"\n" +
                         "AS row FIELDTERMINATOR ';' WITH row WHERE row.MAIN_OBJ_NAME_SRC IS NOT NULL AND row.MAIN_OBJ_NAME_DST IS NOT NULL\n" +
                         "CALL { WITH row \n"+
                         "CREATE (n:"+labelName+")\n" +

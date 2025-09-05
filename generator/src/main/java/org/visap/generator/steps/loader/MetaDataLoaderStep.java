@@ -11,11 +11,8 @@ import org.visap.generator.database.DatabaseConnector;
 
 public class MetaDataLoaderStep {
 
-    private static final DatabaseConnector connector =
-        DatabaseConnector.getInstance(Config.setup.boltAddress());
-    private static final Log log = LogFactory.getLog(
-        ReferencesLoaderStep.class
-    );
+    private static final DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
+    private static final Log log = LogFactory.getLog(ReferencesLoaderStep.class);
     private static final String folderName = "MetaData";
     private static final String fileSuffix = "Meta.csv";
 
@@ -23,10 +20,7 @@ public class MetaDataLoaderStep {
         boolean isSilentMode = Config.setup.silentMode();
         Scanner userInput = new Scanner(System.in);
 
-        List<Path> files = new CsvFilesInputFilter(
-            folderName,
-            fileSuffix
-        ).getFiles();
+        List<Path> files = new CsvFilesInputFilter(folderName, fileSuffix).getFiles();
         if (files.isEmpty()) {
             userInput.close();
             throw new InvocationTargetException(
@@ -81,13 +75,10 @@ public class MetaDataLoaderStep {
     }
 
     private static void createMetaDataNodes(Path p) {
-        String pathToMetasCsv = p.toString().replace("\\", "/");
-        pathToMetasCsv = pathToMetasCsv.replace(" ", "%20");
+        String pathToMetasCsv = p.toUri().toString();
 
         connector.executeImplicit(
-            "LOAD CSV WITH HEADERS FROM \"file:///" +
-            pathToMetasCsv +
-            "\"\n" +
+            "LOAD CSV WITH HEADERS FROM \"" + pathToMetasCsv + "\"\n" +
             "AS row FIELDTERMINATOR ';' WITH row WHERE row.MAIN_OBJ_NAME IS NOT NULL\n" +
             "CALL { WITH row \n" +
             "CREATE (n:Meta)\n" +

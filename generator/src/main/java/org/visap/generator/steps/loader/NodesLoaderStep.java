@@ -27,7 +27,6 @@ public class NodesLoaderStep {
             entry("ElementCombinedKey","combinedKey")
     );
     public static void main(String[] args) {
-
         boolean isSilentMode = Config.setup.silentMode();
         Scanner userInput = new Scanner(System.in);
 
@@ -51,13 +50,16 @@ public class NodesLoaderStep {
             log.info("Path to Meta CSV: "+p);
             log.info("creating Elements Nodes...");
             createNodes(p);
+
             // add attributes to all nodes
             log.info("update Nodes Attributes...");
             createNameAndTypeAttributes();
             log.info("1. Object_name and type attribute created...");
+
             //add type_name attribute
             addTypeNameAttributes();
             log.info("2. type_name attribute created...");
+
             //add local_class attribute
             createLocalClassAttribute();
             log.info("3. local_class attribute created...");
@@ -120,23 +122,25 @@ public class NodesLoaderStep {
     }
 
     private static void createNodes(Path p) {
-        String pathToNodesCsv;
-        pathToNodesCsv = p.toString().replace("\\", "/");
-        pathToNodesCsv = pathToNodesCsv.replace(" ", "%20");
-
+        String pathToNodesCsv = p.toUri().toString();
 
         connector.executeImplicit(
-                "LOAD CSV WITH HEADERS FROM \"file:///" + pathToNodesCsv + "\"\n" +
+                "LOAD CSV WITH HEADERS FROM \"" + pathToNodesCsv + "\"\n" +
                         "AS row FIELDTERMINATOR ';' WITH row WHERE row.MAIN_OBJ_NAME IS NOT NULL\n"+
                         "CALL { WITH row \n" +
                         "CREATE (n:Elements)\n" +
-                        "SET n = row, n.combinedKey = row.MAIN_OBJ_NAME + row.MAIN_OBJ_TYPE + COALESCE(row.SUB_OBJ_NAME, 'NONE') + COALESCE(row.SUB_OBJ_TYPE, 'NONE') + COALESCE(row.SUB_SUB_OBJ_NAME, 'NONE')  + COALESCE(row.SUB_SUB_OBJ_TYPE, 'NONE') } IN TRANSACTIONS OF 10000 ROWS");
+                        "SET n = row, n.combinedKey = row.MAIN_OBJ_NAME + row.MAIN_OBJ_TYPE" +
+                        " + COALESCE(row.SUB_OBJ_NAME, 'NONE')" +
+                        " + COALESCE(row.SUB_OBJ_TYPE, 'NONE')" +
+                        " + COALESCE(row.SUB_SUB_OBJ_NAME, 'NONE')" +
+                        " + COALESCE(row.SUB_SUB_OBJ_TYPE, 'NONE') } IN TRANSACTIONS OF 10000 ROWS");
     }
 
     private static void createLocalClassAttribute() { //in LoaderStep ...
         connector.executeWrite(
                 "MATCH (n:Elements)\n" +
-                        "WHERE ( n.SUB_OBJ_TYPE = 'CLAS' OR n.SUB_OBJ_TYPE = 'INTF' ) AND n.SUB_SUB_OBJ_NAME IS NULL\n" +
+                        "WHERE ( n.SUB_OBJ_TYPE = 'CLAS' OR n.SUB_OBJ_TYPE = 'INTF' )" +
+                        " AND n.SUB_SUB_OBJ_NAME IS NULL\n" +
                         "SET n.local_class = 'true'"
         );
     }

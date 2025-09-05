@@ -17,7 +17,6 @@ public class MetricsLoaderStep {
     private static final String[] Metrics = {"number_of_statements","number_of_object_references","number_of_exec_statements","maximum_nesting_depth","cyclomatic_complexity","keyword_named_variables","number_of_comments","halstead_difficulty","halstead_volume","halstead_effort","number_of_methods","number_of_interfaces","number_of_attributes","number_of_events","number_of_redefined_methods","number_of_protected_methods","number_of_public_methods","number_of_private_attributes","number_of_protected_attributes","number_of_public_attributes","amount_of_slin_findings"};
     private static final String labelName = "Metrics";
     public static void main(String[] args) throws Exception {
-
         boolean isSilentMode = Config.setup.silentMode();
         Scanner userInput = new Scanner(System.in);
 
@@ -36,8 +35,10 @@ public class MetricsLoaderStep {
             log.info("Path to Metrics CSV: "+p);
             log.info("creating Metrics nodes...");
             createMetaNodes(p);
+
             log.info("Adding properties...");
             setAttributes();
+
             log.info("delete unnecessary Metrics nodes...");
             connector.executeWrite("MATCH (n:"+labelName+") DETACH DELETE n");
         }
@@ -46,10 +47,10 @@ public class MetricsLoaderStep {
     }
 
     private static void createMetaNodes(Path p) {
-        String pathToMetricsCsv = p.toString().replace("\\", "/");
-        pathToMetricsCsv = pathToMetricsCsv.replace(" ", "%20");
+        String pathToMetricsCsv = p.toUri().toString();
+
         connector.executeImplicit(
-                "LOAD CSV WITH HEADERS FROM \"file:///" + pathToMetricsCsv + "\"\n" +
+                "LOAD CSV WITH HEADERS FROM \"" + pathToMetricsCsv + "\"\n" +
                         "AS row FIELDTERMINATOR ';' WITH row WHERE row.MAIN_OBJ_NAME IS NOT NULL\n" +
                         "CALL { WITH row \n"+
                         "CREATE (n:"+labelName+")\n" +
