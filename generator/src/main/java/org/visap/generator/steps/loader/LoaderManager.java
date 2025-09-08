@@ -13,7 +13,8 @@ public class LoaderManager {
         NodesLoaderStep.class,
         ReferencesLoaderStep.class,
         MetaDataLoaderStep.class,
-        MetricsLoaderStep.class
+        MetricsLoaderStep.class,
+        ProcStepLoaderStep.class
     };
 
     public static void main(String[] args) {

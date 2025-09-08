@@ -12,7 +12,7 @@ import org.visap.generator.database.DatabaseConnector;
 public class MetaDataLoaderStep {
 
     private static final DatabaseConnector connector = DatabaseConnector.getInstance(Config.setup.boltAddress());
-    private static final Log log = LogFactory.getLog(ReferencesLoaderStep.class);
+    private static final Log log = LogFactory.getLog(MetaDataLoaderStep.class);
     private static final String folderName = "MetaData";
     private static final String fileSuffix = "Meta.csv";
 
