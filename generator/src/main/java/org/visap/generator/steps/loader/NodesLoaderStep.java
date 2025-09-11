@@ -47,7 +47,7 @@ public class NodesLoaderStep {
         }
 
         for (Path p : files) {
-            log.info("Path to Meta CSV: "+p);
+            log.info("Path to Nodes CSV: "+p);
             log.info("creating Elements Nodes...");
             createNodes(p);
 
