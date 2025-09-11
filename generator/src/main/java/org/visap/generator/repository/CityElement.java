@@ -39,6 +39,7 @@ public class CityElement {
         Building,
         Road,
         Reference,
+        Railroad
     }
 
     public enum CitySubType {
