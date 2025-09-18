@@ -9,21 +9,24 @@ import org.aeonbits.owner.Config;
         Sources.CONFIG_PATH + "metropolis/Railroad.properties",
 })
 public interface Railroad extends Config{
-    @DefaultValue("10.0")
+    // x - up/down in the (2D) room
+    @DefaultValue("0.5")
     double railroadXPosition();
 
-    @DefaultValue("10.0")
+    // y - height in the room (3D)
+    @DefaultValue("0.1")
     double railroadYPosition();
 
-    @DefaultValue("10.0")
+    // z - left/right in the (2D) room
+    @DefaultValue("27.5")
     double railroadZPosition();
 
-    @DefaultValue("1.0")
+    @DefaultValue("0.2")
     double railroadHeight();
 
-    @DefaultValue("5.0")
+    @DefaultValue("2.0")
     double railroadWidth();
 
-    @DefaultValue("100.0")
+    @DefaultValue("52.0")
     double railroadLength();
 }
