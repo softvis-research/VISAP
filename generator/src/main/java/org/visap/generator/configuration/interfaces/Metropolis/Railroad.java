@@ -2,7 +2,6 @@ package org.visap.generator.configuration.interfaces.Metropolis;
 
 import org.visap.generator.configuration.Sources;
 import org.aeonbits.owner.Config;
-import org.visap.generator.repository.CityElement;
 
 @Config.LoadPolicy(Config.LoadType.MERGE)
 @Config.Sources({
@@ -19,16 +18,12 @@ public interface Railroad extends Config{
     @DefaultValue("10.0")
     double railroadZPosition();
 
-    @DefaultValue("10.0")
+    @DefaultValue("1.0")
     double railroadHeight();
 
-    @DefaultValue("10.0")
+    @DefaultValue("5.0")
     double railroadWidth();
 
-    @DefaultValue("10.0")
+    @DefaultValue("100.0")
     double railroadLength();
-
-    @DefaultValue("Box")
-    CityElement.CityShape shape();
-
 }
