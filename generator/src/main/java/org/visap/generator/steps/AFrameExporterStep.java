@@ -71,7 +71,8 @@ public class AFrameExporterStep {
         }
 
         if (Config.features.railroad()) {
-            // possible location for the railroad
+            RailroadCreator railroadCreator = new RailroadCreator(cityRepository, nodeRepository);
+            railroadCreator.createRailroad();
         }
 
         if (!isSilentMode) {
