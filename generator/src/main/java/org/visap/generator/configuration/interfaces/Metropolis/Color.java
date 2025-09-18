@@ -61,6 +61,9 @@ public interface Color extends Config {
      @DefaultValue("#000000")
      String road();
 
+    @DefaultValue("#000000")
+    String railroad();
+
      // DDIC
      @DefaultValue("#229954")
      String ddicDistrict();
