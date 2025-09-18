@@ -49,4 +49,7 @@ public interface Shape extends Config {
 
     @DefaultValue("Box")
     CityElement.CityShape road();
+
+    @DefaultValue("Box")
+    CityElement.CityShape railroad();
 }
