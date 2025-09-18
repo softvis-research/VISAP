@@ -34,6 +34,8 @@ public class MetropolisDesigner {
         designMetropolisElementsByType(CityElement.CityType.Building);
 
         designMetropolisElementsByType(CityElement.CityType.Road);
+
+        designMetropolisElementsByType(CityElement.CityType.Railroad);
     }
 
     private void designMetropolisElementsByType(CityElement.CityType cityType) {
@@ -55,6 +57,9 @@ public class MetropolisDesigner {
                     break;
                 case Road:
                     designRoad(cityElement);
+                    break;
+                case Railroad:
+                    designRailRoad(cityElement);
                     break;
                 default:
                     designBuilding(cityElement);
@@ -219,5 +224,13 @@ public class MetropolisDesigner {
     private void designRoad(CityElement road) {
         road.setColor(Config.Visualization.Metropolis.color.road());
         road.setShape(Config.Visualization.Metropolis.shape.road());
+    }
+
+    private void designRailRoad(CityElement railroad) {
+        railroad.setShape(Config.Visualization.Metropolis.railroad.shape());
+        railroad.setColor("#FFFFFF");
+        railroad.setHeight(Config.Visualization.Metropolis.railroad.railroadHeight());
+        railroad.setWidth(Config.Visualization.Metropolis.railroad.railroadWidth());
+        railroad.setLength(Config.Visualization.Metropolis.railroad.railroadLength());
     }
 }
