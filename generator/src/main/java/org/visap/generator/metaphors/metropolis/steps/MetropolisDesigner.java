@@ -229,8 +229,5 @@ public class MetropolisDesigner {
     private void designRailRoad(CityElement railroad) {
         railroad.setShape(Config.Visualization.Metropolis.shape.railroad());
         railroad.setColor(Config.Visualization.Metropolis.color.railroad());
-        railroad.setHeight(Config.Visualization.Metropolis.railroad.railroadHeight());
-        railroad.setWidth(Config.Visualization.Metropolis.railroad.railroadWidth());
-        railroad.setLength(Config.Visualization.Metropolis.railroad.railroadLength());
     }
 }
