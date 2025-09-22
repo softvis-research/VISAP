@@ -10,7 +10,7 @@ import org.aeonbits.owner.Config;
 })
 public interface Railroad extends Config{
     // x - up/down in the (2D) room
-    @DefaultValue("-10.0")
+    @DefaultValue("0.5")
     double railroadXPosition();
 
     // y - height in the room (3D)
@@ -18,15 +18,18 @@ public interface Railroad extends Config{
     double railroadYPosition();
 
     // z - left/right in the (2D) room
-    @DefaultValue("-10.0")
+    @DefaultValue("0.5")
     double railroadZPosition();
 
     @DefaultValue("0.2")
     double railroadHeight();
 
-    @DefaultValue("2.0")
+    @DefaultValue("1.0")
     double railroadWidth();
 
     @DefaultValue("20.0")
     double railroadLength();
+
+    @DefaultValue("2.0")
+    double railroadLaneGap();
 }
