@@ -24,7 +24,7 @@ public interface Railroad extends Config{
     @DefaultValue("0.2")
     double railroadHeight();
 
-    @DefaultValue("1.0")
+    @DefaultValue("0.5")
     double railroadWidth();
 
     @DefaultValue("20.0")
@@ -32,4 +32,25 @@ public interface Railroad extends Config{
 
     @DefaultValue("2.0")
     double railroadLaneGap();
+
+    @DefaultValue("1.0")
+    double sleeperGap();
+
+    @DefaultValue("-1.75")
+    double sleeperXPosition();
+
+    @DefaultValue("0.1")
+    double sleeperYPosition();
+
+    @DefaultValue("0.0")
+    double sleeperZPosition();
+
+    @DefaultValue("0.1")
+    double sleeperHeight();
+
+    @DefaultValue("3.5")
+    double sleeperWidth();
+
+    @DefaultValue("0.5")
+    double sleeperLength();
 }
