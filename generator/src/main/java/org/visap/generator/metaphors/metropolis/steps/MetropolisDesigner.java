@@ -227,7 +227,21 @@ public class MetropolisDesigner {
     }
 
     private void designRailRoad(CityElement railroad) {
-        railroad.setShape(Config.Visualization.Metropolis.shape.railroad());
-        railroad.setColor(Config.Visualization.Metropolis.color.railroad());
+        switch (railroad.getSubType()){
+            case RailroadLane:
+                railroad.setShape(Config.Visualization.Metropolis.shape.railroad());
+                railroad.setColor(Config.Visualization.Metropolis.color.railroadLane());
+                break;
+            case RailroadSleeper:
+                railroad.setShape(Config.Visualization.Metropolis.shape.railroad());
+                railroad.setColor(Config.Visualization.Metropolis.color.railroadSleeper());
+                break;
+            case RailroadStation:
+                railroad.setShape(Config.Visualization.Metropolis.shape.railroad());
+                break;
+            default:
+                railroad.setShape(Config.Visualization.Metropolis.shape.railroad());
+                break;
+        }
     }
 }
