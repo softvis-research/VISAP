@@ -56,7 +56,8 @@ public class CityElement {
 
         // subTypes for railroad
         RailroadStation,
-        RailroadLane
+        RailroadLane,
+        RailroadSleeper,
     }
 
     public enum CityShape {
