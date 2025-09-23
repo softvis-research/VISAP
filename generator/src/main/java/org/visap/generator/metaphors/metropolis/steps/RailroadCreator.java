@@ -13,63 +13,77 @@ public class RailroadCreator {
     private Log log = LogFactory.getLog(this.getClass());
     private CityRepository cityRepository;
     private SourceNodeRepository nodeRepository;
-    private CityElement railroad;
+    private CityElement railroadLaneTop;
+    private CityElement railroadLaneBottom;
 
     public RailroadCreator(CityRepository cityRepository, SourceNodeRepository nodeRepository) {
         this.cityRepository = cityRepository;
         this.nodeRepository = nodeRepository;
 
-        //creating a new element railroad
-        this.railroad = new CityElement(CityElement.CityType.Railroad);
+        this.railroadLaneTop = new CityElement(CityElement.CityType.Railroad);
+        this.railroadLaneBottom = new CityElement(CityElement.CityType.Railroad);
 
         log.info("created...");
     }
 
     public void createRailroad(){
-        //assigning a subType to railroad
-        railroad.setSubType(CityElement.CitySubType.RailroadLane);
+        //assigning a subType
+        railroadLaneTop.setSubType(CityElement.CitySubType.RailroadLane);
+        railroadLaneBottom.setSubType(CityElement.CitySubType.RailroadLane);
 
-        Collection<CityElement> namespaceDistricts = cityRepository.getNamespaceDistrictsOfOriginSet();
-        calculateRailroadPosition(namespaceDistricts);
+        calculateRailroadPosition(cityRepository.getNamespaceDistrictsOfOriginSet());
 
+        cityRepository.addElement(railroadLaneTop);
+        cityRepository.addElement(railroadLaneBottom);
 
+        //Schwellen - railroad sleeper
+        createRailroadSleeper();
 
-        //adding the element to the CityRepository
-        cityRepository.addElement(railroad);
-
-        log.info("Railroad element created and added to the CityRepository ");
+        log.info("Railroad elements created and added to the CityRepository ");
     }
 
     public void calculateRailroadPosition(Collection<CityElement> districts){
-        double namespaceDistrictXPosition = 0.0;
+        for (CityElement district : districts) {
+            //Z-position and length as in the namespace district
+            railroadLaneTop.setZPosition(district.getZPosition());
+            railroadLaneTop.setLength(district.getLength());
+            railroadLaneBottom.setZPosition(district.getZPosition());
+            railroadLaneBottom.setLength(district.getLength());
 
-        if (districts.size() > 0) {
-            for (CityElement district : districts) {
-                namespaceDistrictXPosition = district.getXPosition();
+            //Y-position and height as in the namespace district
+            railroadLaneTop.setHeight(district.getHeight());
+            railroadLaneTop.setYPosition(railroadLaneTop.getHeight()/2);
+            railroadLaneBottom.setHeight(district.getHeight());
+            railroadLaneBottom.setYPosition(railroadLaneBottom.getHeight()/2);
 
-                //Z-position and length as in the namespace district
-                railroad.setZPosition(district.getZPosition());
-                railroad.setLength(district.getLength());
-
-                //Y-position and height as in the namespace district
-                railroad.setHeight(district.getHeight());
-                railroad.setYPosition(railroad.getHeight()/2);
-
-                //  X-Position berechnen - ausgehend von der X-Position des namespace Distriktes
-                //railroad.setXPosition();
-                railroad.setWidth(Config.Visualization.Metropolis.railroad.railroadWidth());
+            //X-Position and width
+            railroadLaneTop.setWidth(Config.Visualization.Metropolis.railroad.railroadWidth());
+            railroadLaneTop.setXPosition(district.getXPosition() - district.getWidth()/2 - railroadLaneTop.getWidth()/2 - Config.Visualization.Metropolis.railroad.railroadLaneGap());
+            railroadLaneBottom.setWidth(Config.Visualization.Metropolis.railroad.railroadWidth());
+            railroadLaneBottom.setXPosition(railroadLaneTop.getXPosition() - railroadLaneBottom.getWidth()/2 - Config.Visualization.Metropolis.railroad.railroadLaneGap());
             }
-        } else {
-            log.info("Position of the Railroad can not be calculated because there is no namespace district!");
-            log.info("--> default position");
-            //positioning of the railroad
-            railroad.setXPosition(Config.Visualization.Metropolis.railroad.railroadXPosition());
-            railroad.setYPosition(Config.Visualization.Metropolis.railroad.railroadYPosition());
-            railroad.setZPosition(Config.Visualization.Metropolis.railroad.railroadZPosition());
-            railroad.setLength(Config.Visualization.Metropolis.railroad.railroadLength());
-            railroad.setHeight(Config.Visualization.Metropolis.railroad.railroadHeight());
-            railroad.setWidth(Config.Visualization.Metropolis.railroad.railroadWidth());
-            return;
+    }
+    public void createRailroadSleeper( ){
+        final double leftBorder = railroadLaneTop.getZPosition() - railroadLaneTop.getLength()/2;
+        final double rightBorder = railroadLaneTop.getZPosition() + railroadLaneTop.getLength()/2;
+        double ZPosition = leftBorder + Config.Visualization.Metropolis.railroad.sleeperGap();
+
+        while (ZPosition < rightBorder){
+            CityElement sleeper = new CityElement(CityElement.CityType.Railroad);
+            sleeper.setSubType(CityElement.CitySubType.RailroadSleeper);
+
+            sleeper.setYPosition(railroadLaneTop.getYPosition()/2);
+            sleeper.setHeight(Config.Visualization.Metropolis.railroad.sleeperHeight());
+
+            sleeper.setXPosition(railroadLaneTop.getXPosition()/2 + railroadLaneBottom.getXPosition()/2);
+            sleeper.setWidth(Config.Visualization.Metropolis.railroad.sleeperWidth());
+
+            sleeper.setZPosition(ZPosition);
+            sleeper.setLength(Config.Visualization.Metropolis.railroad.sleeperLength());
+
+            cityRepository.addElement(sleeper);
+
+            ZPosition = ZPosition + sleeper.getLength() + Config.Visualization.Metropolis.railroad.sleeperGap();
         }
     }
 }
