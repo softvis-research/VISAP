@@ -238,9 +238,10 @@ public class MetropolisDesigner {
                 break;
             case RailroadStation:
                 railroad.setShape(Config.Visualization.Metropolis.shape.railroad());
+                railroad.setColor(Config.Visualization.Metropolis.color.railroadStation());
                 break;
             default:
-                railroad.setShape(Config.Visualization.Metropolis.shape.railroad());
+                log.info("There is no suitable railroad subtype for " + railroad.getSubType() + "!");
                 break;
         }
     }
