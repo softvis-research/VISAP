@@ -11,7 +11,7 @@ import org.visap.generator.repository.SourceNodeRepository;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class RailroadCreator {
+public class RailroadBuilder {
     private Log log = LogFactory.getLog(this.getClass());
     private CityRepository cityRepository;
     private SourceNodeRepository nodeRepository;
@@ -19,32 +19,24 @@ public class RailroadCreator {
     private CityElement railroadLaneTop;
     private CityElement railroadLaneBottom;
 
-    public RailroadCreator(CityRepository cityRepository, SourceNodeRepository nodeRepository) {
+    public RailroadBuilder(CityRepository cityRepository, SourceNodeRepository nodeRepository) {
         this.cityRepository = cityRepository;
         this.nodeRepository = nodeRepository;
 
         this.railroadLaneTop = new CityElement(CityElement.CityType.Railroad);
         this.railroadLaneBottom = new CityElement(CityElement.CityType.Railroad);
 
-        log.info("created...");
+        log.info("start railroad builder...");
     }
 
     public void createRailroad(){
         setOriginNamespaceDistrict();
 
-        //assigning a subType
-        railroadLaneTop.setSubType(CityElement.CitySubType.RailroadLane);
-        railroadLaneBottom.setSubType(CityElement.CitySubType.RailroadLane);
+        buildRailroadLane();
 
-        calculateRailroadLanePosition();
+        buildRailroadSleeper();
 
-        cityRepository.addElement(railroadLaneTop);
-        cityRepository.addElement(railroadLaneBottom);
-
-        //Schwellen - railroad sleeper
-        createRailroadSleeper();
-
-        createRailroadStations();
+        buildRailroadStations();
 
         log.info("Railroad elements created and added to the CityRepository ");
     }
@@ -56,7 +48,18 @@ public class RailroadCreator {
         }
     }
 
-    private void calculateRailroadLanePosition(){
+    private void buildRailroadLane(){
+        //subType is necessary because there is no corresponding SAPNode
+        railroadLaneTop.setSubType(CityElement.CitySubType.RailroadLane);
+        railroadLaneBottom.setSubType(CityElement.CitySubType.RailroadLane);
+
+        setRailroadLanePosition();
+
+        cityRepository.addElement(railroadLaneTop);
+        cityRepository.addElement(railroadLaneBottom);
+    }
+
+    private void setRailroadLanePosition(){
         //Z-position and length as in the namespace district
         railroadLaneTop.setZPosition(namespaceDistrictOfOriginSet.getZPosition());
         railroadLaneTop.setLength(namespaceDistrictOfOriginSet.getLength());
@@ -64,18 +67,19 @@ public class RailroadCreator {
         railroadLaneBottom.setLength(namespaceDistrictOfOriginSet.getLength());
 
         //Y-position and height as in the namespace district
+        railroadLaneTop.setYPosition(namespaceDistrictOfOriginSet.getYPosition());
         railroadLaneTop.setHeight(namespaceDistrictOfOriginSet.getHeight());
-        railroadLaneTop.setYPosition(railroadLaneTop.getHeight()/2);
+        railroadLaneBottom.setYPosition(namespaceDistrictOfOriginSet.getYPosition());
         railroadLaneBottom.setHeight(namespaceDistrictOfOriginSet.getHeight());
-        railroadLaneBottom.setYPosition(railroadLaneBottom.getHeight()/2);
 
         //X-Position and width
-        railroadLaneTop.setWidth(Config.Visualization.Metropolis.railroad.railroadWidth());
         railroadLaneTop.setXPosition(namespaceDistrictOfOriginSet.getXPosition() - namespaceDistrictOfOriginSet.getWidth()/2 - railroadLaneTop.getWidth()/2 - Config.Visualization.Metropolis.railroad.railroadLaneGap());
-        railroadLaneBottom.setWidth(Config.Visualization.Metropolis.railroad.railroadWidth());
+        railroadLaneTop.setWidth(Config.Visualization.Metropolis.railroad.railroadWidth());
         railroadLaneBottom.setXPosition(railroadLaneTop.getXPosition() - railroadLaneBottom.getWidth()/2 - Config.Visualization.Metropolis.railroad.railroadLaneGap());
+        railroadLaneBottom.setWidth(Config.Visualization.Metropolis.railroad.railroadWidth());
     }
-    private void createRailroadSleeper(){
+
+    private void buildRailroadSleeper(){
         final double leftBorder = railroadLaneTop.getZPosition() - railroadLaneTop.getLength()/2;
         final double rightBorder = railroadLaneTop.getZPosition() + railroadLaneTop.getLength()/2;
         double zPosition = leftBorder + Config.Visualization.Metropolis.railroad.sleeperGap();
@@ -85,9 +89,11 @@ public class RailroadCreator {
             sleeper.setSubType(CityElement.CitySubType.RailroadSleeper);
 
             sleeper.setYPosition(railroadLaneTop.getYPosition()/2);
-            sleeper.setHeight(Config.Visualization.Metropolis.railroad.sleeperHeight());
+            sleeper.setHeight(railroadLaneTop.getHeight()/2);
 
             sleeper.setXPosition(railroadLaneTop.getXPosition()/2 + railroadLaneBottom.getXPosition()/2);
+            double sleeperWidth = (railroadLaneTop.getXPosition() + railroadLaneTop.getWidth()/2) - (railroadLaneBottom.getXPosition() + railroadLaneBottom.getWidth()/2);
+
             sleeper.setWidth(Config.Visualization.Metropolis.railroad.sleeperWidth());
 
             sleeper.setZPosition(zPosition);
@@ -99,9 +105,9 @@ public class RailroadCreator {
         }
     }
 
-    private void createRailroadStations(){
+    private void buildRailroadStations(){
         ArrayList<CityElement> procStepCityElements = new ArrayList<>();
-        //--> Rücksprache halten für den Einstieg; Grund: Reports erhalten Gebäude und Distrikt aus dem Grund würden dann zwei Stationen erstellt werden
+        // TODO --> Rücksprache halten für den Einstieg; Grund: Reports erhalten Gebäude und Distrikt aus dem Grund würden dann zwei Stationen erstellt werden
         //      --> wenn man die Einstiege genau setzt, also auf Methode oder Reports etc. könnte man direkt Building nehmen und würde der Dopplung aus dem Weg gehen
 
         for (CityElement cityElement : cityRepository.getElementsByType(CityElement.CityType.District)) {
@@ -137,7 +143,7 @@ public class RailroadCreator {
 
             cityRepository.addElement(railroadStation);
 
-            //Positionsprüfung
+            // TODO Positionsprüfung
         }
     }
 }
