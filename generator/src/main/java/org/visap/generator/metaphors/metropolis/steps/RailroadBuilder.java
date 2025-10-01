@@ -74,15 +74,15 @@ public class RailroadBuilder {
 
         //X-Position and width
         railroadLaneTop.setXPosition(namespaceDistrictOfOriginSet.getXPosition() - namespaceDistrictOfOriginSet.getWidth()/2 - railroadLaneTop.getWidth()/2 - Config.Visualization.Metropolis.railroad.railroadLaneGap());
-        railroadLaneTop.setWidth(Config.Visualization.Metropolis.railroad.railroadWidth());
+        railroadLaneTop.setWidth(Config.Visualization.Metropolis.railroad.railroadLaneWidth());
         railroadLaneBottom.setXPosition(railroadLaneTop.getXPosition() - railroadLaneBottom.getWidth()/2 - Config.Visualization.Metropolis.railroad.railroadLaneGap());
-        railroadLaneBottom.setWidth(Config.Visualization.Metropolis.railroad.railroadWidth());
+        railroadLaneBottom.setWidth(Config.Visualization.Metropolis.railroad.railroadLaneWidth());
     }
 
     private void buildRailroadSleeper(){
         final double leftBorder = railroadLaneTop.getZPosition() - railroadLaneTop.getLength()/2;
         final double rightBorder = railroadLaneTop.getZPosition() + railroadLaneTop.getLength()/2;
-        double zPosition = leftBorder + Config.Visualization.Metropolis.railroad.sleeperGap();
+        double zPosition = leftBorder + Config.Visualization.Metropolis.railroad.railroadSleeperGap();
 
         while (zPosition < rightBorder){
             CityElement sleeper = new CityElement(CityElement.CityType.Railroad);
@@ -92,32 +92,22 @@ public class RailroadBuilder {
             sleeper.setHeight(railroadLaneTop.getHeight()/2);
 
             sleeper.setXPosition(railroadLaneTop.getXPosition()/2 + railroadLaneBottom.getXPosition()/2);
-            double sleeperWidth = (railroadLaneTop.getXPosition() + railroadLaneTop.getWidth()/2) - (railroadLaneBottom.getXPosition() + railroadLaneBottom.getWidth()/2);
-
-            sleeper.setWidth(Config.Visualization.Metropolis.railroad.sleeperWidth());
+            double laneDistance = Math.abs(railroadLaneTop.getXPosition() + railroadLaneTop.getWidth()/2 + railroadLaneBottom.getXPosition() + railroadLaneBottom.getWidth()/2);
+            sleeper.setWidth(laneDistance + Config.Visualization.Metropolis.railroad.railroadSleeperOverhang());
 
             sleeper.setZPosition(zPosition);
-            sleeper.setLength(Config.Visualization.Metropolis.railroad.sleeperLength());
+            sleeper.setLength(Config.Visualization.Metropolis.railroad.railroadSleeperLength());
 
             cityRepository.addElement(sleeper);
 
-            zPosition = zPosition + sleeper.getLength() + Config.Visualization.Metropolis.railroad.sleeperGap();
+            zPosition = zPosition + sleeper.getLength() + Config.Visualization.Metropolis.railroad.railroadSleeperGap();
         }
     }
 
     private void buildRailroadStations(){
         ArrayList<CityElement> procStepCityElements = new ArrayList<>();
-        // TODO --> Rücksprache halten für den Einstieg; Grund: Reports erhalten Gebäude und Distrikt aus dem Grund würden dann zwei Stationen erstellt werden
+        //  --> Rücksprache halten für den Einstieg; Grund: Reports erhalten Gebäude und Distrikt aus dem Grund würden dann zwei Stationen erstellt werden
         //      --> wenn man die Einstiege genau setzt, also auf Methode oder Reports etc. könnte man direkt Building nehmen und würde der Dopplung aus dem Weg gehen
-
-        for (CityElement cityElement : cityRepository.getElementsByType(CityElement.CityType.District)) {
-            if (cityElement.getSourceNodeProperty(SAPNodeProperties.proc_step).equalsIgnoreCase("null")) {
-                continue;
-            }
-            procStepCityElements.add(cityElement);
-        }
-
-        log.info("procStepCityElements - districts: " + procStepCityElements.size());
 
         for (CityElement cityElement : cityRepository.getElementsByType(CityElement.CityType.Building)) {
             if (cityElement.getSourceNodeProperty(SAPNodeProperties.proc_step).equalsIgnoreCase("null")) {
@@ -126,24 +116,24 @@ public class RailroadBuilder {
             procStepCityElements.add(cityElement);
         }
 
-        log.info("procStepCityElements - districts und buildings: " + procStepCityElements.size());
-
         for (CityElement procStepCityElement : procStepCityElements){
             CityElement railroadStation = new CityElement(CityElement.CityType.Railroad);
             railroadStation.setSubType(CityElement.CitySubType.RailroadStation);
 
-            railroadStation.setYPosition(Config.Visualization.Metropolis.railroad.stationYPosition());
-            railroadStation.setHeight(Config.Visualization.Metropolis.railroad.stationYPosition()*2);
+            railroadStation.setYPosition(Config.Visualization.Metropolis.railroad.railroadStationYPosition());
+            railroadStation.setHeight(Config.Visualization.Metropolis.railroad.railroadStationYPosition()*2);
 
-            railroadStation.setXPosition(railroadLaneTop.getXPosition() + railroadLaneTop.getWidth()/2 + Config.Visualization.Metropolis.railroad.stationWidth()/2);
-            railroadStation.setWidth(Config.Visualization.Metropolis.railroad.stationWidth());
+            railroadStation.setXPosition(railroadLaneTop.getXPosition() + railroadLaneTop.getWidth()/2 + Config.Visualization.Metropolis.railroad.railroadStationWidth()/2);
+            railroadStation.setWidth(Config.Visualization.Metropolis.railroad.railroadStationWidth());
 
             railroadStation.setZPosition(procStepCityElement.getZPosition());
-            railroadStation.setLength(Config.Visualization.Metropolis.railroad.stationLength());
+            railroadStation.setLength(Config.Visualization.Metropolis.railroad.railroadStationLength());
 
             cityRepository.addElement(railroadStation);
 
-            // TODO Positionsprüfung
+            //
         }
+
+        log.info(procStepCityElements.size() + " Stationen wurden gebaut");
     }
 }
