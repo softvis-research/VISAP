@@ -12,49 +12,51 @@ public interface Railroad extends Config{
     //properties for the lanes
     // x - up/down in the (2D) room
     @DefaultValue("0.5")
-    double railroadXPosition();
+    double railroadLaneXPosition();
     // y - height in the room (3D)
     @DefaultValue("0.1")
-    double railroadYPosition();
+    double railroadLaneYPosition();
     // z - left/right in the (2D) room
     @DefaultValue("0.5")
-    double railroadZPosition();
+    double railroadLaneZPosition();
     @DefaultValue("0.2")
-    double railroadHeight();
+    double railroadLaneHeight();
     @DefaultValue("0.5")
-    double railroadWidth();
+    double railroadLaneWidth();
     @DefaultValue("20.0")
-    double railroadLength();
+    double railroadLaneLength();
     @DefaultValue("2.0")
     double railroadLaneGap();
 
     //properties for the sleeper
     @DefaultValue("1.0")
-    double sleeperGap();
+    double railroadSleeperGap();
+    @DefaultValue("1.0")
+    double railroadSleeperOverhang();
     @DefaultValue("-1.75")
-    double sleeperXPosition();
+    double railroadSleeperXPosition();
     @DefaultValue("0.1")
-    double sleeperYPosition();
+    double railroadSleeperYPosition();
     @DefaultValue("0.0")
-    double sleeperZPosition();
+    double railroadSleeperZPosition();
     @DefaultValue("0.1")
-    double sleeperHeight();
+    double railroadSleeperHeight();
     @DefaultValue("3.5")
-    double sleeperWidth();
+    double railroadSleeperWidth();
     @DefaultValue("0.5")
-    double sleeperLength();
+    double railroadSleeperLength();
 
     //properties for the stations
     @DefaultValue("0.0")
-    double stationXPosition();
+    double railroadStationXPosition();
     @DefaultValue("0.5")
-    double stationYPosition();
+    double railroadStationYPosition();
     @DefaultValue("0.0")
-    double stationZPosition();
+    double railroadStationZPosition();
     @DefaultValue("1.0")
-    double stationHeight();
+    double railroadStationHeight();
     @DefaultValue("1.0")
-    double stationWidth();
+    double railroadStationWidth();
     @DefaultValue("1.0")
-    double stationLength();
+    double railroadStationLength();
 }
