@@ -53,10 +53,12 @@ public interface Railroad extends Config{
     double railroadStationYPosition();
     @DefaultValue("0.0")
     double railroadStationZPosition();
-    @DefaultValue("1.0")
+    @DefaultValue("1.5")
     double railroadStationHeight();
-    @DefaultValue("1.0")
+    @DefaultValue("1.5")
     double railroadStationWidth();
-    @DefaultValue("1.0")
+    @DefaultValue("1.5")
     double railroadStationLength();
+    @DefaultValue("1.0")
+    double railroadStationOffset();
 }
