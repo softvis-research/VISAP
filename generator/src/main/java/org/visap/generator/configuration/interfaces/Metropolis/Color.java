@@ -67,7 +67,7 @@ public interface Color extends Config {
     @DefaultValue("#808076")
     String railroadSleeper();
 
-    @DefaultValue("#000000")
+    @DefaultValue("#0000FF")
     String railroadStation();
 
     // DDIC
