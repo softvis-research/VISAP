@@ -63,9 +63,9 @@ public class RailroadBuilder {
     private void setRailroadLanePosition(){
         //Z-position and length as in the namespace district
         railroadLaneTop.setZPosition(namespaceDistrictOfOriginSet.getZPosition());
-        railroadLaneTop.setLength(namespaceDistrictOfOriginSet.getLength());
+        railroadLaneTop.setLength(namespaceDistrictOfOriginSet.getLength() * 1.2);
         railroadLaneBottom.setZPosition(namespaceDistrictOfOriginSet.getZPosition());
-        railroadLaneBottom.setLength(namespaceDistrictOfOriginSet.getLength());
+        railroadLaneBottom.setLength(namespaceDistrictOfOriginSet.getLength() * 1.2);
 
         //Y-position and height as in the namespace district
         railroadLaneTop.setYPosition(namespaceDistrictOfOriginSet.getYPosition());
