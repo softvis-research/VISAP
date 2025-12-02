@@ -106,6 +106,11 @@ controllers.model = (function () {
 					entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
 					break;
 
+                case "Railroad":
+                entity.calls = splitByCommaIfNotEmpty(element.calls);
+                entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
+                break;
+
 				case "Variable":
 					entity.accessedBy = splitByCommaIfNotEmpty(element.accessedBy);
 					entity.dependsOn = element.dependsOn;
