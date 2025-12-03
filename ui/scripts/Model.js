@@ -107,9 +107,9 @@ controllers.model = (function () {
 					break;
 
                 case "Railroad":
-                entity.calls = splitByCommaIfNotEmpty(element.calls);
-                entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
-                break;
+                    entity.calls = splitByCommaIfNotEmpty(element.calls);
+                    entity.calledBy = splitByCommaIfNotEmpty(element.calledBy);
+                    break;
 
 				case "Variable":
 					entity.accessedBy = splitByCommaIfNotEmpty(element.accessedBy);
@@ -250,6 +250,11 @@ controllers.model = (function () {
 					replaceIdsWithReferences(entity, 'calls');
 					replaceIdsWithReferences(entity, 'calledBy');
 					break;
+
+			    case "Railroad":
+                	replaceIdsWithReferences(entity, 'calls');
+                    replaceIdsWithReferences(entity, 'calledBy');
+                    break;
 
 				case "Report":
 					if (entity.belongsTo.type == "Namespace") {
