@@ -64,7 +64,17 @@ public class MetaDataExporter {
         boolean hasElements = false;
         for (final CityElement element : elements) {
 
-            if (element.getSourceNode() == null) {
+            //Special treatment for elements of the City subtype RailroadStation,
+            // because they do not have an associated SourceNode
+            if (element.getSubType() == CityElement.CitySubType.RailroadStation) {
+                if (!hasElements) {
+                    hasElements = true;
+                    metaDataFile.append("[{\n");
+                } else {
+                    metaDataFile.append("\n},{\n");
+                }
+                metaDataFile.append(element.getMetaData());
+            } else if (element.getSourceNode() == null ) {
                 continue;
             } else {
 
