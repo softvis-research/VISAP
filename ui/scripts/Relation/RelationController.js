@@ -56,6 +56,7 @@ controllers.relationController = function () {
 			"FunctionModule": "calls",
 			"Report": "calls",
 			"FormRoutine": "calls",
+			"Railroad": "calls",
 			"View": "uses",
 			"Struct": "uses",
 			"Domain": "uses",
