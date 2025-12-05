@@ -2,7 +2,9 @@ package org.visap.generator.metaphors.metropolis.steps;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.visap.generator.abap.AMetaDataMap;
 import org.visap.generator.abap.enums.SAPNodeProperties;
+import org.visap.generator.abap.enums.SAPRelationLabels;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.repository.CityElement;
 import org.visap.generator.repository.CityRepository;
@@ -63,9 +65,9 @@ public class RailroadBuilder {
     private void setRailroadLanePosition(){
         //Z-position and length as in the namespace district
         railroadLaneTop.setZPosition(namespaceDistrictOfOriginSet.getZPosition());
-        railroadLaneTop.setLength(namespaceDistrictOfOriginSet.getLength() * 1.2);
+        railroadLaneTop.setLength(namespaceDistrictOfOriginSet.getLength() * 1.1);
         railroadLaneBottom.setZPosition(namespaceDistrictOfOriginSet.getZPosition());
-        railroadLaneBottom.setLength(namespaceDistrictOfOriginSet.getLength() * 1.2);
+        railroadLaneBottom.setLength(namespaceDistrictOfOriginSet.getLength() * 1.1);
 
         //Y-position and height as in the namespace district
         railroadLaneTop.setYPosition(namespaceDistrictOfOriginSet.getYPosition());
@@ -122,6 +124,20 @@ public class RailroadBuilder {
         return checkStart <= placedEnd && placedStart <= checkEnd;
     }
 
+    private CityElement setMetaDataToRailroadStation(CityElement railroadStation, String callHash){
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("\"" + AMetaDataMap.getMetaDataProperty(SAPNodeProperties.element_id.name()).getName() + "\": \"" + railroadStation.getHash() + "\",\n");
+        builder.append("\"qualifiedName\": \"Station X\",\n");
+        builder.append("\"" + AMetaDataMap.getMetaDataProperty(SAPNodeProperties.object_name.name()).getName() + "\": \"Station X\",\n");
+        builder.append("\"" + AMetaDataMap.getMetaDataProperty(SAPNodeProperties.type_name.name()).getName() + "\": \"" + railroadStation.getType() +"\",\n");
+        builder.append("\"calls\": \"" + callHash + "\"");
+
+        railroadStation.setMetaData(builder.toString());
+
+        return railroadStation;
+    }
+
     private void buildRailroadStations(){
         log.info("Build the railroad stations.");
         ArrayList<CityElement> procStepCityElements = new ArrayList<>();
@@ -165,7 +181,7 @@ public class RailroadBuilder {
 
             log.info(positionConflictCounter + " position conflict(s) occurred at the station for process step " + procStepCityElement.getSourceNodeProperty(SAPNodeProperties.proc_step) + ".");
 
-            placedStations.add(railroadStation);
+            placedStations.add(setMetaDataToRailroadStation(railroadStation, procStepCityElement.getHash()));
             cityRepository.addElement(railroadStation);
         }
     }
