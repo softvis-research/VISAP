@@ -4,11 +4,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.visap.generator.abap.AMetaDataMap;
 import org.visap.generator.abap.enums.SAPNodeProperties;
-import org.visap.generator.abap.enums.SAPRelationLabels;
 import org.visap.generator.configuration.Config;
 import org.visap.generator.repository.CityElement;
 import org.visap.generator.repository.CityRepository;
-import org.visap.generator.repository.SourceNodeRepository;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,14 +14,12 @@ import java.util.Collection;
 public class RailroadBuilder {
     private Log log = LogFactory.getLog(this.getClass());
     private CityRepository cityRepository;
-    private SourceNodeRepository nodeRepository;
     private CityElement namespaceDistrictOfOriginSet;
     private CityElement railroadLaneTop;
     private CityElement railroadLaneBottom;
 
-    public RailroadBuilder(CityRepository cityRepository, SourceNodeRepository nodeRepository) {
+    public RailroadBuilder(CityRepository cityRepository) {
         this.cityRepository = cityRepository;
-        this.nodeRepository = nodeRepository;
 
         this.railroadLaneTop = new CityElement(CityElement.CityType.Railroad);
         this.railroadLaneBottom = new CityElement(CityElement.CityType.Railroad);
@@ -33,13 +29,9 @@ public class RailroadBuilder {
 
     public void createRailroad(){
         setOriginNamespaceDistrict();
-
         buildRailroadLane();
-
         buildRailroadSleeper();
-
         buildRailroadStations();
-
         log.info("Railroad builder completed.");
     }
 
@@ -115,31 +107,26 @@ public class RailroadBuilder {
         }
     }
 
-    private boolean stationOverlaps(double checkZ, double checkLength, double placedZ, double placedLength) {
-        double checkStart = checkZ - checkLength/2;
-        double checkEnd = checkZ + checkLength/2;
-        double placedStart = placedZ - placedLength/2;
-        double placedEnd = placedZ + placedLength/2;
-
-        return checkStart <= placedEnd && placedStart <= checkEnd;
-    }
-
-    private CityElement setMetaDataToRailroadStation(CityElement railroadStation, String callHash){
+    private CityElement setMetaDataToRailroadStation(CityElement railroadStation, int procStep, ArrayList<CityElement> procStepCityElements){
         StringBuilder builder = new StringBuilder();
 
+        CityElement procStepCityElement = procStepCityElements.stream()
+                .filter(cityElement -> cityElement.getSourceNodeProperty(SAPNodeProperties.proc_step)
+                        .equalsIgnoreCase(String.valueOf(procStep)))
+                .findFirst().orElse(null);
+
         builder.append("\"" + AMetaDataMap.getMetaDataProperty(SAPNodeProperties.element_id.name()).getName() + "\": \"" + railroadStation.getHash() + "\",\n");
-        builder.append("\"qualifiedName\": \"Station X\",\n");
-        builder.append("\"" + AMetaDataMap.getMetaDataProperty(SAPNodeProperties.object_name.name()).getName() + "\": \"Station X\",\n");
+        builder.append("\"qualifiedName\": \"Prozessschritt " + procStep + "\",\n");
+        builder.append("\"" + AMetaDataMap.getMetaDataProperty(SAPNodeProperties.object_name.name()).getName() + "\": \"Prozessschritt " + procStep + "\",\n");
         builder.append("\"" + AMetaDataMap.getMetaDataProperty(SAPNodeProperties.type_name.name()).getName() + "\": \"" + railroadStation.getType() +"\",\n");
-        builder.append("\"calls\": \"" + callHash + "\"");
+        builder.append("\"calls\": \"" + procStepCityElement.getHash() + "\"");
 
         railroadStation.setMetaData(builder.toString());
-
         return railroadStation;
     }
 
     private void buildRailroadStations(){
-        log.info("Build the railroad stations.");
+        log.info("Railroad stations are being built.");
         ArrayList<CityElement> procStepCityElements = new ArrayList<>();
         ArrayList<CityElement> placedStations = new ArrayList<>();
 
@@ -150,7 +137,11 @@ public class RailroadBuilder {
             procStepCityElements.add(cityElement);
         }
 
-        for (CityElement procStepCityElement : procStepCityElements){
+        final int numberOfStations = procStepCityElements.size();
+        final double startOfLane = railroadLaneTop.getZPosition() - railroadLaneTop.getLength()/2;
+        final double distance = railroadLaneTop.getLength() / (numberOfStations + 1);
+
+        for (int i = 1; i <= numberOfStations; i++) {
             CityElement railroadStation = new CityElement(CityElement.CityType.Railroad);
             railroadStation.setSubType(CityElement.CitySubType.RailroadStation);
 
@@ -160,29 +151,12 @@ public class RailroadBuilder {
             railroadStation.setWidth(Config.Visualization.Metropolis.railroad.railroadStationWidth());
             railroadStation.setXPosition(railroadLaneTop.getXPosition() + railroadLaneTop.getWidth()/2 + railroadStation.getWidth()/2);
 
-            //position check
-            double targetZPosition = procStepCityElement.getZPosition();
             railroadStation.setLength(Config.Visualization.Metropolis.railroad.railroadStationLength());
-            boolean positionConflict;
-            int positionConflictCounter = 0;
-            do {
-                positionConflict = false;
-                for (CityElement placedStation : placedStations) {
-                    if (stationOverlaps(targetZPosition, railroadStation.getLength(), placedStation.getZPosition(), placedStation.getLength())) {
-                        targetZPosition += Config.Visualization.Metropolis.railroad.railroadStationOffset();
-                        positionConflict = true;
-                        positionConflictCounter++;
-                        break; //recheck with shifted position
-                    }
-                }
-            } while (positionConflict);
+            railroadStation.setZPosition(startOfLane + (i * distance));
 
-            railroadStation.setZPosition(targetZPosition);
-
-            log.info(positionConflictCounter + " position conflict(s) occurred at the station for process step " + procStepCityElement.getSourceNodeProperty(SAPNodeProperties.proc_step) + ".");
-
-            placedStations.add(setMetaDataToRailroadStation(railroadStation, procStepCityElement.getHash()));
+            placedStations.add(setMetaDataToRailroadStation(railroadStation, i, procStepCityElements));
             cityRepository.addElement(railroadStation);
         }
+        log.info("Railroad stations were built.");
     }
 }
