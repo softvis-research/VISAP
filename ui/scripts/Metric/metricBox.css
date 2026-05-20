@@ -1,83 +1,333 @@
+/* ============================================================
+   VISAP metricBox.css – Redesign
+   ============================================================ */
+
+/* ── Festes unteres Panel ────────────────────────────────────── */
+#metricControllerDiv {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 230px;
+    background: #1e1e2e;
+    color: #cdd6f4;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    z-index: 99;
+    border-top: 2px solid #313244;
+    box-sizing: border-box;
+    transition: right 0.25s ease;
+}
+
+body.legend-collapsed #metricControllerDiv {
+    right: 36px;
+}
+
+body {
+    padding-bottom: 46px; /* nur Header-Höhe wenn collapsed */
+}
+
+body.metric-expanded {
+    padding-bottom: 200px; /* Platz für mind. 2 Layer */
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
 #viewControllerHeader {
-	float: left;
-	font-size: 12px;
-	line-height: 20px;
-	background-color: #1faeff;
-	width: 100%;
-	padding: 2px;
-	box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    background: #181825;
+    padding: 6px 10px;
+    border-bottom: 1px solid #313244;
+    width: 100%;
+    box-sizing: border-box;
+    float: none;
+    line-height: normal;
+    font-size: 13px;
+    gap: 6px;
+    height: 44px;
 }
 
-.metricDiv {
-	clear: left;
-	float: left;
-	width: 48%;
-	height: 33%;
-	border: 1px solid lightgray;
-	display:flex;
-	align-items: center;
-	font-size: 12px;
+/* Toggle-Button ganz links */
+#metricToggleBtn {
+    background: none;
+    border: none;
+    color: #7f849c;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+#metricToggleBtn:hover { color: #cdd6f4; }
+
+#headerTextNode {
+    float: none;
+    color: #cdd6f4;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 0;
+    margin: 0;
+    flex: 1;
 }
 
-.mappingDiv {
-	overflow: hidden;
-	height: 33%;
-	border: 1px solid lightgray;
-	display:flex;
-	align-items: center;
-	font-size: 12px;
+/* Fragezeichen-Button */
+#metricHelpBtn {
+    background: none;
+    border: 1px solid #45475a;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    color: #7f849c;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+#metricHelpBtn:hover { color: #cdd6f4; border-color: #cdd6f4; }
+
+.viewDropDown { float: none; }
+
+/* Header-Buttons */
+#downloadViewConfigButton,
+#addLayerButton,
+#executeButton,
+#resetButton {
+    float: none !important;
+    margin: 0 !important;
+    flex-shrink: 0;
 }
 
 #downloadViewConfigButton {
-	float: right;
-	margin-left: 5px;
+    padding: 4px 10px;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    background: none;
+    color: #7f849c;
+    font-size: 11px;
+    cursor: pointer;
 }
-
-#executeButton {
-	float: right;
-	margin-left: 5px;
-	margin-right: 10px;
-}
-
-#resetButton {
-	float: right;
-	margin-left: 5px;
-}
+#downloadViewConfigButton:hover { color: #cdd6f4; }
 
 #addLayerButton {
-	float: right;
-	margin-left: 5px;
+    padding: 5px 10px;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    background: #313244;
+    color: #cdd6f4;
+    font-size: 12px;
+    cursor: pointer;
+}
+#addLayerButton:hover { background: #45475a; }
+
+#executeButton {
+    padding: 5px 18px;
+    border: none;
+    border-radius: 20px;
+    background: #89b4fa;
+    color: #1e1e2e;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+#executeButton:hover { opacity: 0.85; }
+
+#resetButton {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #45475a;
+    border-radius: 50%;
+    background: transparent;
+    color: #cdd6f4;
+    font-size: 15px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+#resetButton:hover { background: #313244; }
+
+/* ── Layer-Body (ein-/ausklappbar) ───────────────────────────── */
+#metricLayerBody {
+    display: none;  /* collapsed by default */
+    flex-direction: column;  /* layers stack vertically */
+    align-items: stretch;
+    width: 100%;
+    overflow: hidden;
 }
 
-#headerTextNode {
-	float: left;
-	color: white;
-	padding: 3px 0;
-	margin-left: 5px;
+#metricLayerBody.metric-open {
+    display: flex;
 }
 
+/* ── Layer-Wrapper: eine Zeile pro Layer ─────────────────────── */
+.metricLayerRow {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    width: 100%;
+    border-bottom: 1px solid #313244;
+    box-sizing: border-box;
+    min-height: 90px;
+}
+
+/* ── Metrik-Sektion ──────────────────────────────────────────── */
+.metricDiv {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 8px 12px;
+    width: 320px;
+    min-width: 240px;
+    height: auto;
+    border: none !important;
+    border-right: 1px solid #313244 !important;
+    background: transparent;
+    float: none;
+    clear: none;
+    box-sizing: border-box;
+    gap: 6px;
+}
+
+/* ── Mapping-Sektion ─────────────────────────────────────────── */
+.mappingDiv {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 8px 12px;
+    flex: 1;
+    height: auto;
+    border: none !important;
+    border-right: 1px solid #313244 !important;
+    background: transparent;
+    overflow: visible;
+    box-sizing: border-box;
+    gap: 6px;
+}
+
+/* Delete-Button sitzt neben metricDiv/mappingDiv */
 .deleteButton {
-	float: right;
-	border: 1px solid lightgray;
+    float: none !important;
+    border: 1px solid #45475a !important;
+    background: transparent !important;
+    color: #f38ba8 !important;
+    border-radius: 4px !important;
+    cursor: pointer;
+    align-self: flex-start;
+    margin: 8px 6px 0 0 !important;
+    flex-shrink: 0;
+    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+}
+.deleteButton:hover { background: #313244 !important; }
+.deleteButton:disabled,
+.deleteButton.ui-state-disabled {
+    opacity: 0.3 !important;
+    cursor: default !important;
+    pointer-events: none;
 }
 
-.viewDropDown {
-	float: right;
+/* ── Section-Labels ──────────────────────────────────────────── */
+.sectionLabel {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #7f849c;
+}
+
+/* ── Textlabels ──────────────────────────────────────────────── */
+.textLabel {
+    font-size: 12px;
+    color: #a6adc8;
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: nowrap;
+}
+
+/* ── Start/End Range ─────────────────────────────────────────── */
+.metricRangeRow {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.rangeField {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.rangeLabel {
+    font-size: 10px;
+    color: #585b70;
+}
+
+.rangeSeparator {
+    color: #7f849c;
+    font-weight: 700;
+    padding-bottom: 6px;
+}
+
+/* ── Ignite Dropdowns ────────────────────────────────────────── */
+.ui-igcombo-container,
+.ui-igcombo {
+    background: #313244 !important;
+    border: 1px solid #45475a !important;
+    border-radius: 4px !important;
+    color: #cdd6f4 !important;
+    font-size: 12px !important;
+}
+.ui-igcombo-container .ui-igcombo-field {
+    color: #cdd6f4 !important;
+    background: transparent !important;
+}
+.ui-igcombo-container .ui-igcombo-button {
+    background: #45475a !important;
+    border-left: 1px solid #585b70 !important;
+}
+
+/* ── Ignite Numerische Felder ────────────────────────────────── */
+.ui-igedit-container,
+.ui-igedit {
+    background: #313244 !important;
+    border: 1px solid #45475a !important;
+    border-radius: 4px !important;
+    color: #cdd6f4 !important;
+    font-size: 12px !important;
+}
+.ui-igedit-container input {
+    color: #cdd6f4 !important;
+    background: transparent !important;
 }
 
 .metricNumParameter,
-.metricDateParameter {
-	text-align: right;
+.metricDateParameter { text-align: right; }
+.mappingParameter { text-align: right; }
+
+/* ── jQuery-UI Resize-Handle unterdrücken ────────────────────── */
+/* Infragistics/jQuery-UI injiziert einen .ui-resizable-handle
+   als weißen Balken über dem Panel. */
+#metricControllerDiv .ui-resizable-handle,
+#metricControllerDiv .ui-resizable-n,
+#metricControllerDiv .ui-resizable-s,
+#metricControllerDiv .ui-resizable-e,
+#metricControllerDiv .ui-resizable-w {
+    display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    background: none !important;
 }
 
-.mappingParameter {
-	text-align: right;
-}
-
-.textLabel {
-	font-size: 12px;
-	margin: 1px;
-	margin-left: 5px;
-	margin-right: 5px;
-	padding: 4px 0;
-}
+/* Tooltip-Styles: siehe scripts/Tooltip/tooltip.css */

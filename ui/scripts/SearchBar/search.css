@@ -1,0 +1,254 @@
+/* ============================================================
+   VISAP search.css – Suchfeld & Navigator
+   ============================================================ */
+
+/* ── Such-Panel (fixed, linke Seite) ────────────────────────── */
+#visap-search {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: auto;
+    max-height: 100vh;
+    z-index: 100;
+    background: #1e1e2e;
+    box-sizing: border-box;
+    border-right: 2px solid #313244;
+    border-bottom: 2px solid #313244;
+    border-bottom-right-radius: 8px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    color: #cdd6f4;
+    transition: width 0.25s ease;
+    overflow: hidden;
+}
+
+#visap-search.search-collapsed {
+    width: 36px;
+    border-bottom-right-radius: 8px;
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+#search-header {
+    display: flex;
+    align-items: center;
+    background: #181825;
+    padding: 0 8px;
+    height: 44px;
+    border-bottom: 1px solid #313244;
+    box-sizing: border-box;
+    gap: 6px;
+}
+
+#search-toggle {
+    background: none;
+    border: none;
+    color: #7f849c;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+}
+#search-toggle:hover { color: #cdd6f4; }
+
+#search-header-label {
+    color: #cdd6f4;
+    font-weight: 600;
+    font-size: 13px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#search-help-btn {
+    background: none;
+    border: 1px solid #45475a;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    color: #7f849c;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+#search-help-btn:hover { color: #cdd6f4; border-color: #cdd6f4; }
+
+/* ── Content (ein-/ausklappbar) ──────────────────────────────── */
+#search-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease, opacity 0.15s ease;
+    max-height: 600px;
+    opacity: 1;
+}
+
+.search-collapsed #search-content {
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ── Trennlinie nach Freitext-Suche ──────────────────────────── */
+.search-divider {
+    height: 1px;
+    background: #313244;
+    margin: 0;
+}
+
+/* ── Jede Zeile im Panel ─────────────────────────────────────── */
+.search-field-row {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 10px 6px;
+    gap: 4px;
+}
+
+.search-field-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #7f849c;
+    white-space: nowrap;
+}
+
+/* ── Inputs & Selects ────────────────────────────────────────── */
+.search-input,
+.search-select {
+    width: 100%;
+    box-sizing: border-box;
+    background: #313244;
+    border: 1px solid #45475a;
+    border-radius: 4px;
+    color: #cdd6f4;
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 5px 8px;
+    outline: none;
+    transition: border-color 0.15s ease;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.search-input:focus,
+.search-select:focus {
+    border-color: #89b4fa;
+}
+
+.search-input::placeholder {
+    color: #585b70;
+}
+
+/* Pfeil für select */
+.search-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.search-select-wrapper::after {
+    content: "▾";
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7f849c;
+    font-size: 11px;
+    pointer-events: none;
+}
+
+.search-select {
+    padding-right: 24px;
+    cursor: pointer;
+}
+
+/* ── Start-Button ────────────────────────────────────────────── */
+.search-footer {
+    padding: 10px 10px 12px;
+    display: flex;
+    justify-content: center;
+}
+
+#search-start-btn {
+    padding: 6px 28px;
+    border: none;
+    border-radius: 20px;
+    background: #89b4fa;
+    color: #1e1e2e;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: Arial, Helvetica, sans-serif;
+    transition: opacity 0.15s ease;
+}
+#search-start-btn:hover { opacity: 0.85; }
+
+/* ── Navigator (erscheint nach Suche, oben sichtbar) ─────────── */
+#visap-navigator {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none; /* sichtbar nach Suche */
+    align-items: center;
+    gap: 10px;
+    background: #313244;
+    border: 1px solid #45475a;
+    border-radius: 24px;
+    padding: 6px 14px;
+    z-index: 101;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    color: #cdd6f4;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    min-width: 200px;
+    justify-content: center;
+}
+
+#visap-navigator.navigator-visible {
+    display: flex;
+}
+
+.navigator-arrow {
+    background: none;
+    border: none;
+    color: #cdd6f4;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 4px;
+    line-height: 1;
+    flex-shrink: 0;
+    border-radius: 4px;
+    transition: background 0.15s ease;
+}
+.navigator-arrow:hover { background: #45475a; }
+
+#navigator-name {
+    background: #89b4fa;
+    color: #1e1e2e;
+    border-radius: 12px;
+    padding: 3px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#navigator-counter {
+    color: #a6adc8;
+    font-size: 12px;
+    white-space: nowrap;
+}

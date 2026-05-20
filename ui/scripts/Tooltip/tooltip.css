@@ -1,0 +1,72 @@
+/* ============================================================
+   VISAP tooltip.css
+   Wiederverwendbare Tooltip-Komponente für alle Controller.
+   ============================================================ */
+
+.visap-tooltip {
+    display: none;
+    position: fixed;
+    background: #313244;
+    color: #cdd6f4;
+    border: 1px solid #585b70;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    z-index: 200;  /* über dem Controller (z-index: 99), aber kein unnötiges 500 */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.45);
+    width: 280px;
+    pointer-events: none;
+}
+
+.visap-tooltip.tooltip-visible {
+    display: block;
+}
+
+/* Pfeil nach unten (standard) */
+.visap-tooltip::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 20px;
+    width: 14px;
+    height: 14px;
+    background: #313244;
+    border-right: 1px solid #585b70;
+    border-bottom: 1px solid #585b70;
+    transform: rotate(45deg);
+}
+
+/* Pfeil nach oben (z.B. für Navigator oben) */
+.visap-tooltip.tooltip-arrow-top::after {
+    bottom: auto;
+    top: -8px;
+    border-right: none;
+    border-bottom: none;
+    border-left: 1px solid #585b70;
+    border-top: 1px solid #585b70;
+}
+
+/* ── Hilfe-Button (wiederverwendbar) ─────────────────────────── */
+.visap-help-btn {
+    background: none;
+    border: 1px solid #45475a;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    color: #7f849c;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.visap-help-btn:hover {
+    color: #cdd6f4;
+    border-color: #cdd6f4;
+}

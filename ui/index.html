@@ -5,16 +5,13 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">
 
-    <!-- main dependencies-->
     <script type="text/javascript" src="libs/jquery/jquery-3.6.1.min.js"></script>
     <script type="text/javascript" src="libs/aframe/aframe-v1.0.4.min.js"></script>
 
-    <!-- Ignite, for UI widgets -->
     <script type="text/javascript" src="libs/jquery-ui/jquery-ui.min.js"></script>
     <script type="text/javascript" src="libs/ignite-ui/infragistics.core-lite.js"></script>
     <script type="text/javascript" src="libs/ignite-ui/infragistics.lob-lite.js"></script>
 
-    <!-- core controllers/logic -->
     <script type="text/javascript">
         const canvasId = "aframe-canvas";
         const controllers = Object.create(null);
@@ -27,7 +24,6 @@
     <script type="text/javascript" src="scripts/OrbitCamera.js"></script>
     <script type="text/javascript" src="scripts/Application.js"></script>
 
-    <!-- optional controllers -->
     <script type="text/javascript" src="scripts/HelloWorld/HelloWorldController.js"></script>
     <script type="text/javascript" src="scripts/CanvasHover/CanvasHoverController.js"></script>
     <script type="text/javascript" src="scripts/CanvasSelect/CanvasSelectController.js"></script>
@@ -36,35 +32,46 @@
     <script type="text/javascript" src="scripts/Relation/RelationCurvedConnectionHelper.js"></script>
     <script type="text/javascript" src="scripts/Relation/RelationController.js"></script>
 
-    <!-- road model & controllers -->
     <script type="text/javascript" src="scripts/RoadModel.js"></script>
     <script type="text/javascript" src="scripts/RoadHighlight/RoadHighlightController.js"></script>
     <script type="text/javascript" src="scripts/RoadHighlight/ParallelColorStripesHelper.js"></script>
 
-    <!-- metric view controllers -->
     <script type="text/javascript" src="scripts/Metric/Constants.js"></script>
     <script type="text/javascript" src="scripts/Metric/ColorGradient.js"></script>
     <script type="text/javascript" src="scripts/Metric/MetricLayer.js"></script>
     <script type="text/javascript" src="scripts/Metric/DomHelper.js"></script>
     <script type="text/javascript" src="scripts/Metric/MetricController.js"></script>
 
-    <!-- legend -->
+    <script type="text/javascript" src="scripts/Tooltip/TooltipController.js"></script>
+
     <script type="text/javascript" src="scripts/Legend/LegendController.js"></script>
 
-    <!-- styling -->
+    <script type="text/javascript" src="scripts/SearchBar/SearchController.js"></script>
+
+    <script type="text/javascript" src="scripts/Navigator/NavigatorController.js"></script>
+
     <link rel="stylesheet" href="libs/ignite-ui/css/metro/infragistics.theme.css" type="text/css" />
     <link rel="stylesheet" href="libs/ignite-ui/css/infragistics.css" type="text/css" />
     <link rel="stylesheet" href="Style.css" type="text/css" />
     <link rel="stylesheet" href="scripts/Legend/legend.css" type="text/css" />
+    <link rel="stylesheet" href="scripts/Tooltip/tooltip.css" type="text/css" />
+    <link rel="stylesheet" href="scripts/Metric/metricBox.css" type="text/css" />
+    <link rel="stylesheet" href="scripts/SearchBar/search.css" type="text/css" />
+    <link rel="stylesheet" href="scripts/Navigator/navigator.css" type="text/css" />
 </head>
 
 <body>
 
-<!-- festes rechtes Legende-Panel -->
 <div id="visap-legend"></div>
+
+<div id="visap-search"></div>
+
+<div id="visap-navigator"></div>
 
 <script type="text/javascript">
     LegendController.init();
+    SearchController.init();
+    NavigatorController.init();
 </script>
 
 </body>
