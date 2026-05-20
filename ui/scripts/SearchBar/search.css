@@ -252,3 +252,25 @@
     font-size: 12px;
     white-space: nowrap;
 }
+
+/* ── Reset-Button (analog zum MetricController) ──────────────── */
+#search-reset-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #45475a;
+    border-radius: 50%;
+    background: transparent;
+    color: #cdd6f4;
+    font-size: 15px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-left: 10px; /* Abstand zum Start-Button */
+    transition: background 0.15s ease;
+}
+
+#search-reset-btn:hover {
+    background: #313244;
+}
