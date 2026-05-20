@@ -10,17 +10,19 @@
 
 var SearchController = (function () {
 
+    // ── Typen-Klassifizierung ────────────────────────────────────────────────
     var TYPE_NAMESPACE  = ["Namespace"];
     var TYPE_TOP        = ["Class", "Report", "Interface", "FunctionGroup"];
     var TYPE_SUB        = ["Method", "FormRoutine", "FunctionModule", "Attribute"];
 
     var allEntities = [];
 
+    // Aktuell gewählte Filter-IDs
     var selectedPaket   = "";
     var selectedTop     = "";
     var selectedSub     = "";
 
-    // 🔴 NEU: Wir merken uns exakt, was wir verändert haben, um den CanvasManipulator-Bug zu umgehen
+    // Speicher für den sauberen visuellen Reset
     var lastSearchResults = [];
     var lastNonMatchedEntities = [];
 
@@ -113,6 +115,7 @@ var SearchController = (function () {
         selectedSub = "";
     }
 
+    // ── Freitext-Suche ────────────────────────────────────────────────────────
     function applyTextFilter(text) {
         var lower = text.toLowerCase().trim();
         if (!lower) return getEntities();
@@ -121,6 +124,7 @@ var SearchController = (function () {
         });
     }
 
+    // ── Suchergebnisse ermitteln ──────────────────────────────────────────────
     function collectResults() {
         var textInput  = document.getElementById("search-input-text");
         var textQuery  = textInput ? textInput.value : "";
@@ -146,25 +150,22 @@ var SearchController = (function () {
         return results;
     }
 
-    // 🔴 NEU: Zentrale Funktion, um die Stadt sicher in den Ursprungszustand zu versetzen
+    // ── Zentrale Funktion für den visuellen Reset ─────────────────────────────
     function clearVisuals() {
+        if (typeof events !== "undefined" && events.selected && lastSearchResults.length > 0) {
+            events.selected.off.publish({ entities: lastSearchResults });
+        }
+
         if (typeof canvasManipulator !== "undefined") {
-            // Nur von den Elementen die Farbe zurücksetzen, die wir auch wirklich rot gefärbt haben!
             if (lastSearchResults.length > 0) {
                 canvasManipulator.resetColorOfEntities(lastSearchResults, { name: "SearchController" });
+                canvasManipulator.resetTransparencyOfEntities(lastSearchResults, { name: "SearchController" });
             }
-            // Nur von den Geister-Elementen die Transparenz zurücksetzen!
             if (lastNonMatchedEntities.length > 0) {
                 canvasManipulator.resetTransparencyOfEntities(lastNonMatchedEntities, { name: "SearchController" });
             }
         }
 
-        // VISAP sagen: Kamera-Auswahl aufheben! (Entfernt das dunkelrote Highlighting)
-        if (typeof events !== "undefined" && events.selected && lastSearchResults.length > 0) {
-            events.selected.off.publish({ entities: lastSearchResults });
-        }
-
-        // Speicher wieder leeren
         lastSearchResults = [];
         lastNonMatchedEntities = [];
     }
@@ -184,7 +185,6 @@ var SearchController = (function () {
         populatePaketSelect();
         clearSelect(document.getElementById("search-sel-sub"), "— untergeordnetes Element —");
 
-        // Stadt zurücksetzen
         clearVisuals();
 
         if (typeof NavigatorController !== "undefined") {
@@ -196,37 +196,47 @@ var SearchController = (function () {
     function executeSearch() {
         var results = collectResults();
 
-        // 1. ALTE SUCHE SAUBER ZURÜCKSETZEN
         clearVisuals();
 
         if (results.length === 0) {
-            if (typeof NavigatorController !== "undefined") {
-                NavigatorController.hide();
-            }
+            if (typeof NavigatorController !== "undefined") NavigatorController.hide();
             alert("Die Suche ergab leider keine Treffer.");
             return;
         }
 
-        // 2. NEUE ERGEBNISSE SPEICHERN
-        lastSearchResults = results;
-        lastNonMatchedEntities = getEntities().filter(function(e) {
-            return results.indexOf(e) === -1;
-        });
-
-        // 3. NAVIGATOR STARTEN
         if (typeof NavigatorController !== "undefined") {
-            NavigatorController.show(results[0].name || "Unbenannt", 1, results.length);
-        }
+            // Übergabe der Callback-Funktion an den Navigator für dynamisches Hovern
+            NavigatorController.load(results, function(activeEntity, allResults) {
 
-        // 4. VISUELLE HERVORHEBUNG (Rot & Transparent) anwenden
-        if (typeof canvasManipulator !== "undefined") {
-            canvasManipulator.changeColorOfEntities(lastSearchResults, "red", { name: "SearchController" });
-            canvasManipulator.changeTransparencyOfEntities(lastNonMatchedEntities, 0.85, { name: "SearchController" });
-        }
+                clearVisuals();
 
-        // 5. KAMERA-FLUG
-        if (typeof events !== "undefined" && events.selected) {
-            events.selected.on.publish({ entities: [results[0]] });
+                lastSearchResults = allResults;
+                lastNonMatchedEntities = getEntities().filter(function(e) {
+                    return allResults.indexOf(e) === -1;
+                });
+
+                if (typeof canvasManipulator !== "undefined") {
+                    // A) ALLE Treffer rot färben
+                    canvasManipulator.changeColorOfEntities(allResults, "red", { name: "SearchController" });
+
+                    // B) Restliche Stadt transparent machen (0.85)
+                    canvasManipulator.changeTransparencyOfEntities(lastNonMatchedEntities, 0.85, { name: "SearchController" });
+
+                    // C) INAKTIVE Treffer halb-transparent machen (0.6)
+                    var inactiveResults = allResults.filter(function(e) { return e.id !== activeEntity.id; });
+                    if (inactiveResults.length > 0) {
+                        canvasManipulator.changeTransparencyOfEntities(inactiveResults, 0.6, { name: "SearchController" });
+                    }
+
+                    // D) Das AKTIVE Element komplett undurchsichtig machen (0.0)
+                    canvasManipulator.changeTransparencyOfEntities([activeEntity], 0.0, { name: "SearchController" });
+                }
+
+                // E) KAMERA-FLUG
+                if (typeof events !== "undefined" && events.selected) {
+                    events.selected.on.publish({ entities: [activeEntity] });
+                }
+            });
         }
     }
 

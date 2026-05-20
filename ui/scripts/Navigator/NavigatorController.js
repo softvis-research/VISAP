@@ -1,13 +1,14 @@
 /**
  * NavigatorController.js
- * Steuert ausschließlich das Navigator-UI oben in der Mitte.
- * Komplett getrennte Komponente (Shared Service für Suche und Metriken).
- * * Ablegen unter: ui/scripts/Navigator/NavigatorController.js
+ * Steuert das Navigator-UI oben in der Mitte und verwaltet das Durchschalten der Ergebnisse.
  */
 
 var NavigatorController = (function () {
 
-    // ── Hilfsfunktion zur Elementerstellung ──────────────────────────────────
+    var items = [];
+    var currentIndex = 0;
+    var onChangeCallback = null;
+
     function el(tag, cls, text) {
         var node = document.createElement(tag);
         if (cls)  node.className = cls;
@@ -15,99 +16,117 @@ var NavigatorController = (function () {
         return node;
     }
 
-    // ── Navigator-Struktur aufbauen ──────────────────────────────────────────
     function buildNavigator(containerId) {
         var container = document.getElementById(containerId || "visap-navigator");
-        if (!container) {
-            console.warn("NavigatorController: #" + (containerId || "visap-navigator") + " not found.");
-            return;
-        }
+        if (!container) return;
         container.innerHTML = "";
 
-        // 1. HEADER (Titel + Fragezeichen-Hilfe)
         var header = el("div", "navigator-header");
         var title = el("span", "navigator-title", "Navigator");
-
-        var helpBtn = el("button", "visap-help-btn");
+        var helpBtn = el("button", "visap-help-btn", "?");
         helpBtn.id = "navigator-help-btn";
         helpBtn.title = "Hilfe";
-        helpBtn.textContent = "?";
-
         header.appendChild(title);
         header.appendChild(helpBtn);
 
-        // 2. NAME (Zentrales blaues Namensschild)
         var nameTag = el("span", "");
         nameTag.id = "navigator-name";
-        nameTag.textContent = "Name"; // Platzhalter
+        nameTag.textContent = "Name";
 
-        // 3. CONTROLS (Pfeiltasten + Ergebniszähler)
         var controls = el("div", "navigator-controls");
 
         var prevBtn = el("button", "navigator-arrow");
-        prevBtn.innerHTML = "&#9664;"; // Linker Dreieckspfeil (◀)
+        prevBtn.id = "navigator-prev-btn"; // ID für das Klick-Event hinzugefügt
+        prevBtn.innerHTML = "&#9664;";
         prevBtn.title = "Vorheriges Objekt";
 
         var counter = el("span", "");
         counter.id = "navigator-counter";
-        counter.textContent = "1 / 1"; // Platzhalter
+        counter.textContent = "1 / 1";
 
         var nextBtn = el("button", "navigator-arrow");
-        nextBtn.innerHTML = "&#9654;"; // Rechter Dreieckspfeil (▶)
+        nextBtn.id = "navigator-next-btn"; // ID für das Klick-Event hinzugefügt
+        nextBtn.innerHTML = "&#9654;";
         nextBtn.title = "Nächstes Objekt";
 
         controls.appendChild(prevBtn);
         controls.appendChild(counter);
         controls.appendChild(nextBtn);
 
-        // Alle Sektionen in den Hauptcontainer einfügen
         container.appendChild(header);
         container.appendChild(nameTag);
         container.appendChild(controls);
     }
 
-    // ── Öffentliche Schnittstelle (API) ───────────────────────────────────────
+    // Geht zum vorherigen Element
+    function prev() {
+        if (items.length === 0) return;
+        currentIndex = (currentIndex > 0) ? currentIndex - 1 : items.length - 1;
+        updateUIAndTriggerCallback();
+    }
+
+    // Geht zum nächsten Element
+    function next() {
+        if (items.length === 0) return;
+        currentIndex = (currentIndex < items.length - 1) ? currentIndex + 1 : 0;
+        updateUIAndTriggerCallback();
+    }
+
+    function updateUIAndTriggerCallback() {
+        var nav = document.getElementById("visap-navigator");
+        if (!nav) return;
+
+        if (items.length > 0) {
+            nav.classList.add("navigator-visible");
+            var activeItem = items[currentIndex];
+
+            // Text anpassen
+            document.getElementById("navigator-name").textContent = activeItem.name || "Unbenannt";
+            document.getElementById("navigator-counter").textContent = (currentIndex + 1) + " / " + items.length;
+
+            // Den aufrufenden Controller (Search oder Metric) informieren, dass sich das Element geändert hat!
+            if (typeof onChangeCallback === "function") {
+                onChangeCallback(activeItem, items);
+            }
+        } else {
+            hide();
+        }
+    }
+
     function init(navigatorId) {
         buildNavigator(navigatorId);
 
-        // Tooltip für den Navigator registrieren
+        // Klick-Events für die Pfeile registrieren
+        document.getElementById("navigator-prev-btn").addEventListener("click", prev);
+        document.getElementById("navigator-next-btn").addEventListener("click", next);
+
         if (typeof TooltipController !== "undefined") {
             TooltipController.register("navigatorTooltip", "navigator-help-btn", "navigator");
         }
     }
 
     /**
-     * Macht den Navigator sichtbar und befüllt ihn mit dynamischen Daten.
-     * Kann sowohl vom SearchController als auch vom MetricController aufgerufen werden!
-     * * @param {string} name  - Name des aktuell fokussierten Elements
-     * @param {number} index - Aktuelle Position (1-basiert)
-     * @param {number} total - Gesamtzahl der Treffer
+     * Startet den Navigator mit einer Liste an Ergebnissen.
+     * @param {Array} newItems - Die Such- oder Metrikergebnisse
+     * @param {Function} callback - Wird aufgerufen, wenn ein neues Element fokussiert wird
      */
-    function show(name, index, total) {
-        var nav = document.getElementById("visap-navigator");
-        if (!nav) return;
-        nav.classList.add("navigator-visible");
-
-        var nameEl = document.getElementById("navigator-name");
-        var counterEl = document.getElementById("navigator-counter");
-
-        if (nameEl) nameEl.textContent = name || "—";
-        if (index && total) {
-            counterEl.textContent = index + " / " + total;
-        }
+    function load(newItems, callback) {
+        items = newItems || [];
+        currentIndex = 0; // Beim Start immer beim ersten Element beginnen
+        onChangeCallback = callback;
+        updateUIAndTriggerCallback();
     }
 
-    /**
-     * Versteckt den Navigator wieder im UI.
-     */
     function hide() {
         var nav = document.getElementById("visap-navigator");
         if (nav) nav.classList.remove("navigator-visible");
+        items = [];
+        onChangeCallback = null;
     }
 
     return {
         init: init,
-        show: show,
+        load: load,
         hide: hide
     };
 
