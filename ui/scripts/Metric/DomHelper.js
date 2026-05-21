@@ -48,7 +48,6 @@ class DomHelper {
 
         $(this.rootDiv).append(uiHeadHtml);
 
-        // Toggle Panel
         var self = this;
         document.getElementById("metricToggleBtn").addEventListener("click", function() {
             var body = document.getElementById("metricLayerBody");
@@ -56,39 +55,46 @@ class DomHelper {
             var isOpen = body.classList.toggle("metric-open");
             btn.innerHTML = isOpen ? "&#9650;" : "&#9660;";
             document.body.classList.toggle("metric-expanded", isOpen);
+
+            // Dem VISAP-Splitter sagen, dass er sich zusammenschieben soll!
+            var $splitter = $("#metricControllerDiv").closest(".ui-igsplitter");
+            if ($splitter.length > 0) {
+                if (isOpen) {
+                    // Aufklappen: Alte Größe wiederherstellen (oder 250px als Standard)
+                    $splitter.igSplitter("setSecondPanelSize", self.lastSplitterSize || 250);
+                } else {
+                    // Einklappen: Aktuelle Größe speichern (falls der Nutzer sie gezogen hat)
+                    var currentSize = $("#metricControllerDiv").parent().height();
+                    if (currentSize > 60) {
+                        self.lastSplitterSize = currentSize;
+                    }
+                    // Panel auf exakt 44px (Höhe des Headers) zusammenschrumpfen
+                    $splitter.igSplitter("setSecondPanelSize", 50);
+                }
+            }
         });
 
-        // Tooltip über TooltipController registrieren
         TooltipController.register("metricTooltip", "metricHelpBtn", "metricController");
 
-        // Ignite widgets
         $(cssIDs.viewDropDown).igCombo(Object.assign({}, this.defaultIgComboSettings, {
             height: widgetSize.headerDropDownHeight,
             dataSource: this.controllerConfig.views.map(function(a) { return a.name; })
         }));
-        // Hinweis: downloadViewConfigButton, executeButton, resetButton und addLayerButton
-        // werden NICHT per igButton initialisiert – das würde jQuery-UI-Markup
-        // (weißer Wrapper-Span / Resize-Handle) injizieren und das CSS-Design zerstören.
-        // Die Buttons werden direkt über CSS in MetricController.css gestylt.
 
-        // Layer-Body initial öffnen
         var body = document.getElementById("metricLayerBody");
         body.classList.add("metric-open");
         document.getElementById("metricToggleBtn").innerHTML = "&#9650;";
         document.body.classList.add("metric-expanded");
 
-        // rootDiv auf layerBody umlenken für alle buildUiLayer-Calls
         this.rootDiv = document.getElementById("metricLayerBody");
     }
 
     buildUiLayer(layerID) {
-        // Wrapper-Div für diesen Layer: hält metricDiv, deleteButton und mappingDiv in einer Zeile
         var wrapper = document.createElement("div");
         wrapper.id = "metricLayerRow" + layerID;
         wrapper.className = "metricLayerRow " + domClasses.layer + layerID;
         this.rootDiv.appendChild(wrapper);
 
-        // rootDiv temporär auf den Wrapper umlenken
         var originalRoot = this.rootDiv;
         this.rootDiv = wrapper;
 
@@ -96,7 +102,6 @@ class DomHelper {
         this.buildDeleteButton(layerID);
         this.buildMappingArea(layerID);
 
-        // rootDiv wieder auf den Layer-Body zurücksetzen
         this.rootDiv = originalRoot;
     }
 
@@ -130,8 +135,10 @@ class DomHelper {
             dataSource: this.controllerConfig.metrics,
             placeHolder: "Select Metric"
         }));
+
+        // WICHTIG: True übergeben, da diese Änderung manuell vom Nutzer kommt (Default-Werte eintragen!)
         $(document).delegate(cssIDs.metricSelectionDropDown + layerID, "igcomboselectionchanged", function(evt, ui) {
-            this.metricSelectionDropDownSelected(layerID);
+            this.metricSelectionDropDownSelected(layerID, true);
         }.bind(this));
 
         $(cssIDs.metricFromInput + layerID).igNumericEditor(Object.assign({}, this.defaultIgNumInputSettings));
@@ -143,23 +150,42 @@ class DomHelper {
         $(cssIDs.metricToDateInput + layerID).igDatePicker("hide");
     }
 
-    metricSelectionDropDownSelected(layerID) {
+    // AUTO-FILL LOGIK: Setzt Min/Max-Werte ein, wenn eine Metrik gewählt wird
+    metricSelectionDropDownSelected(layerID, updateValuesToDefault = false) {
         $(cssIDs.metricFromText + layerID).show();
         $(cssIDs.metricToText + layerID).show();
 
-        switch ($(cssIDs.metricSelectionDropDown + layerID).igCombo("value")) {
+        const selectedLabel = $(cssIDs.metricSelectionDropDown + layerID).igCombo("value");
+        const metricVariant = Object.keys(metrics).find(key => metrics[key] === selectedLabel);
+
+        let bounds = null;
+        if (updateValuesToDefault && metricVariant && typeof metricController !== "undefined" && metricController.getMetricBounds) {
+            bounds = metricController.getMetricBounds(metricVariant);
+        }
+
+        switch (selectedLabel) {
             case metrics.dateOfCreation:
             case metrics.dateOfLastChange:
                 $(cssIDs.metricFromInput + layerID).igNumericEditor("hide");
                 $(cssIDs.metricToInput + layerID).igNumericEditor("hide");
                 $(cssIDs.metricFromDateInput + layerID).igDatePicker("show");
                 $(cssIDs.metricToDateInput + layerID).igDatePicker("show");
+
+                if (bounds) {
+                    $(cssIDs.metricFromDateInput + layerID).igDatePicker("value", new Date(bounds.min));
+                    $(cssIDs.metricToDateInput + layerID).igDatePicker("value", new Date(bounds.max));
+                }
                 break;
             default:
                 $(cssIDs.metricFromDateInput + layerID).igDatePicker("hide");
                 $(cssIDs.metricToDateInput + layerID).igDatePicker("hide");
                 $(cssIDs.metricFromInput + layerID).igNumericEditor("show");
                 $(cssIDs.metricToInput + layerID).igNumericEditor("show");
+
+                if (bounds) {
+                    $(cssIDs.metricFromInput + layerID).igNumericEditor("value", bounds.min);
+                    $(cssIDs.metricToInput + layerID).igNumericEditor("value", bounds.max);
+                }
                 break;
         }
     }
@@ -263,11 +289,9 @@ class DomHelper {
         var deleteButton = document.createElement("button");
         deleteButton.id = domIDs.deleteButton + layerID;
         deleteButton.classList.add(domClasses.deleteButton, domClasses.layer + layerID);
-        // × als Inhalt
         deleteButton.innerHTML = "&#x2715;";
         deleteButton.title = "Layer entfernen";
 
-        // NEU: Wenn es der erste Layer ist (also der einzige), Button direkt deaktivieren!
         if (layerID === 1) {
             deleteButton.disabled = true;
             deleteButton.classList.add("ui-state-disabled");
@@ -295,7 +319,9 @@ class DomHelper {
                 break;
         }
 
-        this.metricSelectionDropDownSelected(layer.id);
+        // WICHTIG: False übergeben! Damit bestehende View-Configs nicht überschrieben werden.
+        this.metricSelectionDropDownSelected(layer.id, false);
+
         $(cssIDs.mappingDropDown + layer.id).igCombo("value", layer.mapping.variant);
 
         switch (layer.mapping.variant) {
@@ -327,12 +353,10 @@ class DomHelper {
 
     destroyLayerUI(layerID) {
         this.resetLayerUI(layerID);
-        // Gesamten Layer-Wrapper entfernen (enthält metricDiv, deleteButton, mappingDiv)
         var wrapper = document.getElementById("metricLayerRow" + layerID);
         if (wrapper) {
             wrapper.parentNode.removeChild(wrapper);
         } else {
-            // Fallback: alle Elemente mit der Layer-Klasse entfernen
             $(cssClasses.layer + layerID).remove();
         }
     }

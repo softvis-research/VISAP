@@ -34,160 +34,22 @@ controllers.metricController = (function () {
             mappings.rotation,
         ],
         views: [
-            {
-                name: "View 1",
-                viewMappings: [
-                    {
-                        metric: { variant: "number_of_statements", from: 1, to: 2 },
-                        mapping: {
-                            variant: "Pulsation",
-                            color: "",
-                            startColor: "",
-                            endColor: "",
-                            transparency: 0,
-                            period: 1000,
-                            scale: 2,
-                        },
-                    },
-                    {
-                        metric: { variant: "maximum_nesting_depth", from: 3, to: 10 },
-                        mapping: {
-                            variant: "Color",
-                            color: "red",
-                            startColor: "",
-                            endColor: "",
-                            transparency: 0,
-                            period: 0,
-                            scale: 0,
-                        },
-                    },
-                    {
-                        metric: { variant: "halstead_difficulty", from: 1, to: 2 },
-                        mapping: {
-                            variant: "Flashing",
-                            color: "orange",
-                            startColor: "",
-                            endColor: "",
-                            transparency: 0,
-                            period: 1000,
-                            scale: 0,
-                        },
-                    },
-                ],
-            },
-            {
-                name: "View 2",
-                viewMappings: [
-                    {
-                        metric: { variant: "number_of_interfaces", from: 0, to: 0 },
-                        mapping: {
-                            variant: "Transparency",
-                            color: "",
-                            startColor: "",
-                            endColor: "",
-                            transparency: 0.65,
-                            period: 0,
-                            scale: 0,
-                        },
-                    },
-                    {
-                        metric: { variant: "number_of_comments", from: 4, to: 30 },
-                        mapping: {
-                            variant: "Flashing",
-                            color: "red",
-                            startColor: "",
-                            endColor: "",
-                            transparency: 0,
-                            period: 1000,
-                            scale: 0,
-                        },
-                    },
-                    {
-                        metric: { variant: "number_of_events", from: 1, to: 5 },
-                        mapping: {
-                            variant: "Pulsation",
-                            color: "",
-                            startColor: "",
-                            endColor: "",
-                            transparency: 0,
-                            period: 1000,
-                            scale: 3,
-                        },
-                    },
-                    {
-                        metric: { variant: "cyclomatic_complexity", from: 1, to: 5 },
-                        mapping: {
-                            variant: "Transparency",
-                            color: "",
-                            startColor: "",
-                            endColor: "",
-                            transparency: 0.01,
-                            period: 0,
-                            scale: 0,
-                        },
-                    },
-                ],
-            },
-            {
-                name: "View 3",
-                viewMappings: [
-                    {
-                        metric: {
-                            variant: "dateOfLastChange",
-                            from: 1546300800000,
-                            to: 1649808000000,
-                        },
-                        mapping: {
-                            variant: "Transparency",
-                            color: "",
-                            startColor: "",
-                            endColor: "",
-                            transparency: 0.7,
-                            period: 0,
-                            scale: 0,
-                        },
-                    },
-                    {
-                        metric: { variant: "number_of_object_references", from: 1, to: 5 },
-                        mapping: {
-                            variant: "Flashing",
-                            color: "red",
-                            startColor: "",
-                            endColor: "",
-                            transparency: 0,
-                            period: 500,
-                            scale: 0,
-                        },
-                    },
-                    {
-                        metric: { variant: "amount_of_slin", from: 1, to: 5 },
-                        mapping: {
-                            variant: "Pulsation",
-                            color: "",
-                            startColor: "",
-                            endColor: "",
-                            transparency: 0,
-                            period: 1000,
-                            scale: 3,
-                        },
-                    },
-                ],
-            },
+            { name: "View 1", viewMappings: [] },
+            { name: "View 2", viewMappings: [] },
+            { name: "View 3", viewMappings: [] },
         ],
     };
 
     let domHelper;
-
     let layerCounter = 0;
     let layers = [];
     let viewConfig;
 
-    const metricDefault = {
-        variant: undefined,
-        from: 0,
-        to: 0,
-    };
+    let lastUnmatched = [];
+    let lastInactive = [];
+    let lastActive = [];
 
+    const metricDefault = { variant: undefined, from: 0, to: 0 };
     const mappingDefault = {
         variant: mappings.color,
         color: "white",
@@ -212,15 +74,84 @@ controllers.metricController = (function () {
         $(cssIDs.resetButton).click(() => resetButtonClicked());
         $(cssIDs.addLayerButton).click(() => addLayer());
         $(cssIDs.downloadViewConfigButton).click(() => downloadViewConfig());
-        $(document).delegate(cssIDs.viewDropDown, "igcomboselectionchanged", () =>
-            changeView(),
-        );
+        $(document).delegate(cssIDs.viewDropDown, "igcomboselectionchanged", () => changeView());
+    }
+
+    function clearNavigatorFocus() {
+        if (typeof canvasManipulator !== "undefined") {
+            if (lastUnmatched.length > 0) canvasManipulator.resetTransparencyOfEntities(lastUnmatched, { name: "MetricNavigatorFocus" });
+            if (lastInactive.length > 0) canvasManipulator.resetTransparencyOfEntities(lastInactive, { name: "MetricNavigatorFocus" });
+            if (lastActive.length > 0) canvasManipulator.resetTransparencyOfEntities(lastActive, { name: "MetricNavigatorFocus" });
+        }
+
+        if (typeof events !== "undefined" && events.selected && lastActive.length > 0) {
+            events.selected.off.publish({ entities: lastActive });
+        }
+
+        lastUnmatched = [];
+        lastInactive = [];
+        lastActive = [];
+    }
+
+    // 🔴 NEU: Berechnet dynamisch den kleinsten und größten Wert einer Metrik aus den Model-Daten
+    function getMetricBounds(metricVariant) {
+        if (!metricVariant) return null;
+
+        let min = Number.POSITIVE_INFINITY;
+        let max = Number.NEGATIVE_INFINITY;
+        let isDate = (metricVariant === "dateOfCreation" || metricVariant === "dateOfLastChange");
+
+        if (typeof model !== "undefined" && typeof model.getAllEntities === "function") {
+            const entitiesMap = model.getAllEntities();
+            for (const entity of entitiesMap.values()) {
+                let val = entity[metricVariant];
+                if (val !== undefined && val !== null) {
+                    if (isDate) {
+                        val = (val instanceof Date) ? val.getTime() : new Date(val).getTime();
+                    }
+                    if (typeof val === "number" && !isNaN(val)) {
+                        if (val < min) min = val;
+                        if (val > max) max = val;
+                    }
+                }
+            }
+        }
+
+        // Fallback, falls die Metrik bei keinem Element existiert
+        if (min === Number.POSITIVE_INFINITY) min = 0;
+        if (max === Number.NEGATIVE_INFINITY) max = 0;
+
+        return { min: min, max: max, isDate: isDate };
     }
 
     function executeButtonClicked() {
+        clearNavigatorFocus();
+
         for (const layer of layers) {
             layer.reset();
             layer.readUIData();
+
+            // 🔴 NEU: Strenge Validierung, bevor das Mapping ausgeführt wird!
+            if (!layer.metric.variant) {
+                alert(`Fehler in Layer ${layer.id}: Bitte wähle eine Metrik aus!`);
+                return; // Bricht den Start ab
+            }
+
+            const bounds = getMetricBounds(layer.metric.variant);
+            if (bounds) {
+                if (layer.metric.from > layer.metric.to) {
+                    alert(`Fehler in Layer ${layer.id}: Der Startwert darf nicht größer als der Endwert sein!`);
+                    return;
+                }
+
+                // Prüft, ob der User absichtlich Werte außerhalb des Gültigkeitsbereichs eingetippt hat
+                if (layer.metric.from < bounds.min || layer.metric.to > bounds.max) {
+                    let minStr = bounds.isDate ? new Date(bounds.min).toLocaleDateString() : bounds.min;
+                    let maxStr = bounds.isDate ? new Date(bounds.max).toLocaleDateString() : bounds.max;
+                    alert(`Fehler in Layer ${layer.id}:\nDer erlaubte Bereich für "${metrics[layer.metric.variant]}" liegt zwischen ${minStr} und ${maxStr}.`);
+                    return;
+                }
+            }
         }
 
         if (viewConfig && !viewEqualToMetricMappings(viewConfig, layers)) {
@@ -232,13 +163,9 @@ controllers.metricController = (function () {
 
     function changeView() {
         const selectedView = $(cssIDs.viewDropDown).igCombo("value");
-        const newViewConfig = controllerConfig.views.find(
-            (view) => view.name === selectedView,
-        );
+        const newViewConfig = controllerConfig.views.find((view) => view.name === selectedView);
         if (!newViewConfig) {
-            events.log.error.publish({
-                text: `MetricController - view ${selectedView} not found`,
-            });
+            events.log.error.publish({ text: `MetricController - view ${selectedView} not found` });
         } else {
             viewConfig = newViewConfig;
         }
@@ -257,14 +184,47 @@ controllers.metricController = (function () {
     }
 
     function executeMapping() {
+        let allMatchedEntities = [];
+
         for (const layer of layers) {
             layer.getMatchingEntities();
             layer.doMapping();
+            allMatchedEntities = allMatchedEntities.concat(layer.entities);
+        }
+
+        const uniqueEntities = [...new Set(allMatchedEntities)];
+
+        if (typeof NavigatorController !== "undefined") {
+            if (uniqueEntities.length > 0) {
+                let allEnts = [];
+                if (typeof model !== "undefined" && typeof model.getAllEntities === "function") {
+                    let entityMap = model.getAllEntities();
+                    if(entityMap) allEnts = Array.from(entityMap.values());
+                }
+
+                NavigatorController.load(uniqueEntities, function(activeEntity, allResults) {
+                    clearNavigatorFocus();
+
+                    lastUnmatched = allEnts.filter(e => allResults.indexOf(e) === -1);
+                    lastInactive = allResults.filter(e => e.id !== activeEntity.id);
+                    lastActive = [activeEntity];
+
+                    if (typeof canvasManipulator !== "undefined") {
+                        canvasManipulator.changeTransparencyOfEntities(lastUnmatched, 0.85, { name: "MetricNavigatorFocus" });
+                        canvasManipulator.changeTransparencyOfEntities(lastInactive, 0.6, { name: "MetricNavigatorFocus" });
+                        canvasManipulator.changeTransparencyOfEntities(lastActive, 0.0, { name: "MetricNavigatorFocus" });
+                    }
+
+                    if (typeof events !== "undefined" && events.selected) {
+                        events.selected.on.publish({ entities: [activeEntity] });
+                    }
+                });
+            } else {
+                NavigatorController.hide();
+            }
         }
     }
 
-    // Some AFrame properties are not flushed to the DOM until the next render (e.g. transparency by way of the material property)
-    // so wait until the next tick after the reset to re-modify transparency, otherwise the reset will not work
     async function executeMappingOnRender() {
         await canvasManipulator.waitForRenderOfElement(application.getCanvas());
         executeMapping();
@@ -279,7 +239,6 @@ controllers.metricController = (function () {
         }
 
         layers.push(newLayer);
-
         domHelper.buildUiLayer(layerCounter);
 
         if (layerCounter > 1) {
@@ -289,21 +248,12 @@ controllers.metricController = (function () {
     }
 
     function removeLayer(event) {
-        if (event !== undefined && event.currentTarget.disabled) {
-            return;
-        }
-
-        // SICHERHEITSCHECK: Verhindern, dass der User den allerletzten Layer über das UI wegklickt.
-        // (Wenn "event" definiert ist, war es ein Mausklick).
-        if (event !== undefined && layerCounter <= 1) {
-            return;
-        }
+        if (event !== undefined && event.currentTarget.disabled) return;
+        if (event !== undefined && layerCounter <= 1) return;
 
         layers.pop().reset();
         domHelper.destroyLayerUI(layerCounter--);
 
-        // WICHTIG: Vorherigen Button nur wieder aktivieren, wenn es NICHT der allerletzte Layer (Layer 1) ist.
-        // Vorher stand hier (layerCounter > 0).
         if (layerCounter > 1) {
             var btn = document.getElementById(domIDs.deleteButton + layerCounter);
             if (btn) {
@@ -315,50 +265,32 @@ controllers.metricController = (function () {
 
     function downloadViewConfig() {
         const viewName = prompt("Please enter View name", "View");
-
-        if (viewName === null) {
-            return;
-        }
+        if (viewName === null) return;
 
         let text = '{\n\tname: "' + viewName + '",\n\tviewMappings: [';
-
         for (const layer of layers) {
             layer.readUIData();
-            text +=
-                "\n\t\t{\n\t\t\tmetric: " +
-                JSON.stringify(layer.metric) +
-                ",\n\t\t\tmapping: " +
-                JSON.stringify(layer.mapping) +
-                "\n\t\t},";
+            text += "\n\t\t{\n\t\t\tmetric: " + JSON.stringify(layer.metric) + ",\n\t\t\tmapping: " + JSON.stringify(layer.mapping) + "\n\t\t},";
         }
-
         text = text.slice(0, -1);
         text += "\n\t]\n}";
-
         downloadObjectAsTxt("viewConfig" + viewName + ".txt", text);
     }
 
     function downloadObjectAsTxt(filename, text) {
         const pom = document.createElement("a");
-        pom.setAttribute(
-            "href",
-            "data:text/plain;charset=utf-8," + encodeURIComponent(text),
-        );
+        pom.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(text));
         pom.setAttribute("download", filename);
-        document.body.appendChild(pom); // required for firefox
+        document.body.appendChild(pom);
         pom.click();
         pom.remove();
     }
 
     function viewEqualToMetricMappings(view, layers) {
-        if (view.viewMappings.length != layers.length) {
-            return false;
-        }
-
-        return layers.every(
-            (layer, index) =>
-                isEqual(view.viewMappings[index].metric, layer.metric) &&
-                isEqual(view.viewMappings[index].mapping, layer.mapping),
+        if (view.viewMappings.length != layers.length) return false;
+        return layers.every((layer, index) =>
+            isEqual(view.viewMappings[index].metric, layer.metric) &&
+            isEqual(view.viewMappings[index].mapping, layer.mapping),
         );
     }
 
@@ -366,9 +298,7 @@ controllers.metricController = (function () {
         if (isObject(obj1) && isObject(obj2)) {
             return (
                 Object.keys(obj1).length === Object.keys(obj2).length &&
-                Object.keys(obj1).every(
-                    (key) => obj2.hasOwnProperty(key) && isEqual(obj1[key], obj2[key]),
-                )
+                Object.keys(obj1).every((key) => obj2.hasOwnProperty(key) && isEqual(obj1[key], obj2[key]))
             );
         } else {
             return obj1 === obj2;
@@ -383,6 +313,11 @@ controllers.metricController = (function () {
         $(cssIDs.viewDropDown).igCombo("clearInput");
 
         reset();
+        clearNavigatorFocus();
+
+        if (typeof NavigatorController !== "undefined") {
+            NavigatorController.hide();
+        }
 
         addLayer();
     }
@@ -397,9 +332,8 @@ controllers.metricController = (function () {
         initialize: initialize,
         activate: activate,
         reset: reset,
-
         removeLayer: removeLayer,
-
+        getMetricBounds: getMetricBounds, // 🔴 NEU: Wird für den DomHelper freigegeben
         metricDefault: metricDefault,
         mappingDefault: mappingDefault,
     };

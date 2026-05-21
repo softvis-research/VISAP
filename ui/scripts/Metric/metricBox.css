@@ -1,52 +1,64 @@
 /* ============================================================
-   VISAP metricBox.css – Redesign
+   VISAP metricBox.css – Redesign (Catppuccin Dark)
    ============================================================ */
 
-/* ── Festes unteres Panel ────────────────────────────────────── */
+/* ── 1. SPLITTER FIX (Zerstört den weißen Balken!) ──────────── */
+.ui-igsplitter-splitbar-horizontal,
+.ui-igsplitter-splitbar-vertical,
+.ui-splitbar {
+    background-image: none !important;
+    background-color: #313244 !important; /* Dunkles Grau für den Anfasser */
+    border: none !important;
+}
+.ui-igsplitter-collapse-button,
+.ui-igsplitter-expand-button {
+    background-image: none !important;
+    background-color: #45475a !important; /* Button im Balken abdunkeln */
+    border: 1px solid #1e1e2e !important;
+}
+
+/* ── 2. HAUPTCONTAINER ───────────────────────────────────────── */
 #metricControllerDiv {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 230px;
-    background: #1e1e2e;
+    /* Wichtig: Kein position:fixed! Der Splitter regelt das Layout. */
+    width: 100%;
+    height: 100%;
+    background: #1e1e2e !important;
     color: #cdd6f4;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 13px;
-    z-index: 99;
-    border-top: 2px solid #313244;
     box-sizing: border-box;
-    transition: right 0.25s ease;
+    overflow-y: auto; /* Scrollbar, falls zu viele Layer offen sind */
+
+    padding-right: 250px;
+    transition: padding-right 0.25s ease;
 }
 
+/* Wenn die Legende eingeklappt wird, bekommt das Metrik-Panel den Platz zurück */
 body.legend-collapsed #metricControllerDiv {
-    right: 36px;
+    padding-right: 40px;
 }
 
-body {
-    padding-bottom: 46px; /* nur Header-Höhe wenn collapsed */
-}
+/* Wir überschreiben alte body-paddings, die das Layout verschoben haben */
+body, body.metric-expanded { padding-bottom: 0 !important; }
 
-body.metric-expanded {
-    padding-bottom: 200px; /* Platz für mind. 2 Layer */
-}
-
-/* ── Header ──────────────────────────────────────────────────── */
+/* ── 3. HEADER ───────────────────────────────────────────────── */
 #viewControllerHeader {
     display: flex;
     align-items: center;
     background: #181825;
-    padding: 6px 10px;
+    padding: 6px 16px; /* Etwas mehr Luft an den Seiten */
     border-bottom: 1px solid #313244;
     width: 100%;
     box-sizing: border-box;
-    float: none;
-    line-height: normal;
-    font-size: 13px;
-    gap: 6px;
-    height: 44px;
+    height: 50px; /* Etwas höher für mehr Freiraum */
+    gap: 12px !important; /* 🔴 Das ist die Magie: Exakt 12px Platz zwischen JEDEM Element! */
 }
 
-/* Toggle-Button ganz links */
+/* Entfernt alte Margins, damit 'gap' sauber arbeiten kann */
+#viewControllerHeader > * {
+    margin: 0 !important;
+}
+
 #metricToggleBtn {
     background: none;
     border: none;
@@ -60,16 +72,13 @@ body.metric-expanded {
 #metricToggleBtn:hover { color: #cdd6f4; }
 
 #headerTextNode {
-    float: none;
     color: #cdd6f4;
     font-weight: 600;
     font-size: 13px;
     padding: 0;
-    margin: 0;
-    flex: 1;
+    flex: 1; /* Schiebt alle folgenden Buttons schön nach rechts */
 }
 
-/* Fragezeichen-Button */
 #metricHelpBtn {
     background: none;
     border: 1px solid #45475a;
@@ -87,82 +96,83 @@ body.metric-expanded {
 }
 #metricHelpBtn:hover { color: #cdd6f4; border-color: #cdd6f4; }
 
-.viewDropDown { float: none; }
-
-/* Header-Buttons */
-#downloadViewConfigButton,
-#addLayerButton,
-#executeButton,
-#resetButton {
-    float: none !important;
-    margin: 0 !important;
-    flex-shrink: 0;
+/* Das Dropdown-Feld im Header (macht es dunkel statt weiß) */
+.viewDropDown .ui-igcombo {
+    background: #313244 !important;
+    border: 1px solid #45475a !important;
+    border-radius: 4px !important;
+}
+.viewDropDown .ui-igcombo input {
+    color: #cdd6f4 !important;
 }
 
+/* Die Buttons */
 #downloadViewConfigButton {
-    padding: 4px 10px;
+    padding: 5px 12px;
     border: 1px solid #45475a;
     border-radius: 4px;
     background: none;
     color: #7f849c;
-    font-size: 11px;
+    font-size: 12px;
     cursor: pointer;
+    flex-shrink: 0;
 }
 #downloadViewConfigButton:hover { color: #cdd6f4; }
 
 #addLayerButton {
-    padding: 5px 10px;
+    padding: 5px 12px;
     border: 1px solid #45475a;
     border-radius: 4px;
     background: #313244;
     color: #cdd6f4;
     font-size: 12px;
     cursor: pointer;
+    flex-shrink: 0;
 }
 #addLayerButton:hover { background: #45475a; }
 
 #executeButton {
-    padding: 5px 18px;
+    padding: 5px 20px;
     border: none;
     border-radius: 20px;
     background: #89b4fa;
     color: #1e1e2e;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
+    flex-shrink: 0;
 }
 #executeButton:hover { opacity: 0.85; }
 
 #resetButton {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border: 1px solid #45475a;
     border-radius: 50%;
     background: transparent;
     color: #cdd6f4;
-    font-size: 15px;
+    font-size: 16px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0;
+    flex-shrink: 0;
 }
 #resetButton:hover { background: #313244; }
 
-/* ── Layer-Body (ein-/ausklappbar) ───────────────────────────── */
+/* ── 4. LAYER-BODY ───────────────────────────────────────────── */
 #metricLayerBody {
-    display: none;  /* collapsed by default */
-    flex-direction: column;  /* layers stack vertically */
-    align-items: stretch;
+    display: none;
+    flex-direction: column;
     width: 100%;
-    overflow: hidden;
+    background: #1e1e2e;
 }
 
 #metricLayerBody.metric-open {
     display: flex;
 }
 
-/* ── Layer-Wrapper: eine Zeile pro Layer ─────────────────────── */
 .metricLayerRow {
     display: flex;
     flex-direction: row;
@@ -173,71 +183,35 @@ body.metric-expanded {
     min-height: 90px;
 }
 
-/* ── Metrik-Sektion ──────────────────────────────────────────── */
+/* ── 5. LAYER-INHALTE ────────────────────────────────────────── */
 .metricDiv {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    padding: 8px 12px;
+    padding: 10px 16px;
     width: 320px;
     min-width: 240px;
-    height: auto;
     border: none !important;
     border-right: 1px solid #313244 !important;
     background: transparent;
-    float: none;
-    clear: none;
     box-sizing: border-box;
     gap: 6px;
 }
 
-/* ── Mapping-Sektion ─────────────────────────────────────────── */
 .mappingDiv {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    padding: 8px 12px;
+    padding: 10px 16px;
     flex: 1;
-    height: auto;
     border: none !important;
-    border-right: 1px solid #313244 !important;
     background: transparent;
-    overflow: visible;
     box-sizing: border-box;
     gap: 6px;
 }
 
-/* Delete-Button sitzt neben metricDiv/mappingDiv */
-.deleteButton {
-    float: none !important;
-    border: 1px solid #45475a !important;
-    background: transparent !important;
-    color: #f38ba8 !important;
-    border-radius: 4px !important;
-    cursor: pointer;
-    align-self: flex-start;
-    margin: 8px 6px 0 0 !important;
-    flex-shrink: 0;
-    font-size: 14px;
-    width: 28px;
-    height: 28px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    line-height: 1;
-}
-.deleteButton:hover { background: #313244 !important; }
-.deleteButton:disabled,
-.deleteButton.ui-state-disabled {
-    opacity: 0.3 !important;
-    cursor: default !important;
-    pointer-events: none;
-}
-
-/* ── Section-Labels ──────────────────────────────────────────── */
 .sectionLabel {
     font-size: 10px;
     font-weight: 700;
@@ -246,7 +220,6 @@ body.metric-expanded {
     color: #7f849c;
 }
 
-/* ── Textlabels ──────────────────────────────────────────────── */
 .textLabel {
     font-size: 12px;
     color: #a6adc8;
@@ -255,7 +228,6 @@ body.metric-expanded {
     white-space: nowrap;
 }
 
-/* ── Start/End Range ─────────────────────────────────────────── */
 .metricRangeRow {
     display: flex;
     align-items: flex-end;
@@ -280,25 +252,31 @@ body.metric-expanded {
     padding-bottom: 6px;
 }
 
-/* ── Ignite Dropdowns ────────────────────────────────────────── */
-.ui-igcombo-container,
-.ui-igcombo {
-    background: #313244 !important;
+/* ── Delete Button ── */
+.deleteButton {
     border: 1px solid #45475a !important;
-    border-radius: 4px !important;
-    color: #cdd6f4 !important;
-    font-size: 12px !important;
-}
-.ui-igcombo-container .ui-igcombo-field {
-    color: #cdd6f4 !important;
     background: transparent !important;
+    color: #f38ba8 !important;
+    border-radius: 4px !important;
+    cursor: pointer;
+    align-self: flex-start;
+    margin: 10px 10px 0 10px !important;
+    flex-shrink: 0;
+    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
 }
-.ui-igcombo-container .ui-igcombo-button {
-    background: #45475a !important;
-    border-left: 1px solid #585b70 !important;
-}
+.deleteButton:hover { background: #313244 !important; }
 
-/* ── Ignite Numerische Felder ────────────────────────────────── */
+/* ── 6. IGNITE FORMS (Dropdowns & Inputs im Dark Mode) ───────── */
+.ui-widget-content,
+.ui-igcombo-container,
+.ui-igcombo,
 .ui-igedit-container,
 .ui-igedit {
     background: #313244 !important;
@@ -307,27 +285,12 @@ body.metric-expanded {
     color: #cdd6f4 !important;
     font-size: 12px !important;
 }
+.ui-igcombo-container .ui-igcombo-field,
 .ui-igedit-container input {
     color: #cdd6f4 !important;
     background: transparent !important;
 }
-
-.metricNumParameter,
-.metricDateParameter { text-align: right; }
-.mappingParameter { text-align: right; }
-
-/* ── jQuery-UI Resize-Handle unterdrücken ────────────────────── */
-/* Infragistics/jQuery-UI injiziert einen .ui-resizable-handle
-   als weißen Balken über dem Panel. */
-#metricControllerDiv .ui-resizable-handle,
-#metricControllerDiv .ui-resizable-n,
-#metricControllerDiv .ui-resizable-s,
-#metricControllerDiv .ui-resizable-e,
-#metricControllerDiv .ui-resizable-w {
-    display: none !important;
-    height: 0 !important;
-    width: 0 !important;
-    background: none !important;
+.ui-igcombo-container .ui-igcombo-button {
+    background: #45475a !important;
+    border-left: 1px solid #585b70 !important;
 }
-
-/* Tooltip-Styles: siehe scripts/Tooltip/tooltip.css */
