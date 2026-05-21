@@ -120,24 +120,88 @@ controllers.canvasHoverController = (function () {
 		$("#tooltip").css("display", "none");
 	}
 
-	function getTooltipName(entity) {
-		if (entity.type === "Reference") {
-			return `Reference: ${entity.name}`;
-		} else if (entity.type === "Namespace") {
-			return `Package: ${entity.name}`;
-		} else {
-			const packages = entity.allParents.filter(parent => parent.type === "Namespace");
-			if (packages.length === 0) {
-				return `${entity.type}: ${entity.name}`;
-			}
+    function getTooltipName(entity) {
+        let sections = []; // Wir sammeln die Text-Blöcke und setzen die Linien am Ende automatisch
 
-			const namespace = packages[0].name;
-			if (entity.type === "Method" && entity.signature != "") {
-				return `Package: ${namespace}<br/>${entity.type}: ${entity.signature}`;
-			}
-			return `Package: ${namespace}<br/>${entity.type}: ${entity.name}`;
-		}
-	}
+        // ── 1. Basis-Info (Paket & Name) ──
+        let headerText = "";
+        if (entity.type === "Reference") {
+            headerText += `<b>Reference:</b> ${entity.name}`;
+        } else if (entity.type === "Namespace") {
+            headerText += `<b>Package:</b> ${entity.name}`;
+        } else {
+            const packages = entity.allParents.filter(parent => parent.type === "Namespace");
+            if (packages.length > 0) {
+                headerText += `<b>Package:</b> ${packages[0].name}<br/>`;
+            }
+            if (entity.type === "Method" && entity.signature) {
+                headerText += `<b>${entity.type}:</b> ${entity.signature}`;
+            } else {
+                headerText += `<b>${entity.type}:</b> ${entity.name}`;
+            }
+        }
+        if (headerText) sections.push(headerText);
+
+        // ── 2. Lebenszyklus (Daten) ──
+        // VISAP parst die Daten in echte Date-Objekte. Wir prüfen, ob sie gültig sind.
+        let lifeText = "";
+        if (entity.dateOfCreation && entity.dateOfCreation.getFullYear() > 1970) {
+            lifeText += `<span style="color:#a6adc8">Erstellt:</span> ${entity.dateOfCreation.toLocaleDateString()}<br/>`;
+        }
+        if (entity.dateOfLastChange && entity.dateOfLastChange.getFullYear() > 1970) {
+            lifeText += `<span style="color:#a6adc8">Geändert:</span> ${entity.dateOfLastChange.toLocaleDateString()}`;
+        }
+
+        lifeText = lifeText.replace(/<br\/>$/, "");
+        if (lifeText) sections.push(lifeText);
+
+        // ── 3. Typ-spezifische Informationen (Metriken & Beziehungen) ──
+        let metricText = "";
+
+        // WICHTIG: Wir nutzen jetzt entity.type, das garantiert von VISAP befüllt wird!
+        switch (entity.type) {
+            case "Class":
+            case "Interface":
+                if (entity.number_of_methods !== undefined) {
+                    metricText += `<span style="color:#a6adc8">Methoden:</span> ${entity.number_of_methods}<br/>`;
+                }
+                if (entity.number_of_attributes !== undefined) {
+                    metricText += `<span style="color:#a6adc8">Attribute:</span> ${entity.number_of_attributes}<br/>`;
+                }
+                break;
+
+            case "Method":
+            case "FunctionModule":
+            case "FormRoutine":
+            case "Report": // Hier fällt dein Report rein!
+                if (entity.number_of_statements !== undefined) {
+                    metricText += `<span style="color:#a6adc8">Code-Statements:</span> ${entity.number_of_statements}<br/>`;
+                }
+                if (entity.cyclomatic_complexity !== undefined) {
+                    metricText += `<span style="color:#a6adc8">Komplexität:</span> ${entity.cyclomatic_complexity}<br/>`;
+                }
+
+                // Beziehungs-Zähler (Vernetzung im Code)
+                if (entity.calls && entity.calls.length > 0) {
+                    metricText += `<span style="color:#a6adc8">Ruft auf:</span> ${entity.calls.length} Elemente<br/>`;
+                }
+                if (entity.calledBy && entity.calledBy.length > 0) {
+                    metricText += `<span style="color:#a6adc8">Wird aufgerufen von:</span> ${entity.calledBy.length} Elementen<br/>`;
+                }
+                break;
+
+            case "Attribute":
+                if (entity.accessedBy && entity.accessedBy.length > 0) {
+                    metricText += `<span style="color:#a6adc8">Lese-/Schreibzugriffe:</span> ${entity.accessedBy.length}x<br/>`;
+                }
+                break;
+        }
+
+        metricText = metricText.replace(/<br\/>$/, "");
+        if (metricText) sections.push(metricText);
+
+        return sections.join('<hr style="margin: 6px 0; border: 0; border-top: 1px solid #45475a;" />');
+    }
 
 	return {
 		initialize: initialize,

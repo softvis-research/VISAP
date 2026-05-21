@@ -1,6 +1,6 @@
 /**
  * SearchController.js
- * Suchfeld + kaskadierende Filter für VISAP.
+ * Suchfeld + kaskadierende Filter + Autocomplete für VISAP.
  * Datenquelle: model.getAllEntities() (aus Model.js).
  * * Hierarchie (Korrekt nach ABAP-Struktur):
  * Namespace (Paket)
@@ -60,7 +60,7 @@ var SearchController = (function () {
         });
     }
 
-    // ── Select-Optionen befüllen ──────────────────────────────────────────────
+    // ── Select-Optionen & Autocomplete befüllen ───────────────────────────────
     function fillSelect(selectEl, items, placeholder) {
         selectEl.innerHTML = "";
         var ph = el("option", "", placeholder || "— auswählen —");
@@ -84,6 +84,32 @@ var SearchController = (function () {
         ph.value = "";
         selectEl.appendChild(ph);
         selectEl.disabled = true;
+    }
+
+    function populateAutocomplete() {
+        var dl = document.getElementById("search-autocomplete-list");
+        if (!dl) return;
+        dl.innerHTML = "";
+
+        var entities = getEntities();
+        var uniqueNames = [];
+
+        // Eindeutige Namen extrahieren
+        entities.forEach(function(e) {
+            if (e.name && uniqueNames.indexOf(e.name) === -1) {
+                uniqueNames.push(e.name);
+            }
+        });
+
+        // Alphabetisch sortieren
+        uniqueNames.sort(function(a, b) { return a.localeCompare(b); });
+
+        // Optionen in die Datalist einfügen
+        uniqueNames.forEach(function(name) {
+            var opt = el("option");
+            opt.value = name;
+            dl.appendChild(opt);
+        });
     }
 
     // ── Kaskadierendes Filter-Update ──────────────────────────────────────────
@@ -279,11 +305,21 @@ var SearchController = (function () {
     }
 
     function buildTextInput() {
+        var wrapper = el("div");
+        wrapper.style.width = "100%";
+
         var inp = el("input", "search-input");
         inp.type = "text";
         inp.id   = "search-input-text";
         inp.placeholder = "Suchbegriff …";
-        return inp;
+        inp.setAttribute("list", "search-autocomplete-list"); // HTML5 Datalist Verknüpfung
+
+        var dl = el("datalist");
+        dl.id = "search-autocomplete-list";
+
+        wrapper.appendChild(inp);
+        wrapper.appendChild(dl);
+        return wrapper;
     }
 
     function buildSelect(id, placeholder) {
@@ -372,6 +408,7 @@ var SearchController = (function () {
                 if (getEntities().length > 0) {
                     clearInterval(dataCheckInterval);
                     populatePaketSelect();
+                    populateAutocomplete(); // Befüllt die Autocomplete-Liste
                 }
             } catch (err) {
                 console.warn("SearchController wartet auf Model...", err);
