@@ -43,6 +43,10 @@ class DomHelper {
             '<button id="' + domIDs.addLayerButton + '">+ Layer</button>' +
             '<button id="' + domIDs.executeButton + '">Start</button>' +
             '<button id="' + domIDs.resetButton + '" title="Parameter zur\u00fccksetzen">&#x21BA;</button>' +
+            '<label class="metric-dim-label" title="Nicht relevante Elemente bei Navigation transparent machen">' +
+            '<input type="checkbox" id="metricDimBackground" checked>' +
+            ' Dim' +
+            '</label>' +
             '</div>' +
             '<div id="metricLayerBody"></div>';
 
@@ -75,6 +79,10 @@ class DomHelper {
         });
 
         TooltipController.register("metricTooltip", "metricHelpBtn", "metricController");
+
+        document.getElementById("metricDimBackground").addEventListener("change", function() {
+            metricController.applyDimming(this.checked);
+        });
 
         $(cssIDs.viewDropDown).igCombo(Object.assign({}, this.defaultIgComboSettings, {
             height: widgetSize.headerDropDownHeight,

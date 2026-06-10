@@ -254,7 +254,7 @@ var SearchController = (function () {
 
                     // B) Inaktive Treffer: Orange, leicht transparent
                     canvasManipulator.changeColorOfEntities(inactiveResults, "orange", { name: "SearchController" });
-                    canvasManipulator.changeTransparencyOfEntities(inactiveResults, 0.6, { name: "SearchController" });
+                    canvasManipulator.changeTransparencyOfEntities(inactiveResults, 0.3, { name: "SearchController" });
 
                     // C) Aktives Element: Rot, voll sichtbar
                     canvasManipulator.changeColorOfEntities([activeEntity], "red", { name: "SearchController" });

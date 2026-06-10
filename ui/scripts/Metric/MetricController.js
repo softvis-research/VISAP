@@ -216,12 +216,19 @@ controllers.metricController = (function () {
                     lastActive = [activeEntity];
 
                     if (typeof canvasManipulator !== "undefined") {
-                        // Hintergrund leicht transparent
-                        canvasManipulator.changeTransparencyOfEntities(lastUnmatched, 0.4, { name: "MetricNavigatorFocus" });
+                        const dimCheckbox = document.getElementById("metricDimBackground");
+                        const shouldDim = !dimCheckbox || dimCheckbox.checked;
+
+                        // Hintergrund: nur dimmen wenn Checkbox aktiv
+                        if (shouldDim) {
+                            canvasManipulator.changeTransparencyOfEntities(lastUnmatched, 0.4, { name: "MetricNavigatorFocus" });
+                        } else {
+                            canvasManipulator.resetTransparencyOfEntities(lastUnmatched, { name: "MetricNavigatorFocus" });
+                        }
 
                         // Inaktive Treffer: Orange, leicht transparent
                         canvasManipulator.changeColorOfEntities(lastInactive, "orange", { name: "MetricNavigatorFocus" });
-                        canvasManipulator.changeTransparencyOfEntities(lastInactive, 0.6, { name: "MetricNavigatorFocus" });
+                        canvasManipulator.changeTransparencyOfEntities(lastInactive, 0.3, { name: "MetricNavigatorFocus" });
 
                         // Aktives Element: Rot, voll sichtbar
                         canvasManipulator.changeColorOfEntities(lastActive, "red", { name: "MetricNavigatorFocus" });
@@ -341,6 +348,15 @@ controllers.metricController = (function () {
         }
     }
 
+    function applyDimming(shouldDim) {
+        if (typeof canvasManipulator === "undefined" || lastUnmatched.length === 0) return;
+        if (shouldDim) {
+            canvasManipulator.changeTransparencyOfEntities(lastUnmatched, 0.4, { name: "MetricNavigatorFocus" });
+        } else {
+            canvasManipulator.resetTransparencyOfEntities(lastUnmatched, { name: "MetricNavigatorFocus" });
+        }
+    }
+
     function getActiveLayers() {
         return layers.filter(function(l) { return l.metric && l.metric.variant; });
     }
@@ -351,6 +367,7 @@ controllers.metricController = (function () {
         reset: reset,
         removeLayer: removeLayer,
         getMetricBounds: getMetricBounds,
+        applyDimming: applyDimming,
         getActiveLayers: getActiveLayers,
         metricDefault: metricDefault,
         mappingDefault: mappingDefault,

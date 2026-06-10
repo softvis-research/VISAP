@@ -16,8 +16,9 @@ var TooltipController = (function () {
     var TOOLTIPS = {
         metricController: 'Wählen Sie eine Metrik und ein Intervall. ' +
             'Standardmäßig werden die Minimal- und Maximalwerte der ausgewählten Metrik verwendet. ' +
-            'Bestimmen Sie das visuelle Mapping (z. B. Farbe) und klicken Sie auf „Start“. ' +
-            'Das Refresh-Symbol setzt Ihre Eingaben zurück.',
+            'Bestimmen Sie das visuelle Mapping (z. B. Farbe) und klicken Sie auf „Start”. ' +
+            'Das Refresh-Symbol setzt Ihre Eingaben zurück. ' +
+            'Die Checkbox <b>Dim</b> steuert, ob nicht relevante Elemente bei der Navigation transparent dargestellt werden.',
 
         navigator: 'Navigieren Sie zwischen den betroffenen Paketen Ihrer ' +
             'Auswahl. Nutzen Sie daf\u00fcr die Pfeiltasten, um direkt zum ' +

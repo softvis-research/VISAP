@@ -161,6 +161,24 @@ body, body.metric-expanded { padding-bottom: 0 !important; }
 }
 #resetButton:hover { background: #313244; }
 
+.metric-dim-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #a6adc8;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    user-select: none;
+}
+.metric-dim-label input[type="checkbox"] {
+    accent-color: #89b4fa;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
 /* ── 4. LAYER-BODY ───────────────────────────────────────────── */
 #metricLayerBody {
     display: none;
