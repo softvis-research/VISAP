@@ -242,19 +242,17 @@ var SearchController = (function () {
                 });
 
                 if (typeof canvasManipulator !== "undefined") {
-                    // A) ALLE Treffer rot färben
-                    canvasManipulator.changeColorOfEntities(allResults, "red", { name: "SearchController" });
-
-                    // B) Restliche Stadt transparent machen (0.85)
-                    canvasManipulator.changeTransparencyOfEntities(lastNonMatchedEntities, 0.85, { name: "SearchController" });
-
-                    // C) INAKTIVE Treffer halb-transparent machen (0.6)
                     var inactiveResults = allResults.filter(function(e) { return e.id !== activeEntity.id; });
-                    if (inactiveResults.length > 0) {
-                        canvasManipulator.changeTransparencyOfEntities(inactiveResults, 0.6, { name: "SearchController" });
-                    }
 
-                    // D) Das AKTIVE Element komplett undurchsichtig machen (0.0)
+                    // A) Hintergrund leicht transparent machen
+                    canvasManipulator.changeTransparencyOfEntities(lastNonMatchedEntities, 0.4, { name: "SearchController" });
+
+                    // B) Inaktive Treffer: Orange, voll sichtbar
+                    canvasManipulator.changeColorOfEntities(inactiveResults, "orange", { name: "SearchController" });
+                    canvasManipulator.changeTransparencyOfEntities(inactiveResults, 0.0, { name: "SearchController" });
+
+                    // C) Aktives Element: Rot, voll sichtbar
+                    canvasManipulator.changeColorOfEntities([activeEntity], "red", { name: "SearchController" });
                     canvasManipulator.changeTransparencyOfEntities([activeEntity], 0.0, { name: "SearchController" });
                 }
 

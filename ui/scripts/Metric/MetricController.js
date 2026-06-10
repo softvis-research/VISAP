@@ -80,8 +80,14 @@ controllers.metricController = (function () {
     function clearNavigatorFocus() {
         if (typeof canvasManipulator !== "undefined") {
             if (lastUnmatched.length > 0) canvasManipulator.resetTransparencyOfEntities(lastUnmatched, { name: "MetricNavigatorFocus" });
-            if (lastInactive.length > 0) canvasManipulator.resetTransparencyOfEntities(lastInactive, { name: "MetricNavigatorFocus" });
-            if (lastActive.length > 0) canvasManipulator.resetTransparencyOfEntities(lastActive, { name: "MetricNavigatorFocus" });
+            if (lastInactive.length > 0) {
+                canvasManipulator.resetColorOfEntities(lastInactive, { name: "MetricNavigatorFocus" });
+                canvasManipulator.resetTransparencyOfEntities(lastInactive, { name: "MetricNavigatorFocus" });
+            }
+            if (lastActive.length > 0) {
+                canvasManipulator.resetColorOfEntities(lastActive, { name: "MetricNavigatorFocus" });
+                canvasManipulator.resetTransparencyOfEntities(lastActive, { name: "MetricNavigatorFocus" });
+            }
         }
 
         if (typeof events !== "undefined" && events.selected && lastActive.length > 0) {
@@ -210,8 +216,15 @@ controllers.metricController = (function () {
                     lastActive = [activeEntity];
 
                     if (typeof canvasManipulator !== "undefined") {
-                        canvasManipulator.changeTransparencyOfEntities(lastUnmatched, 0.85, { name: "MetricNavigatorFocus" });
-                        canvasManipulator.changeTransparencyOfEntities(lastInactive, 0.6, { name: "MetricNavigatorFocus" });
+                        // Hintergrund leicht transparent
+                        canvasManipulator.changeTransparencyOfEntities(lastUnmatched, 0.4, { name: "MetricNavigatorFocus" });
+
+                        // Inaktive Treffer: Orange, voll sichtbar
+                        canvasManipulator.changeColorOfEntities(lastInactive, "orange", { name: "MetricNavigatorFocus" });
+                        canvasManipulator.changeTransparencyOfEntities(lastInactive, 0.0, { name: "MetricNavigatorFocus" });
+
+                        // Aktives Element: Rot, voll sichtbar
+                        canvasManipulator.changeColorOfEntities(lastActive, "red", { name: "MetricNavigatorFocus" });
                         canvasManipulator.changeTransparencyOfEntities(lastActive, 0.0, { name: "MetricNavigatorFocus" });
                     }
 

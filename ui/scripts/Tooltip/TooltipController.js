@@ -14,10 +14,10 @@ var TooltipController = (function () {
 
     // ── Tooltip-Texte ────────────────────────────────────────────
     var TOOLTIPS = {
-        metricController: 'W\u00e4hlen Sie eine Metrik und ein Intervall ' +
-            '(Standardwerte sind vordefiniert). Bestimmen Sie das visuelle ' +
-            'Mapping (z.\u00a0B. Farbe) und klicken Sie auf \u201eStart\u201c. ' +
-            'Das Refresh-Symbol setzt Ihre Eingaben zur\u00fcck.',
+        metricController: 'Wählen Sie eine Metrik und ein Intervall. ' +
+            'Standardmäßig werden die Minimal- und Maximalwerte der ausgewählten Metrik verwendet. ' +
+            'Bestimmen Sie das visuelle Mapping (z. B. Farbe) und klicken Sie auf „Start“. ' +
+            'Das Refresh-Symbol setzt Ihre Eingaben zurück.',
 
         navigator: 'Navigieren Sie zwischen den betroffenen Paketen Ihrer ' +
             'Auswahl. Nutzen Sie daf\u00fcr die Pfeiltasten, um direkt zum ' +
