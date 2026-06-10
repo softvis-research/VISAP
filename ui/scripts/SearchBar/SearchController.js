@@ -173,7 +173,12 @@ var SearchController = (function () {
             results = getEntities();
         }
 
-        return results;
+        var seen = {};
+        return results.filter(function(e) {
+            if (seen[e.id]) return false;
+            seen[e.id] = true;
+            return true;
+        });
     }
 
     // ── Zentrale Funktion für den visuellen Reset ─────────────────────────────
