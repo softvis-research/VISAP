@@ -236,32 +236,43 @@ var SearchController = (function () {
         }
 
         if (typeof NavigatorController !== "undefined") {
-            // Übergabe der Callback-Funktion an den Navigator für dynamisches Hovern
+            // Non-matched EINMAL berechnen – Set für O(1)-Lookup statt O(n) indexOf
+            var resultsSet = new Set(results.map(function(e) { return e.id; }));
+            lastSearchResults = results;
+            lastNonMatchedEntities = getEntities().filter(function(e) {
+                return !resultsSet.has(e.id);
+            });
+
+            // Hintergrund EINMAL dimmen – nicht bei jedem Navigator-Schritt
+            if (typeof canvasManipulator !== "undefined") {
+                canvasManipulator.changeTransparencyOfEntities(lastNonMatchedEntities, 0.4, { name: "SearchController" });
+            }
+
+            var prevActive = null;
+            var prevInactive = [];
+
             NavigatorController.load(results, function(activeEntity, allResults) {
-
-                clearVisuals();
-
-                lastSearchResults = allResults;
-                lastNonMatchedEntities = getEntities().filter(function(e) {
-                    return allResults.indexOf(e) === -1;
-                });
-
                 if (typeof canvasManipulator !== "undefined") {
+                    // Nur die Elemente zurücksetzen, die sich vom letzten Schritt geändert haben
+                    if (prevActive) {
+                        canvasManipulator.resetColorOfEntities([prevActive], { name: "SearchController" });
+                    }
+                    if (prevInactive.length > 0) {
+                        canvasManipulator.resetColorOfEntities(prevInactive, { name: "SearchController" });
+                        canvasManipulator.resetTransparencyOfEntities(prevInactive, { name: "SearchController" });
+                    }
+
                     var inactiveResults = allResults.filter(function(e) { return e.id !== activeEntity.id; });
 
-                    // A) Hintergrund leicht transparent machen
-                    canvasManipulator.changeTransparencyOfEntities(lastNonMatchedEntities, 0.4, { name: "SearchController" });
-
-                    // B) Inaktive Treffer: Orange, leicht transparent
                     canvasManipulator.changeColorOfEntities(inactiveResults, "orange", { name: "SearchController" });
                     canvasManipulator.changeTransparencyOfEntities(inactiveResults, 0.3, { name: "SearchController" });
-
-                    // C) Aktives Element: Rot, voll sichtbar
                     canvasManipulator.changeColorOfEntities([activeEntity], "red", { name: "SearchController" });
                     canvasManipulator.changeTransparencyOfEntities([activeEntity], 0.0, { name: "SearchController" });
+
+                    prevActive = activeEntity;
+                    prevInactive = inactiveResults;
                 }
 
-                // E) KAMERA-FLUG
                 if (typeof events !== "undefined" && events.selected) {
                     events.selected.on.publish({ entities: [activeEntity] });
                 }

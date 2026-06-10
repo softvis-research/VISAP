@@ -19,6 +19,16 @@ controllers.canvasManipulator = (function () {
 	let hiddenEntitiesMap = new Map();
 	let notificationCallbackQueue = [];
 
+	const domElementCache = new Map();
+
+	function getCachedElement(id) {
+		let el = domElementCache.get(id);
+		if (!el) {
+			el = document.getElementById(id);
+			if (el) domElementCache.set(id, el);
+		}
+		return el;
+	}
 
 	function initialize() {
 		scene = application.getCanvas();
@@ -59,8 +69,8 @@ controllers.canvasManipulator = (function () {
 				return;
 			}
 
-			const component = document.getElementById(entity.id);
-			if (component === undefined) {
+			const component = getCachedElement(entity.id);
+			if (!component) {
 				events.log.error.publish({ text: "CanvasManipulator - changeTransparencyOfEntities - components for entityIds not found" });
 				return;
 			}
@@ -116,7 +126,7 @@ controllers.canvasManipulator = (function () {
 			transparencyList.splice(transparencyEffectIndex, 1);
 
 			if (transparencyEffectIndex === transparencyList.length) {
-				const component = document.getElementById(entity.id);
+				const component = getCachedElement(entity.id);
 				if (!component) {
 					events.log.error.publish({ text: "CanvasManipulator - resetTransparencyOfEntities - components for entityIds not found" });
 					return;
@@ -219,7 +229,7 @@ controllers.canvasManipulator = (function () {
 				return;
 			}
 
-			const component = document.getElementById(entity.id);
+			const component = getCachedElement(entity.id);
 			if (!component) {
 				events.log.error.publish({ text: "CanvasManipulator - changeColorOfEntities - components for entityIds not found" });
 				return;
@@ -273,7 +283,7 @@ controllers.canvasManipulator = (function () {
 			colorList.splice(colorEffectIndex, 1);
 
 			if (colorEffectIndex === colorList.length) {
-				const component = document.getElementById(entity.id);
+				const component = getCachedElement(entity.id);
 				if (!component) {
 					events.log.error.publish({ text: "CanvasManipulator - resetColorOfEntities - components for entityIds not found" });
 					return;

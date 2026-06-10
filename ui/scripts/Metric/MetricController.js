@@ -205,32 +205,39 @@ controllers.metricController = (function () {
                 let allEnts = [];
                 if (typeof model !== "undefined" && typeof model.getAllEntities === "function") {
                     let entityMap = model.getAllEntities();
-                    if(entityMap) allEnts = Array.from(entityMap.values());
+                    if (entityMap) allEnts = Array.from(entityMap.values());
+                }
+
+                // Non-matched EINMAL berechnen – Set für O(1)-Lookup statt O(n) indexOf
+                const matchedSet = new Set(uniqueEntities.map(e => e.id));
+                lastUnmatched = allEnts.filter(e => !matchedSet.has(e.id));
+
+                // Hintergrund EINMAL dimmen – nicht bei jedem Navigator-Schritt
+                if (typeof canvasManipulator !== "undefined") {
+                    const dimCheckbox = document.getElementById("metricDimBackground");
+                    const shouldDim = !dimCheckbox || dimCheckbox.checked;
+                    if (shouldDim) {
+                        canvasManipulator.changeTransparencyOfEntities(lastUnmatched, 0.4, { name: "MetricNavigatorFocus" });
+                    }
                 }
 
                 NavigatorController.load(uniqueEntities, function(activeEntity, allResults) {
-                    clearNavigatorFocus();
-
-                    lastUnmatched = allEnts.filter(e => allResults.indexOf(e) === -1);
-                    lastInactive = allResults.filter(e => e.id !== activeEntity.id);
-                    lastActive = [activeEntity];
-
                     if (typeof canvasManipulator !== "undefined") {
-                        const dimCheckbox = document.getElementById("metricDimBackground");
-                        const shouldDim = !dimCheckbox || dimCheckbox.checked;
-
-                        // Hintergrund: nur dimmen wenn Checkbox aktiv
-                        if (shouldDim) {
-                            canvasManipulator.changeTransparencyOfEntities(lastUnmatched, 0.4, { name: "MetricNavigatorFocus" });
-                        } else {
-                            canvasManipulator.resetTransparencyOfEntities(lastUnmatched, { name: "MetricNavigatorFocus" });
+                        // Nur die Elemente zurücksetzen, die sich vom letzten Schritt geändert haben
+                        if (lastInactive.length > 0) {
+                            canvasManipulator.resetColorOfEntities(lastInactive, { name: "MetricNavigatorFocus" });
+                            canvasManipulator.resetTransparencyOfEntities(lastInactive, { name: "MetricNavigatorFocus" });
+                        }
+                        if (lastActive.length > 0) {
+                            canvasManipulator.resetColorOfEntities(lastActive, { name: "MetricNavigatorFocus" });
+                            canvasManipulator.resetTransparencyOfEntities(lastActive, { name: "MetricNavigatorFocus" });
                         }
 
-                        // Inaktive Treffer: Orange, leicht transparent
-                        canvasManipulator.changeColorOfEntities(lastInactive, "orange", { name: "MetricNavigatorFocus" });
-                        canvasManipulator.changeTransparencyOfEntities(lastInactive, 0.3, { name: "MetricNavigatorFocus" });
+                        lastInactive = allResults.filter(e => e.id !== activeEntity.id);
+                        lastActive = [activeEntity];
 
-                        // Aktives Element: Rot, voll sichtbar
+                        canvasManipulator.changeColorOfEntities(lastInactive, "orange", { name: "MetricNavigatorFocus" });
+                        canvasManipulator.changeTransparencyOfEntities(lastInactive, 0.6, { name: "MetricNavigatorFocus" });
                         canvasManipulator.changeColorOfEntities(lastActive, "red", { name: "MetricNavigatorFocus" });
                         canvasManipulator.changeTransparencyOfEntities(lastActive, 0.0, { name: "MetricNavigatorFocus" });
                     }
