@@ -341,12 +341,17 @@ controllers.metricController = (function () {
         }
     }
 
+    function getActiveLayers() {
+        return layers.filter(function(l) { return l.metric && l.metric.variant; });
+    }
+
     return {
         initialize: initialize,
         activate: activate,
         reset: reset,
         removeLayer: removeLayer,
-        getMetricBounds: getMetricBounds, // 🔴 NEU: Wird für den DomHelper freigegeben
+        getMetricBounds: getMetricBounds,
+        getActiveLayers: getActiveLayers,
         metricDefault: metricDefault,
         mappingDefault: mappingDefault,
     };

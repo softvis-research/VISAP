@@ -200,6 +200,31 @@ controllers.canvasHoverController = (function () {
         metricText = metricText.replace(/<br\/>$/, "");
         if (metricText) sections.push(metricText);
 
+        // ── 4. Aktive Metrik-Layer ──
+        if (typeof metricController !== "undefined" && typeof metrics !== "undefined") {
+            const activeLayers = metricController.getActiveLayers();
+            if (activeLayers.length > 0) {
+                let activeMetricText = "";
+                activeLayers.forEach(function(layer) {
+                    const variant = layer.metric.variant;
+                    const displayName = metrics[variant] || variant;
+                    let value = entity[variant];
+                    if (value === undefined || value === null) return;
+
+                    const isDate = (variant === "dateOfCreation" || variant === "dateOfLastChange");
+                    if (isDate) {
+                        value = (value instanceof Date)
+                            ? value.toLocaleDateString()
+                            : new Date(value).toLocaleDateString();
+                    }
+
+                    activeMetricText += `<span style="color:#a6adc8">${displayName}:</span> ${value}<br/>`;
+                });
+                activeMetricText = activeMetricText.replace(/<br\/>$/, "");
+                if (activeMetricText) sections.push(activeMetricText);
+            }
+        }
+
         return sections.join('<hr style="margin: 6px 0; border: 0; border-top: 1px solid #45475a;" />');
     }
 
