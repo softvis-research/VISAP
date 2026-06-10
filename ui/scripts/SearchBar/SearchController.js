@@ -252,9 +252,9 @@ var SearchController = (function () {
                     // A) Hintergrund leicht transparent machen
                     canvasManipulator.changeTransparencyOfEntities(lastNonMatchedEntities, 0.4, { name: "SearchController" });
 
-                    // B) Inaktive Treffer: Orange, voll sichtbar
+                    // B) Inaktive Treffer: Orange, leicht transparent
                     canvasManipulator.changeColorOfEntities(inactiveResults, "orange", { name: "SearchController" });
-                    canvasManipulator.changeTransparencyOfEntities(inactiveResults, 0.0, { name: "SearchController" });
+                    canvasManipulator.changeTransparencyOfEntities(inactiveResults, 0.6, { name: "SearchController" });
 
                     // C) Aktives Element: Rot, voll sichtbar
                     canvasManipulator.changeColorOfEntities([activeEntity], "red", { name: "SearchController" });

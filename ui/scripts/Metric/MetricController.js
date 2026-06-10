@@ -219,9 +219,9 @@ controllers.metricController = (function () {
                         // Hintergrund leicht transparent
                         canvasManipulator.changeTransparencyOfEntities(lastUnmatched, 0.4, { name: "MetricNavigatorFocus" });
 
-                        // Inaktive Treffer: Orange, voll sichtbar
+                        // Inaktive Treffer: Orange, leicht transparent
                         canvasManipulator.changeColorOfEntities(lastInactive, "orange", { name: "MetricNavigatorFocus" });
-                        canvasManipulator.changeTransparencyOfEntities(lastInactive, 0.0, { name: "MetricNavigatorFocus" });
+                        canvasManipulator.changeTransparencyOfEntities(lastInactive, 0.6, { name: "MetricNavigatorFocus" });
 
                         // Aktives Element: Rot, voll sichtbar
                         canvasManipulator.changeColorOfEntities(lastActive, "red", { name: "MetricNavigatorFocus" });
