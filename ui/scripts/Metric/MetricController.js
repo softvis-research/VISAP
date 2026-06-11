@@ -240,6 +240,8 @@ controllers.metricController = (function () {
                         canvasManipulator.changeTransparencyOfEntities(lastInactive, 0.6, { name: "MetricNavigatorFocus" });
                         canvasManipulator.changeColorOfEntities(lastActive, "red", { name: "MetricNavigatorFocus" });
                         canvasManipulator.changeTransparencyOfEntities(lastActive, 0.0, { name: "MetricNavigatorFocus" });
+
+                        canvasManipulator.flyToEntity(activeEntity);
                     }
 
                     if (typeof events !== "undefined" && events.selected) {

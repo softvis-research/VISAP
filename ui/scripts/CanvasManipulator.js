@@ -372,6 +372,48 @@ controllers.canvasManipulator = (function () {
 		return object.localToWorld(center);
 	}
 
+	function flyToEntity(entity) {
+		try {
+			const entityCenter = getCenterOfEntity(entity);
+			const cameraEl = document.querySelector('[orbit-camera]');
+			if (!cameraEl) return;
+			const orbitCamera = cameraEl.components['orbit-camera'];
+			if (!orbitCamera) return;
+
+			const startTarget = orbitCamera.target.clone();
+			const startCameraPos = orbitCamera.dolly.position.clone();
+
+			// Aktuelle Distanz beibehalten, aber sinnvoll eingrenzen
+			const currentDist = startCameraPos.distanceTo(startTarget);
+			const topDownDist = Math.min(Math.max(currentDist, 30), 300);
+
+			// Zielposition: direkt über dem Element (Vogelperspektive)
+			const endCameraPos = new THREE.Vector3(
+				entityCenter.x,
+				entityCenter.y + topDownDist,
+				entityCenter.z
+			);
+
+			const duration = 600;
+			const startTime = performance.now();
+
+			function animate(now) {
+				const t = Math.min((now - startTime) / duration, 1);
+				const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+				orbitCamera.target.lerpVectors(startTarget, entityCenter, ease);
+				orbitCamera.dolly.position.lerpVectors(startCameraPos, endCameraPos, ease);
+				if (t < 1) requestAnimationFrame(animate);
+			}
+			requestAnimationFrame(animate);
+		} catch (e) {
+			// Entity hat möglicherweise noch kein Mesh (z.B. Namespace-Container)
+		}
+	}
+
+	function setCenterOfRotation(entity) {
+		flyToEntity(entity);
+	}
+
 	function setTransparency(object, value) {
 		object.setAttribute('material', {
 			opacity: 1 - value
@@ -468,6 +510,8 @@ controllers.canvasManipulator = (function () {
 		removeElement: removeElement,
 
 		getCenterOfEntity: getCenterOfEntity,
+		flyToEntity: flyToEntity,
+		setCenterOfRotation: setCenterOfRotation,
 
 		addElementsFromAframeData: addElementsFromAframeData,
 		loadAsHiddenFromAframeData: loadAsHiddenFromAframeData,

@@ -271,6 +271,8 @@ var SearchController = (function () {
 
                     prevActive = activeEntity;
                     prevInactive = inactiveResults;
+
+                    canvasManipulator.flyToEntity(activeEntity);
                 }
 
                 if (typeof events !== "undefined" && events.selected) {
