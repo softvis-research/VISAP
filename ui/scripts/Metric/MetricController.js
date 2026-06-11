@@ -68,13 +68,38 @@ controllers.metricController = (function () {
         domHelper = new DomHelper(rootDiv, controllerConfig);
         domHelper.buildUiHead();
 
-        addLayer();
-
         $(cssIDs.executeButton).click(() => executeButtonClicked());
         $(cssIDs.resetButton).click(() => resetButtonClicked());
         $(cssIDs.addLayerButton).click(() => addLayer());
         $(cssIDs.downloadViewConfigButton).click(() => downloadViewConfig());
         $(document).delegate(cssIDs.viewDropDown, "igcomboselectionchanged", () => changeView());
+
+        // Wait for model data, then filter empty metrics and build the first layer
+        var initInterval = setInterval(function() {
+            try {
+                if (typeof model !== "undefined" && typeof model.getAllEntities === "function") {
+                    const entityMap = model.getAllEntities();
+                    if (entityMap && entityMap.size > 0) {
+                        clearInterval(initInterval);
+                        filterAvailableMetrics();
+                        addLayer();
+                    }
+                }
+            } catch (e) {}
+        }, 300);
+    }
+
+    function filterAvailableMetrics() {
+        if (typeof model === "undefined" || typeof model.getAllEntities !== "function") return;
+        const entityMap = model.getAllEntities();
+        if (!entityMap || entityMap.size === 0) return;
+
+        controllerConfig.metrics = controllerConfig.metrics.filter(function(metricLabel) {
+            const metricKey = Object.keys(metrics).find(function(k) { return metrics[k] === metricLabel; });
+            if (!metricKey) return true;
+            const bounds = getMetricBounds(metricKey);
+            return !bounds || bounds.min !== 0 || bounds.max !== 0;
+        });
     }
 
     function clearNavigatorFocus() {
