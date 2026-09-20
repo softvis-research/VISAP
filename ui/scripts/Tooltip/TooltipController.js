@@ -18,7 +18,7 @@ var TooltipController = (function () {
             'Standardmäßig werden die Minimal- und Maximalwerte der ausgewählten Metrik verwendet. ' +
             'Bestimmen Sie das visuelle Mapping (z. B. Farbe) und klicken Sie auf „Start”. ' +
             'Das Refresh-Symbol setzt Ihre Eingaben zurück. ' +
-            'Die Checkbox <b>Dim</b> steuert, ob nicht relevante Elemente bei der Navigation transparent dargestellt werden.',
+            'Die Checkbox <b>Dim</b> steuert die Transparenz bei der Navigation: Ist sie aktiv, werden nicht relevante Elemente ausgeblasst. Ist sie aus, ist die Transparenz komplett aus und die Treffer werden nur \u00fcber die Farbe hervorgehoben. Sie gilt f\u00fcr Suche und Metrik Controller gemeinsam.',
 
         navigator: 'Navigieren Sie zwischen den betroffenen Paketen Ihrer ' +
             'Auswahl. Nutzen Sie daf\u00fcr die Pfeiltasten, um direkt zum ' +
@@ -26,7 +26,8 @@ var TooltipController = (function () {
 
         searchFenster: 'Suchen Sie gezielt nach Objekten. Ist der exakte Name ' +
             'unbekannt, k\u00f6nnen Sie die Auswahl \u00fcber die unteren ' +
-            'Filter-Felder eingrenzen. Best\u00e4tigen Sie mit \u201eStart\u201c.'
+            'Filter-Felder eingrenzen. Best\u00e4tigen Sie mit \u201eStart\u201c. ' +
+            'Die Checkbox <b>Dim</b> steuert die Transparenz bei der Navigation: Ist sie aktiv, werden nicht relevante Elemente ausgeblasst. Ist sie aus, ist die Transparenz komplett aus und die Treffer werden nur \u00fcber die Farbe hervorgehoben. Sie gilt f\u00fcr Suche und Metrik Controller gemeinsam.'
     };
 
     // ── Interne Registry ─────────────────────────────────────────

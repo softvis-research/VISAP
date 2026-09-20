@@ -43,7 +43,7 @@ class DomHelper {
             '<button id="' + domIDs.addLayerButton + '">+ Layer</button>' +
             '<button id="' + domIDs.executeButton + '">Start</button>' +
             '<button id="' + domIDs.resetButton + '" title="Parameter zur\u00fccksetzen">&#x21BA;</button>' +
-            '<label class="metric-dim-label" title="Nicht relevante Elemente bei Navigation transparent machen">' +
+            '<label class="metric-dim-label" title="Transparenz bei der Navigation ein-/ausschalten \u2013 aus hei\u00dft komplett deckend (gilt auch f\u00fcr die Suche)">' +
             '<input type="checkbox" id="metricDimBackground" checked>' +
             ' Dim' +
             '</label>' +
@@ -80,9 +80,8 @@ class DomHelper {
 
         TooltipController.register("metricTooltip", "metricHelpBtn", "metricController");
 
-        document.getElementById("metricDimBackground").addEventListener("change", function() {
-            metricController.applyDimming(this.checked);
-        });
+        // Gemeinsamer Schalter mit der Suche – nicht direkt applyDimming aufrufen
+        DimSettings.bindCheckbox(document.getElementById("metricDimBackground"));
 
         $(cssIDs.viewDropDown).igCombo(Object.assign({}, this.defaultIgComboSettings, {
             height: widgetSize.headerDropDownHeight,

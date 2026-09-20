@@ -22,9 +22,19 @@ var SearchController = (function () {
     var selectedTop     = "";
     var selectedSub     = "";
 
+    // Alle Transparenz-/Farbeffekte der Suche laufen unter diesem Namen
+    var searchEffect = { name: "SearchController" };
+
     // Speicher für den sauberen visuellen Reset
     var lastSearchResults = [];
     var lastNonMatchedEntities = [];
+    // Aktueller Navigator-Stand – muss auf Modulebene liegen, damit der
+    // Dim-Schalter die Transparenz dieser Gruppen nachträglich ändern kann
+    var lastInactiveResults = [];
+    var lastActiveEntity = [];
+    // Merkt sich, ob der Hintergrund aktuell gedimmt ist, damit die Transparenz
+    // nicht doppelt aufgetragen wird (jedes Auftragen landet auf einem Stack).
+    var dimApplied = false;
 
     // ── Helpers ───────────────────────────────────────────────────────────────
     function el(tag, cls, text) {
@@ -189,16 +199,47 @@ var SearchController = (function () {
 
         if (typeof canvasManipulator !== "undefined") {
             if (lastSearchResults.length > 0) {
-                canvasManipulator.resetColorOfEntities(lastSearchResults, { name: "SearchController" });
-                canvasManipulator.resetTransparencyOfEntities(lastSearchResults, { name: "SearchController" });
+                canvasManipulator.resetColorOfEntities(lastSearchResults, searchEffect);
+                canvasManipulator.resetTransparencyOfEntities(lastSearchResults, searchEffect);
             }
             if (lastNonMatchedEntities.length > 0) {
-                canvasManipulator.resetTransparencyOfEntities(lastNonMatchedEntities, { name: "SearchController" });
+                canvasManipulator.resetTransparencyOfEntities(lastNonMatchedEntities, searchEffect);
             }
         }
 
         lastSearchResults = [];
         lastNonMatchedEntities = [];
+        lastInactiveResults = [];
+        lastActiveEntity = [];
+        dimApplied = false;
+    }
+
+    // ── Dim-Schalter (geteilt mit dem Metrik Controller) ──────────────────────
+    /**
+     * Schaltet die Transparenz der Suche komplett ein oder aus:
+     * Hintergrund, inaktive Treffer und aktiver Treffer.
+     * Ausgeschaltet heißt wirklich "keine Transparenz" – nicht nur ein blasserer Hintergrund.
+     */
+    function applyDimming(shouldDim) {
+        if (typeof canvasManipulator === "undefined") return;
+        if (shouldDim === dimApplied) return;
+
+        var groups = [
+            { entities: lastNonMatchedEntities, transparency: DimSettings.transparency.background },
+            { entities: lastInactiveResults, transparency: DimSettings.transparency.inactiveHit },
+            { entities: lastActiveEntity, transparency: DimSettings.transparency.activeHit }
+        ];
+
+        groups.forEach(function (group) {
+            if (group.entities.length === 0) return;
+            if (shouldDim) {
+                canvasManipulator.changeTransparencyOfEntities(group.entities, group.transparency, searchEffect);
+            } else {
+                canvasManipulator.resetTransparencyOfEntities(group.entities, searchEffect);
+            }
+        });
+
+        dimApplied = shouldDim;
     }
 
     // ── Reset-Funktion ────────────────────────────────────────────────────────
@@ -245,32 +286,38 @@ var SearchController = (function () {
 
             // Hintergrund EINMAL dimmen – nicht bei jedem Navigator-Schritt
             if (typeof canvasManipulator !== "undefined") {
-                canvasManipulator.changeTransparencyOfEntities(lastNonMatchedEntities, 0.4, { name: "SearchController" });
+                dimApplied = DimSettings.isEnabled();
+                if (dimApplied) {
+                    canvasManipulator.changeTransparencyOfEntities(lastNonMatchedEntities, DimSettings.transparency.background, searchEffect);
+                }
             }
-
-            var prevActive = null;
-            var prevInactive = [];
 
             NavigatorController.load(results, function(activeEntity, allResults) {
                 if (typeof canvasManipulator !== "undefined") {
                     // Nur die Elemente zurücksetzen, die sich vom letzten Schritt geändert haben
-                    if (prevActive) {
-                        canvasManipulator.resetColorOfEntities([prevActive], { name: "SearchController" });
+                    if (lastActiveEntity.length > 0) {
+                        canvasManipulator.resetColorOfEntities(lastActiveEntity, searchEffect);
+                        // Auch die Transparenz zurücksetzen, sonst stapeln sich die Effekte
+                        // und das Element bleibt beim Zurücksetzen der Suche transparent
+                        canvasManipulator.resetTransparencyOfEntities(lastActiveEntity, searchEffect);
                     }
-                    if (prevInactive.length > 0) {
-                        canvasManipulator.resetColorOfEntities(prevInactive, { name: "SearchController" });
-                        canvasManipulator.resetTransparencyOfEntities(prevInactive, { name: "SearchController" });
+                    if (lastInactiveResults.length > 0) {
+                        canvasManipulator.resetColorOfEntities(lastInactiveResults, searchEffect);
+                        canvasManipulator.resetTransparencyOfEntities(lastInactiveResults, searchEffect);
                     }
 
-                    var inactiveResults = allResults.filter(function(e) { return e.id !== activeEntity.id; });
+                    lastInactiveResults = allResults.filter(function(e) { return e.id !== activeEntity.id; });
+                    lastActiveEntity = [activeEntity];
 
-                    canvasManipulator.changeColorOfEntities(inactiveResults, "orange", { name: "SearchController" });
-                    canvasManipulator.changeTransparencyOfEntities(inactiveResults, 0.3, { name: "SearchController" });
-                    canvasManipulator.changeColorOfEntities([activeEntity], "red", { name: "SearchController" });
-                    canvasManipulator.changeTransparencyOfEntities([activeEntity], 0.0, { name: "SearchController" });
+                    canvasManipulator.changeColorOfEntities(lastInactiveResults, "orange", searchEffect);
+                    canvasManipulator.changeColorOfEntities(lastActiveEntity, "red", searchEffect);
 
-                    prevActive = activeEntity;
-                    prevInactive = inactiveResults;
+                    // Bei ausgeschaltetem Dim bleibt die Szene komplett deckend –
+                    // die Treffer werden dann nur über die Farbe hervorgehoben
+                    if (DimSettings.isEnabled()) {
+                        canvasManipulator.changeTransparencyOfEntities(lastInactiveResults, DimSettings.transparency.inactiveHit, searchEffect);
+                        canvasManipulator.changeTransparencyOfEntities(lastActiveEntity, DimSettings.transparency.activeHit, searchEffect);
+                    }
 
                     canvasManipulator.flyToEntity(activeEntity);
                 }
@@ -382,8 +429,22 @@ var SearchController = (function () {
         footer.appendChild(startBtn);
         footer.appendChild(resetBtn);
         content.appendChild(footer);
+        content.appendChild(buildDimRow());
 
         return content;
+    }
+
+    function buildDimRow() {
+        var label = el("label", "search-dim-label");
+        label.title = "Transparenz bei der Navigation ein-/ausschalten \u2013 aus hei\u00dft komplett deckend (gilt auch f\u00fcr den Metrik Controller)";
+
+        var cb = el("input");
+        cb.type = "checkbox";
+        cb.id = "searchDimBackground";
+
+        label.appendChild(cb);
+        label.appendChild(document.createTextNode(" Dim"));
+        return label;
     }
 
     function bindSelectEvents() {
@@ -418,6 +479,10 @@ var SearchController = (function () {
         panel.appendChild(buildContent());
 
         bindSelectEvents();
+
+        // Der Dim-Schalter wird von Suche und Metrik Controller geteilt
+        DimSettings.bindCheckbox(document.getElementById("searchDimBackground"));
+        DimSettings.subscribe(applyDimming);
 
         var dataCheckInterval = setInterval(function() {
             try {

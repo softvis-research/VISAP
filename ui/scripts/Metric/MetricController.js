@@ -45,9 +45,15 @@ controllers.metricController = (function () {
     let layers = [];
     let viewConfig;
 
+    // Alle Transparenz-/Farbeffekte der Navigation laufen unter diesem Namen
+    const navigatorEffect = { name: "MetricNavigatorFocus" };
+
     let lastUnmatched = [];
     let lastInactive = [];
     let lastActive = [];
+    // Merkt sich, ob der Hintergrund aktuell gedimmt ist, damit die Transparenz
+    // nicht doppelt aufgetragen wird (jedes Auftragen landet auf einem Stack).
+    let dimApplied = false;
 
     const metricDefault = { variant: undefined, from: 0, to: 0 };
     const mappingDefault = {
@@ -73,6 +79,9 @@ controllers.metricController = (function () {
         $(cssIDs.addLayerButton).click(() => addLayer());
         $(cssIDs.downloadViewConfigButton).click(() => downloadViewConfig());
         $(document).delegate(cssIDs.viewDropDown, "igcomboselectionchanged", () => changeView());
+
+        // Der Dim-Schalter wird von Suche und Metrik Controller geteilt
+        DimSettings.subscribe(applyDimming);
 
         // Wait for model data, then filter empty metrics and build the first layer
         var initInterval = setInterval(function() {
@@ -104,14 +113,14 @@ controllers.metricController = (function () {
 
     function clearNavigatorFocus() {
         if (typeof canvasManipulator !== "undefined") {
-            if (lastUnmatched.length > 0) canvasManipulator.resetTransparencyOfEntities(lastUnmatched, { name: "MetricNavigatorFocus" });
+            if (lastUnmatched.length > 0) canvasManipulator.resetTransparencyOfEntities(lastUnmatched, navigatorEffect);
             if (lastInactive.length > 0) {
-                canvasManipulator.resetColorOfEntities(lastInactive, { name: "MetricNavigatorFocus" });
-                canvasManipulator.resetTransparencyOfEntities(lastInactive, { name: "MetricNavigatorFocus" });
+                canvasManipulator.resetColorOfEntities(lastInactive, navigatorEffect);
+                canvasManipulator.resetTransparencyOfEntities(lastInactive, navigatorEffect);
             }
             if (lastActive.length > 0) {
-                canvasManipulator.resetColorOfEntities(lastActive, { name: "MetricNavigatorFocus" });
-                canvasManipulator.resetTransparencyOfEntities(lastActive, { name: "MetricNavigatorFocus" });
+                canvasManipulator.resetColorOfEntities(lastActive, navigatorEffect);
+                canvasManipulator.resetTransparencyOfEntities(lastActive, navigatorEffect);
             }
         }
 
@@ -122,6 +131,7 @@ controllers.metricController = (function () {
         lastUnmatched = [];
         lastInactive = [];
         lastActive = [];
+        dimApplied = false;
     }
 
     // 🔴 NEU: Berechnet dynamisch den kleinsten und größten Wert einer Metrik aus den Model-Daten
@@ -239,10 +249,9 @@ controllers.metricController = (function () {
 
                 // Hintergrund EINMAL dimmen – nicht bei jedem Navigator-Schritt
                 if (typeof canvasManipulator !== "undefined") {
-                    const dimCheckbox = document.getElementById("metricDimBackground");
-                    const shouldDim = !dimCheckbox || dimCheckbox.checked;
-                    if (shouldDim) {
-                        canvasManipulator.changeTransparencyOfEntities(lastUnmatched, 0.4, { name: "MetricNavigatorFocus" });
+                    dimApplied = DimSettings.isEnabled();
+                    if (dimApplied) {
+                        canvasManipulator.changeTransparencyOfEntities(lastUnmatched, DimSettings.transparency.background, navigatorEffect);
                     }
                 }
 
@@ -250,21 +259,26 @@ controllers.metricController = (function () {
                     if (typeof canvasManipulator !== "undefined") {
                         // Nur die Elemente zurücksetzen, die sich vom letzten Schritt geändert haben
                         if (lastInactive.length > 0) {
-                            canvasManipulator.resetColorOfEntities(lastInactive, { name: "MetricNavigatorFocus" });
-                            canvasManipulator.resetTransparencyOfEntities(lastInactive, { name: "MetricNavigatorFocus" });
+                            canvasManipulator.resetColorOfEntities(lastInactive, navigatorEffect);
+                            canvasManipulator.resetTransparencyOfEntities(lastInactive, navigatorEffect);
                         }
                         if (lastActive.length > 0) {
-                            canvasManipulator.resetColorOfEntities(lastActive, { name: "MetricNavigatorFocus" });
-                            canvasManipulator.resetTransparencyOfEntities(lastActive, { name: "MetricNavigatorFocus" });
+                            canvasManipulator.resetColorOfEntities(lastActive, navigatorEffect);
+                            canvasManipulator.resetTransparencyOfEntities(lastActive, navigatorEffect);
                         }
 
                         lastInactive = allResults.filter(e => e.id !== activeEntity.id);
                         lastActive = [activeEntity];
 
-                        canvasManipulator.changeColorOfEntities(lastInactive, "orange", { name: "MetricNavigatorFocus" });
-                        canvasManipulator.changeTransparencyOfEntities(lastInactive, 0.6, { name: "MetricNavigatorFocus" });
-                        canvasManipulator.changeColorOfEntities(lastActive, "red", { name: "MetricNavigatorFocus" });
-                        canvasManipulator.changeTransparencyOfEntities(lastActive, 0.0, { name: "MetricNavigatorFocus" });
+                        canvasManipulator.changeColorOfEntities(lastInactive, "orange", navigatorEffect);
+                        canvasManipulator.changeColorOfEntities(lastActive, "red", navigatorEffect);
+
+                        // Bei ausgeschaltetem Dim bleibt die Szene komplett deckend –
+                        // die Treffer werden dann nur über die Farbe hervorgehoben
+                        if (DimSettings.isEnabled()) {
+                            canvasManipulator.changeTransparencyOfEntities(lastInactive, DimSettings.transparency.inactiveHit, navigatorEffect);
+                            canvasManipulator.changeTransparencyOfEntities(lastActive, DimSettings.transparency.activeHit, navigatorEffect);
+                        }
 
                         canvasManipulator.flyToEntity(activeEntity);
                     }
@@ -382,13 +396,31 @@ controllers.metricController = (function () {
         }
     }
 
+    /**
+     * Schaltet die Transparenz der Navigation komplett ein oder aus:
+     * Hintergrund, inaktive Treffer und aktiver Treffer.
+     * Ausgeschaltet heißt wirklich "keine Transparenz" – nicht nur ein blasserer Hintergrund.
+     */
     function applyDimming(shouldDim) {
-        if (typeof canvasManipulator === "undefined" || lastUnmatched.length === 0) return;
-        if (shouldDim) {
-            canvasManipulator.changeTransparencyOfEntities(lastUnmatched, 0.4, { name: "MetricNavigatorFocus" });
-        } else {
-            canvasManipulator.resetTransparencyOfEntities(lastUnmatched, { name: "MetricNavigatorFocus" });
-        }
+        if (typeof canvasManipulator === "undefined") return;
+        if (shouldDim === dimApplied) return;
+
+        const groups = [
+            { entities: lastUnmatched, transparency: DimSettings.transparency.background },
+            { entities: lastInactive, transparency: DimSettings.transparency.inactiveHit },
+            { entities: lastActive, transparency: DimSettings.transparency.activeHit }
+        ];
+
+        groups.forEach(function (group) {
+            if (group.entities.length === 0) return;
+            if (shouldDim) {
+                canvasManipulator.changeTransparencyOfEntities(group.entities, group.transparency, navigatorEffect);
+            } else {
+                canvasManipulator.resetTransparencyOfEntities(group.entities, navigatorEffect);
+            }
+        });
+
+        dimApplied = shouldDim;
     }
 
     function getActiveLayers() {
