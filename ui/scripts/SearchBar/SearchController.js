@@ -191,8 +191,23 @@ var SearchController = (function () {
         });
     }
 
+    // ── Info-Box zum aktiven Treffer (identisch zur Hover-Information) ────────
+    function showEntityInfo(entity) {
+        if (typeof canvasHoverController !== "undefined" && typeof canvasHoverController.showInfoForEntity === "function") {
+            canvasHoverController.showInfoForEntity(entity);
+        }
+    }
+
+    function hideEntityInfo() {
+        if (typeof canvasHoverController !== "undefined" && typeof canvasHoverController.hideInfo === "function") {
+            canvasHoverController.hideInfo();
+        }
+    }
+
     // ── Zentrale Funktion für den visuellen Reset ─────────────────────────────
     function clearVisuals() {
+        hideEntityInfo();
+
         if (typeof events !== "undefined" && events.selected && lastSearchResults.length > 0) {
             events.selected.off.publish({ entities: lastSearchResults });
         }
@@ -321,6 +336,9 @@ var SearchController = (function () {
 
                     canvasManipulator.flyToEntity(activeEntity);
                 }
+
+                // Die Hover-Information des aktiven Treffers direkt einblenden
+                showEntityInfo(activeEntity);
 
                 if (typeof events !== "undefined" && events.selected) {
                     events.selected.on.publish({ entities: [activeEntity] });

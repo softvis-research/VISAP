@@ -111,7 +111,22 @@ controllers.metricController = (function () {
         });
     }
 
+    // ── Info-Box zum aktiven Treffer (identisch zur Hover-Information) ────────
+    function showEntityInfo(entity) {
+        if (typeof canvasHoverController !== "undefined" && typeof canvasHoverController.showInfoForEntity === "function") {
+            canvasHoverController.showInfoForEntity(entity);
+        }
+    }
+
+    function hideEntityInfo() {
+        if (typeof canvasHoverController !== "undefined" && typeof canvasHoverController.hideInfo === "function") {
+            canvasHoverController.hideInfo();
+        }
+    }
+
     function clearNavigatorFocus() {
+        hideEntityInfo();
+
         if (typeof canvasManipulator !== "undefined") {
             if (lastUnmatched.length > 0) canvasManipulator.resetTransparencyOfEntities(lastUnmatched, navigatorEffect);
             if (lastInactive.length > 0) {
@@ -283,11 +298,15 @@ controllers.metricController = (function () {
                         canvasManipulator.flyToEntity(activeEntity);
                     }
 
+                    // Die Hover-Information des aktiven Treffers direkt einblenden
+                    showEntityInfo(activeEntity);
+
                     if (typeof events !== "undefined" && events.selected) {
                         events.selected.on.publish({ entities: [activeEntity] });
                     }
                 });
             } else {
+                hideEntityInfo();
                 NavigatorController.hide();
             }
         }

@@ -19,3 +19,42 @@
     margin: 0;
     line-height: 1.5;
 }
+
+/* ── Info zum aktuell ausgewählten Element (Suche & Metrik) ──────────────
+   Gleicher Inhalt wie der Hover-Tooltip, bleibt aber am fokussierten
+   Element kleben, damit der Nutzer die Daten sofort sieht. */
+#selectionTooltip {
+    display: none;
+    z-index: 102; /* über Navigator und Panels */
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    max-width: 260px;
+    padding: 8px 14px 10px 14px;
+
+    background-color: #1e1e2e;
+    color: #cdd6f4;
+    border: 1px solid #89b4fa; /* Navigator-Blau: gehört sichtbar zur Navigation */
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    font-family: Arial, Helvetica, sans-serif;
+
+    /* Die Info darf die Interaktion mit dem Modell nicht blockieren */
+    pointer-events: none;
+}
+
+#selectionTooltipHeader {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #89b4fa;
+    margin-bottom: 6px;
+}
+
+#selectionTooltipName {
+    font-size: 12px;
+    font-weight: normal;
+    margin: 0;
+    line-height: 1.5;
+}

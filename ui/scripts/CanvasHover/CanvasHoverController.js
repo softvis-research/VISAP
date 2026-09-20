@@ -12,17 +12,25 @@ controllers.canvasHoverController = (function () {
 		application.loadCSS("scripts/CanvasHover/ho.css");
 	}
 
+	// Aktuell im Navigator fokussiertes Element – für dieses wird die Info dauerhaft angezeigt
+	let selectionEntity = null;
+	let selectionTrackingRequest = null;
+	let lastSelectionPosition = { left: null, top: null };
+
 	function activate() {
 		actionController.actions.mouse.hover.subscribe(handleOnMouseEnter);
 		actionController.actions.mouse.unhover.subscribe(handleOnMouseLeave);
 
 		createTooltipContainer();
+		createSelectionTooltipContainer();
 
 		events.hovered.on.subscribe(onEntityHover);
 		events.hovered.off.subscribe(onEntityUnhover);
 	}
 
 	function reset() {
+		hideInfo();
+
 		const hoveredEntities = events.hovered.getEntities();
 
 		hoveredEntities.forEach(function (hoveredEntity) {
@@ -44,6 +52,24 @@ controllers.canvasHoverController = (function () {
 			createParagraphAsChildOf(tooltipDivElement, "tooltipQualifiedName");
 		}
 		canvas.appendChild(tooltipDivElement);
+	}
+
+	// Eigener Container für die dauerhaft eingeblendete Info des ausgewählten Elements.
+	// Liegt am body (position: fixed), damit er unabhängig vom Canvas-Layout positioniert werden kann.
+	function createSelectionTooltipContainer() {
+		if (document.getElementById("selectionTooltip")) {
+			return;
+		}
+
+		const selectionTooltipDivElement = application.createDiv("selectionTooltip");
+
+		const header = document.createElement("DIV");
+		header.id = "selectionTooltipHeader";
+		header.textContent = "Ausgewähltes Element";
+		selectionTooltipDivElement.appendChild(header);
+
+		createParagraphAsChildOf(selectionTooltipDivElement, "selectionTooltipName");
+		document.body.appendChild(selectionTooltipDivElement);
 	}
 
 	function createParagraphAsChildOf(parentElement, paragraphId) {
@@ -118,6 +144,123 @@ controllers.canvasHoverController = (function () {
 		canvasManipulator.resetColorOfEntities([entity], { name: "canvasHoverController" });
 
 		$("#tooltip").css("display", "none");
+	}
+
+	// ── Info für das aktuell ausgewählte Element (Suche & Metrik) ─────────────
+	/**
+	 * Zeigt dieselben Informationen wie der Hover-Tooltip dauerhaft für das
+	 * Element an, das gerade im Navigator fokussiert ist. So sieht der Nutzer
+	 * die Details sofort, ohne das Element erst mit der Maus treffen zu müssen.
+	 */
+	function showInfoForEntity(entity) {
+		if (entity === undefined || entity === null) {
+			hideInfo();
+			return;
+		}
+
+		const selectionTooltip = document.getElementById("selectionTooltip");
+		if (!selectionTooltip) {
+			return;
+		}
+
+		$("#selectionTooltipName").html(getTooltipName(entity));
+		selectionTooltip.style.display = "block";
+
+		selectionEntity = entity;
+		lastSelectionPosition = { left: null, top: null };
+		positionSelectionTooltip();
+		startSelectionTracking();
+	}
+
+	function hideInfo() {
+		selectionEntity = null;
+
+		if (selectionTrackingRequest !== null) {
+			cancelAnimationFrame(selectionTrackingRequest);
+			selectionTrackingRequest = null;
+		}
+
+		const selectionTooltip = document.getElementById("selectionTooltip");
+		if (selectionTooltip) {
+			selectionTooltip.style.display = "none";
+		}
+	}
+
+	// Die Kamera bewegt sich (Flug zum Element, Drehen, Zoomen) – die Info bleibt am Element kleben
+	function startSelectionTracking() {
+		if (selectionTrackingRequest !== null) {
+			return;
+		}
+
+		const step = function () {
+			selectionTrackingRequest = null;
+			if (selectionEntity === null) {
+				return;
+			}
+			positionSelectionTooltip();
+			selectionTrackingRequest = requestAnimationFrame(step);
+		};
+
+		selectionTrackingRequest = requestAnimationFrame(step);
+	}
+
+	function positionSelectionTooltip() {
+		const selectionTooltip = document.getElementById("selectionTooltip");
+		if (!selectionTooltip || selectionEntity === null) {
+			return;
+		}
+
+		const margin = 12;
+		const width = selectionTooltip.offsetWidth || 240;
+		const height = selectionTooltip.offsetHeight || 140;
+		const screenPosition = projectEntityToScreen(selectionEntity);
+
+		let left;
+		let top;
+
+		if (screenPosition === null) {
+			// Element gerade nicht projizierbar (z.B. hinter der Kamera) – Info an fester Stelle zeigen
+			left = window.innerWidth - width - margin;
+			top = margin;
+		} else {
+			left = screenPosition.x + 28;
+			top = screenPosition.y + 28;
+		}
+
+		left = Math.min(Math.max(left, margin), Math.max(window.innerWidth - width - margin, margin));
+		top = Math.min(Math.max(top, margin), Math.max(window.innerHeight - height - margin, margin));
+
+		// Nur schreiben, wenn sich wirklich etwas geändert hat – spart Layout-Arbeit pro Frame
+		if (lastSelectionPosition.left === left && lastSelectionPosition.top === top) {
+			return;
+		}
+
+		lastSelectionPosition = { left: left, top: top };
+		selectionTooltip.style.left = left + "px";
+		selectionTooltip.style.top = top + "px";
+	}
+
+	function projectEntityToScreen(entity) {
+		try {
+			const sceneElement = application.getCanvas() || document.querySelector("a-scene");
+			if (!sceneElement || !sceneElement.camera || !sceneElement.canvas) {
+				return null;
+			}
+
+			const projected = canvasManipulator.getCenterOfEntity(entity).clone().project(sceneElement.camera);
+			if (projected.z > 1) {
+				return null;
+			}
+
+			const canvasRect = sceneElement.canvas.getBoundingClientRect();
+			return {
+				x: canvasRect.left + (projected.x * 0.5 + 0.5) * canvasRect.width,
+				y: canvasRect.top + (-projected.y * 0.5 + 0.5) * canvasRect.height
+			};
+		} catch (e) {
+			// Entity hat möglicherweise noch kein Mesh
+			return null;
+		}
 	}
 
     function getTooltipName(entity) {
@@ -233,6 +376,8 @@ controllers.canvasHoverController = (function () {
 		activate: activate,
 		reset: reset,
 		handleOnMouseEnter: handleOnMouseEnter,
-		handleOnMouseLeave: handleOnMouseLeave
+		handleOnMouseLeave: handleOnMouseLeave,
+		showInfoForEntity: showInfoForEntity,
+		hideInfo: hideInfo
 	};
 })();
