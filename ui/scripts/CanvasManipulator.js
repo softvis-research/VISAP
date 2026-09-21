@@ -372,6 +372,50 @@ controllers.canvasManipulator = (function () {
 		return object.localToWorld(center);
 	}
 
+	// Zoom-Verhalten beim Anfliegen eines Elements (Suche & Metrik):
+	// Das Element soll auch in großen Modellen deutlich sichtbar sein.
+	const flyToZoom = {
+		// Etwas Luft um das Element herum, damit es nicht am Bildrand klebt
+		sizeFactor: 1.6,
+		// Zusätzlicher Kontext in Weltkoordinaten – sorgt dafür, dass bei winzigen
+		// Elementen die Nachbarschaft sichtbar bleibt, große aber das Bild füllen
+		contextMargin: 8,
+		// Nicht näher heran, sonst fliegt die Kamera in die Nachbargebäude
+		minDistance: 8,
+		// Auch sehr große Pakete werden nicht aus zu weiter Ferne gezeigt
+		maxDistance: 300
+	};
+
+	/**
+	 * Abstand, aus dem das Element formatfüllend (plus Kontext) zu sehen ist.
+	 * Grundlage ist die Grundfläche des Elements und der Öffnungswinkel der Kamera.
+	 */
+	function getZoomDistanceForEntity(entity) {
+		const object = getCachedElement(entity.id).object3DMap.mesh;
+		const size = new THREE.Box3().setFromObject(object).getSize(new THREE.Vector3());
+
+		// Vogelperspektive: die Grundfläche (x/z) bestimmt, wie viel Platz das Element im Bild braucht
+		const footprint = Math.max(size.x, size.z) || 1;
+
+		const camera = scene.camera;
+		const fov = ((camera && camera.fov) ? camera.fov : 80) * Math.PI / 180;
+		const aspect = (camera && camera.aspect) ? camera.aspect : 1;
+
+		// So viel Fläche soll im Bild zu sehen sein: Element plus Umgebung
+		const visibleExtent = footprint * flyToZoom.sizeFactor + flyToZoom.contextMargin;
+
+		let distance = (visibleExtent / 2) / Math.tan(fov / 2);
+		if (aspect < 1) {
+			// Schmales Fenster: horizontal wird es zuerst eng
+			distance = distance / aspect;
+		}
+
+		// Die Höhe des Elements zeigt zur Kamera – sonst steht man zu dicht über hohen Gebäuden
+		distance += size.y / 2;
+
+		return Math.min(Math.max(distance, flyToZoom.minDistance), flyToZoom.maxDistance);
+	}
+
 	function flyToEntity(entity) {
 		try {
 			const entityCenter = getCenterOfEntity(entity);
@@ -383,9 +427,8 @@ controllers.canvasManipulator = (function () {
 			const startTarget = orbitCamera.target.clone();
 			const startCameraPos = orbitCamera.dolly.position.clone();
 
-			// Aktuelle Distanz beibehalten, aber sinnvoll eingrenzen
-			const currentDist = startCameraPos.distanceTo(startTarget);
-			const topDownDist = Math.min(Math.max(currentDist, 30), 300);
+			// An das Element heranzoomen, damit es auch in großen Modellen zu sehen ist
+			const topDownDist = getZoomDistanceForEntity(entity);
 
 			// Zielposition: direkt über dem Element (Vogelperspektive)
 			const endCameraPos = new THREE.Vector3(
