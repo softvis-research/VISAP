@@ -324,8 +324,8 @@ var SearchController = (function () {
                     lastInactiveResults = allResults.filter(function(e) { return e.id !== activeEntity.id; });
                     lastActiveEntity = [activeEntity];
 
-                    canvasManipulator.changeColorOfEntities(lastInactiveResults, "orange", searchEffect);
-                    canvasManipulator.changeColorOfEntities(lastActiveEntity, "red", searchEffect);
+                    canvasManipulator.changeColorOfEntities(lastInactiveResults, DimSettings.highlightColor.inactiveHit, searchEffect);
+                    canvasManipulator.changeColorOfEntities(lastActiveEntity, DimSettings.highlightColor.activeHit, searchEffect);
 
                     // Bei ausgeschaltetem Dim bleibt die Szene komplett deckend –
                     // die Treffer werden dann nur über die Farbe hervorgehoben

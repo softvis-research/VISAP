@@ -13,21 +13,40 @@
 var TooltipController = (function () {
 
     // ── Tooltip-Texte ────────────────────────────────────────────
+    // Der Metrik Controller ist bewusst in mehrere kurze Tooltips aufgeteilt:
+    // Jeder Bereich erklärt nur seine eigenen Bedienelemente.
     var TOOLTIPS = {
-        metricController: 'Wählen Sie eine Metrik und ein Intervall. ' +
-            'Standardmäßig werden die Minimal- und Maximalwerte der ausgewählten Metrik verwendet. ' +
-            'Bestimmen Sie das visuelle Mapping (z. B. Farbe) und klicken Sie auf „Start”. ' +
-            'Das Refresh-Symbol setzt Ihre Eingaben zurück. ' +
-            'Die Checkbox <b>Dim</b> steuert die Transparenz bei der Navigation: Ist sie aktiv, werden nicht relevante Elemente ausgeblasst. Ist sie aus, ist die Transparenz komplett aus und die Treffer werden nur \u00fcber die Farbe hervorgehoben. Sie gilt f\u00fcr Suche und Metrik Controller gemeinsam.',
+        metricController: 'Kopfzeile des Metrik Controllers:' +
+            '<ul class="tooltip-list">' +
+            '<li><b>View</b> – gespeicherte Ansicht laden</li>' +
+            '<li><b>Config</b> – aktuelle Einstellung als View sichern</li>' +
+            '<li><b>+ Layer</b> – weitere Metrik zusätzlich darstellen</li>' +
+            '<li><b>Start</b> – Einstellungen auf das Modell anwenden</li>' +
+            '<li><b>&#x21BA;</b> – Eingaben zurücksetzen</li>' +
+            '<li><b>Dim</b> – Transparenz bei der Navigation ein/aus</li>' +
+            '</ul>',
+
+        metricSection: 'Welche Kennzahl dargestellt wird.<br/>' +
+            '<b>Start</b> und <b>End</b> grenzen den Wertebereich ein – beim Auswählen der ' +
+            'Metrik werden der kleinste und größte Wert des Modells eingetragen. ' +
+            'Hervorgehoben wird alles, was in diesem Bereich liegt.',
+
+        mappingSection: 'Wie die Treffer im Modell dargestellt werden: Farbe, Farbverlauf, ' +
+            'Transparenz, Pulsation, Blinken oder Rotation.<br/>' +
+            'Je nach Auswahl erscheinen die passenden Felder, z. B. die Farbe oder die Periode in ms.',
 
         navigator: 'Navigieren Sie zwischen den betroffenen Paketen Ihrer ' +
             'Auswahl. Nutzen Sie daf\u00fcr die Pfeiltasten, um direkt zum ' +
             'jeweiligen Quellcode-Objekt zu springen.',
 
-        searchFenster: 'Suchen Sie gezielt nach Objekten. Ist der exakte Name ' +
-            'unbekannt, k\u00f6nnen Sie die Auswahl \u00fcber die unteren ' +
-            'Filter-Felder eingrenzen. Best\u00e4tigen Sie mit \u201eStart\u201c. ' +
-            'Die Checkbox <b>Dim</b> steuert die Transparenz bei der Navigation: Ist sie aktiv, werden nicht relevante Elemente ausgeblasst. Ist sie aus, ist die Transparenz komplett aus und die Treffer werden nur \u00fcber die Farbe hervorgehoben. Sie gilt f\u00fcr Suche und Metrik Controller gemeinsam.'
+        searchFenster: 'Objekte im Modell finden:' +
+            '<ul class="tooltip-list">' +
+            '<li><b>Suche</b> \u2013 Name eingeben, Vorschl\u00e4ge kommen aus dem Modell</li>' +
+            '<li><b>Paket</b> / <b>\u00dcbergeordnet</b> / <b>Untergeordnet</b> \u2013 Auswahl eingrenzen, wenn der Name unbekannt ist; die Felder bauen aufeinander auf</li>' +
+            '<li><b>Start</b> \u2013 Suche ausf\u00fchren, Treffer im Navigator durchschalten</li>' +
+            '<li><b>&#x21BA;</b> \u2013 Eingaben und Markierungen zur\u00fccksetzen</li>' +
+            '<li><b>Dim</b> \u2013 Transparenz bei der Navigation ein/aus</li>' +
+            '</ul>'
     };
 
     // ── Interne Registry ─────────────────────────────────────────
@@ -61,24 +80,25 @@ var TooltipController = (function () {
     }
 
     // ── Tooltip positionieren ────────────────────────────────────
+    // Wird erst aufgerufen, wenn der Tooltip sichtbar ist – nur dann sind
+    // Breite und Höhe bekannt und die Platzierung sitzt wirklich am Button.
     function positionTooltip(tip, btn) {
+        var margin = 12;
+        var gap = 14;
         var btnRect = btn.getBoundingClientRect();
-        var tipWidth = 280;
-        var tipHeight = tip.offsetHeight || 120; // geschätzte Höhe wenn noch nicht sichtbar
+        var tipWidth = tip.offsetWidth || 280;
+        var tipHeight = tip.offsetHeight || 120;
 
-        // Controller ist am unteren Rand fixiert → Tooltip erscheint ÜBER dem Button
-        var top = btnRect.top - tipHeight - 16;
-        var left = btnRect.left;
+        // Mittig über dem Button statt linksbündig – so gehört der Tooltip sichtbar dazu
+        var left = btnRect.left + btnRect.width / 2 - tipWidth / 2;
+        var top = btnRect.top - tipHeight - gap;
 
-        // Nicht über den rechten Rand hinaus
-        if (left + tipWidth > window.innerWidth - 16) {
-            left = window.innerWidth - tipWidth - 16;
-        }
-        if (left < 8) left = 8;
+        // Innerhalb des Fensters halten
+        left = Math.min(Math.max(left, margin), Math.max(window.innerWidth - tipWidth - margin, margin));
 
         // Wenn kein Platz oben (z.B. Panel oben angedockt): unter den Button
-        if (top < 8) {
-            top = btnRect.bottom + 10;
+        if (top < margin) {
+            top = btnRect.bottom + gap;
             tip.classList.add("tooltip-arrow-top");
         } else {
             tip.classList.remove("tooltip-arrow-top");
@@ -86,6 +106,11 @@ var TooltipController = (function () {
 
         tip.style.top  = top + "px";
         tip.style.left = left + "px";
+
+        // Pfeil auf den Button ausrichten, auch wenn der Tooltip am Rand verschoben wurde
+        var arrowLeft = btnRect.left + btnRect.width / 2 - left - 7;
+        arrowLeft = Math.min(Math.max(arrowLeft, 14), Math.max(tipWidth - 28, 14));
+        tip.style.setProperty("--tooltip-arrow-left", arrowLeft + "px");
     }
 
     // ── Öffentliche API ──────────────────────────────────────────
@@ -106,6 +131,10 @@ var TooltipController = (function () {
             return;
         }
 
+        // Layer im Metrik Controller werden dynamisch auf- und abgebaut –
+        // eine alte Registrierung derselben ID darf nicht doppelt im DOM landen
+        unregister(tooltipId);
+
         var tip = createTooltipEl(tooltipId, content, false);
 
         btn.addEventListener("click", function (e) {
@@ -116,12 +145,28 @@ var TooltipController = (function () {
             closeAll();
 
             if (!isVisible) {
-                positionTooltip(tip, btn);
+                // Erst sichtbar machen, dann messen und platzieren
                 tip.classList.add("tooltip-visible");
+                positionTooltip(tip, btn);
             }
         });
 
         registered.push(tip);
+    }
+
+    /**
+     * Entfernt einen Tooltip wieder – z.B. wenn sein Layer gelöscht wird.
+     * @param {string} tooltipId – ID des Tooltip-Elements
+     */
+    function unregister(tooltipId) {
+        registered = registered.filter(function (tip) {
+            return tip.id !== tooltipId;
+        });
+
+        var existing = document.getElementById(tooltipId);
+        if (existing && existing.parentNode) {
+            existing.parentNode.removeChild(existing);
+        }
     }
 
     function closeAll() {
@@ -135,6 +180,7 @@ var TooltipController = (function () {
 
     return {
         register: register,
+        unregister: unregister,
         texts: TOOLTIPS
     };
 

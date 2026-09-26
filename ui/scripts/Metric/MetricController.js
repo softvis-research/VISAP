@@ -285,8 +285,8 @@ controllers.metricController = (function () {
                         lastInactive = allResults.filter(e => e.id !== activeEntity.id);
                         lastActive = [activeEntity];
 
-                        canvasManipulator.changeColorOfEntities(lastInactive, "orange", navigatorEffect);
-                        canvasManipulator.changeColorOfEntities(lastActive, "red", navigatorEffect);
+                        canvasManipulator.changeColorOfEntities(lastInactive, DimSettings.highlightColor.inactiveHit, navigatorEffect);
+                        canvasManipulator.changeColorOfEntities(lastActive, DimSettings.highlightColor.activeHit, navigatorEffect);
 
                         // Bei ausgeschaltetem Dim bleibt die Szene komplett deckend –
                         // die Treffer werden dann nur über die Farbe hervorgehoben

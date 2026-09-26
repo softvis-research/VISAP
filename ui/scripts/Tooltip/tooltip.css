@@ -24,12 +24,25 @@
     display: block;
 }
 
+/* Kompakte Aufzählung für Tooltips, die mehrere Bedienelemente erklären */
+.visap-tooltip .tooltip-list {
+    margin: 6px 0 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.visap-tooltip .tooltip-list li {
+    margin: 0 0 3px 0;
+    line-height: 1.45;
+}
+
 /* Pfeil nach unten (standard) */
 .visap-tooltip::after {
     content: "";
     position: absolute;
     bottom: -8px;
-    left: 20px;
+    /* Wird vom TooltipController auf die Mitte des ?-Buttons gesetzt */
+    left: var(--tooltip-arrow-left, 20px);
     width: 14px;
     height: 14px;
     background: #313244;
@@ -42,6 +55,7 @@
 .visap-tooltip.tooltip-arrow-top::after {
     bottom: auto;
     top: -8px;
+    left: var(--tooltip-arrow-left, 20px);
     border-right: none;
     border-bottom: none;
     border-left: 1px solid #585b70;
@@ -69,4 +83,16 @@
 .visap-help-btn:hover {
     color: #cdd6f4;
     border-color: #cdd6f4;
+}
+
+/* Variante für Abschnittsüberschriften (Metrik, Mapping) – deutlich kleiner,
+   damit sie die Überschrift begleitet statt sie zu dominieren */
+.visap-help-btn.sectionHelpBtn {
+    width: 15px;
+    height: 15px;
+    font-size: 9px;
+    letter-spacing: 0;
+    padding: 0;
+    margin-left: 6px;
+    vertical-align: middle;
 }

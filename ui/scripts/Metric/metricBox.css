@@ -236,6 +236,9 @@ body, body.metric-expanded { padding-bottom: 0 !important; }
 }
 
 .sectionLabel {
+    /* Überschrift und der kleine Hilfe-Button stehen auf einer Linie */
+    display: flex;
+    align-items: center;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.08em;

@@ -112,11 +112,19 @@ class DomHelper {
         this.rootDiv = originalRoot;
     }
 
+    /**
+     * Kleiner Hilfe-Button für eine Abschnittsüberschrift ("Metrik", "Mapping").
+     * So erklärt jeder Bereich nur seine eigenen Felder statt eines langen Gesamttextes.
+     */
+    buildSectionHelpButton(buttonID) {
+        return '<button type="button" id="' + buttonID + '" class="visap-help-btn sectionHelpBtn" title="Hilfe">?</button>';
+    }
+
     buildMetricArea(layerID) {
         var layerClass = domClasses.layer + layerID;
         var metricHtml =
             '<div id="' + domIDs.metricDiv + layerID + '" class="' + domClasses.metricDiv + ' ' + layerClass + '">' +
-            '<div class="sectionLabel">Metrik</div>' +
+            '<div class="sectionLabel">Metrik' + this.buildSectionHelpButton("metricSectionHelpBtn" + layerID) + '</div>' +
             '<label id="' + domIDs.metricTextNode + layerID + '" class="' + domClasses.metricTextNode + ' ' + layerClass + ' ' + domClasses.textLabel + '" style="display:none">Metrik</label>' +
             '<div id="' + domIDs.metricSelectionDropDown + layerID + '" class="' + domClasses.metricsDropDown + ' ' + layerClass + ' ' + domClasses.metricSelectionDropDown + '"></div>' +
             '<div class="metricRangeRow">' +
@@ -137,6 +145,9 @@ class DomHelper {
             '</div>';
 
         $(this.rootDiv).append(metricHtml);
+
+        // Eigener, kurzer Hilfetext direkt am Bereich "Metrik"
+        TooltipController.register("metricSectionTooltip" + layerID, "metricSectionHelpBtn" + layerID, "metricSection");
 
         $(cssIDs.metricSelectionDropDown + layerID).igCombo(Object.assign({}, this.defaultIgComboSettings, {
             dataSource: this.controllerConfig.metrics,
@@ -202,7 +213,7 @@ class DomHelper {
         var mappingParamClass = domClasses.mappingParameter + ' ' + domClasses.mappingParameter + layerID;
         var mappingHtml =
             '<div id="' + domIDs.mappingDiv + layerID + '" class="' + domClasses.mappingDiv + ' ' + layerClass + '">' +
-            '<div class="sectionLabel">Mapping</div>' +
+            '<div class="sectionLabel">Mapping' + this.buildSectionHelpButton("mappingSectionHelpBtn" + layerID) + '</div>' +
             '<label id="' + domIDs.mappingTextNode + layerID + '" class="' + domClasses.mappingTextNode + ' ' + layerClass + ' ' + domClasses.textLabel + '" style="display:none">Mapping</label>' +
             '<div id="' + domIDs.mappingDropDown + layerID + '" class="' + domClasses.metricsDropDown + ' ' + layerClass + ' ' + domClasses.mappingDropDown + '"></div>' +
             '<label id="' + domIDs.mappingFromText + layerID + '" class="' + mappingParamClass + ' ' + layerClass + ' ' + domClasses.textLabel + '">Mapping - From</label>' +
@@ -220,6 +231,9 @@ class DomHelper {
             '</div>';
 
         $(this.rootDiv).append(mappingHtml);
+
+        // Eigener, kurzer Hilfetext direkt am Bereich "Mapping"
+        TooltipController.register("mappingSectionTooltip" + layerID, "mappingSectionHelpBtn" + layerID, "mappingSection");
 
         $(cssIDs.mappingDropDown + layerID).igCombo(Object.assign({}, this.defaultIgComboSettings, {
             dataSource: this.controllerConfig.mappings,
@@ -360,6 +374,10 @@ class DomHelper {
 
     destroyLayerUI(layerID) {
         this.resetLayerUI(layerID);
+
+        TooltipController.unregister("metricSectionTooltip" + layerID);
+        TooltipController.unregister("mappingSectionTooltip" + layerID);
+
         var wrapper = document.getElementById("metricLayerRow" + layerID);
         if (wrapper) {
             wrapper.parentNode.removeChild(wrapper);
