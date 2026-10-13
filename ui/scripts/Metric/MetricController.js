@@ -58,7 +58,7 @@ controllers.metricController = (function () {
     const metricDefault = { variant: undefined, from: 0, to: 0 };
     const mappingDefault = {
         variant: mappings.color,
-        color: "white",
+        color: "red",
         startColor: "blue",
         endColor: "red",
         transparency: 0.5,

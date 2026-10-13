@@ -333,6 +333,10 @@ class DomHelper {
         $(cssIDs.mappingPeriodInput + layerID).igNumericEditor("hide");
         $(cssIDs.mappingTransparencyInput + layerID).igNumericEditor("hide");
         $(cssClasses.mappingParameter + layerID).hide();
+
+        // Mapping mit Default (Color) vorbelegen
+        $(cssIDs.mappingDropDown + layerID).igCombo("value", metricController.mappingDefault.variant);
+        this.mappingDropDownSelected(layerID);
     }
 
     mappingDropDownSelected(layerID) {
@@ -340,9 +344,12 @@ class DomHelper {
 
         switch ($(cssIDs.mappingDropDown + layerID).igCombo("value")) {
             case mappings.color:
+                this.preselectComboIfEmpty(cssIDs.mappingColorDropDown + layerID, metricController.mappingDefault.color);
                 $(cssIDs.mappingColorDropDown + layerID).show();
                 break;
             case mappings.colorGradient:
+                this.preselectComboIfEmpty(cssIDs.mappingStartColorDropDown + layerID, metricController.mappingDefault.startColor);
+                this.preselectComboIfEmpty(cssIDs.mappingEndColorDropDown + layerID, metricController.mappingDefault.endColor);
                 $(cssIDs.mappingStartColorDropDown + layerID).show();
                 $(cssIDs.mappingEndColorDropDown + layerID).show();
                 break;
@@ -358,12 +365,21 @@ class DomHelper {
             case mappings.flashing:
                 $(cssIDs.mappingPeriodText + layerID).show();
                 $(cssIDs.mappingPeriodInput + layerID).show();
+                this.preselectComboIfEmpty(cssIDs.mappingColorDropDown + layerID, metricController.mappingDefault.color);
                 $(cssIDs.mappingColorDropDown + layerID).show();
                 break;
             case mappings.rotation:
                 $(cssIDs.mappingPeriodText + layerID).show();
                 $(cssIDs.mappingPeriodInput + layerID).show();
                 break;
+        }
+    }
+
+    // Farbauswahl mit Default vorbelegen, ohne eine bereits getroffene Auswahl zu überschreiben
+    preselectComboIfEmpty(comboCssId, defaultValue) {
+        const value = $(comboCssId).igCombo("value");
+        if (value === null || value === undefined || value === "" || (Array.isArray(value) && value.length === 0)) {
+            $(comboCssId).igCombo("value", defaultValue);
         }
     }
 
