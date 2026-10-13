@@ -375,13 +375,13 @@ controllers.canvasManipulator = (function () {
 	// Zoom-Verhalten beim Anfliegen eines Elements (Suche & Metrik):
 	// Das Element soll auch in großen Modellen deutlich sichtbar sein.
 	const flyToZoom = {
-		// Etwas Luft um das Element herum, damit es nicht am Bildrand klebt
-		sizeFactor: 1.6,
+		// Großzügig Luft um das Element herum, damit die Umgebung erkennbar bleibt
+		sizeFactor: 3,
 		// Zusätzlicher Kontext in Weltkoordinaten – sorgt dafür, dass bei winzigen
-		// Elementen die Nachbarschaft sichtbar bleibt, große aber das Bild füllen
-		contextMargin: 8,
-		// Nicht näher heran, sonst fliegt die Kamera in die Nachbargebäude
-		minDistance: 8,
+		// Elementen die Nachbarschaft sichtbar bleibt
+		contextMargin: 60,
+		// Nicht zu nah heran – das Element soll im Kontext seines Pakets erscheinen
+		minDistance: 50,
 		// Auch sehr große Pakete werden nicht aus zu weiter Ferne gezeigt
 		maxDistance: 300
 	};

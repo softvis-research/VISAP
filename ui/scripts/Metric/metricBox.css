@@ -322,3 +322,27 @@ body, body.metric-expanded { padding-bottom: 0 !important; }
     background: #45475a !important;
     border-left: 1px solid #585b70 !important;
 }
+/* ── 7. METRIK-BESCHREIBUNG BEIM HOVERN ───────────────────────── */
+.metric-description-hint {
+    display: none;
+    position: fixed;
+    max-width: 260px;
+    background: #313244;
+    color: #cdd6f4;
+    border: 1px solid #585b70;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    line-height: 1.45;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.45);
+    z-index: 100000; /* über der aufgeklappten Combo-Liste */
+    pointer-events: none;
+}
+.metric-description-hint.visible { display: block; }
+.metric-description-title {
+    display: block;
+    margin-bottom: 3px;
+    font-weight: 700;
+    color: #89b4fa;
+}

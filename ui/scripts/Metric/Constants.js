@@ -103,6 +103,34 @@ const metrics = {
 	dateOfLastChange: "Date of Last Change"
 };
 
+// Kurzbeschreibung je Metrik, angezeigt beim Hovern in der Metrik-Auswahl.
+// Schlüssel ist der Anzeigename, weil die Combo nur den Text kennt.
+const metricDescriptions = {
+	[metrics.dateOfCreation]: "Datum, an dem das Objekt angelegt wurde.",
+	[metrics.dateOfLastChange]: "Datum der letzten Änderung am Objekt.",
+	[metrics.number_of_statements]: "Anzahl aller Anweisungen im Quellcode.",
+	[metrics.amount_of_slin]: "Anzahl der Meldungen (Fehler, Warnungen, Hinweise) der erweiterten Programmprüfung (SLIN).",
+	[metrics.number_of_object_references]: "Anzahl der Referenzen auf andere Objekte im Quellcode.",
+	[metrics.number_of_exec_statements]: "Anzahl der ausführbaren Anweisungen – ohne Deklarationen und Kommentare.",
+	[metrics.maximum_nesting_depth]: "Tiefste Verschachtelung von Kontrollstrukturen (IF, LOOP, …) im Quellcode.",
+	[metrics.cyclomatic_complexity]: "McCabe-Metrik: Anzahl der unabhängigen Ausführungspfade. Hoher Wert = schwer zu testen.",
+	[metrics.keyword_named_variables]: "Anzahl der Variablen, die wie ein ABAP-Schlüsselwort benannt sind.",
+	[metrics.number_of_comments]: "Anzahl der Kommentare im Quellcode.",
+	[metrics.halstead_difficulty]: "Halstead: Schwierigkeit bzw. Fehlerneigung, abgeleitet aus Operatoren und Operanden.",
+	[metrics.halstead_volume]: "Halstead: Programmgröße, abgeleitet aus Operatoren und Operanden.",
+	[metrics.halstead_effort]: "Halstead: geschätzter Implementierungsaufwand (Schwierigkeit × Volumen).",
+	[metrics.number_of_methods]: "Anzahl der Methoden einer Klasse.",
+	[metrics.number_of_interfaces]: "Anzahl der von einer Klasse implementierten Interfaces.",
+	[metrics.number_of_attributes]: "Anzahl der Attribute eines Quellcode-Distrikts.",
+	[metrics.number_of_events]: "Anzahl der definierten Events.",
+	[metrics.number_of_public_methods]: "Anzahl der Methoden einer Klasse im öffentlichen Bereich (PUBLIC).",
+	[metrics.number_of_redefined_methods]: "Anzahl der bei der Vererbung neu definierten (redefinierten) Methoden.",
+	[metrics.number_of_protected_methods]: "Anzahl der Methoden einer Klasse im geschützten Bereich (PROTECTED).",
+	[metrics.number_of_public_attributes]: "Anzahl der Attribute einer Klasse im öffentlichen Bereich (PUBLIC).",
+	[metrics.number_of_private_attributes]: "Anzahl der Attribute einer Klasse im privaten Bereich (PRIVATE).",
+	[metrics.number_of_protected_attributes]: "Anzahl der Attribute einer Klasse im geschützten Bereich (PROTECTED)."
+};
+
 const mappings = {
 	color: "Color",
 	colorGradient: "Color Gradient",

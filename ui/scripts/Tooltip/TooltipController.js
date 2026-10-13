@@ -29,7 +29,8 @@ var TooltipController = (function () {
         metricSection: 'Welche Kennzahl dargestellt wird.<br/>' +
             '<b>Start</b> und <b>End</b> grenzen den Wertebereich ein – beim Auswählen der ' +
             'Metrik werden der kleinste und größte Wert des Modells eingetragen. ' +
-            'Hervorgehoben wird alles, was in diesem Bereich liegt.',
+            'Hervorgehoben wird alles, was in diesem Bereich liegt.<br/>' +
+            '<b>Tipp:</b> Mit der Maus über eine Metrik fahren – in der Liste oder im Feld – zeigt, was sie bedeutet.',
 
         mappingSection: 'Wie die Treffer im Modell dargestellt werden: Farbe, Farbverlauf, ' +
             'Transparenz, Pulsation, Blinken oder Rotation.<br/>' +

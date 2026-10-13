@@ -80,6 +80,8 @@ class DomHelper {
 
         TooltipController.register("metricTooltip", "metricHelpBtn", "metricController");
 
+        this.initMetricDescriptionHint();
+
         // Gemeinsamer Schalter mit der Suche – nicht direkt applyDimming aufrufen
         DimSettings.bindCheckbox(document.getElementById("metricDimBackground"));
 
@@ -94,6 +96,65 @@ class DomHelper {
         document.body.classList.add("metric-expanded");
 
         this.rootDiv = document.getElementById("metricLayerBody");
+    }
+
+    /**
+     * Zeigt beim Hovern über eine Metrik – in der Auswahlliste oder im Feld mit
+     * der gewählten Metrik – deren Kurzbeschreibung an. Ein einziger delegierter
+     * Listener reicht für alle Layer, auch für später hinzugefügte.
+     */
+    initMetricDescriptionHint() {
+        var hint = document.createElement("div");
+        hint.className = "metric-description-hint";
+        document.body.appendChild(hint);
+
+        function descriptionFor(target) {
+            // Eintrag in der aufgeklappten Liste
+            var item = target.closest(".ui-igcombo-listitem");
+            if (item) {
+                return { anchor: item, name: item.textContent.trim() };
+            }
+            // Feld mit der aktuell gewählten Metrik
+            var combo = target.closest("." + domClasses.metricSelectionDropDown);
+            var field = combo && combo.querySelector("input.ui-igcombo-field");
+            if (field) {
+                return { anchor: combo, name: field.value.trim() };
+            }
+            return null;
+        }
+
+        function show(anchor, name, text) {
+            hint.innerHTML = '<span class="metric-description-title">' + name + '</span>' + text;
+            hint.classList.add("visible");
+
+            // Rechts neben dem Eintrag, sonst links davon
+            var gap = 10;
+            var rect = anchor.getBoundingClientRect();
+            var left = rect.right + gap;
+            if (left + hint.offsetWidth > window.innerWidth - gap) {
+                left = rect.left - hint.offsetWidth - gap;
+            }
+            var top = rect.top + rect.height / 2 - hint.offsetHeight / 2;
+            top = Math.min(Math.max(top, gap), window.innerHeight - hint.offsetHeight - gap);
+
+            hint.style.left = Math.max(left, gap) + "px";
+            hint.style.top = top + "px";
+        }
+
+        document.addEventListener("mouseover", function (event) {
+            var info = descriptionFor(event.target);
+            var text = info && metricDescriptions[info.name];
+            if (text) {
+                show(info.anchor, info.name, text);
+            } else {
+                hint.classList.remove("visible");
+            }
+        });
+
+        // Beim Auswählen schließt sich die Liste – die Beschreibung soll nicht stehen bleiben
+        document.addEventListener("mousedown", function () {
+            hint.classList.remove("visible");
+        });
     }
 
     buildUiLayer(layerID) {
