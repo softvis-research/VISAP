@@ -174,11 +174,11 @@ body.legend-collapsed {
 
 .legend-icon--method {
     border: 1.5px solid #a6adc8;
-    background: transparent;
+    background: #FFFFFF;
 }
 
 .legend-icon--attr {
-    background: #585b70;
+    background: #000000;
     border: 1.5px solid #7f849c;
 }
 

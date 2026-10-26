@@ -12,47 +12,49 @@
 var LegendController = (function () {
 
     // ── Data ────────────────────────────────────────────────────────────────
+    // Colors match the generator defaults in
+    // generator/src/main/java/org/visap/generator/configuration/interfaces/Metropolis/Color.java
 
     var ELEMENTS = [
         {
             label: "Package",
-            color: "#9E9E9E",
+            color: "#95A5A6",
             dot: "circle",
             children: []
         },
         {
             label: "Class",
-            color: "#D4A017",
+            color: "#F4D93F",
             dot: "square",
             children: [
-                { label: "Lokale Klasse",    icon: "swatch", color: "#F0D080" },
+                { label: "Lokale Klasse",    icon: "swatch", color: "#FFE7A3" },
                 { label: "Methode",          icon: "method" },
                 { label: "Klassen-Attribut", icon: "attr"   }
             ]
         },
         {
             label: "Interface",
-            color: "#C0392B",
+            color: "#B80437",
             dot: "square",
             children: [
-                { label: "Lokales Interface", icon: "swatch", color: "#F1948A" },
+                { label: "Lokales Interface", icon: "swatch", color: "#E79394" },
                 { label: "Methode",           icon: "method" },
                 { label: "Klassen-Attribut",  icon: "attr"   }
             ]
         },
         {
             label: "Report",
-            color: "#2980B9",
+            color: "#85C1E9",
             dot: "square",
             children: [
-                { label: "QuellCode",         icon: "swatch", color: "#85C1E9", circle: true },
+                { label: "QuellCode",         icon: "swatch", color: "#335B9C", circle: true },
                 { label: "Formroutine",       icon: "method" },
                 { label: "Globales-Attribut", icon: "attr"   }
             ]
         },
         {
             label: "Funktionsgruppe",
-            color: "#C39BD3",
+            color: "#7D3C98",
             dot: "square",
             children: [
                 { label: "Funktionsbaustein", icon: "method" },
